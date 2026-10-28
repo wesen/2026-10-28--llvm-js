@@ -1,0 +1,7 @@
+{
+  "test262_repository": "https://github.com/tc39/test262",
+  "test262_revision": "0b4e0812022b18236b5276d2804948fdd9f71603",
+  "interpretation_sha256": "cc213fd1e590ebdccacc7c846340517cbee2a241ea8a915392b0d071f3fd800e",
+  "specification": "https://tc39.es/ecma262/2026/multipage/",
+  "profile_status": "exploratory; edition/proposal partition not yet complete"
+}

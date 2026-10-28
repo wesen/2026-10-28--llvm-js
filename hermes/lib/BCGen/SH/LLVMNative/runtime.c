@@ -361,9 +361,21 @@ extern SHConsoleContext *init_console_bindings(SHRuntime *,int,const char *const
 extern void release_console_bindings(SHConsoleContext *);
 extern void free_console_context(SHConsoleContext *);
 extern bool run_event_loop(SHRuntime *,SHConsoleContext *);
+extern void shllvm_test262_exception(SHRuntime *, const SHLegacyValue *);
 int32_t shllvm_run(int32_t argc, void *argv_raw, void *creator) {
   _SH_MODEL();
   char **argv = argv_raw;
+  bool test262 = false;
+  // This host-only switch is consumed before Hermes parses runtime options.
+  // Arguments after -- remain script arguments, including this literal string.
+  for (int i = 1; i < argc && strcmp(argv[i], "--") != 0; ++i) {
+    if (strcmp(argv[i], "--shllvm-test262") == 0) {
+      test262 = true;
+      memmove(argv + i, argv + i + 1, (argc - i) * sizeof(*argv));
+      --argc;
+      --i;
+    }
+  }
   int script_argc = 0, cl_argc = argc;
   char **script_argv = NULL;
   for (int i = 1; i < argc; ++i) {
@@ -376,7 +388,16 @@ int32_t shllvm_run(int32_t argc, void *argv_raw, void *creator) {
   }
   SHRuntime *shr = _sh_init(cl_argc,argv);
   SHConsoleContext *console = init_console_bindings(shr,script_argc,(const char *const *)script_argv);
-  bool success = _sh_initialize_units(shr,1,(SHUnitCreator)creator) && run_event_loop(shr,console);
+  bool success;
+  if (test262) {
+    SHLegacyValue completion;
+    success = _sh_unit_init_guarded(shr, (SHUnitCreator)creator, &completion);
+    if (!success)
+      shllvm_test262_exception(shr, &completion);
+  } else {
+    success = _sh_initialize_units(shr,1,(SHUnitCreator)creator);
+  }
+  success = success && run_event_loop(shr,console);
   release_console_bindings(console);
   _sh_done(shr);
   free_console_context(console);

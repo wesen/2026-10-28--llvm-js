@@ -1,0 +1,217 @@
+{
+  "schema_version": 1,
+  "complete": true,
+  "started_at_unix": 1793227677.8789837,
+  "finished_at_unix": 1793227719.9203467,
+  "source_cases": 53,
+  "passed_cases": 53,
+  "failed_cases": 0,
+  "skipped_cases": 0,
+  "positive_cases": 44,
+  "runtime_error_cases": 3,
+  "runtime_rejection_cases": 3,
+  "compile_error_cases": 3,
+  "native_llvm_executions": 200,
+  "native_llvm_matches": 200,
+  "native_llvm_vs_node_matches": 188,
+  "native_llvm_expected_rejections": 12,
+  "lli_executions": 50,
+  "lli_matches": 50,
+  "lli_vs_node_matches": 47,
+  "lli_expected_rejections": 3,
+  "c_oracle_fully_matched_cases": 40,
+  "c_oracle_limitations": [
+    {
+      "name": "eval_closure_gc.js",
+      "policy": "skip",
+      "reason": "Escaped eval closures must capture the actual native Environment, which the inherited C helper does not pass.",
+      "results": [
+        {
+          "hermes_opt": "O0",
+          "status": "skipped",
+          "required": false
+        },
+        {
+          "hermes_opt": "O",
+          "status": "skipped",
+          "required": false
+        }
+      ]
+    },
+    {
+      "name": "eval_lexical_bindings.js",
+      "policy": "skip",
+      "reason": "The inherited C DirectEval helper does not receive the caller lexical environment.",
+      "results": [
+        {
+          "hermes_opt": "O0",
+          "status": "skipped",
+          "required": false
+        },
+        {
+          "hermes_opt": "O",
+          "status": "skipped",
+          "required": false
+        }
+      ]
+    },
+    {
+      "name": "eval_lexical_errors.js",
+      "policy": "skip",
+      "reason": "The inherited C direct-eval path lacks lexical binding and TDZ metadata.",
+      "results": [
+        {
+          "hermes_opt": "O0",
+          "status": "skipped",
+          "required": false
+        },
+        {
+          "hermes_opt": "O",
+          "status": "skipped",
+          "required": false
+        }
+      ]
+    },
+    {
+      "name": "eval_private_context_boundary.js",
+      "policy": "skip",
+      "reason": "The inherited C direct-eval path also lacks enclosing class lexical metadata.",
+      "results": [
+        {
+          "hermes_opt": "O0",
+          "status": "skipped",
+          "required": false
+        },
+        {
+          "hermes_opt": "O",
+          "status": "skipped",
+          "required": false
+        }
+      ]
+    },
+    {
+      "name": "eval_nested_global.js",
+      "policy": "skip",
+      "reason": "The LLVM direct-eval extension retains the original global or function context through nested dynamic calls.",
+      "results": [
+        {
+          "hermes_opt": "O0",
+          "status": "skipped",
+          "required": false
+        },
+        {
+          "hermes_opt": "O",
+          "status": "skipped",
+          "required": false
+        }
+      ]
+    },
+    {
+      "name": "eval_nested.js",
+      "policy": "skip",
+      "reason": "The static C DirectEval entry lacks the native caller Environment; nested dynamic calls use the shared interpreter metadata path.",
+      "results": [
+        {
+          "hermes_opt": "O0",
+          "status": "skipped",
+          "required": false
+        },
+        {
+          "hermes_opt": "O",
+          "status": "skipped",
+          "required": false
+        }
+      ]
+    },
+    {
+      "name": "eval_sloppy_boundary.js",
+      "policy": "skip",
+      "reason": "The inherited C helper silently evaluates globally instead of injecting caller bindings.",
+      "results": [
+        {
+          "hermes_opt": "O0",
+          "status": "skipped",
+          "required": false
+        },
+        {
+          "hermes_opt": "O",
+          "status": "skipped",
+          "required": false
+        }
+      ]
+    },
+    {
+      "name": "eval_super_context_boundary.js",
+      "policy": "skip",
+      "reason": "The inherited C direct-eval path also lacks the method home object.",
+      "results": [
+        {
+          "hermes_opt": "O0",
+          "status": "skipped",
+          "required": false
+        },
+        {
+          "hermes_opt": "O",
+          "status": "skipped",
+          "required": false
+        }
+      ]
+    },
+    {
+      "name": "eval_source_context.js",
+      "policy": "skip",
+      "reason": "Source-site lexical and new.target context is recorded only by the LLVM direct-eval extension.",
+      "results": [
+        {
+          "hermes_opt": "O0",
+          "status": "skipped",
+          "required": false
+        },
+        {
+          "hermes_opt": "O",
+          "status": "skipped",
+          "required": false
+        }
+      ]
+    },
+    {
+      "name": "eval_this_arguments.js",
+      "policy": "skip",
+      "reason": "The inherited C direct-eval helper substitutes global this and has no caller argument environment.",
+      "results": [
+        {
+          "hermes_opt": "O0",
+          "status": "skipped",
+          "required": false
+        },
+        {
+          "hermes_opt": "O",
+          "status": "skipped",
+          "required": false
+        }
+      ]
+    }
+  ],
+  "input_files_unchanged": true,
+  "changed_input_files": [],
+  "hermes_optimization_levels": [
+    "O0",
+    "O"
+  ],
+  "llvm_optimization_levels": [
+    "0",
+    "2"
+  ],
+  "jit_optimization_levels": {
+    "hermes": "O",
+    "llvm": "2"
+  },
+  "selection": [],
+  "partial_gate": false,
+  "llvm_validation_performed": true,
+  "asan_options": "detect_leaks=0",
+  "lsan_options": "",
+  "scope": "host native and real lli execution; targeted language extension contracts; not device execution or full ECMAScript conformance",
+  "node_semantics": "script via vm.runInThisContext; not a CommonJS module wrapper",
+  "full_report_sha256": "7411a0a9b12fe55510cae971eee64146cc8e8947a9057cbac7c7ac5f83c2a2cb"
+}

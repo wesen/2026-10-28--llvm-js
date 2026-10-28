@@ -10,9 +10,10 @@
 - [x] Validate ticket metadata and source references.
 - [x] Render and upload guide plus research ledger to reMarkable.
 
-## Proposed implementation backlog — not completed by this ticket
+## Active implementation backlog
 
-- [ ] Pin specification artifact and Test262 revision; implement LLVM runner classification.
+- [x] Pin Test262 revision and implement the initial LLVM runner/classification with native probes.
+- [ ] Pin an immutable specification artifact and partition edition/proposal coverage.
 - [ ] Establish a complete baseline with explicit exclusions and failure attribution.
 - [ ] Correct frontend error timing and expand dynamic eval semantics.
 - [ ] Implement and validate module/realm foundations.
