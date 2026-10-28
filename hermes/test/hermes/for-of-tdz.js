@@ -17,6 +17,6 @@ for (let [y, z = ()=>y] of [[x = ()=>y,]]) {
     try { x(); } catch(e) { print(e); }
 }
 
-// CHECK:      function x() { [bytecode] }
-// CHECK-NEXT: function x() { [bytecode] }
+// CHECK:      function () { [native code] }
+// CHECK-NEXT: function () { [native code] }
 // CHECK-NEXT: ReferenceError: accessing an uninitialized variable

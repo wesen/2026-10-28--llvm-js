@@ -13,7 +13,7 @@ print("with eval");
 
 var dflt = eval("(function(){})");
 print(dflt.toString());
-// CHECK-NEXT: function () { [bytecode] }
+// CHECK-NEXT: function () { [native code] }
 
 var showSource = eval("(function(){'show source'})");
 print(showSource.toString());

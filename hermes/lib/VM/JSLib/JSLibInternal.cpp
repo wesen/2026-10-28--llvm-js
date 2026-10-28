@@ -418,7 +418,9 @@ CallResult<HermesValue> createDynamicFunction(
   };
   size.add(functionHeader.size());
 
-  auto bodyHeader = createASCIIRef("){");
+  // Parameter text can end in a line comment. Keep generated delimiters and
+  // body source on separate lines, as required by CreateDynamicFunction.
+  auto bodyHeader = createASCIIRef("\n){\n");
   size.add(bodyHeader.size());
 
   // Note: add a \n before the closing '}' in case the

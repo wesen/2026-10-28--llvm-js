@@ -197,54 +197,23 @@ CallResult<HermesValue> functionPrototypeToString(void *, Runtime &runtime) {
     }
   }
 
-  SmallU16String<64> strBuf{};
-  if (Callable::isAsyncFunction(*func)) {
-    strBuf.append("async function ");
-  } else if (Callable::isGeneratorFunction(*func)) {
-    strBuf.append("function *");
-  } else {
-    strBuf.append("function ");
+  // When source text is unavailable, ECMAScript requires NativeFunction
+  // syntax even for bytecode, compiled JS, bound functions, and callable
+  // proxies. Do not inspect public name/length properties: doing so can invoke
+  // arbitrary getters or proxy traps, including on revoked callable proxies.
+  if (!vmisa<NativeFunction>(*func) || func->isProxyObject(runtime)) {
+    return StringPrimitive::create(
+        runtime, createASCIIRef("function () { [native code] }"));
   }
 
+  // Retain builtin names in their native representation. Source-unavailable
+  // JavaScript functions above do not need synthesized names or parameters.
+  SmallU16String<64> strBuf{};
+  strBuf.append("function ");
   if (LLVM_UNLIKELY(appendFunctionName(strBuf) == ExecutionStatus::EXCEPTION)) {
     return ExecutionStatus::EXCEPTION;
   }
-
-  // Formal parameters and the rest of the body.
-  if (vmisa<NativeFunction>(*func)) {
-    // Use [native code] here because we want to work with tools like Babel
-    // which detect the string "[native code]" and use it to alter behavior
-    // during the class transform.
-    // Also print without synthesized formal parameters to avoid breaking
-    // heuristics that detect the string "() { [native code] }".
-    // \see https://github.com/facebook/hermes/issues/471
-    strBuf.append("() { [native code] }");
-  } else {
-    // Append the synthesized formal parameters.
-    strBuf.append('(');
-
-    // Extract ".length".
-    auto lengthProp = Callable::extractOwnLengthProperty_RJS(func, runtime);
-    if (lengthProp == ExecutionStatus::EXCEPTION)
-      return ExecutionStatus::EXCEPTION;
-
-    // The value of the property is not guaranteed to be meaningful, so clamp it
-    // to [0..65535] for sanity.
-    uint32_t paramCount =
-        (uint32_t)std::min(65535.0, std::max(0.0, *lengthProp));
-
-    for (uint32_t i = 0; i < paramCount; ++i) {
-      if (i != 0)
-        strBuf.append(", ");
-      char buf[16];
-      ::snprintf(buf, sizeof(buf), "a%u", i);
-      strBuf.append(buf);
-    }
-
-    // Avoid using the [native code] string to prevent extra wrapping overhead
-    // in, e.g., Babel's class extension mechanism.
-    strBuf.append(") { [bytecode] }");
-  }
+  strBuf.append("() { [native code] }");
 
   // Finally allocate a StringPrimitive.
   return StringPrimitive::create(runtime, strBuf);

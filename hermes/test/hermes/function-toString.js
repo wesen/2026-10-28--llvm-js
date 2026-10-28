@@ -19,7 +19,7 @@ print('Function.prototype.toString');
 
 function dflt(x) {};
 print(dflt.toString());
-// CHECK-NEXT: function dflt(a0) { [bytecode] }
+// CHECK-NEXT: function () { [native code] }
 
 function showSource(x) { 'show source' }
 print(showSource.toString());
@@ -60,9 +60,8 @@ print((() => { 'hide source' }).toString());
 
 
 /// --- Async / Generator Function ---
-/// You can tell if a function is async/generator for 
-/// both the Default and ShowSource source visibility, but
-/// not the HideSource and Sensitive.
+/// Retained source preserves async/generator syntax. Source-unavailable
+/// functions use ordinary NativeFunction syntax.
 
 async function af1() { await 1; };
 async function af2() { 'show source'; await 1; };
@@ -72,7 +71,7 @@ print(af1.toString());
 print(af2.toString());
 print(af3.toString());
 print(af4.toString());
-// CHECK-NEXT: async function af1() { [bytecode] }
+// CHECK-NEXT: function () { [native code] }
 // CHECK-NEXT: async function af2() { 'show source'; await 1; }
 // CHECK-NEXT: function af3() { [native code] }
 // CHECK-NEXT: function af4() { [native code] }
@@ -85,7 +84,7 @@ print(gf1.toString());
 print(gf2.toString());
 print(gf3.toString());
 print(gf4.toString());
-// CHECK-NEXT: function *gf1() { [bytecode] }
+// CHECK-NEXT: function () { [native code] }
 // CHECK-NEXT: function* gf2() { 'show source'; yield 1; }
 // CHECK-NEXT: function gf3() { [native code] }
 // CHECK-NEXT: function gf4() { [native code] }

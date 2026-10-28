@@ -347,3 +347,59 @@ Read the original core failure in Step 6, the replacement fixture, and the raw-d
 
 ### Technical details
 Current release regression totals are 22 core contracts and 55 extension contracts. Function baseline counts are variants and must not be added to the source-contract totals as if they used the same unit.
+
+## Step 8: Correct dynamic function boundaries and source-unavailable representations
+
+The default error-timing milestone was committed as `3912ed6`. The expanded Function baseline then identified a focused pair of defects: parameter line comments consumed generated delimiters, and source-unavailable callables returned nonstandard `[bytecode]` text while inspecting public properties. The patch adds source boundaries and uses NativeFunction syntax without invoking name/length getters for these callables.
+
+### Prompt Context
+See Step 1. This step follows the measured Function-family failures rather than expanding the skip list.
+
+### What I did
+- Inserted line breaks before the generated closing parameter delimiter and before body text in `createDynamicFunction`.
+- Preserved explicitly retained source, but returned standard anonymous NativeFunction syntax for other non-builtin callables, including compiled JS, bound functions, and callable proxies.
+- Removed synthesized parameter enumeration and public name/length reads from that fallback. Existing native-builtin name handling remains separate.
+- Added `function_source_boundaries.js` covering ordinary/bound/proxy/revoked-proxy introspection and normal/generator/async dynamic constructors with line comments.
+- Updated the affected function-constructor snapshots in native and interpreter test sources.
+- Confirmed the new fixture's expected outcome with Node; started focused and upstream toString tests.
+
+### Why
+ECMAScript Function.prototype.toString requires either available source text or NativeFunction syntax for callable objects. A synthesized `[bytecode]` body does not satisfy that grammar. Reading a public name/length property can invoke getters or proxy traps that the operation should not invoke. Parameter comments also require delimiters on a fresh line.
+
+### What worked
+The independent script oracle prints `function-source-boundaries-ok`. Validation of the shared-runtime implementation follows in the next checkpoint.
+
+### What didn't work
+No new execution failure is asserted before the focused run. The baseline failure modes are preserved in the prior Function receipt.
+
+### What I learned
+The fallback must use ordinary NativeFunction grammar even for async/generator callables. Their source-unavailable representation cannot be synthesized with an async or generator prefix and a bytecode marker.
+
+### What was tricky to build
+A callable proxy must not be unwrapped or queried; revoked callable proxies still need a string representation. Dynamic constructors remain unnamed function expressions internally, avoiding introduction of an unintended lexical `anonymous` binding merely to format output.
+
+### What warrants a second pair of eyes
+Review the source-availability policy and retained-source branch. Native builtin initial-name preservation is still a separate concern; this patch does not claim to fix every builtin property mutation.
+
+### What should be done in the future
+Compare the exact toString subset against the prior baseline, then run full affected regression gates. Address remaining builtin/caller and dynamic-scope failures independently.
+
+### Code review instructions
+Read `JSLibInternal.cpp` source assembly and `Function.cpp` source fallback together with the new fixture. The existing native builtin path is intentionally visible for further review.
+
+### Technical details
+Primary algorithm reference: https://tc39.es/ecma262/2026/multipage/fundamental-objects.html#sec-function.prototype.tostring . Source availability determines whether retained text is returned; fallback is `function () { [native code] }`.
+
+### Step 8 focused failure and correction
+
+The first focused fixture failed in C, all native LLVM combinations, and lli with `Uncaught Error: proxy get` at `get`, `toString`, and `call`. Source inspection showed that `JSCallableProxy` inherits `NativeFunction`; a generic NativeFunction class check therefore incorrectly selected the builtin name-reading branch. Added the runtime's non-observable `isProxyObject` check to select the anonymous fallback for callable proxies, including revoked proxies. This is a runtime class-hierarchy correction, not a relaxed test expectation. The affected native function-constructor lit snapshot passed before this correction.
+
+### Step 8 validation outcome and limits
+
+After the proxy correction, the focused fixture passes its C comparison, all four native LLVM optimization combinations, and real lli. The complete core gate passes 22/22 and the extension gate passes 56/56, with unchanged inputs. The pinned Function.prototype.toString selection completes with 154/160 passing variants, compared with 44/160 in the prior Function baseline. The six remaining failures cover builtin native syntax, symbol-named builtins, and a computed method-name case that depends on retained source text. No failing variant was excluded.
+
+A repository-wide search found additional `[bytecode]` expectations in interpreter, debugger, and REPL snapshots. Updated their expected representations and the source-visibility explanation. Built the interpreter and debugger executables to attempt those checks. Five of eleven selected snapshots passed, including retained/hidden source visibility in function-toString.js, both TDZ iteration cases, the REPL, and the native constructor fixture. Four debugger snapshots cannot execute with this build: `hdb compiled without Hermes debugger enabled.` The initial vars-async-arrow invocation also lacked the FileCheckOrRegen substitution (`FileCheck-18: Too many positional arguments specified!`). These debugger expectations remain execution-unverified. Source inspection confirms hdb renders values through Value.toString.
+
+The two remaining interpreter fixtures stop at inherited direct-eval boundaries: function-constructor.js reports `direct eval requires retained lexical scope metadata` and source-visibility/with-eval.js reports `sloppy direct string eval is unsupported; use a strict caller or indirect global eval`. Their eval calls were preserved; converting them to indirect eval simply to obtain a green test would change their contracts. The passing native and conformance tests do not establish interpreter eval support.
+
+Commands: `python3 hermes/utils/test_shllvm.py --build-dir hermes/build-llvm --llvm-bin /usr/lib/llvm-18/bin --jobs 3 --output /tmp/llvm-source-core.json`; the same build/tool arguments to `test_shllvm_extensions.py` with output `/tmp/llvm-source-extensions.json`; and `hermes-lit -v` with explicit hermes, shermes, hdb, FileCheck paths on the eleven changed snapshots. The detailed result receipt is `implementation-evidence/function-source-milestone.json`. The snapshot log digest is recorded there. These results qualify the changed native behavior, not complete ECMAScript conformance.

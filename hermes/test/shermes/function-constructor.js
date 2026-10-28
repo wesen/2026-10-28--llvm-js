@@ -48,25 +48,25 @@ print(f.__proto__ === F.prototype, f.constructor === F, f.prop1);
 print('toString');
 // CHECK-LABEL: toString
 print(function (){});
-// CHECK-NEXT: function () { [bytecode] }
+// CHECK-NEXT: function () { [native code] }
 print(function foo(){});
-// CHECK-NEXT: function foo() { [bytecode] }
+// CHECK-NEXT: function () { [native code] }
 print(function(a,b,c){});
-// CHECK-NEXT: function (a0, a1, a2) { [bytecode] }
+// CHECK-NEXT: function () { [native code] }
 print(function(a,b,c,d,e,f,g,h,i,j,k){});
-// CHECK-NEXT: function (a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10) { [bytecode] }
+// CHECK-NEXT: function () { [native code] }
 
 // Reconfigured .length
 function foo(x) {}
 Object.defineProperty(foo, "length", { value: 5 })
 print(foo);
-// CHECK-NEXT: function foo(a0, a1, a2, a3, a4) { [bytecode] }
+// CHECK-NEXT: function () { [native code] }
 
 // Non-string .length
 var foo = function badlength(a, b, c){};
 Object.defineProperty(foo, "length", {value:"aa"});
 print(foo);
-// CHECK-NEXT: function badlength() { [bytecode] }
+// CHECK-NEXT: function () { [native code] }
 
 // NativeFunctions are printed as 0-arity.
 print(Map);

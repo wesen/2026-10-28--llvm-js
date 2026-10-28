@@ -23,3 +23,7 @@ Implemented mutable sloppy arguments bindings, including arrow captures and susp
 ## 2026-10-28
 
 Enabled runtime error timing for normal LLVM output. Migrated obsolete const rejection; core 22/22, extensions 55/55, raw defaults 8/8, driver checks 6/6. Expanded Function baseline: 721 pass, 146 semantic failures, 26 unsupported across 893 variants.
+
+## 2026-10-28
+
+Implemented pinned Test262 infrastructure and measured fixes for arguments reassignment, runtime error timing, dynamic Function comment boundaries, and source-unavailable callable representations. Latest native gates: core 22/22, extensions 56/56; toString subset 154/160, with remaining failures retained.
