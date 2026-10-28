@@ -1,0 +1,32 @@
+{
+  "checked_paths": [
+    "hermes/docs/llvm/ARCHITECTURE.md",
+    "hermes/lib/AST/AsyncGenerator.cpp",
+    "hermes/lib/BCGen/SH/LLVMNative/",
+    "hermes/lib/BCGen/SH/LLVMNative/LLVMBackend.cpp",
+    "hermes/lib/BCGen/SH/LLVMNative/eval_extensions.cpp",
+    "hermes/lib/BCGen/SH/LLVMNative/eval_extensions.h",
+    "hermes/lib/BCGen/SH/LLVMNative/runtime.c",
+    "hermes/lib/BCGen/SH/LLVMNative/runtime.h",
+    "hermes/lib/BCGen/SH/LLVMNative/value_extensions.c",
+    "hermes/lib/BCGen/SH/SH.cpp",
+    "hermes/lib/InternalJavaScript/01-Promise.js",
+    "hermes/lib/InternalJavaScript/02-AsyncFn.js",
+    "hermes/lib/InternalJavaScript/04-AsyncIterator.js",
+    "hermes/lib/Optimizer/Scalar/LowerGeneratorFunction.cpp",
+    "hermes/lib/VM/JSObject.cpp",
+    "hermes/lib/VM/StaticHInit.cpp",
+    "hermes/utils/shllvm.py",
+    "hermes/utils/test_shllvm_extensions.py",
+    "hermes/utils/testsuite/hermes.py",
+    "hermes/utils/testsuite/preprocess.py",
+    "hermes/utils/testsuite/skiplist.json",
+    "hermes/utils/testsuite/test_run_defs.py",
+    "ttmp/2026-10-28/extensions-validation/",
+    "ttmp/2026-10-28/extensions-validation/implementation-report.md"
+  ],
+  "missing_paths": [],
+  "words": 6766,
+  "mermaid_diagrams": 3,
+  "balanced_fences": true
+}

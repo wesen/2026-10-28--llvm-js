@@ -1,0 +1,17 @@
+{
+  "exit_code": 0,
+  "result": "OK: uploaded LLVM-ECMA-001-Intern-Guide.pdf -> /ai/2026/10/28/LLVM-ECMA-001",
+  "destination": "/ai/2026/10/28/LLVM-ECMA-001",
+  "document": "LLVM-ECMA-001-Intern-Guide.pdf",
+  "evidence_level": "Successful uploader result; physical device synchronization not inspected",
+  "inputs": [
+    {
+      "path": "ttmp/2026/10/28/LLVM-ECMA-001--ecmascript-conformance-architecture-and-intern-implementation-guide/design-doc/01-intern-guide-to-the-direct-llvm-runtime-and-ecmascript-conformance.md",
+      "sha256": "17d5679cb98e47bf9c435d95907a069a181b2407e5effb97cb43db2a13726f72"
+    },
+    {
+      "path": "ttmp/2026/10/28/LLVM-ECMA-001--ecmascript-conformance-architecture-and-intern-implementation-guide/reference/01-research-ledger-and-evidence-inventory.md",
+      "sha256": "003f74ac3341a8e3554e475fabbd3436534bde7977b9e4ffbf0b4e0b13eb3a18"
+    }
+  ]
+}

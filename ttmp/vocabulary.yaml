@@ -5,6 +5,10 @@ topics:
       description: Backend services
     - slug: websocket
       description: WebSocket lifecycle & events
+    - slug: llvm
+      description: LLVM compiler and runtime architecture
+    - slug: javascript
+      description: JavaScript and ECMAScript semantics
 docTypes:
     - slug: design-doc
       description: Structured rationale and architecture notes
