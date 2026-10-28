@@ -31,8 +31,8 @@ def main():
         valid.write_text("print(6 * 7);\n")
         invalid = directory / "invalid.js"
         invalid.write_text("function {")
-        unsupported = directory / "unsupported.js"
-        unsupported.write_text('print(/abc/.test("abc"));\n')
+        unsupported = directory / "oversized.js"
+        unsupported.write_text("print(" + ",".join(str(i) for i in range(1100)) + ");\n")
         output = directory / "existing.ll"
         sentinel = b"existing LLVM module must survive failed compilation\n"
         output.write_bytes(sentinel)
@@ -57,7 +57,7 @@ def main():
             })
 
         for name, source in [("syntax failure preserves output", invalid),
-                             ("unsupported opcode preserves output", unsupported)]:
+                             ("oversized frame preserves output", unsupported)]:
             process = invoke(source, "-o", str(output))
             record(name, process, {
                 "rejected": process.returncode != 0,
@@ -67,10 +67,10 @@ def main():
             })
 
         process = invoke(unsupported, "-o", "-")
-        record("unsupported opcode produces no partial stdout module", process, {
+        record("oversized frame produces no partial stdout module", process, {
             "rejected": process.returncode != 0,
             "stdout_empty": process.stdout == "",
-            "opcode_diagnostic": "CreateRegExpInst" in process.stderr,
+            "admission_diagnostic": "admission limit" in process.stderr,
         })
 
         process = invoke(valid)

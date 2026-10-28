@@ -36,6 +36,8 @@ Value *isStoreOnceVariable(Variable *V) {
       continue;
     }
 
+    if (llvh::isa<DirectEvalInst>(U))
+      return nullptr;
     llvm_unreachable("invalid user!");
   }
 

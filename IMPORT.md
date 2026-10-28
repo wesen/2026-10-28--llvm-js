@@ -1,4 +1,7 @@
-# Imported release and local validation
+# Original release import and local validation
+
+This is the historical original-release record at commit `b1f3757`. The current
+checkout contains the extension release; see `EXTENSIONS-IMPORT.md`.
 
 Imported on 2026-10-28 from `/home/manuel/Downloads/direct-llvm-release`.
 All 13,052 SHA-256 manifest entries verified before copying. The complete

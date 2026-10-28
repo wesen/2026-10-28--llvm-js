@@ -1,0 +1,45 @@
+[1/45] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/JSLib/DateCache.cpp.o
+[2/45] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/JSLib/Symbol.cpp.o
+[3/45] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/JSLib/Date.cpp.o
+[4/45] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/JSLib/RegExp.cpp.o
+[5/45] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/JSLib/WeakMap.cpp.o
+[6/45] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/JSLib/WeakSet.cpp.o
+[7/45] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/JSLib/WeakRef.cpp.o
+[8/45] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/JSLib/FinalizationRegistry.cpp.o
+[9/45] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/JSLib/print.cpp.o
+[10/45] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/JSLib/eval.cpp.o
+[11/45] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/JSLib/escape.cpp.o
+[12/45] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/JSLib/require.cpp.o
+[13/45] Generating InternalBytecode.inc
+[14/45] Linking CXX static library API/hermes/libhermesapi.a
+[15/45] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/gcs/AlignedHeapSegment.cpp.o
+[16/45] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/gcs/FillerCell.cpp.o
+[17/45] Building CXX object lib/InternalJavaScript/CMakeFiles/hermesInternalBytecode_obj.dir/InternalBytecode.cpp.o
+[18/45] Building CXX object lib/CMakeFiles/hermesvm_a.dir/BCGen/SH/LLVMNative/eval_extensions.cpp.o
+[19/45] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/gcs/HadesGC.cpp.o
+[20/45] Linking CXX static library lib/VM/libhermesVMRuntime.a
+[21/45] Building CXX object API/napi/CMakeFiles/hermesNapi_obj.dir/hermes_napi.cpp.o
+[22/45] Building CXX object API/napi/CMakeFiles/hermesNapi_obj.dir/hermes_napi_arraybuffer.cpp.o
+[23/45] Building CXX object API/napi/CMakeFiles/hermesNapi_obj.dir/hermes_napi_async_context.cpp.o
+[24/45] Building CXX object API/napi/CMakeFiles/hermesNapi_obj.dir/hermes_napi_async_work.cpp.o
+[25/45] Building CXX object API/napi/CMakeFiles/hermesNapi_obj.dir/hermes_napi_bigint.cpp.o
+[26/45] Building CXX object API/napi/CMakeFiles/hermesNapi_obj.dir/hermes_napi_buffer.cpp.o
+[27/45] Building CXX object API/napi/CMakeFiles/hermesNapi_obj.dir/hermes_napi_dataview.cpp.o
+[28/45] Building CXX object API/napi/CMakeFiles/hermesNapi_obj.dir/hermes_napi_error.cpp.o
+[29/45] Building CXX object API/napi/CMakeFiles/hermesNapi_obj.dir/hermes_napi_external.cpp.o
+[30/45] Building CXX object API/napi/CMakeFiles/hermesNapi_obj.dir/hermes_napi_object.cpp.o
+[31/45] Building CXX object API/napi/CMakeFiles/hermesNapi_obj.dir/hermes_napi_function.cpp.o
+[32/45] Building CXX object API/napi/CMakeFiles/hermesNapi_obj.dir/hermes_napi_promise.cpp.o
+[33/45] Building CXX object API/napi/CMakeFiles/hermesNapi_obj.dir/hermes_napi_reference.cpp.o
+[34/45] Building CXX object API/napi/CMakeFiles/hermesNapi_obj.dir/hermes_napi_scope.cpp.o
+[35/45] Building CXX object API/napi/CMakeFiles/hermesNapi_obj.dir/hermes_napi_string.cpp.o
+[36/45] Building CXX object API/napi/CMakeFiles/hermesNapi_obj.dir/hermes_napi_tsfn.cpp.o
+[37/45] Building CXX object API/napi/CMakeFiles/hermesNapi_obj.dir/hermes_napi_typedarray.cpp.o
+[38/45] Linking CXX static library lib/libhermesvm_a.a
+[39/45] Building CXX object API/napi/CMakeFiles/hermesNapi_obj.dir/hermes_napi_typetag.cpp.o
+[40/45] Building CXX object API/napi/CMakeFiles/hermesNapi_obj.dir/hermes_napi_value.cpp.o
+[41/45] Building CXX object API/napi/CMakeFiles/hermesNapi_obj.dir/hermes_napi_wrap.cpp.o
+[42/45] Linking CXX static library API/napi/libhermesNapi.a
+[43/45] Linking CXX shared library lib/libhermesvm.so
+[44/45] Linking CXX shared library tools/shermes/libshermes_console.so
+[45/45] Linking C shared library lib/libshllvm_runtime.so

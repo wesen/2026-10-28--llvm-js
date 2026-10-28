@@ -23,7 +23,9 @@ add_hermes_library(hermesSHBackend
 
 # The bridge is compiled once for a runtime configuration. JavaScript modules
 # emitted by the LLVM backend link against it without generating or parsing C.
-add_library(shllvm_runtime_obj OBJECT LLVMNative/runtime.c)
+add_library(shllvm_runtime_obj OBJECT
+  LLVMNative/runtime.c
+  LLVMNative/value_extensions.c)
 set_target_properties(shllvm_runtime_obj PROPERTIES
   POSITION_INDEPENDENT_CODE ON)
 if(NOT MSVC)

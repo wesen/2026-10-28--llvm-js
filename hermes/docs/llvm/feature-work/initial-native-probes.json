@@ -1,0 +1,326 @@
+{
+  "time": 1793219361.8471293,
+  "results": [
+    {
+      "name": "generator_delegation.js",
+      "passed": true,
+      "node": {
+        "command": [
+          "node",
+          "--expose-gc",
+          "-e",
+          "globalThis.print=(...a)=>console.log(...a);require('vm').runInThisContext(require('fs').readFileSync(process.argv[1],'utf8'),{filename:process.argv[1]});",
+          "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNativeExtensions/generator_delegation.js"
+        ],
+        "exit": 0,
+        "stdout": "combined {\"value\":1,\"done\":false}\ncombined {\"value\":2,\"done\":false}\ncombined {\"value\":\"A\",\"done\":false}\ncombined {\"value\":\"\ud83d\ude00\",\"done\":false}\ncombined {\"value\":3,\"done\":false}\ncombined {\"value\":\"child-return:4\",\"done\":false}\ncombined {\"value\":9,\"done\":true}\ndelegate-next 0 undefined\nforward-start {\"value\":\"ready\",\"done\":false}\ndelegate-return 20\nforward-return {\"value\":\"cleanup\",\"done\":false}\ndelegate-next 1 30\nforward-finish {\"value\":31,\"done\":true}\nmissing-start {\"value\":\"open\",\"done\":false}\nmissing-throw TypeError 1\nmissing-done {\"done\":true}\nloop 10\nclosed break\nclosed throw\nloop-error:10\nclosed destructure\nfirst 10\nclosed spread\nspread [10,20]\nself-iterator true\nreceiver TypeError\nfunction-kind function function\n",
+        "stderr": ""
+      },
+      "native": {
+        "command": [
+          "python3",
+          "utils/shllvm.py",
+          "run",
+          "--no-runtime-build",
+          "--hermes-opt",
+          "O0",
+          "-o",
+          "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/feature-probes/generator_delegation-initial",
+          "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNativeExtensions/generator_delegation.js"
+        ],
+        "exit": 0,
+        "stdout": "combined {\"value\":1,\"done\":false}\ncombined {\"value\":2,\"done\":false}\ncombined {\"value\":\"A\",\"done\":false}\ncombined {\"value\":\"\ud83d\ude00\",\"done\":false}\ncombined {\"value\":3,\"done\":false}\ncombined {\"value\":\"child-return:4\",\"done\":false}\ncombined {\"value\":9,\"done\":true}\ndelegate-next 0 undefined\nforward-start {\"value\":\"ready\",\"done\":false}\ndelegate-return 20\nforward-return {\"value\":\"cleanup\",\"done\":false}\ndelegate-next 1 30\nforward-finish {\"value\":31,\"done\":true}\nmissing-start {\"value\":\"open\",\"done\":false}\nmissing-throw TypeError 1\nmissing-done {\"done\":true}\nloop 10\nclosed break\nclosed throw\nloop-error:10\nclosed destructure\nfirst 10\nclosed spread\nspread [10,20]\nself-iterator true\nreceiver TypeError\nfunction-kind function function\n",
+        "stderr": ""
+      }
+    },
+    {
+      "name": "generator_enumeration.js",
+      "passed": true,
+      "node": {
+        "command": [
+          "node",
+          "--expose-gc",
+          "-e",
+          "globalThis.print=(...a)=>console.log(...a);require('vm').runInThisContext(require('fs').readFileSync(process.argv[1],'utf8'),{filename:process.argv[1]});",
+          "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNativeExtensions/generator_enumeration.js"
+        ],
+        "exit": 0,
+        "stdout": "keys [\"first:1\",\"second:2\",\"inherited:7\"]\nempty [] []\ndeleted a,c\nnested-total 18\n",
+        "stderr": ""
+      },
+      "native": {
+        "command": [
+          "python3",
+          "utils/shllvm.py",
+          "run",
+          "--no-runtime-build",
+          "--hermes-opt",
+          "O0",
+          "-o",
+          "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/feature-probes/generator_enumeration-initial",
+          "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNativeExtensions/generator_enumeration.js"
+        ],
+        "exit": 0,
+        "stdout": "keys [\"first:1\",\"second:2\",\"inherited:7\"]\nempty [] []\ndeleted a,c\nnested-total 18\n",
+        "stderr": ""
+      }
+    },
+    {
+      "name": "generator_finally.js",
+      "passed": true,
+      "node": {
+        "command": [
+          "node",
+          "--expose-gc",
+          "-e",
+          "globalThis.print=(...a)=>console.log(...a);require('vm').runInThisContext(require('fs').readFileSync(process.argv[1],'utf8'),{filename:process.argv[1]});",
+          "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNativeExtensions/generator_finally.js"
+        ],
+        "exit": 0,
+        "stdout": "return-start {\"value\":\"start\",\"done\":false}\nreturn-cleanup {\"value\":\"cleanup-1\",\"done\":false}\nreturn-cleanup2 {\"value\":\"cleanup-2\",\"done\":false}\nreturn-done {\"value\":\"forced-return\",\"done\":true}\nthrow-start {\"value\":\"start\",\"done\":false}\nthrow-cleanup {\"value\":\"cleanup-1\",\"done\":false}\nthrow-cleanup2 {\"value\":\"cleanup-2\",\"done\":false}\nthrow-final forced-throw\nthrow-done {\"done\":true}\nnested {\"value\":\"nested-start\",\"done\":false}\nnested {\"value\":\"inner-finally\",\"done\":false}\nnested {\"value\":\"caught:inside\",\"done\":false}\nnested {\"value\":\"outer-finally\",\"done\":false}\nnested {\"value\":\"nested-done\",\"done\":true}\noverride-start {\"value\":1,\"done\":false}\noverride-cleanup {\"value\":2,\"done\":false}\noverride-done {\"value\":3,\"done\":true}\n",
+        "stderr": ""
+      },
+      "native": {
+        "command": [
+          "python3",
+          "utils/shllvm.py",
+          "run",
+          "--no-runtime-build",
+          "--hermes-opt",
+          "O0",
+          "-o",
+          "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/feature-probes/generator_finally-initial",
+          "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNativeExtensions/generator_finally.js"
+        ],
+        "exit": 0,
+        "stdout": "return-start {\"value\":\"start\",\"done\":false}\nreturn-cleanup {\"value\":\"cleanup-1\",\"done\":false}\nreturn-cleanup2 {\"value\":\"cleanup-2\",\"done\":false}\nreturn-done {\"value\":\"forced-return\",\"done\":true}\nthrow-start {\"value\":\"start\",\"done\":false}\nthrow-cleanup {\"value\":\"cleanup-1\",\"done\":false}\nthrow-cleanup2 {\"value\":\"cleanup-2\",\"done\":false}\nthrow-final forced-throw\nthrow-done {\"done\":true}\nnested {\"value\":\"nested-start\",\"done\":false}\nnested {\"value\":\"inner-finally\",\"done\":false}\nnested {\"value\":\"caught:inside\",\"done\":false}\nnested {\"value\":\"outer-finally\",\"done\":false}\nnested {\"value\":\"nested-done\",\"done\":true}\noverride-start {\"value\":1,\"done\":false}\noverride-cleanup {\"value\":2,\"done\":false}\noverride-done {\"value\":3,\"done\":true}\n",
+        "stderr": ""
+      }
+    },
+    {
+      "name": "generator_gc.js",
+      "passed": true,
+      "node": {
+        "command": [
+          "node",
+          "--expose-gc",
+          "-e",
+          "globalThis.print=(...a)=>console.log(...a);require('vm').runInThisContext(require('fs').readFileSync(process.argv[1],'utf8'),{filename:process.argv[1]});",
+          "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNativeExtensions/generator_gc.js"
+        ],
+        "exit": 0,
+        "stdout": "suspended 30:kept:30\nshared true 37:kept:30 37:kept:30\ncompleted true true 38:replaced\nescaped 38:replaced\nmany 3240\n",
+        "stderr": ""
+      },
+      "native": {
+        "command": [
+          "python3",
+          "utils/shllvm.py",
+          "run",
+          "--no-runtime-build",
+          "--hermes-opt",
+          "O0",
+          "-o",
+          "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/feature-probes/generator_gc-initial",
+          "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNativeExtensions/generator_gc.js"
+        ],
+        "exit": 0,
+        "stdout": "suspended 30:kept:30\nshared true 37:kept:30 37:kept:30\ncompleted true true 38:replaced\nescaped 38:replaced\nmany 3240\n",
+        "stderr": ""
+      }
+    },
+    {
+      "name": "generator_protocol.js",
+      "passed": true,
+      "node": {
+        "command": [
+          "node",
+          "--expose-gc",
+          "-e",
+          "globalThis.print=(...a)=>console.log(...a);require('vm').runInThisContext(require('fs').readFileSync(process.argv[1],'utf8'),{filename:process.argv[1]});",
+          "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNativeExtensions/generator_protocol.js"
+        ],
+        "exit": 0,
+        "stdout": "first {\"value\":10,\"done\":false}\nsent {\"value\":15,\"done\":false}\nsequence-finally 15\ndone {\"value\":30,\"done\":true}\nafter {\"done\":true}\nb-start {\"value\":20,\"done\":false}\nb-return {\"value\":99,\"done\":true}\nb-after {\"done\":true}\nc-start {\"value\":\"ready\",\"done\":false}\nc-throw {\"value\":\"caught:boom\",\"done\":false}\ncaught-finally\nc-finish {\"value\":\"finished\",\"done\":true}\ncompleted-throw late\nunstarted-return {\"value\":7,\"done\":true}\nunstarted-throw early\nunstarted-body false\nreentrant {\"value\":\"TypeError\",\"done\":false}\nreentrant-done {\"done\":true}\n",
+        "stderr": ""
+      },
+      "native": {
+        "command": [
+          "python3",
+          "utils/shllvm.py",
+          "run",
+          "--no-runtime-build",
+          "--hermes-opt",
+          "O0",
+          "-o",
+          "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/feature-probes/generator_protocol-initial",
+          "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNativeExtensions/generator_protocol.js"
+        ],
+        "exit": 0,
+        "stdout": "first {\"value\":10,\"done\":false}\nsent {\"value\":15,\"done\":false}\nsequence-finally 15\ndone {\"value\":30,\"done\":true}\nafter {\"done\":true}\nb-start {\"value\":20,\"done\":false}\nb-return {\"value\":99,\"done\":true}\nb-after {\"done\":true}\nc-start {\"value\":\"ready\",\"done\":false}\nc-throw {\"value\":\"caught:boom\",\"done\":false}\ncaught-finally\nc-finish {\"value\":\"finished\",\"done\":true}\ncompleted-throw late\nunstarted-return {\"value\":7,\"done\":true}\nunstarted-throw early\nunstarted-body false\nreentrant {\"value\":\"TypeError\",\"done\":false}\nreentrant-done {\"done\":true}\n",
+        "stderr": ""
+      }
+    },
+    {
+      "name": "features_bigint.js",
+      "passed": true,
+      "node": {
+        "command": [
+          "node",
+          "--expose-gc",
+          "-e",
+          "globalThis.print=(...a)=>console.log(...a);require('vm').runInThisContext(require('fs').readFileSync(process.argv[1],'utf8'),{filename:process.argv[1]});",
+          "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNativeExtensions/features_bigint.js"
+        ],
+        "exit": 0,
+        "stdout": "bigint 0 -1\n123456789012345678901234567890\n18446744073709551615 9223372036854775807 42\ntrue\n12345678901234567897 12345678901234567883 86419752308641975230\n1763668414462081127 1 -1763668414462081127 -1\n1881676372353657772490265749424677022198701224860897069000 -12345678901234567891\n2 12345678901234567895 12345678901234567893\n1821900632858158512180493664091289681920 -1543209862654320987 3086419725308641972\n12345678901234567890 12345678901234567892 12345678901234567892 12345678901234567890\ntrue true true false false\n-1 255\nTypeError\nTypeError\nTypeError\nRangeError\nRangeError\nRangeError\n",
+        "stderr": ""
+      },
+      "native": {
+        "command": [
+          "python3",
+          "utils/shllvm.py",
+          "run",
+          "--no-runtime-build",
+          "--hermes-opt",
+          "O0",
+          "-o",
+          "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/feature-probes/features_bigint-initial",
+          "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNativeExtensions/features_bigint.js"
+        ],
+        "exit": 0,
+        "stdout": "bigint 0 -1\n123456789012345678901234567890\n18446744073709551615 9223372036854775807 42\ntrue\n12345678901234567897 12345678901234567883 86419752308641975230\n1763668414462081127 1 -1763668414462081127 -1\n1881676372353657772490265749424677022198701224860897069000 -12345678901234567891\n2 12345678901234567895 12345678901234567893\n1821900632858158512180493664091289681920 -1543209862654320987 3086419725308641972\n12345678901234567890 12345678901234567892 12345678901234567892 12345678901234567890\ntrue true true false false\n-1 255\nTypeError\nTypeError\nTypeError\nRangeError\nRangeError\nRangeError\n",
+        "stderr": ""
+      }
+    },
+    {
+      "name": "features_private_fields.js",
+      "passed": true,
+      "node": {
+        "command": [
+          "node",
+          "--expose-gc",
+          "-e",
+          "globalThis.print=(...a)=>console.log(...a);require('vm').runInThisContext(require('fs').readFileSync(process.argv[1],'utf8'),{filename:process.argv[1]});",
+          "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNativeExtensions/features_private_fields.js"
+        ],
+        "exit": 0,
+        "stdout": "26 13 90 105 3\n31 30 30\ntrue true false 0\nTypeError\nTypeError\na\nTypeError\n17 0\nTypeError\n",
+        "stderr": ""
+      },
+      "native": {
+        "command": [
+          "python3",
+          "utils/shllvm.py",
+          "run",
+          "--no-runtime-build",
+          "--hermes-opt",
+          "O0",
+          "-o",
+          "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/feature-probes/features_private_fields-initial",
+          "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNativeExtensions/features_private_fields.js"
+        ],
+        "exit": 0,
+        "stdout": "26 13 90 105 3\n31 30 30\ntrue true false 0\nTypeError\nTypeError\na\nTypeError\n17 0\nTypeError\n",
+        "stderr": ""
+      }
+    },
+    {
+      "name": "features_regexp.js",
+      "passed": true,
+      "node": {
+        "command": [
+          "node",
+          "--expose-gc",
+          "-e",
+          "globalThis.print=(...a)=>console.log(...a);require('vm').runInThisContext(require('fs').readFileSync(process.argv[1],'utf8'),{filename:process.argv[1]});",
+          "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNativeExtensions/features_regexp.js"
+        ],
+        "exit": 0,
+        "stdout": "true hello i\nOne-12 One 12 0 6\nTWO-34 TWO 34 7 13\nnull 0\ntrue 2\nfalse 0\ntrue true 0\ntrue false\ntrue true\nitem 2048\nA2 B3\none|two|three\nSyntaxError\nSyntaxError\n",
+        "stderr": ""
+      },
+      "native": {
+        "command": [
+          "python3",
+          "utils/shllvm.py",
+          "run",
+          "--no-runtime-build",
+          "--hermes-opt",
+          "O0",
+          "-o",
+          "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/feature-probes/features_regexp-initial",
+          "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNativeExtensions/features_regexp.js"
+        ],
+        "exit": 0,
+        "stdout": "true hello i\nOne-12 One 12 0 6\nTWO-34 TWO 34 7 13\nnull 0\ntrue 2\nfalse 0\ntrue true 0\ntrue false\ntrue true\nitem 2048\nA2 B3\none|two|three\nSyntaxError\nSyntaxError\n",
+        "stderr": ""
+      }
+    },
+    {
+      "name": "promise_order.js",
+      "passed": true,
+      "node": {
+        "command": [
+          "node",
+          "--expose-gc",
+          "-e",
+          "globalThis.print=(...a)=>console.log(...a);require('vm').runInThisContext(require('fs').readFileSync(process.argv[1],'utf8'),{filename:process.argv[1]});",
+          "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNativeExtensions/promise_order.js"
+        ],
+        "exit": 0,
+        "stdout": "sync|tick|outer|all:3|inner\nthen-get 1 7\ndone: promise_order\n",
+        "stderr": ""
+      },
+      "native": {
+        "command": [
+          "python3",
+          "utils/shllvm.py",
+          "run",
+          "--no-runtime-build",
+          "--hermes-opt",
+          "O0",
+          "-o",
+          "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/feature-probes/promise_order-initial",
+          "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNativeExtensions/promise_order.js"
+        ],
+        "exit": 0,
+        "stdout": "sync|tick|outer|all:3|inner\nthen-get 1 7\ndone: promise_order\n",
+        "stderr": ""
+      }
+    },
+    {
+      "name": "async_generators.js",
+      "passed": false,
+      "node": {
+        "command": [
+          "node",
+          "--expose-gc",
+          "-e",
+          "globalThis.print=(...a)=>console.log(...a);require('vm').runInThisContext(require('fs').readFileSync(process.argv[1],'utf8'),{filename:process.argv[1]});",
+          "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNativeExtensions/async_generators.js"
+        ],
+        "exit": 0,
+        "stdout": "for-await 1,2,3,4\nbreak 5\nclosed true\ndone: async_generators\n",
+        "stderr": ""
+      },
+      "native": {
+        "command": [
+          "python3",
+          "utils/shllvm.py",
+          "run",
+          "--no-runtime-build",
+          "--hermes-opt",
+          "O0",
+          "--hermes-arg=-Xasync-generators",
+          "-o",
+          "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/feature-probes/async_generators-initial",
+          "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNativeExtensions/async_generators.js"
+        ],
+        "exit": 0,
+        "stdout": "for-await 1,2,3,4\nbreak 5\nclosed false\ndone: async_generators\n",
+        "stderr": ""
+      }
+    }
+  ]
+}

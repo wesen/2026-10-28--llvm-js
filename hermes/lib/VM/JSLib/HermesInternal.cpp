@@ -767,6 +767,17 @@ static CallResult<HermesValue> hermesInternalIsLazy(void *, Runtime &runtime) {
   return HermesValue::encodeBoolValue(codeBlock->isLazy());
 }
 
+/// Expose the VM's allocation-free IsConstructor predicate to JS builtins.
+/// Unlike attempting Reflect.construct, this does not read a user-supplied
+/// prototype or invoke a constructor/proxy trap. Arguments remain rooted in
+/// the native call frame throughout the predicate's target-chain walk.
+static CallResult<HermesValue> hermesInternalIsConstructor(
+    void *,
+    Runtime &runtime) {
+  NativeArgs args = runtime.getCurrentFrame().getNativeArgs();
+  return HermesValue::encodeBoolValue(isConstructor(runtime, args.getArg(0)));
+}
+
 HermesValue createHermesInternalObject(
     Runtime &runtime,
     const JSLibFlags &flags) {
@@ -853,6 +864,7 @@ HermesValue createHermesInternalObject(
       P::enablePromiseRejectionTracker,
       hermesInternalEnablePromiseRejectionTracker);
   defineInternMethod(P::useEngineQueue, hermesInternalUseEngineQueue);
+  defineInternMethod(P::isConstructor, hermesInternalIsConstructor, 1);
   // test262Enabled() reflects the --test262 CLI flag so JS code can branch
   // on it (e.g. test262 harness wiring). Returns false when the flag is
   // absent or false.

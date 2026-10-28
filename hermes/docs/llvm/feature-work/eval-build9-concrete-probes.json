@@ -1,0 +1,251 @@
+{
+  "build": "9",
+  "node": {
+    "eval_nested": {
+      "command": [
+        "node",
+        "--expose-gc",
+        "-e",
+        "global.print=(...x)=>console.log(...x);require(\"vm\").runInThisContext(require(\"fs\").readFileSync(process.argv[1],\"utf8\"),{filename:process.argv[1]});",
+        "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNativeExtensions/eval_nested.js"
+      ],
+      "returncode": 0,
+      "stdout": "nested-initial 8\nescaped-nested 12 12\nnested-shared 32 32\nnested-completion 42\nnested-non-string 13\n",
+      "stderr": "",
+      "seconds": 0.062
+    },
+    "function_dynamic_eval": {
+      "command": [
+        "node",
+        "--expose-gc",
+        "-e",
+        "global.print=(...x)=>console.log(...x);require(\"vm\").runInThisContext(require(\"fs\").readFileSync(process.argv[1],\"utf8\"),{filename:process.argv[1]});",
+        "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNativeExtensions/function_dynamic_eval.js"
+      ],
+      "returncode": 0,
+      "stdout": "function-eval 42 42 42\nfunction-eval-retained 45 45\nfunction-eval-context 12\nfunction-arrow-eval-context 17\n",
+      "stderr": "",
+      "seconds": 0.052
+    },
+    "eval_tdz_closure": {
+      "command": [
+        "node",
+        "--expose-gc",
+        "-e",
+        "global.print=(...x)=>console.log(...x);require(\"vm\").runInThisContext(require(\"fs\").readFileSync(process.argv[1],\"utf8\"),{filename:process.argv[1]});",
+        "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNativeExtensions/eval_tdz_closure.js"
+      ],
+      "returncode": 0,
+      "stdout": "uninitialized-closure ReferenceError\n",
+      "stderr": "",
+      "seconds": 0.044
+    },
+    "eval_nested_global": {
+      "command": [
+        "node",
+        "--expose-gc",
+        "-e",
+        "global.print=(...x)=>console.log(...x);require(\"vm\").runInThisContext(require(\"fs\").readFileSync(process.argv[1],\"utf8\"),{filename:process.argv[1]});",
+        "/tmp/llvm_eval_nested_global.js"
+      ],
+      "returncode": 0,
+      "stdout": "nested-global-new-target SyntaxError\nnested-global-arguments undefined\nnested-constructor-new-target true\n",
+      "stderr": "",
+      "seconds": 0.056
+    }
+  },
+  "native": [
+    {
+      "command": [
+        "python3",
+        "utils/shllvm.py",
+        "run",
+        "--no-runtime-build",
+        "--hermes-opt",
+        "O0",
+        "--llvm-opt",
+        "2",
+        "--llvm-bin",
+        "/tmp/llvm-direct-toolchain/bin",
+        "-o",
+        "/tmp/eval-build9-eval_nested-O0",
+        "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNativeExtensions/eval_nested.js"
+      ],
+      "returncode": 0,
+      "stdout": "nested-initial 8\nescaped-nested 12 12\nnested-shared 32 32\nnested-completion 42\nnested-non-string 13\n",
+      "stderr": "",
+      "seconds": 0.419,
+      "case": "eval_nested",
+      "hermes_opt": "O0",
+      "matches_node": true
+    },
+    {
+      "command": [
+        "python3",
+        "utils/shllvm.py",
+        "run",
+        "--no-runtime-build",
+        "--hermes-opt",
+        "O",
+        "--llvm-opt",
+        "2",
+        "--llvm-bin",
+        "/tmp/llvm-direct-toolchain/bin",
+        "-o",
+        "/tmp/eval-build9-eval_nested-O",
+        "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNativeExtensions/eval_nested.js"
+      ],
+      "returncode": 0,
+      "stdout": "nested-initial 8\nescaped-nested 12 12\nnested-shared 32 32\nnested-completion 42\nnested-non-string 13\n",
+      "stderr": "",
+      "seconds": 0.433,
+      "case": "eval_nested",
+      "hermes_opt": "O",
+      "matches_node": true
+    },
+    {
+      "command": [
+        "python3",
+        "utils/shllvm.py",
+        "run",
+        "--no-runtime-build",
+        "--hermes-opt",
+        "O0",
+        "--llvm-opt",
+        "2",
+        "--llvm-bin",
+        "/tmp/llvm-direct-toolchain/bin",
+        "-o",
+        "/tmp/eval-build9-function_dynamic_eval-O0",
+        "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNativeExtensions/function_dynamic_eval.js"
+      ],
+      "returncode": 0,
+      "stdout": "function-eval 42 42 42\nfunction-eval-retained 45 45\nfunction-eval-context 12\nfunction-arrow-eval-context 17\n",
+      "stderr": "",
+      "seconds": 0.385,
+      "case": "function_dynamic_eval",
+      "hermes_opt": "O0",
+      "matches_node": true
+    },
+    {
+      "command": [
+        "python3",
+        "utils/shllvm.py",
+        "run",
+        "--no-runtime-build",
+        "--hermes-opt",
+        "O",
+        "--llvm-opt",
+        "2",
+        "--llvm-bin",
+        "/tmp/llvm-direct-toolchain/bin",
+        "-o",
+        "/tmp/eval-build9-function_dynamic_eval-O",
+        "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNativeExtensions/function_dynamic_eval.js"
+      ],
+      "returncode": 0,
+      "stdout": "function-eval 42 42 42\nfunction-eval-retained 45 45\nfunction-eval-context 12\nfunction-arrow-eval-context 17\n",
+      "stderr": "",
+      "seconds": 0.363,
+      "case": "function_dynamic_eval",
+      "hermes_opt": "O",
+      "matches_node": true
+    },
+    {
+      "command": [
+        "python3",
+        "utils/shllvm.py",
+        "run",
+        "--no-runtime-build",
+        "--hermes-opt",
+        "O0",
+        "--llvm-opt",
+        "2",
+        "--llvm-bin",
+        "/tmp/llvm-direct-toolchain/bin",
+        "-o",
+        "/tmp/eval-build9-eval_tdz_closure-O0",
+        "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNativeExtensions/eval_tdz_closure.js"
+      ],
+      "returncode": 0,
+      "stdout": "uninitialized-closure ReferenceError\n",
+      "stderr": "",
+      "seconds": 0.357,
+      "case": "eval_tdz_closure",
+      "hermes_opt": "O0",
+      "matches_node": true
+    },
+    {
+      "command": [
+        "python3",
+        "utils/shllvm.py",
+        "run",
+        "--no-runtime-build",
+        "--hermes-opt",
+        "O",
+        "--llvm-opt",
+        "2",
+        "--llvm-bin",
+        "/tmp/llvm-direct-toolchain/bin",
+        "-o",
+        "/tmp/eval-build9-eval_tdz_closure-O",
+        "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNativeExtensions/eval_tdz_closure.js"
+      ],
+      "returncode": 0,
+      "stdout": "uninitialized-closure ReferenceError\n",
+      "stderr": "",
+      "seconds": 0.345,
+      "case": "eval_tdz_closure",
+      "hermes_opt": "O",
+      "matches_node": true
+    },
+    {
+      "command": [
+        "python3",
+        "utils/shllvm.py",
+        "run",
+        "--no-runtime-build",
+        "--hermes-opt",
+        "O0",
+        "--llvm-opt",
+        "2",
+        "--llvm-bin",
+        "/tmp/llvm-direct-toolchain/bin",
+        "-o",
+        "/tmp/eval-build9-eval_nested_global-O0",
+        "/tmp/llvm_eval_nested_global.js"
+      ],
+      "returncode": 0,
+      "stdout": "incorrectly-accepted-global-new-target\nnested-global-arguments undefined\nnested-constructor-new-target true\n",
+      "stderr": "",
+      "seconds": 0.363,
+      "case": "eval_nested_global",
+      "hermes_opt": "O0",
+      "matches_node": false
+    },
+    {
+      "command": [
+        "python3",
+        "utils/shllvm.py",
+        "run",
+        "--no-runtime-build",
+        "--hermes-opt",
+        "O",
+        "--llvm-opt",
+        "2",
+        "--llvm-bin",
+        "/tmp/llvm-direct-toolchain/bin",
+        "-o",
+        "/tmp/eval-build9-eval_nested_global-O",
+        "/tmp/llvm_eval_nested_global.js"
+      ],
+      "returncode": 0,
+      "stdout": "incorrectly-accepted-global-new-target\nnested-global-arguments undefined\nnested-constructor-new-target true\n",
+      "stderr": "",
+      "seconds": 0.348,
+      "case": "eval_nested_global",
+      "hermes_opt": "O",
+      "matches_node": false
+    }
+  ]
+}

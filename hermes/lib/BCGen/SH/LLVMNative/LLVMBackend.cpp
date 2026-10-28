@@ -9,9 +9,11 @@
 #include "hermes/IR/IR.h"
 #include "hermes/IR/IRVerifier.h"
 #include "hermes/IR/Instrs.h"
+#include "hermes/Support/BigIntSupport.h"
 #include "hermes/Support/HashString.h"
 #include "hermes/Support/UTF8.h"
 #include "runtime.h"
+#include "eval_extensions.h"
 #include "llvh/Support/raw_ostream.h"
 
 #include <algorithm>
@@ -79,6 +81,7 @@ class FunctionEmitter {
   void emitEdges();
   void emitCatchDispatch();
   void emitCall(BaseCallInst &instruction, bool builtin);
+  void emitEval(DirectEvalInst &instruction);
   void unary(Instruction &instruction, Value *value, unsigned op);
   void binary(Instruction &instruction, Value *lhs, Value *rhs, unsigned op);
   void floating(
@@ -112,6 +115,18 @@ class ModuleEmitter {
   std::vector<Function *> functions;
   std::map<std::string, unsigned> stringIDs;
   std::vector<std::string> strings;
+  std::map<std::vector<uint8_t>, unsigned> bigintIDs;
+  std::vector<std::vector<uint8_t>> bigints;
+  struct EvalBinding {
+    std::string name;
+    uint32_t slot;
+    uint32_t flags;
+  };
+  struct EvalScope {
+    std::vector<EvalBinding> bindings;
+    uint32_t slotCount;
+  };
+  std::vector<std::vector<EvalScope>> evalSites;
   std::map<std::string, std::pair<std::string, std::vector<std::string>>> imports;
 
   ModuleEmitter(Module *m, const BytecodeGenerationOptions &o)
@@ -130,6 +145,13 @@ class ModuleEmitter {
     auto entry = stringIDs.emplace(key, strings.size());
     if (entry.second)
       strings.push_back(std::move(key));
+    return entry.first->second;
+  }
+  unsigned bigint(llvh::ArrayRef<uint8_t> bytes) {
+    std::vector<uint8_t> key(bytes.begin(), bytes.end());
+    auto entry = bigintIDs.emplace(key, bigints.size());
+    if (entry.second)
+      bigints.push_back(std::move(key));
     return entry.first->second;
   }
   std::string functionName(Function *f) {
@@ -153,6 +175,7 @@ class ModuleEmitter {
 
 bool isConstant(Value *value) {
   return llvh::isa<LiteralNumber>(value) ||
+      llvh::isa<LiteralBigInt>(value) ||
       llvh::isa<LiteralString>(value) ||
       llvh::isa<LiteralBool>(value) ||
       llvh::isa<LiteralUndefined>(value) ||
@@ -167,9 +190,12 @@ FunctionEmitter::FunctionEmitter(ModuleEmitter &module, Function &function)
   for (auto &bb : function_) {
     blocks_[&bb] = blocks_.size();
     for (auto &instruction : bb) {
-      // Including side-effect-only instructions keeps numbering simple and
-      // deterministic. Unused slots hold undefined and are safe for the GC.
-      slots_.emplace(&instruction, slots_.size());
+      // Keep every used SSA value in its own root, including address-like
+      // AllocStack operands. Side-effect-only instructions need no result
+      // storage. Unused produced values share a separate rooted discard slot
+      // for the duration of their emission (e.g. array initialization).
+      if (instruction.hasUsers())
+        slots_.emplace(&instruction, slots_.size());
       if (auto *call = llvh::dyn_cast<BaseCallInst>(&instruction))
         maxArgs_ = std::max(maxArgs_, call->getNumArguments() - 1);
       if (auto *start = llvh::dyn_cast<TryStartInst>(&instruction))
@@ -208,6 +234,9 @@ void FunctionEmitter::fail(
 std::string FunctionEmitter::slot(Value *value) {
   auto it = slots_.find(value);
   if (it == slots_.end()) {
+    if (auto *instruction = llvh::dyn_cast<Instruction>(value))
+      if (!instruction->hasUsers())
+        return "%discard";
     fail(nullptr, "unrepresentable value operand");
     return "%scratch";
   }
@@ -258,6 +287,18 @@ void FunctionEmitter::emitConstant(Value *value) {
         u32(module_.string(s->getValue().str()))});
   } else if (llvh::isa<GlobalObject>(value)) {
     call("shllvm_global", {ptr(slot(value)), ptr("%shr")});
+  } else if (auto *n = llvh::dyn_cast<LiteralBigInt>(value)) {
+    auto parsed = bigint::ParsedBigInt::parsedBigIntFromNumericValue(
+        n->getValue()->str());
+    if (!parsed) {
+      fail(nullptr, "invalid BigInt literal representation");
+      return;
+    }
+    auto bytes = parsed->getBytes();
+    unsigned id = module_.bigint(bytes);
+    call("shllvm_bigint", {
+        ptr(slot(value)), ptr("%shr"),
+        ptr("@shllvm_bigint" + std::to_string(id)), u32(bytes.size())});
   } else {
     unsigned kind = SHLLVM_UNDEFINED;
     uint64_t bits = 0;
@@ -437,6 +478,52 @@ void FunctionEmitter::emitCall(BaseCallInst &instruction, bool builtin) {
   }
 }
 
+void FunctionEmitter::emitEval(DirectEvalInst &instruction) {
+  if (instruction.getDerivedConstructorContext()) {
+    fail(&instruction, "direct eval in a derived constructor is not supported");
+    return;
+  }
+  // Descriptor order is physical outer-to-inner Environment order. Bindings
+  // are the semantically visible operands collected by IRGen, not every slot
+  // in a merged VariableScope (which can include shadowed/out-of-scope names).
+  std::vector<VariableScope *> scopes;
+  for (auto *scope = instruction.getVariableScope(); scope;
+       scope = scope->getParentScope())
+    scopes.push_back(scope);
+  std::reverse(scopes.begin(), scopes.end());
+  std::vector<ModuleEmitter::EvalScope> descriptors;
+  for (auto *scope : scopes)
+    descriptors.push_back({{}, static_cast<uint32_t>(scope->getVariables().size())});
+  auto capture = [&](Variable *variable, std::string name) {
+    auto found = std::find(scopes.begin(), scopes.end(), variable->getParent());
+    if (found == scopes.end()) {
+      fail(&instruction, "direct eval binding is outside its environment chain");
+      return;
+    }
+    uint32_t flags = variable->getObeysTDZ() ? SHLLVM_EVAL_BINDING_TDZ : 0;
+    if (variable->getConstness() == sema::Decl::Constness::Always)
+      flags |= SHLLVM_EVAL_BINDING_CONST;
+    else if (variable->getConstness() == sema::Decl::Constness::StrictModeOnly)
+      flags |= SHLLVM_EVAL_BINDING_SILENT_CONST;
+    descriptors[found - scopes.begin()].bindings.push_back(
+        {std::move(name), variable->getIndexInVariableList(), flags});
+  };
+  for (unsigned i = 0; i != instruction.getNumCapturedVariables(); ++i) {
+    auto *variable = instruction.getCapturedVariable(i);
+    capture(variable, variable->getName().str());
+  }
+  if (auto *arguments = instruction.getCapturedArguments())
+    capture(arguments, "arguments");
+  unsigned id = module_.evalSites.size();
+  module_.evalSites.push_back(std::move(descriptors));
+  call("shllvm_eval_direct", {
+      ptr(slot(&instruction)), ptr("%shr"), ptr(slot(instruction.getEvalText())),
+      ptr(slot(instruction.getEnvironment())), ptr(slot(instruction.getThisValue())),
+      ptr(slot(instruction.getNewTarget())),
+      ptr("@shllvm_eval_scopes" + std::to_string(id)), u32(scopes.size()),
+      u32((instruction.getStrictCaller() ? 1 : 0) | (instruction.getGlobalCaller() ? 2 : 0))});
+}
+
 void FunctionEmitter::emitInstruction(Instruction &i) {
   os_ << "  ; Hermes " << i.getName() << "\n";
   if (llvh::isa<PhiInst>(&i) || llvh::isa<AllocStackInst>(&i))
@@ -484,6 +571,13 @@ void FunctionEmitter::emitInstruction(Instruction &i) {
         ptr(slot(x)), ptr("%shr"), ptr(environment), ptr("%unit"),
         ptr(module_.functionName(x->getFunctionCode())),
         u32(module_.functionIDs.at(x->getFunctionCode()))});
+  } else if (auto *x = llvh::dyn_cast<CreateGeneratorInst>(&i)) {
+    auto environment = llvh::isa<EmptySentinel>(x->getScope())
+        ? "null" : slot(x->getScope());
+    call("shllvm_generator", {
+        ptr(slot(x)), ptr("%shr"), ptr(environment), ptr("%unit"),
+        ptr(module_.functionName(x->getFunctionCode())),
+        u32(module_.functionIDs.at(x->getFunctionCode()))});
   } else if (auto *x = llvh::dyn_cast<CreateClassInst>(&i)) {
     auto environment = llvh::isa<EmptySentinel>(x->getScope())
         ? "null" : slot(x->getScope());
@@ -498,6 +592,8 @@ void FunctionEmitter::emitInstruction(Instruction &i) {
     emitCall(*x, false);
   } else if (auto *x = llvh::dyn_cast<CallBuiltinInst>(&i)) {
     emitCall(*x, true);
+  } else if (auto *x = llvh::dyn_cast<DirectEvalInst>(&i)) {
+    emitEval(*x);
   } else if (auto *x = llvh::dyn_cast<GetBuiltinClosureInst>(&i)) {
     call("shllvm_builtin_closure", {
         ptr(slot(x)), ptr("%shr"), u32(static_cast<unsigned>(x->getBuiltinIndex()))});
@@ -516,6 +612,27 @@ void FunctionEmitter::emitInstruction(Instruction &i) {
   } else if (auto *x = llvh::dyn_cast<BranchInst>(&i)) {
     auto destination = edge(i.getParent(), x->getBranchDest());
     os_ << "  br label %" << destination << "\n";
+  } else if (auto *x = llvh::dyn_cast<GetPNamesInst>(&i)) {
+    auto hasValue = call("shllvm_pnames", {
+        ptr(slot(x->getIterator())), ptr("%shr"), ptr(slot(x->getBase())),
+        ptr(slot(x->getIndex())), ptr(slot(x->getSize()))}, "i32");
+    auto condition = temporary();
+    os_ << "  " << condition << " = icmp ne i32 " << hasValue << ", 0\n";
+    auto some = edge(i.getParent(), x->getOnSomeDest());
+    auto empty = edge(i.getParent(), x->getOnEmptyDest());
+    os_ << "  br i1 " << condition << ", label %" << some
+        << ", label %" << empty << "\n";
+  } else if (auto *x = llvh::dyn_cast<GetNextPNameInst>(&i)) {
+    auto hasValue = call("shllvm_pname_next", {
+        ptr(slot(x->getPropertyAddr())), ptr("%shr"),
+        ptr(slot(x->getIteratorAddr())), ptr(slot(x->getBaseAddr())),
+        ptr(slot(x->getIndexAddr())), ptr(slot(x->getSizeAddr()))}, "i32");
+    auto condition = temporary();
+    os_ << "  " << condition << " = icmp ne i32 " << hasValue << ", 0\n";
+    auto some = edge(i.getParent(), x->getOnSomeDest());
+    auto last = edge(i.getParent(), x->getOnLastDest());
+    os_ << "  br i1 " << condition << ", label %" << some
+        << ", label %" << last << "\n";
   } else if (auto *x = llvh::dyn_cast<TryStartInst>(&i)) {
     os_ << "  store volatile i32 " << tries_.at(x)
         << ", ptr %try_state, align 4\n";
@@ -571,6 +688,28 @@ void FunctionEmitter::emitInstruction(Instruction &i) {
         ptr("%shr"), ptr("%unit"), u32(module_.string(x->getName()->getValue().str()))});
   } else if (auto *x = llvh::dyn_cast<LIRGetGlobalObjectInst>(&i)) {
     call("shllvm_global", {ptr(slot(x)), ptr("%shr")});
+  } else if (auto *x = llvh::dyn_cast<CreateRegExpInst>(&i)) {
+    call("shllvm_regexp", {
+        ptr(slot(x)), ptr("%shr"), ptr("%unit"),
+        u32(module_.string(x->getPattern()->getValue().str())),
+        u32(module_.string(x->getFlags()->getValue().str()))});
+  } else if (auto *x = llvh::dyn_cast<CreatePrivateNameInst>(&i)) {
+    auto *name = llvh::cast<LiteralString>(x->getSingleOperand());
+    call("shllvm_private_name", {
+        ptr(slot(x)), ptr("%shr"), ptr("%unit"),
+        u32(module_.string(name->getValue().str()))});
+  } else if (auto *x = llvh::dyn_cast<LoadOwnPrivateFieldInst>(&i)) {
+    call("shllvm_private_get", {
+        ptr(slot(x)), ptr("%shr"), ptr(slot(x->getObject())),
+        ptr(slot(x->getProperty()))});
+  } else if (auto *x = llvh::dyn_cast<StoreOwnPrivateFieldInst>(&i)) {
+    call("shllvm_private_set", {
+        ptr("%shr"), ptr(slot(x->getObject())), ptr(slot(x->getProperty())),
+        ptr(slot(x->getStoredValue()))});
+  } else if (auto *x = llvh::dyn_cast<AddOwnPrivateFieldInst>(&i)) {
+    call("shllvm_private_add", {
+        ptr("%shr"), ptr(slot(x->getObject())), ptr(slot(x->getProperty())),
+        ptr(slot(x->getStoredValue()))});
   } else if (auto *x = llvh::dyn_cast<LoadPropertyInst>(&i)) {
     getProperty(*x, x->getObject(), x->getProperty(), false);
   } else if (auto *x = llvh::dyn_cast<PrLoadInst>(&i)) {
@@ -667,6 +806,17 @@ void FunctionEmitter::emitInstruction(Instruction &i) {
     call("shllvm_coerce_this", {ptr(slot(x)), ptr("%shr"), ptr("%scratch")});
   } else if (auto *x = llvh::dyn_cast<GetNewTargetInst>(&i)) {
     call("shllvm_new_target", {ptr(slot(x)), ptr("%frame")});
+  } else if (auto *x = llvh::dyn_cast<IteratorBeginInst>(&i)) {
+    call("shllvm_iterator_begin", {
+        ptr(slot(x)), ptr("%shr"), ptr(slot(x->getSourceOrNext()))});
+  } else if (auto *x = llvh::dyn_cast<IteratorNextInst>(&i)) {
+    call("shllvm_iterator_next", {
+        ptr(slot(x)), ptr("%shr"), ptr(slot(x->getIterator())),
+        ptr(slot(x->getSourceOrNext()))});
+  } else if (auto *x = llvh::dyn_cast<IteratorCloseInst>(&i)) {
+    call("shllvm_iterator_close", {
+        ptr("%shr"), ptr(slot(x->getIterator())),
+        u32(x->getIgnoreInnerException())});
   } else if (auto *x = llvh::dyn_cast<CreateThisInst>(&i)) {
     call("shllvm_create_this", {
         ptr(slot(x)), ptr("%shr"), ptr(slot(x->getClosure())),
@@ -738,6 +888,11 @@ void FunctionEmitter::emitInstruction(Instruction &i) {
   } else if (auto *x = llvh::dyn_cast<BinaryOperatorInst>(&i)) {
     unsigned op;
     switch (x->getKind()) {
+      case ValueKind::BinaryPrivateInInstKind:
+        call("shllvm_private_in", {
+            ptr(slot(x)), ptr("%shr"), ptr(slot(x->getLeftHandSide())),
+            ptr(slot(x->getRightHandSide()))});
+        return;
       case ValueKind::BinaryAddInstKind: op = SHLLVM_ADD; break;
       case ValueKind::BinarySubtractInstKind: op = SHLLVM_SUB; break;
       case ValueKind::BinaryMultiplyInstKind: op = SHLLVM_MUL; break;
@@ -797,21 +952,21 @@ bool FunctionEmitter::generate() {
   // has a fixed safety gap; admitting a half-megabyte dynamic alloca could jump
   // over that gap before the next check. This is an admission limit, not a total
   // memory bound (LLVM spills and runtime/recursive frames also consume stack).
-  if (slots_.size() + 1 + std::max(1u, maxArgs_) > 1024) {
+  if (slots_.size() + 2 + std::max(1u, maxArgs_) > 1024) {
     fail(nullptr, "function exceeds 1024 combined root/argument-slot admission limit");
     return false;
   }
   os_ << "define internal i64 " << module_.functionName(&function_)
       << "(ptr %shr) {\nentry:\n";
   call("_sh_check_native_stack_overflow", {ptr("%shr")});
-  auto size = call("shllvm_frame_size", {u32(slots_.size() + 1)}, "i64");
+  auto size = call("shllvm_frame_size", {u32(slots_.size() + 2)}, "i64");
   os_ << "  %storage = alloca i8, i64 " << size << ", align 16\n"
       << "  %argv = alloca [" << std::max(1u, maxArgs_) << " x i64], align 8\n"
       << "  %unit_index = load i32, ptr @shllvm_unit_index, align 4\n";
   module_.import("shllvm_enter", "ptr", {
       ptr(""), ptr(""), u32(0), u32(0), {"i32", ""}});
   os_ << "  %frame = call ptr @shllvm_enter(ptr %shr, ptr %storage, i32 "
-      << slots_.size() + 1 << ", i32 " << maxArgs_ << ", i32 %unit_index)\n";
+      << slots_.size() + 2 << ", i32 " << maxArgs_ << ", i32 %unit_index)\n";
   module_.import("shllvm_roots", "ptr", {ptr("")});
   os_ << "  %roots = call ptr @shllvm_roots(ptr %storage)\n";
   module_.import("shllvm_get_unit", "ptr", {ptr(""), u32(0)});
@@ -819,6 +974,7 @@ bool FunctionEmitter::generate() {
   for (unsigned n = 0; n != slots_.size(); ++n)
     os_ << "  %s" << n << " = getelementptr i64, ptr %roots, i32 " << n << "\n";
   os_ << "  %scratch = getelementptr i64, ptr %roots, i32 " << scratch_ << "\n";
+  os_ << "  %discard = getelementptr i64, ptr %roots, i32 " << scratch_ + 1 << "\n";
   call("shllvm_check_invocation", {
       ptr("%shr"), ptr("%frame"),
       u32(static_cast<uint32_t>(function_.getProhibitInvoke()))});
@@ -889,6 +1045,45 @@ void ModuleEmitter::emitData(llvh::raw_ostream &os) {
     }
     os << "]\n";
   };
+  for (unsigned id = 0; id != bigints.size(); ++id) {
+    auto bytes = bigints[id];
+    if (bytes.empty()) bytes.push_back(0);
+    auto name = "shllvm_bigint" + std::to_string(id);
+    array(name.c_str(), "i8", bytes);
+  }
+  if (!evalSites.empty())
+    os << "%SHLLVMEvalBinding = type { ptr, i32, i32 }\n"
+       << "%SHLLVMEvalScope = type { ptr, i32, i32 }\n";
+  for (unsigned site = 0; site != evalSites.size(); ++site) {
+    const auto &scopes = evalSites[site];
+    for (unsigned depth = 0; depth != scopes.size(); ++depth) {
+      const auto &bindings = scopes[depth].bindings;
+      auto prefix = "shllvm_eval_" + std::to_string(site) + "_" + std::to_string(depth);
+      for (unsigned i = 0; i != bindings.size(); ++i) {
+        std::vector<uint8_t> name(bindings[i].name.begin(), bindings[i].name.end());
+        name.push_back(0);
+        auto global = prefix + "_name" + std::to_string(i);
+        array(global.c_str(), "i8", name);
+      }
+      os << "@" << prefix << "_bindings = private constant ["
+         << bindings.size() << " x %SHLLVMEvalBinding] [";
+      for (unsigned i = 0; i != bindings.size(); ++i) {
+        if (i) os << ", ";
+        os << "%SHLLVMEvalBinding { ptr @" << prefix << "_name" << i
+           << ", i32 " << bindings[i].slot << ", i32 " << bindings[i].flags << " }";
+      }
+      os << "]\n";
+    }
+    os << "@shllvm_eval_scopes" << site << " = private constant ["
+       << scopes.size() << " x %SHLLVMEvalScope] [";
+    for (unsigned depth = 0; depth != scopes.size(); ++depth) {
+      if (depth) os << ", ";
+      os << "%SHLLVMEvalScope { ptr @shllvm_eval_" << site << "_" << depth
+         << "_bindings, i32 " << scopes[depth].bindings.size()
+         << ", i32 " << scopes[depth].slotCount << " }";
+    }
+    os << "]\n";
+  }
   array("shllvm_ascii", "i8", ascii);
   array("shllvm_utf16", "i16", utf16);
   array("shllvm_strings", "i32", triples);

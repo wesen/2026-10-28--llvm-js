@@ -1,0 +1,53 @@
+{
+  "passed": 2,
+  "total": 2,
+  "records": [
+    {
+      "case": "async_generator_finally",
+      "command": [
+        "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/bin/shermes",
+        "-O0",
+        "-Xes6-block-scoping",
+        "-Xenable-tdz",
+        "-Xasync-generators",
+        "-emit-llvm",
+        "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNativeExtensions/async_generator_finally.js",
+        "-o",
+        "/workspace/scratch/ea758b58c6af/tmp/llvm-root-admission/async_generator_finally.ll"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "functions": 12,
+      "max_root_slots": 641,
+      "max_combined_slots": 642,
+      "discard_roots": 12,
+      "llvm_verified": true,
+      "verification_stderr": "",
+      "passed": true
+    },
+    {
+      "case": "async_generator_return_values",
+      "command": [
+        "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/bin/shermes",
+        "-O0",
+        "-Xes6-block-scoping",
+        "-Xenable-tdz",
+        "-Xasync-generators",
+        "-emit-llvm",
+        "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNativeExtensions/async_generator_return_values.js",
+        "-o",
+        "/workspace/scratch/ea758b58c6af/tmp/llvm-root-admission/async_generator_return_values.ll"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "functions": 40,
+      "max_root_slots": 822,
+      "max_combined_slots": 826,
+      "discard_roots": 40,
+      "llvm_verified": true,
+      "verification_stderr": "",
+      "passed": true
+    }
+  ],
+  "note": "The unchanged1024 combined-slot admission bound includes scratch/discard and minimum argument storage. Native execution is covered by the focused/final extension gates."
+}

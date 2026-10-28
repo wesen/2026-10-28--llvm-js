@@ -577,7 +577,17 @@ class IRBuilder {
       ValueKind kind,
       Type type = Type::createAnyType());
 
-  DirectEvalInst *createDirectEvalInst(Value *evalText, bool strictCaller);
+  DirectEvalInst *createDirectEvalInst(
+      Value *evalText,
+      bool strictCaller,
+      bool globalCaller,
+      bool derivedConstructorContext,
+      VariableScope *variableScope,
+      Value *environment,
+      Value *thisValue,
+      Value *newTarget,
+      Variable *capturedArguments,
+      llvh::ArrayRef<Variable *> capturedVariables);
 
   DeclareGlobalVarInst *createDeclareGlobalVarInst(LiteralString *name);
 

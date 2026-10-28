@@ -30,14 +30,19 @@ that objects or closures run in the RV32 interpreter or on physical PicoCalc
 hardware.
 
 The host backend reuses the full dynamic Hermes runtime, including its heap,
-collector, objects, and closure machinery, through a selected set of emitted
-instructions. This does not mean complete ECMAScript acceptance. Generators,
-direct `eval`, and regular-expression literals are rejected; typed-object
-and private fixed-slot operations are outside this backend. The pinned frontend
-also rejects the supplied `const` reassignment and some statically provable TDZ
-violations during compilation, even inside `try`. Runtime TDZ behavior through
-captured bindings is tested separately. See `evidence/validation.json`,
-`evidence/driver-validation.json`, and `evidence/lexical-defaults-validation.json`.
+collector, objects and closure machinery. The extension implements generators,
+async execution, RegExp literals, BigInt, private fields, typed arrays and
+direct lexical eval from strict callers. Dynamic strings use the Hermes
+bytecode compiler. Chapter 7 explains these mechanisms and the remaining
+eval context restrictions. Specialized internal typed-object and fixed-slot
+instructions remain outside the admitted subset. The pinned frontend also
+rejects the supplied static `const` reassignment and some statically provable
+TDZ violations during compilation, even inside `try`. Runtime TDZ behavior
+through captured bindings is tested separately. The current host evidence is
+in `feature-work/core-final-validation.json`,
+`feature-work/extension-final-validation.json`,
+`feature-work/driver-final-validation.json` and
+`feature-work/lexical-defaults-final-validation.json`.
 
 ## The shared architectural idea
 

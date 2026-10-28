@@ -1,0 +1,42 @@
+--- a/lib/VM/JSObject.cpp
++++ b/lib/VM/JSObject.cpp
+@@ -2087,6 +2087,24 @@
+     }
+   }
+ 
++  // Ordinary [[Set]] must still use the exotic [[DefineOwnProperty]] of a
++  // distinct typed-array receiver. Invalid numeric keys fail without converting
++  // the value; they must never become ordinary named properties on the receiver.
++  if (LLVM_UNLIKELY(llvh::isa<JSTypedArrayBase>(*receiverHandle))) {
++    auto numericIndex = canonicalNumericIndex(runtime, nameValPrimitiveHandle);
++    if (LLVM_UNLIKELY(numericIndex == ExecutionStatus::EXCEPTION))
++      return ExecutionStatus::EXCEPTION;
++    if (*numericIndex) {
++      return defineOwnComputedPrimitive(
++          receiverHandle,
++          runtime,
++          nameValPrimitiveHandle,
++          DefinePropertyFlags::getDefaultNewPropertyFlags(),
++          valueHandle,
++          opFlags);
++    }
++  }
++
+   /// Can we add more properties?
+   if (LLVM_UNLIKELY(!receiverHandle->isExtensible(runtime))) {
+     if (opFlags.getThrowOnError()) {
+--- a/test/LLVMNativeExtensions/features_typed_array_indices.js
++++ b/test/LLVMNativeExtensions/features_typed_array_indices.js
+@@ -57,6 +57,12 @@
+     Reflect.set(a, "-1", 8, receiver),
+     Object.prototype.hasOwnProperty.call(receiver, "-1"),
+     Reflect.set(a, "0", 17, receiver), receiver[0], a[0]);
++  let receiverConversions = 0;
++  const convertedValue = {valueOf() { receiverConversions++; return 5; }};
++  print("typed-receiver-invalid", Reflect.set({}, "-1", convertedValue, a),
++    receiverConversions, a[-1]);
++  print("typed-receiver-valid", Reflect.set({}, "0", convertedValue, a),
++    receiverConversions, a[0]);
+ }
+ 
+ function numericPrototypeProperties() {

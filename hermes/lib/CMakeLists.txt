@@ -140,6 +140,10 @@ set(HERMESVM_PUBLIC_INCLUDE_DIRS
 )
 
 add_library(hermesvm_a STATIC)
+# Native lexical eval uses compiler/VM internals, so it belongs only in the
+# full runtime. The archive is also linked into the shared VM used by lli.
+target_sources(hermesvm_a PRIVATE BCGen/SH/LLVMNative/eval_extensions.cpp)
+set_target_properties(hermesvm_a PROPERTIES POSITION_INDEPENDENT_CODE ON)
 target_include_directories(hermesvm_a PUBLIC ${HERMESVM_PUBLIC_INCLUDE_DIRS})
 target_link_libraries(hermesvm_a PUBLIC
   LLVHSupport_obj

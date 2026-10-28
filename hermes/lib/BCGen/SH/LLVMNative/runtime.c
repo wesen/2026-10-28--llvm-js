@@ -128,6 +128,38 @@ void shllvm_closure(void *out, void *shr, void *env, void *unit,
       (SHLegacyValue (*)(SHRuntime *))function,
       &llvm_unit->functions[function_index], U(unit));
 }
+void shllvm_generator(void *out, void *shr, void *env, void *unit,
+                      void *function, uint32_t function_index) {
+  SHLLVMUnit *llvm_unit = unit;
+  if (function_index >= llvm_unit->function_count)
+    bad("generator function index out of range");
+  if (env && _sh_ljs_is_undefined(V(env))) env = NULL;
+  if (!env) bad("lowered generator has no environment");
+  /* LowerGeneratorFunction has already moved suspended locals and control
+   * state into a managed environment. This helper creates the runtime
+   * generator object whose resumption callback is emitted directly in LLVM. */
+  V(out) = _sh_ljs_create_generator_object(R(shr), env,
+      (SHLegacyValue (*)(SHRuntime *))function,
+      &llvm_unit->functions[function_index], U(unit));
+}
+void shllvm_iterator_begin(void *out, void *shr, void *source_or_next) {
+  V(out) = _sh_ljs_iterator_begin_rjs(R(shr), source_or_next);
+}
+void shllvm_iterator_next(void *out, void *shr, void *iterator, void *source_or_next) {
+  V(out) = _sh_ljs_iterator_next_rjs(R(shr), iterator, source_or_next);
+}
+void shllvm_iterator_close(void *shr, void *iterator, uint32_t ignore_exception) {
+  _sh_ljs_iterator_close_rjs(R(shr), iterator, ignore_exception != 0);
+}
+uint32_t shllvm_pnames(void *out, void *shr, void *base, void *index, void *size) {
+  V(out) = _sh_ljs_get_pname_list_rjs(R(shr), base, index, size);
+  return !_sh_ljs_is_undefined(V(out));
+}
+uint32_t shllvm_pname_next(void *out, void *shr, void *iterator,
+                          void *base, void *index, void *size) {
+  V(out) = _sh_ljs_get_next_pname_rjs(R(shr), iterator, base, index, size);
+  return !_sh_ljs_is_undefined(V(out));
+}
 static void copy_args(SHRuntime *shr, uint32_t argc, void *argv) {
   /* This loop does not allocate. During the following call the register frame
    * is traced by Hermes. Inputs must already have been evaluated and rooted. */

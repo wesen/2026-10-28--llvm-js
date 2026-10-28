@@ -1,0 +1,26 @@
+[
+  {
+    "name": "async_generator_return_values.js",
+    "exit_code": 0,
+    "stdout": "caught-return Error return expression\nreturn-finally\nreturn-result {\"value\":42,\"done\":true}\nready {\"value\":\"ready\",\"done\":false}\ncaught-argument Error return argument\nrecovered {\"value\":\"recovered\",\"done\":false}\nargument-finally\nafter-recovery {\"done\":true}\ncompleted-return {\"value\":99,\"done\":true}\ncompleted-throw late\ncaught-argument SyntaxError constructor getter\ngetter-result {\"value\":\"recovered\",\"done\":false}\nargument-finally\ngetter-done {\"done\":true}\nunstarted {\"value\":17,\"done\":true}\nunstarted-rejection TypeError unstarted return\ncontexts {\"value\":27,\"done\":true}\ndefault-parameter {\"value\":4,\"done\":false} {\"value\":5,\"done\":true}\ndelegate-return true true 11\nempty function true {\"done\":true}\ndone: async_generator_return_values\n",
+    "stderr": ""
+  },
+  {
+    "name": "async_generator_return_order.js",
+    "exit_code": 0,
+    "stdout": "return-order caller|finally|tick-1|returned|tick-2\nexpression-order caller|return-thenable|return-finally|result:3\ndone: async_generator_return_order\n",
+    "stderr": ""
+  },
+  {
+    "name": "async_generator_queue_completion.js",
+    "exit_code": 0,
+    "stdout": "queue 2052 1758 294\nfirst {\"status\":\"fulfilled\",\"value\":{\"value\":1,\"done\":true}}\ntail [{\"status\":\"fulfilled\",\"value\":{\"value\":\"completed-return\",\"done\":true}},{\"status\":\"rejected\",\"reason\":\"completed-throw\"},{\"status\":\"fulfilled\",\"value\":{\"done\":true}}]\ndone: async_generator_queue_completion\n",
+    "stderr": ""
+  },
+  {
+    "name": "async_timers.js",
+    "exit_code": 0,
+    "stdout": "script|microtask|timer-1|microtask-1|timer-2|microtask-2|timer-3|await:6\ndone: async_timers\n",
+    "stderr": ""
+  }
+]

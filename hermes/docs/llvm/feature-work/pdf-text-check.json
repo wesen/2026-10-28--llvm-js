@@ -1,0 +1,147 @@
+{
+  "pages": 35,
+  "issues": [],
+  "text_layers": [
+    {
+      "page": 1,
+      "characters": 520
+    },
+    {
+      "page": 2,
+      "characters": 1569
+    },
+    {
+      "page": 3,
+      "characters": 3080
+    },
+    {
+      "page": 4,
+      "characters": 2575
+    },
+    {
+      "page": 5,
+      "characters": 2586
+    },
+    {
+      "page": 6,
+      "characters": 2405
+    },
+    {
+      "page": 7,
+      "characters": 2282
+    },
+    {
+      "page": 8,
+      "characters": 3287
+    },
+    {
+      "page": 9,
+      "characters": 3851
+    },
+    {
+      "page": 10,
+      "characters": 3379
+    },
+    {
+      "page": 11,
+      "characters": 2622
+    },
+    {
+      "page": 12,
+      "characters": 3735
+    },
+    {
+      "page": 13,
+      "characters": 3611
+    },
+    {
+      "page": 14,
+      "characters": 3708
+    },
+    {
+      "page": 15,
+      "characters": 3599
+    },
+    {
+      "page": 16,
+      "characters": 2954
+    },
+    {
+      "page": 17,
+      "characters": 3119
+    },
+    {
+      "page": 18,
+      "characters": 3411
+    },
+    {
+      "page": 19,
+      "characters": 3671
+    },
+    {
+      "page": 20,
+      "characters": 2622
+    },
+    {
+      "page": 21,
+      "characters": 3110
+    },
+    {
+      "page": 22,
+      "characters": 3576
+    },
+    {
+      "page": 23,
+      "characters": 3719
+    },
+    {
+      "page": 24,
+      "characters": 3045
+    },
+    {
+      "page": 25,
+      "characters": 3606
+    },
+    {
+      "page": 26,
+      "characters": 3030
+    },
+    {
+      "page": 27,
+      "characters": 2554
+    },
+    {
+      "page": 28,
+      "characters": 2758
+    },
+    {
+      "page": 29,
+      "characters": 3290
+    },
+    {
+      "page": 30,
+      "characters": 4251
+    },
+    {
+      "page": 31,
+      "characters": 4138
+    },
+    {
+      "page": 32,
+      "characters": 3530
+    },
+    {
+      "page": 33,
+      "characters": 3991
+    },
+    {
+      "page": 34,
+      "characters": 4060
+    },
+    {
+      "page": 35,
+      "characters": 3048
+    }
+  ],
+  "scope": "Text/bounds check complements visual page review; it does not replace layout inspection."
+}

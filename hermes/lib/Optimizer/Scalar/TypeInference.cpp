@@ -107,6 +107,12 @@ static Type inferMemoryLocationType(TypeContext &tc, Value *addr) {
     Value *storedVal = nullptr;
 
     switch (U->getKind()) {
+      case ValueKind::DirectEvalInstKind:
+        // Eval can store any JavaScript value, but it cannot erase the Empty
+        // or Uninit possibilities introduced by other stores. Keep scanning
+        // so TDZ checks remain valid even when initialization is unreachable.
+        T = tc.unionTy(T, Type::createAnyType());
+        continue;
       case ValueKind::StoreFrameInstKind: {
         auto *SF = cast<StoreFrameInst>(U);
         storedVal = SF->getValue();

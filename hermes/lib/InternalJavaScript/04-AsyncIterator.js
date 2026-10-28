@@ -166,19 +166,58 @@ function initAsyncGenerators() {
      */
     function AsyncGenerator(generatorFunction) {
         var currentPromise, resolveQueue;
+        var completed = false;
+
+        function startRequest(key, argument) {
+            if (key === "return") {
+                // AsyncGeneratorUnwrapYieldResumption awaits a return
+                // argument before injecting its completion at the yield.
+                // A rejected argument becomes a throw there, so the source
+                // generator's catch/finally clauses can handle it.
+                try {
+                    HermesPromise.resolve(argument).then(function (value) {
+                        completed ? conclude("return", value) : resume("return", value);
+                    }, function (error) {
+                        completed ? conclude("throw", error) : resume("throw", error);
+                    });
+                } catch (error) {
+                    completed ? conclude("throw", error) : resume("throw", error);
+                }
+                return;
+            }
+            if (completed) {
+                conclude(key === "throw" ? "throw" : "return",
+                    key === "throw" ? argument : undefined);
+                return;
+            }
+            resume(key, argument);
+        }
 
         function resume(key, argument) {
             try {
                 var nextIteration = generatorFunction[key](argument),
                     iterationValue = nextIteration.value,
                     isOverloadYield = iterationValue instanceof OverloadYield;
+                if (nextIteration.done) {
+                    // Source return expressions were awaited inside the
+                    // generator, and return() arguments at request entry.
+                    // Awaiting again here introduces an extra observable
+                    // microtask and incorrectly unwraps delegated returns.
+                    completed = true;
+                    conclude("return", iterationValue);
+                    return;
+                }
                 HermesPromise.resolve(isOverloadYield ? iterationValue.value : iterationValue).then(function (resolvedValue) {
                     if (isOverloadYield) {
                         var nextKey = "return" === key ? "return" : "next";
                         if (!iterationValue.kind) {
-                            // kind=0 (await): always resume with the
-                            // resolved value.
-                            return resume(nextKey, resolvedValue);
+                            // kind=0 is an internal await, including an
+                            // await reached while return() runs a finally
+                            // clause. The generator already holds that
+                            // pending return completion. A second return()
+                            // would abandon the remaining finally body and
+                            // replace its value with this await's result.
+                            return resume("next", resolvedValue);
                         }
                         // kind=1 (delegate yield*). Per spec §15.5.5
                         // (yield * AssignmentExpression) step 8.a.iv reads
@@ -218,6 +257,7 @@ function initAsyncGenerators() {
                     resume("throw", error);
                 });
             } catch (error) {
+                completed = true;
                 conclude("throw", error);
             }
         }
@@ -233,7 +273,19 @@ function initAsyncGenerators() {
                 default:
                     currentPromise.resolve({ value: result, done: false });
             }
-            (currentPromise = currentPromise.next) ? resume(currentPromise.key, currentPromise.arg) : resolveQueue = null;
+            currentPromise = currentPromise.next;
+            // Once complete, drain ordinary next/throw requests without
+            // recursion. A long queue must not overflow the native stack.
+            // A return request still has to await its argument first.
+            while (currentPromise && completed && currentPromise.key !== "return") {
+                if (currentPromise.key === "throw") {
+                    currentPromise.reject(currentPromise.arg);
+                } else {
+                    currentPromise.resolve({ value: undefined, done: true });
+                }
+                currentPromise = currentPromise.next;
+            }
+            currentPromise ? startRequest(currentPromise.key, currentPromise.arg) : resolveQueue = null;
         }
 
         this._invoke = function (key, argument) {
@@ -245,7 +297,7 @@ function initAsyncGenerators() {
                     reject: reject,
                     next: null
                 };
-                resolveQueue ? resolveQueue = resolveQueue.next = promiseCapability : (currentPromise = resolveQueue = promiseCapability, resume(key, argument));
+                resolveQueue ? resolveQueue = resolveQueue.next = promiseCapability : (currentPromise = resolveQueue = promiseCapability, startRequest(key, argument));
             });
         };
 

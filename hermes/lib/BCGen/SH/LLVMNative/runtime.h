@@ -48,6 +48,14 @@ void shllvm_env_load(void *out, void *env, uint32_t index);
 void shllvm_env_store(void *shr, void *env, void *value, uint32_t index);
 void shllvm_closure(void *out, void *shr, void *env, void *unit,
                     void *function, uint32_t function_index);
+void shllvm_generator(void *out, void *shr, void *env, void *unit,
+                      void *function, uint32_t function_index);
+void shllvm_iterator_begin(void *out, void *shr, void *source_or_next);
+void shllvm_iterator_next(void *out, void *shr, void *iterator, void *source_or_next);
+void shllvm_iterator_close(void *shr, void *iterator, uint32_t ignore_exception);
+uint32_t shllvm_pnames(void *out, void *shr, void *base, void *index, void *size);
+uint32_t shllvm_pname_next(void *out, void *shr, void *iterator,
+                          void *base, void *index, void *size);
 /* argc excludes this; argv is contiguous SHLegacyValue data. */
 void shllvm_class(void *out, void *shr, void *env, void *unit,
                   void *function, uint32_t function_index, void *home_out, void *super_class);

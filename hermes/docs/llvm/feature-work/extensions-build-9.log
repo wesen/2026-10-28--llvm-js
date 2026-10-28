@@ -1,0 +1,20 @@
+[1/20] Building CXX object lib/AST/CMakeFiles/hermesAST_obj.dir/AsyncGenerator.cpp.o
+[2/20] Building CXX object lib/CMakeFiles/hermesOptimizer_obj.dir/Optimizer/Scalar/TypeInference.cpp.o
+[3/20] Building CXX object lib/CMakeFiles/hermesFrontend_obj.dir/IRGen/ESTreeIRGen-func.cpp.o
+[4/20] Building CXX object lib/CMakeFiles/hermesFrontend_obj.dir/IRGen/ESTreeIRGen.cpp.o
+[5/20] Building CXX object lib/BCGen/SH/CMakeFiles/hermesSHBackend_obj.dir/LLVMNative/LLVMBackend.cpp.o
+[6/20] Linking CXX static library lib/libhermescompiler.a
+[7/20] Linking CXX executable bin/shermes
+[8/20] Linking CXX executable bin/hermesc
+[9/20] Generating ExtensionsBytecode.hbc
+[10/20] Generating ExtensionsBytecode.inc
+[11/20] Generating InternalBytecode.hbc
+[12/20] Generating InternalBytecode.inc
+[13/20] Building CXX object API/hermes/CMakeFiles/hermesapi_obj.dir/extensions/ExtensionsBytecode.cpp.o
+[14/20] Linking CXX static library API/hermes/libhermesapi.a
+[15/20] Building CXX object lib/InternalJavaScript/CMakeFiles/hermesInternalBytecode_obj.dir/InternalBytecode.cpp.o
+[16/20] Building CXX object lib/CMakeFiles/hermesvm_a.dir/BCGen/SH/LLVMNative/eval_extensions.cpp.o
+[17/20] Linking CXX static library lib/libhermesvm_a.a
+[18/20] Linking CXX shared library lib/libhermesvm.so
+[19/20] Linking CXX shared library tools/shermes/libshermes_console.so
+[20/20] Linking C shared library lib/libshllvm_runtime.so

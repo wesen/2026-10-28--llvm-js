@@ -1,0 +1,41 @@
+{
+  "captured_utc": "2026-10-28T20:22:13.030729+00:00",
+  "files": [
+    {
+      "path": "lib/BCGen/SH/LLVMNative/LLVMBackend.cpp",
+      "sha256": "04569fe6e459ef02a43eddf0e4883748151581955857d9143e03c5ea405b8126"
+    },
+    {
+      "path": "lib/BCGen/SH/LLVMNative/runtime.c",
+      "sha256": "0eb8ddecad472265a09990a19c57a2debdcc046affa9a7d89dadc3ec5b0fce80"
+    },
+    {
+      "path": "lib/BCGen/SH/LLVMNative/runtime.h",
+      "sha256": "f0d71c2c51dd2f7d449ed7b127264a1850ae170530e86dab23ed74d00842c864"
+    },
+    {
+      "path": "lib/BCGen/SH/CMakeLists.txt",
+      "sha256": "a69dc352318fe001abd12c62c08179fd8eb7d8a164369b17d8abd79bd1dfa2d5"
+    },
+    {
+      "path": "tools/shermes/shermes.cpp",
+      "sha256": "66d4fb5836fe4fcf5e5088afb0e61ece1cf75c6783166775c784ca9c32ceebfb"
+    },
+    {
+      "path": "utils/shllvm.py",
+      "sha256": "dc3e04a08fcfafadaf585884880b5a30bee39579520d5b57ffc0ebbf7614a291"
+    },
+    {
+      "path": "utils/test_shllvm.py",
+      "sha256": "2d57414c3de72875719a38acdccf3de3306cd830ac9803702d27f4b83adf187a"
+    },
+    {
+      "path": "docs/llvm/evidence/final-validation.json",
+      "sha256": "c1b8d7afc000589a8c0b88805ff466a754967e99bb61147a9e4f00070e8dac22"
+    },
+    {
+      "path": "docs/llvm/evidence/final-validated-files.json",
+      "sha256": "bfaaa8679d3eb2990070c73bfbe53d32d91b3890232bac54d296ee214fe4f844"
+    }
+  ]
+}

@@ -868,7 +868,9 @@ void ESTreeIRGen::initCaptureStateInES5FunctionHelper() {
   // this because we have to generate the eval function as an arrow function in
   // order to correctly look up `this`, and that arrow function will require the
   // full captured state.
-  if (!(curFunction()->getSemInfo()->containsArrowFunctions ||
+  bool hasLocalEval =
+      curFunction()->getSemInfo()->getFunctionBodyScope()->localEval;
+  if (!(curFunction()->getSemInfo()->containsArrowFunctions || hasLocalEval ||
         ((Mod->getContext().getDebugInfoSetting() == DebugInfoSetting::ALL) &&
          isLegacyClassConstructor)))
     return;
@@ -897,7 +899,10 @@ void ESTreeIRGen::initCaptureStateInES5FunctionHelper() {
   emitStore(newTarget, curFunction()->capturedState.newTarget, true);
 
   // "arguments".
-  if (curFunction()->getSemInfo()->containsArrowFunctionsUsingArguments) {
+  if (!curFunction()->capturedState.arguments &&
+      (curFunction()->getSemInfo()->containsArrowFunctionsUsingArguments ||
+       (hasLocalEval &&
+        curFunction()->getSemInfo()->argumentsDecl.hasValue()))) {
     auto *args = Builder.createVariable(
         scope,
         genAnonymousLabelName("arguments"),
@@ -905,6 +910,10 @@ void ESTreeIRGen::initCaptureStateInES5FunctionHelper() {
         /* hidden */ true);
     curFunction()->capturedState.arguments = args;
     emitStore(curFunction()->createArgumentsInst, args, true);
+    if (auto declaration = curFunction()->getSemInfo()->argumentsDecl;
+        declaration &&
+        (*declaration)->special == sema::Decl::Special::Arguments)
+      setDeclData(*declaration, args);
   }
 }
 
@@ -1650,7 +1659,7 @@ void ESTreeIRGen::onCompiledFunction(hermes::Function *F) {
         std::move(data),
         shouldCaptureState ? curFunction()->capturedState.thisVal : nullptr,
         shouldCaptureState ? curFunction()->capturedState.newTarget : nullptr,
-        nullptr,
+        curFunction()->capturedState.arguments,
         curFunction()->capturedState.homeObject,
         clsConstructor,
         clsInitFunc,

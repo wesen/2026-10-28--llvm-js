@@ -1,0 +1,42 @@
+{
+  "phase": "source guard applied; binary still coordinated build4",
+  "records": [
+    {
+      "stage": "node",
+      "command": [
+        "node",
+        "--expose-gc",
+        "-e",
+        "globalThis.print=(...a)=>console.log(...a);require(process.argv[1]);",
+        "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNativeExtensions/features_typed_array_indices.js"
+      ],
+      "exit_code": 0,
+      "stdout": "-1 undefined false true false true\n-1 undefined false true false true\n-0 undefined false true false true\n1.5 undefined false true false true\n1.5 undefined false true false true\nNaN undefined false true false true\nNaN undefined false true false true\nInfinity undefined false true false true\n-Infinity undefined false true false true\n2 undefined false true false true\n4294967295 undefined false true false true\n4294967296 undefined false true false true\n1e+21 undefined false true false true\nconverted 13 3,4\nzero-and-bigint 8 9 undefined\nnamed undefined undefined false\nordinary 20,21,22,23,24,25,26,27 1,2\ndescriptor true false false false false 42\ndefine-invalid TypeError false\nnot-extensible true true\nnumber-conversion TypeError\nbigint-conversion TypeError\nordering key,value undefined\nreceiver true false true 17 1\ntyped-receiver-invalid false 0 undefined\ntyped-receiver-valid true 1 5\nprototype undefined undefined undefined undefined false false false\nprototype-write undefined 70\n",
+      "stderr": ""
+    },
+    {
+      "stage": "c-build",
+      "command": [
+        "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/bin/shermes",
+        "-O",
+        "-Xes6-block-scoping",
+        "-Xenable-tdz",
+        "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNativeExtensions/features_typed_array_indices.js",
+        "-o",
+        "/workspace/scratch/ea758b58c6af/tmp/value-feature-build4-probes/receiver-before-guard"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "stage": "c-run-before-rebuild",
+      "command": [
+        "/workspace/scratch/ea758b58c6af/tmp/value-feature-build4-probes/receiver-before-guard"
+      ],
+      "exit_code": 0,
+      "stdout": "-1 undefined false true false true\n-1 undefined false true false true\n-0 undefined false true false true\n1.5 undefined false true false true\n1.5 undefined false true false true\nNaN undefined false true false true\nNaN undefined false true false true\nInfinity undefined false true false true\n-Infinity undefined false true false true\n2 undefined false true false true\n4294967295 undefined false true false true\n4294967296 undefined false true false true\n1e+21 undefined false true false true\nconverted 13 3,4\nzero-and-bigint 8 9 undefined\nnamed undefined undefined false\nordinary 20,21,22,23,24,25,26,27 1,2\ndescriptor true false false false false 42\ndefine-invalid TypeError false\nnot-extensible true true\nnumber-conversion TypeError\nbigint-conversion TypeError\nordering key,value undefined\nreceiver true false true 17 1\ntyped-receiver-invalid true 0 undefined\ntyped-receiver-valid true 1 5\nprototype undefined undefined undefined undefined false false false\nprototype-write undefined 70\n",
+      "stderr": ""
+    }
+  ]
+}

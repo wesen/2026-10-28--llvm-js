@@ -1,0 +1,67 @@
+PASS async_basic.js
+PASS async_closures.js
+PASS async_gc.js
+PASS async_exceptions.js
+PASS async_generator_queue.js
+PASS async_generator_finally.js
+PASS error_promise_executor.js
+PASS async_generators.js
+PASS error_promise_receiver.js
+PASS error_promise_species.js
+PASS promise_combinators.js
+PASS promise_order.js
+PASS promise_resolution.js
+PASS promise_species.js
+PASS promise_subclass.js
+PASS promise_subclass_order.js
+PASS promise_thenable_jobs.js
+{
+  "schema_version": 1,
+  "complete": true,
+  "started_at_unix": 1793220095.0453484,
+  "finished_at_unix": 1793220121.1418045,
+  "source_cases": 17,
+  "passed_cases": 17,
+  "failed_cases": 0,
+  "skipped_cases": 0,
+  "positive_cases": 14,
+  "runtime_error_cases": 3,
+  "runtime_rejection_cases": 0,
+  "compile_error_cases": 0,
+  "native_llvm_executions": 68,
+  "native_llvm_matches": 68,
+  "native_llvm_vs_node_matches": 68,
+  "native_llvm_expected_rejections": 0,
+  "lli_executions": 17,
+  "lli_matches": 17,
+  "lli_vs_node_matches": 17,
+  "lli_expected_rejections": 0,
+  "c_oracle_fully_matched_cases": 17,
+  "c_oracle_limitations": [],
+  "input_files_unchanged": true,
+  "changed_input_files": [],
+  "hermes_optimization_levels": [
+    "O0",
+    "O"
+  ],
+  "llvm_optimization_levels": [
+    "0",
+    "2"
+  ],
+  "jit_optimization_levels": {
+    "hermes": "O",
+    "llvm": "2"
+  },
+  "selection": [
+    "async_",
+    "promise_",
+    "error_promise"
+  ],
+  "partial_gate": true,
+  "llvm_validation_performed": true,
+  "asan_options": "detect_leaks=0",
+  "lsan_options": "",
+  "scope": "host native and real lli execution; targeted language extension contracts; not device execution or full ECMAScript conformance",
+  "node_semantics": "script via vm.runInThisContext; not a CommonJS module wrapper"
+}
+Evidence: /workspace/scratch/ea758b58c6af/hermes-llvm-lab/docs/llvm/feature-work/async-promise-fixed-pass.json

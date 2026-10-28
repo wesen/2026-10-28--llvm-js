@@ -1,0 +1,14 @@
+[
+  {
+    "stage": "compile",
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "stage": "execute",
+    "exit_code": 0,
+    "stdout": "for-await 1,2,3,4\nbreak 5\nclosed false\ndone: async_generators\n",
+    "stderr": ""
+  }
+]

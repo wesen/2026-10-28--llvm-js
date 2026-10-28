@@ -266,6 +266,13 @@ static bool runScopeHoisting(Module *M) {
         // hoist past scopes that are used.
         if (RSI->getStartVarScope() == VS)
           uses.insert(RSI->getVariableScope());
+      } else if (auto *eval = llvh::dyn_cast<DirectEvalInst>(U)) {
+        // The string may resolve any visible binding. There need not be an
+        // explicit ResolveScopeInst for these uses in the native function.
+        for (unsigned i = 0; i != eval->getNumCapturedVariables(); ++i)
+          uses.insert(eval->getCapturedVariable(i)->getParent());
+        if (auto *arguments = eval->getCapturedArguments())
+          uses.insert(arguments->getParent());
       } else if (auto *BCLI = llvh::dyn_cast<BaseCreateLexicalChildInst>(U)) {
         // If the scope is the parent of some function, try hoisting that
         // function, since inner scopes and functions have already been hoisted.

@@ -4571,24 +4571,89 @@ class DirectEvalInst : public Instruction {
   DirectEvalInst(const DirectEvalInst &) = delete;
   void operator=(const DirectEvalInst &) = delete;
 
- public:
-  enum { EvalTextIdx = 0, StrictCallerIdx = 1 };
+  // Source context must survive inlining and other changes of function owner.
+  bool globalCaller_;
+  bool derivedConstructorContext_;
 
-  explicit DirectEvalInst(Value *evalText, LiteralBool *strictCaller)
-      : Instruction(ValueKind::DirectEvalInstKind) {
+ public:
+  enum {
+    EvalTextIdx,
+    StrictCallerIdx,
+    VariableScopeIdx,
+    EnvironmentIdx,
+    ThisValueIdx,
+    NewTargetIdx,
+    CapturedArgumentsIdx,
+    FirstCapturedVariableIdx
+  };
+
+  explicit DirectEvalInst(
+      Value *evalText,
+      LiteralBool *strictCaller,
+      bool globalCaller,
+      bool derivedConstructorContext,
+      VariableScope *variableScope,
+      Value *environment,
+      Value *thisValue,
+      Value *newTarget,
+      Value *capturedArguments,
+      llvh::ArrayRef<Variable *> capturedVariables)
+      : Instruction(ValueKind::DirectEvalInstKind),
+        globalCaller_(globalCaller),
+        derivedConstructorContext_(derivedConstructorContext) {
     pushOperand(evalText);
     pushOperand(strictCaller);
+    pushOperand(variableScope);
+    pushOperand(environment);
+    pushOperand(thisValue);
+    pushOperand(newTarget);
+    pushOperand(capturedArguments);
+    // A direct eval can access a binding even if the statically compiled
+    // program never loads it. Keeping these as operands also makes alias and
+    // type analyses conservatively account for unknown reads and writes.
+    for (auto *variable : capturedVariables)
+      pushOperand(variable);
   }
   explicit DirectEvalInst(
       const DirectEvalInst *src,
       llvh::ArrayRef<Value *> operands)
-      : Instruction(src, operands) {}
+      : Instruction(src, operands),
+        globalCaller_(src->globalCaller_),
+        derivedConstructorContext_(src->derivedConstructorContext_) {}
 
   Value *getEvalText() const {
     return getOperand(EvalTextIdx);
   }
   bool getStrictCaller() const {
     return llvh::cast<LiteralBool>(getOperand(StrictCallerIdx))->getValue();
+  }
+  bool getGlobalCaller() const {
+    return globalCaller_;
+  }
+  bool getDerivedConstructorContext() const {
+    return derivedConstructorContext_;
+  }
+  VariableScope *getVariableScope() const {
+    return llvh::cast<VariableScope>(getOperand(VariableScopeIdx));
+  }
+  Value *getEnvironment() const {
+    return getOperand(EnvironmentIdx);
+  }
+  Value *getThisValue() const {
+    return getOperand(ThisValueIdx);
+  }
+  Value *getNewTarget() const {
+    return getOperand(NewTargetIdx);
+  }
+  Variable *getCapturedArguments() const {
+    return llvh::dyn_cast<Variable>(getOperand(CapturedArgumentsIdx));
+  }
+  unsigned getNumCapturedVariables() const {
+    return getNumOperands() - FirstCapturedVariableIdx;
+  }
+  Variable *getCapturedVariable(unsigned index) const {
+    return llvh::cast<Variable>(
+        getOperand(FirstCapturedVariableIdx + index));
   }
 
   static bool hasOutput() {

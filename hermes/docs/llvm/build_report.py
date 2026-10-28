@@ -43,26 +43,62 @@ def numbered_chapter(text, number, title):
     return f"# {number}. {title}\n" + text
 
 def compose():
-    final_matrix = HERE / "evidence/final-validation.json"
-    matrix = json.loads((final_matrix if final_matrix.exists()
-                         else HERE / "evidence/validation.json").read_text())
-    driver = json.loads((HERE / "evidence/driver-validation.json").read_text())
-    lexical = json.loads((HERE / "evidence/lexical-defaults-validation.json").read_text())
-    # Only final recorded outcomes support this table.
-    assert matrix["source_cases"] == matrix["passed_cases"] == 22
+    feature = HERE / "feature-work"
+    matrix = json.loads((feature / "core-final-validation.json").read_text())
+    extension = json.loads((feature / "extension-final-validation.json").read_text())
+    driver = json.loads((feature / "driver-final-validation.json").read_text())
+    lexical = json.loads((feature / "lexical-defaults-final-validation.json").read_text())
+    # The report is a view of completed evidence, never a substitute for it.
+    assert matrix["source_cases"] == matrix["passed_cases"]
     assert matrix["failed_cases"] == 0
-    assert matrix["native_llvm_vs_node_and_c_comparisons"] == 64
+    assert extension["source_cases"] == extension["passed_cases"]
+    assert extension["failed_cases"] == 0 and extension["skipped_cases"] == 0
+    assert extension["input_files_unchanged"] and not extension["partial_gate"]
+    assert driver["passed"] == driver["total"]
+    assert lexical["passed"] == lexical["total"]
+
+    def count_records(data, stage, kind=None):
+        return sum(record.get("stage") == stage
+                   for result in data["results"]
+                   if kind is None or result["kind"] == kind
+                   for record in result["records"])
+
+    core_kinds = {
+        kind: sum(result["kind"] == kind for result in matrix["results"])
+        for kind in ["positive", "runtime-error", "compile-rejection"]
+    }
+    positive_runs = count_records(extension, "llvm-run", "positive")
+    error_runs = count_records(extension, "llvm-run", "runtime-error")
+    rejected_runs = extension["native_llvm_expected_rejections"]
     rows = [
         "| Evidence layer | Recorded final outcome | Scope |",
         "|---|---|---|",
-        "| Host source cases | 22 / 22 passed | 16 positive, 3 runtime-error, 3 compile-rejection |",
-        "| Native differential executions | 64 / 64 comparisons passed | Hermes O0 and O, each at LLVM O0 and O2; compared with Node and C |",
-        "| LLVM JIT executions | 3 / 3 comparisons passed | Functions, mutable closures and forced collection |",
-        "| Runtime-error executions | 6 / 6 expected errors | Three sources at both Hermes frontend settings |",
-        f"| Compiler publication checks | {driver['passed']} / {driver['total']} passed | Default/stdout/exported output, C bypass and preservation on failure |",
-        f"| Raw lexical-default checks | {lexical['passed']} / {lexical['total']} passed | Default behavior, explicit overrides and static TDZ diagnostic |",
-        "| RV32 integer-world regression | 24 / 24 passed; no skips | Complete recorded socket-enabled simulator/service run |",
-        "| RV32 replay artifacts | 6 verified modules; 11 trace records | Linked ELF images, actual instruction execution and reload trace |",
+        f"| Core source cases | {matrix['passed_cases']} / {matrix['source_cases']} passed | "
+        f"{core_kinds['positive']} positive, {core_kinds['runtime-error']} runtime-error, "
+        f"{core_kinds['compile-rejection']} compile-rejection contracts |",
+        f"| Core native comparisons | {matrix['native_llvm_vs_node_and_c_comparisons']} passed | "
+        "Hermes O0/O, LLVM O0/O2; Node and patched C backend |",
+        f"| Core JIT and errors | {count_records(matrix, 'lli-jit')} JIT; "
+        f"{count_records(matrix, 'runtime-error')} runtime-error executions passed | "
+        "Separate execution contracts |",
+        f"| Extension source cases | {extension['passed_cases']} / {extension['source_cases']} passed | "
+        f"{extension['positive_cases']} positive, {extension['runtime_error_cases']} language-error, "
+        f"{extension['runtime_rejection_cases']} explicit runtime-boundary, "
+        f"{extension['compile_error_cases']} compile-error contracts |",
+        f"| Extension native execution | {positive_runs} output comparisons; "
+        f"{error_runs} language-error checks; {rejected_runs} expected rejections | "
+        "Four frontend/LLVM combinations per executable fixture |",
+        f"| Extension LLVM JIT | {extension['lli_vs_node_matches']} Node-contract matches; "
+        f"{extension['lli_expected_rejections']} expected rejections | "
+        "Real lli execution at Hermes O / LLVM O2 |",
+        f"| Compiler publication checks | {driver['passed']} / {driver['total']} passed | "
+        "Default/stdout/exported output, C bypass and preservation on failure |",
+        f"| Raw lexical-default checks | {lexical['passed']} / {lexical['total']} passed | "
+        "Default behavior, explicit overrides and static TDZ diagnostic |",
+        "| RV32 integer-world regression | Earlier 24 / 24 verified; unchanged lane | "
+        "200 C-vs-LLVM event comparisons, 160 original Node oracle events |",
+        "| RV32 replay artifacts | 6 verified modules; 11 trace records | "
+        "Linked ELF images, instruction execution and reload trace |",
     ]
     intro = (HERE / "REPORT_INTRO.md").read_text()
     intro = intro.split("## 1.5 How to use this report", 1)[0]
@@ -71,162 +107,112 @@ def compose():
     assert output == (HERE / "evidence/counter-jit.txt").read_text().strip()
     intro = intro.replace("<!-- COUNTER_SOURCE -->", "```javascript\n" + example + "\n```")
     intro = intro.replace("<!-- COUNTER_OUTPUT -->", "```text\n" + output + "\n```")
-    arch = (HERE / "ARCHITECTURE.md").read_text()
-    arch, refs = arch.split("## References and source-reading guide", 1)
+    arch, refs = (HERE / "ARCHITECTURE.md").read_text().split(
+        "## References and source-reading guide", 1)
     arch = numbered_chapter(arch, 2, "Architecture and implementation")
     arch = re.sub(r"Section (\d+)", r"Section 2.\1", arch)
     validation = (HERE / "REPORT_VALIDATION.md").read_text()
     validation = validation.replace("<!-- VALIDATION_TABLE -->", "\n".join(rows))
     validation = validation.replace("`picocalc/logs/", "`picocalc-llvm-poc/logs/")
-    if final_matrix.exists():
-        validation = validation.replace(
-            "The final host results are `docs/llvm/evidence/validation.json` and `validation.log`.",
-            "The final host results are `docs/llvm/evidence/final-validation.json` "
-            "and `final-validation.log`. The original `validation.json` and "
-            "`validation.log` remain as historical evidence.")
-        validation = validation.replace(
-            "`validated-files.json` connects the execution evidence to hashes of the actual inputs and binaries.",
-            "`final-validated-files.json` connects the final execution evidence "
-            "to hashes of the actual inputs and binaries; "
-            "`validated-files.json` preserves the earlier capture.")
-    post = HERE / "evidence/post-review-verifier.json"
-    if post.exists():
+    validation += (
+        "\n## 3.8 Extension evidence and oracle boundaries\n\n"
+        "The final extension gate used no selection filter, quick mode, "
+        "JIT skip or oracle-only option. It recorded unchanged source and "
+        "binary fingerprints before and after execution. The positive "
+        "fixture output, expected exception classes, explicit unsupported "
+        "boundaries and output-publication checks remain separate records. "
+        "A rejected Node-valid program is a passing rejection contract, "
+        "not a passing JavaScript semantic comparison.\n\n"
+        f"The updated core suite supplied {matrix['native_llvm_vs_node_and_c_comparisons']} "
+        f"native comparisons and the extension suite supplied {positive_runs}. "
+        "The latter includes lexical-eval cases compared directly with Node "
+        "because the inherited C helper lacks caller environment semantics. "
+        "For ordinary shared features, C and LLVM use the same rebuilt "
+        "runtime including the Promise, async-generator and typed-array fixes.\n\n"
+        "The compiler and runtime were built with AddressSanitizer; leak "
+        "checking was disabled only for the documented sandbox restriction. "
+        "The pinned Release build makes the upstream Hermes IR verifier a "
+        "no-op unless HERMES_SLOW_DEBUG is enabled. The wrapper's LLVM "
+        "assembly and opt verification are real structural checks, and "
+        "the executions are real host native/JIT runs.\n"
+    )
+    if extension["c_oracle_limitations"]:
         validation += (
-            "\n## 3.8 Post-review diagnostic parity\n\n"
-            "Final review identified one diagnostic parity gap: direct emission "
-            "did not consult the requested lowered-Hermes-IR verification option. "
-            "The emitter now follows the existing C backend's verifier sequence "
-            "before assigning environment indices. The original full-matrix "
-            "records and hashes are preserved. The separate post-review record "
-            "identifies the final source/compiler hashes: 32 enabled/disabled "
-            "emission pairs were byte-identical, all 64 modules assembled and "
-            "passed LLVM verification, and both counter executions (native "
-            "and JIT) matched the prior output. The broad native matrix was "
-            "not rerun after this diagnostic-only change. "
-            "The pinned Release build compiles the upstream Hermes verifier "
-            "as a no-op unless HERMES_SLOW_DEBUG is enabled; these checks "
-            "therefore establish flag plumbing and output invariance, not "
-            "a malformed-Hermes-IR rejection experiment. LLVM assembly and "
-            "LLVM verification remain real checks in this build.\n"
+            "\nThe machine-readable result explicitly lists these C-oracle "
+            "limitations; they are not reported as matched C executions:\n\n"
         )
-    if (HERE / "evidence/post-review-driver.json").exists():
-        validation += (
-            "\nFinal reproduction review also found that the wrapper's "
-            "automatic CMake command refreshed only the shared bridge, while "
-            "native linking uses the static archive. It now requests both "
-            "bridge targets. Separate native and JIT counter runs with "
-            "automatic building enabled verified the dependency correction "
-            "and matched the prior output. This driver-only change is recorded "
-            "separately from the full differential matrix and does not change "
-            "the emitter's instruction translation.\n"
-        )
-    if final_matrix.exists():
-        validation = validation.replace(
-            "The broad native matrix was not rerun after this diagnostic-only change.",
-            "That focused guard check initially left the broad native matrix unchanged.")
-        validation += (
-            "\nThe subsequent automatic dependency build also refreshed the "
-            "Hermes VM binary. To validate that concrete final artifact, the "
-            "complete host matrix was then repeated with the final compiler, "
-            "driver, runtime and bridges: all 22 cases passed, including "
-            "64 native comparisons, three JIT comparisons and six checked "
-            "runtime-error executions. No quick mode or JIT skip was used. "
-            "The final matrix is the release gate; earlier and focused records "
-            "remain available to explain how the implementation reached it.\n"
-        )
+        for item in extension["c_oracle_limitations"]:
+            name = item.get("name", item.get("case", "fixture"))
+            reason = item.get("reason", item.get("c_oracle_reason", "see fixture metadata"))
+            validation += f"- `{name}`: {reason}\n"
     integration_source = (HERE / "PICOCALC_INTEGRATION.md").read_text()
     integration_source = integration_source.split("## Source references", 1)[0]
     integration_source += (
         "\nSource-reading pointers for these contracts are collected in "
-        "Chapter 6. The standalone integration chapter retains its own "
-        "local reference list.\n")
+        "Chapter 6. The standalone integration chapter retains its local "
+        "reference list. This extension phase did not modify that lane.\n")
     integration = numbered_chapter(
-        integration_source, 4,
-        "PicoCalc integration and the device boundary")
+        integration_source, 4, "PicoCalc integration and the device boundary")
     driver_text = numbered_chapter((HERE / "DRIVER.md").read_text(), 5,
                                   "Build, inspect, execute, and reproduce")
-    driver_text = driver_text.replace(
-        "--target shermes shllvm_runtime_shared",
-        "--target shermes shllvm_runtime shllvm_runtime_shared")
     driver_text += r"""
-## 5.6 Exact release layout and patch route
 
-The complete archive has a `hermes/` source tree and a `picocalc-llvm-poc/`
-tree. Run host commands from `hermes/`. The archive omits build outputs,
-Git history, package caches and `node_modules`. It retains the relevant
-upstream licences, dependency sources, the PicoCalc lockfile, recorded
-evidence and report sources. Rebuild binaries for your installation.
+## 5.7 Release layout and exact patch reproduction
 
-For an existing clone, check out the pinned base in a separate worktree and
-apply `Static-Hermes-direct-LLVM.patch` with `git apply --check` followed by
-`git apply`. The delivered provenance records a successful independent-index
-application to that base and an exact resulting-tree comparison. Do not
-assume that a moving upstream branch accepts the patch unchanged.
+The archive contains `hermes/` and `picocalc-llvm-poc/` source trees,
+`Static-Hermes-direct-LLVM.patch`, the PDF report, consolidated diary,
+`PROVENANCE.json` and `SHA256SUMS.txt`. Host commands run from `hermes/`.
+Build directories, downloaded toolchain binaries, Git history and Node
+dependencies are omitted; rebuild those for the local installation.
 
-To reproduce the individual compiler gates after the build:
+The patch applies to Static Hermes commit
+`f837b9dd8396ebf5c4e8115412417d273565f0fe`. Reproduction was checked with
+separate Git indexes: applying the patch to the exact base produced the
+same source tree as the packaged modifications, without staging the
+working repository. The recorded patch hash and resulting tree identity
+are in `PROVENANCE.json`. Every packaged ZIP member was read back with CRC
+and SHA-256 checks.
 
-```sh
-python3 utils/test_shllvm_driver.py
-python3 utils/test_shllvm_defaults.py
-python3 utils/test_shllvm.py --jobs 2
-```
+`docs/llvm/feature-work/` preserves the extension diary, original failures,
+final test records and input identities. The old `evidence/` directory
+preserves the first release's tests and toolchain provenance. These are
+different stages of the same project; only the named final records support
+the current host counts.
 
-For a nondefault installation, configure each test entry point explicitly:
-
-```sh
-python3 utils/test_shllvm_driver.py \
-  --compiler /path/to/build/bin/shermes
-python3 utils/test_shllvm_defaults.py \
-  --build-dir /path/to/build --clang /path/to/llvm/bin/clang
-python3 utils/test_shllvm.py \
-  --build-dir /path/to/build --llvm-bin /path/to/llvm/bin --jobs 2
-```
-
-The main differential runner also honors `LLVM_BIN` and `HERMES_BUILD_DIR`.
-The raw driver check uses `--compiler`; the lexical-default check uses
-`--build-dir` and `--clang` (with `CLANG` supplying its default compiler).
-The original evidence contains absolute paths from the recording environment;
-these are provenance, not paths that must exist on another machine.
-The Python drivers resolve current tool and runtime locations.
-
-The PicoCalc README gives its own toolchain variables, dependency installation,
-test commands and replay format. Its original C-oriented technical report is
-retained as historical context; `docs/DIRECT_LLVM.md` and the present report
-describe the updated compiler. The two projects' test runners are independent.
-
-PDF regeneration uses `python3 docs/llvm/build_report.py` from the Hermes
-source root with ReportLab and DejaVu fonts installed. This renders the saved
-chapters and evidence; it does not rerun or synthesize validation results.
+Regenerate the PDF with `python3 docs/llvm/build_report.py` using ReportLab
+and DejaVu fonts. The script reads completed final evidence and refuses
+failed, partial or changed-input extension gates. It renders documentation;
+it does not manufacture test results or rerun the compiler.
 """
     references = "# 6. References and source-reading guide\n" + refs
     references += """
 
-## Additional evidence-reading references
+## How to connect source and evidence
 
-The numbered sources above support the architecture chapter. Implementation
-and experiment claims also refer to the delivered source and logs named in
-Chapter 3. Read `test/LLVMNative/gc_closures.js` together with the upstream
-`lib/VM/JSLib/GlobalObject.cpp` collector hook when assessing the forced-GC
-test. Follow source code to its runtime implementation when an inline header
-declaration does not establish allocation or lifetime behavior.
+Chapter 7 adds source pointers for generator lowering, Promise jobs,
+typed-array properties and lexical evaluation. Follow each bridge call to
+the runtime implementation when a header declaration does not establish
+allocation or lifetime behavior. The test harness defines exactly which
+outputs and errors are compared.
 
-For further study, use the official
-[LLVM garbage-collection documentation](https://releases.llvm.org/18.1.8/docs/GarbageCollection.html)
-to compare this explicit-root bridge with compiler-supported collector
-interfaces. The present implementation does not use LLVM statepoints.
-Use the official
-[ECMAScript specification](https://tc39.es/ecma262/)
-when distinguishing language semantics from retained Static Hermes
-frontend restrictions. A specification describes the required language;
-the test matrix describes the subset actually exercised here.
+The official [LLVM garbage-collection documentation](https://releases.llvm.org/18.1.8/docs/GarbageCollection.html)
+provides a useful comparison with this explicit-root design. The current
+emitter does not use LLVM statepoints or coroutine intrinsics. The
+[ECMAScript specification](https://tc39.es/ecma262/) describes the language;
+the delivered source and targeted tests establish what this implementation
+actually supports.
 """
-    result = "# Direct LLVM Implementation: Functions, Objects, Closures, and PicoCalc\n\n"
+    extensions = numbered_chapter((HERE / "LANGUAGE_EXTENSIONS.md").read_text(), 7,
+                                  "Language extensions and dynamic evaluation")
+    result = "# Direct LLVM Implementation: JavaScript Language Extensions and PicoCalc\n\n"
     result += "Technical report and undergraduate compiler laboratory. 28 October 2026.\n\n"
-    result += "\n\n".join([intro, arch, validation, integration, driver_text, references])
+    result += "\n\n".join([intro, arch, validation, integration,
+                           driver_text, references, extensions])
     if "<!--" in result:
         raise ValueError("Unresolved report placeholder")
     (HERE / "REPORT.md").write_text(result)
     return result
+
 
 REPORT = compose()
 REFERENCE_URLS = dict(re.findall(r"(?m)^\[(\d+)\]:\s*(\S+)\s*$", REPORT))
@@ -329,7 +315,9 @@ def table(lines):
         ("LEFTPADDING", (0,0), (-1,-1), 6),
         ("RIGHTPADDING", (0,0), (-1,-1), 6),
     ]))
-    return t
+    # Compact protocol/state tables read best as one unit. Long tables still
+    # split with their header repeated on the following page.
+    return KeepTogether([t]) if len(rows) <= 5 else t
 
 def box(d, x, y, w, h, label, accent=BLUE):
     d.add(Rect(x, y, w, h, rx=5, ry=5, fillColor=colors.HexColor(PALE),
@@ -364,9 +352,9 @@ def diagram(number):
         box(d,right,74,w,36,"Prebuilt C runtime bridge")
         for y in [248,190,132,74]: arrow(d,left+w/2,y,left+w/2,y-22)
         arrow(d,left+w,208,right,208)
-        arrow(d,right+w/2,132,right+w/2,110)
+        arrow(d,right+w/2,110,right+w/2,132)
         arrow(d,left+w,34,right+20,74)
-        cap = "Figure 1. The direct emitter branches before C-specific register allocation. Generated functions call the prebuilt bridge; the existing C backend remains an independent comparison path."
+        cap = "Figure 1. The direct emitter branches before C-specific register allocation. Generated functions call the prebuilt bridge; the C backend provides a second code-generation path using the same runtime."
     else:
         d = Drawing(CONTENT, 240)
         box(d,113,198,100,32,"Object a")
@@ -398,7 +386,7 @@ def cover(canvas, doc):
     canvas.drawString(MARGIN,HEIGHT-190,"Direct LLVM")
     canvas.drawString(MARGIN,HEIGHT-239,"Implementation")
     canvas.setFont("Head",17)
-    canvas.drawString(MARGIN,HEIGHT-286,"Functions, objects, closures, and PicoCalc")
+    canvas.drawString(MARGIN,HEIGHT-286,"Generators, async code, values, and dynamic eval")
     canvas.setFont("Body",12)
     for i,line in enumerate([
         "Architecture and runtime contracts",
@@ -435,7 +423,7 @@ class Book(BaseDocTemplate):
     def __init__(self, path):
         super().__init__(str(path), pagesize=A4, leftMargin=MARGIN,
             rightMargin=MARGIN, topMargin=51, bottomMargin=49,
-            title="Direct LLVM Implementation: Functions, Objects, Closures, and PicoCalc",
+            title="Direct LLVM Implementation: Language Extensions and PicoCalc",
             author="Direct LLVM implementation project",
             subject="Architecture, implementation, validation, and undergraduate laboratories")
         frame_args = dict(x1=MARGIN, y1=49, width=CONTENT, height=HEIGHT-100,
@@ -466,7 +454,8 @@ story += [toc, Spacer(1,25), Paragraph(
     "supports it. The accompanying source archive includes the complete source "
     "trees, a patch, exercises, raw logs and the detailed diary. Chapter 2 is "
     "the teaching core; Chapter 3 is the release evidence; Chapter 4 defines "
-    "the remaining device integration boundary.",S["body"]),
+    "the remaining device integration boundary. Chapter 7 explains generators, "
+    "async execution, richer values and lexical eval.",S["body"]),
     Paragraph("How to study the implementation",S["h2"]),
     Paragraph(
         "You should be comfortable with functions, pointers and basic data "
@@ -474,7 +463,8 @@ story += [toc, Spacer(1,25), Paragraph(
         "blocks, phi values, tagged values, roots, closure environments and ABI "
         "contracts. Its five exercises connect source programs to observable "
         "behavior. Chapter 5 gives the build and execution commands; Chapter 6 "
-        "provides primary references and a guide to the source.",S["body"]),
+        "provides primary references and a guide to the source. Chapter 7 adds "
+        "six exercises connecting language extensions to runtime behavior.",S["body"]),
     Paragraph(
         "Read the final evidence separately from the engineering diary. The "
         "diary preserves decisions, experiments, failures and fixes. Earlier "
@@ -548,5 +538,5 @@ doc.multiBuild(story)
 summary = {"markdown":str(HERE/"REPORT.md"),"pdf":str(ARGS.output),
            "words_approx":len(re.findall(r"\b[\w'-]+\b",REPORT)),
            "pages":doc.page,"vector_figures":figures}
-(HERE / "evidence/report-build.json").write_text(json.dumps(summary,indent=2)+"\n")
+(HERE / "feature-work/report-build.json").write_text(json.dumps(summary,indent=2)+"\n")
 print(json.dumps(summary,indent=2))

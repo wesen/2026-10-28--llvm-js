@@ -89,6 +89,8 @@ isAnalyzableVariable(TypeContext &tc, Variable *V, Value *val) {
   for (auto *U : V->getUsers()) {
     if (llvh::isa<LoadFrameInst>(U))
       continue;
+    if (llvh::isa<DirectEvalInst>(U))
+      return {false, false};
     auto *SF = llvh::cast<StoreFrameInst>(U);
 
     // Storing the same closure does not affect our ability to propagate

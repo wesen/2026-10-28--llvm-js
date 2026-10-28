@@ -1,0 +1,18 @@
+first {"value":10,"done":false}
+sent {"value":15,"done":false}
+sequence-finally 15
+done {"value":30,"done":true}
+after {"done":true}
+b-start {"value":20,"done":false}
+b-return {"value":99,"done":true}
+b-after {"done":true}
+c-start {"value":"ready","done":false}
+c-throw {"value":"caught:boom","done":false}
+caught-finally
+c-finish {"value":"finished","done":true}
+completed-throw late
+unstarted-return {"value":7,"done":true}
+unstarted-throw early
+unstarted-body false
+reentrant {"value":"TypeError","done":false}
+reentrant-done {"done":true}

@@ -1,12 +1,9 @@
 /* @nolint */var initPromise = (function () {
   'use strict';
   var useEngineQueue = HermesInternal.useEngineQueue();
-  // Captured at startup so per-element checks in Promise.all stay
-  // cheap. Spec compliance (§27.2.4.1.2 step 8.e: always Invoke
-  // `.then`) is gated on `--test262`; otherwise we keep the
-  // fast path that synchronously invokes the resolve element when
-  // the input is an already-fulfilled core Promise.
-  var test262Enabled = HermesInternal.test262Enabled();
+  var isConstructor = HermesInternal.isConstructor;
+  var speciesSymbol = Symbol.species;
+  var apply = Reflect.apply;
   function noop() {}
 
   // States:
@@ -101,6 +98,10 @@
 
     /* Static Methods */
 
+    static get [Symbol.species]() {
+      return this;
+    }
+
     static resolve(value) {
       // Per spec §27.2.4.5 step 2: If Type(this) is not Object, throw
       // TypeError. Includes null (typeof null === 'object', but null
@@ -119,27 +120,12 @@
       }
 
       if (C === core) {
-        // Fast path for core Promise.
-        if (value === null) return NULL;
-        if (value === undefined) return UNDEFINED;
-        if (value === true) return TRUE;
-        if (value === false) return FALSE;
-        if (value === 0) return ZERO;
-        if (value === '') return EMPTYSTRING;
-
-        if (typeof value === 'object' || typeof value === 'function') {
-          try {
-            var then = value.then;
-            if (typeof then === 'function') {
-              return new core(then.bind(value));
-            }
-          } catch (ex) {
-            return new core(function (resolve, reject) {
-              reject(ex);
-            });
-          }
-        }
-        return valuePromise(value);
+        // Public Promise.resolve must produce a fresh Promise for a
+        // non-Promise value. The private await caches below are never
+        // returned here: sharing them exposes identity and mutable state.
+        var promise = new core(noop);
+        resolve(promise, value);
+        return promise;
       }
 
       // Subclass path: NewPromiseCapability(C) + capability.[[Resolve]](value)
@@ -261,27 +247,19 @@
       }
       // Step 7-8: PerformPromiseAll, IfAbruptRejectPromise. Catches
       // abrupt completions from the iterator protocol, promiseResolve,
-      // nextPromise.then, the fast-path resolveElement call, and the
+      // nextPromise.then and the
       // final capResolve (subclass capabilities can throw).
       try {
         for (var item of arr) {
           var nextPromise = promiseResolve.call(C, item);
           var resolveElement = makeResolveElement(index);
           remainingElementsCount++;
-          // Per spec §27.2.4.1.2 step 8.e, .then must be invoked on
-          // nextPromise so the reaction is enqueued as a
-          // PromiseReactionJob. The fast path below synchronously calls
-          // resolveElement when nextPromise is an already-fulfilled core
-          // Promise, collapsing the spec's 1-microtask hop. We retain it
-          // by default for performance and only take the spec path under
-          // --test262.
-          if (test262Enabled) {
-            nextPromise.then(resolveElement, capReject);
-          } else {
-            nextPromise._y === 1
-              ? resolveElement(nextPromise._z)
-              : nextPromise.then(resolveElement, capReject);
-          }
+          // Always invoke .then, including for an already-fulfilled core
+          // Promise. Its reaction is an observable PromiseReactionJob:
+          // resolving the element synchronously changes microtask order and
+          // skips user-visible .then access. Spec compliance must not depend
+          // on whether the command line enables test262 mode.
+          nextPromise.then(resolveElement, capReject);
           index++;
         }
         if (--remainingElementsCount === 0) {
@@ -598,14 +576,9 @@
       if (!(this instanceof Promise)) {
         throw new TypeError('Promise.prototype.then called on non-Promise');
       }
-      // Per spec §27.2.5.4 step 3 + §7.3.22 SpeciesConstructor: when
-      // `constructor` is undefined, fall back to %Promise% — i.e. take
-      // the fast path. Without this, an `undefined` constructor would
-      // hit safeThen → newPromiseCapability(undefined) → spurious
-      // TypeError where the spec returns a normal Promise.
-      var C = this.constructor;
-      if (C !== undefined && C !== Promise) {
-        return safeThen(this, onFulfilled, onRejected);
+      var C = speciesConstructor(this);
+      if (C !== Promise) {
+        return safeThen(this, C, onFulfilled, onRejected);
       }
       var res = new Promise(noop);
       handle(this, new Handler(onFulfilled, onRejected, res));
@@ -621,17 +594,13 @@
     // Per spec §27.2.5.3: Promise.prototype.finally ( onFinally )
     finally(onFinally) {
       // Per spec §27.2.5.3 step 2: If Type(this) is not Object, throw
-    // TypeError. Includes null (typeof null === 'object', but null
-    // is the Null type, not Object).
-    if (this === null ||
-        (typeof this !== 'object' && typeof this !== 'function')) {
-      throw new TypeError('Promise.prototype.finally called on non-object');
-    }
-    // Spec step 3 calls SpeciesConstructor(this, %Promise%); we
-      // don't support @@species (perf), so fall back to
-      // this.constructor (gives subclass dispatch for non-species-
-      // overriding subclasses).
-      var C = this.constructor;
+      // TypeError. Includes null (typeof null === 'object', but null
+      // is the Null type, not Object).
+      if (this === null ||
+          (typeof this !== 'object' && typeof this !== 'function')) {
+        throw new TypeError('Promise.prototype.finally called on non-object');
+      }
+      var C = speciesConstructor(this);
       var thenFinally, catchFinally;
       if (typeof onFinally !== 'function') {
         thenFinally = onFinally;
@@ -643,13 +612,12 @@
         // constructors and are anonymous (array-literal element
         // position avoids NamedEvaluation per §8.5.5). Per spec
         // §27.2.5.3.1 step 4, the result of onFinally() is wrapped
-        // via PromiseResolve(C, result) — delegating to C.resolve
-        // covers that (it handles same-Promise short-circuit,
-        // thenable assimilation, and value wrapping).
+        // via the abstract PromiseResolve(C, result). Reading C.resolve
+        // would incorrectly invoke an overridable user property.
         var fns = [(value) => {
-          return C.resolve(onFinally()).then(() => value);
+          return promiseResolve(C, onFinally()).then(() => value);
         }, (reason) => {
-          return C.resolve(onFinally()).then(() => { throw reason; });
+          return promiseResolve(C, onFinally()).then(() => { throw reason; });
         }];
         thenFinally = fns[0];
         catchFinally = fns[1];
@@ -659,17 +627,39 @@
   }
   var core = Promise;
 
-  function safeThen(self, onFulfilled, onRejected) {
+  // SpeciesConstructor(O, %Promise%) must observe constructor and @@species
+  // exactly once and validate constructibility without invoking user code.
+  function speciesConstructor(object) {
+    var C = object.constructor;
+    if (C === undefined) return Promise;
+    if (!isObject(C)) {
+      throw new TypeError('Promise constructor is not an object');
+    }
+    var S = C[speciesSymbol];
+    if (S === undefined || S === null) return Promise;
+    if (!isConstructor(S)) {
+      throw new TypeError('Promise species is not a constructor');
+    }
+    return S;
+  }
+
+  function promiseResolve(C, value) {
+    if (value instanceof Promise && value.constructor === C) return value;
+    var capability = newPromiseCapability(C);
+    var capResolve = capability.resolve;
+    capResolve(value);
+    return capability.promise;
+  }
+
+  function safeThen(self, C, onFulfilled, onRejected) {
     // Per spec §27.2.5.4: NewPromiseCapability runs BEFORE
     // PerformPromiseThen attaches the reaction.
-    var capability = newPromiseCapability(self.constructor);
-    // Intermediate core Promise that holds the result of running
-    // onFulfilled/onRejected when self settles.
-    var res = new Promise(noop);
-    handle(self, new Handler(onFulfilled, onRejected, res));
-    // Chain res's settlement to the C-typed capability.
-    handle(res, new Handler(capability.resolve, capability.reject,
-      new Promise(noop)));
+    var capability = newPromiseCapability(C);
+    var handler = new Handler(onFulfilled, onRejected, capability.promise);
+    handler.capability = capability;
+    // Settle the chosen constructor's capability in the original reaction
+    // job. An intermediate Promise would add an observable microtask hop.
+    handle(self, handler);
     return capability.promise;
   }
 
@@ -742,6 +732,19 @@
         }
         return;
       }
+      if (deferred.capability !== null) {
+        var result = self._z;
+        var isRejection = self._y === 2;
+        if (cb !== null) {
+          result = tryCallOne(cb, result);
+          isRejection = result === IS_ERROR;
+          if (isRejection) result = LAST_ERROR;
+        }
+        var settle = isRejection ? deferred.capability.reject
+                                 : deferred.capability.resolve;
+        settle(result);
+        return;
+      }
       if (cb === null) {
         if (self._y === 1) {
           resolve(promise, self._z);
@@ -774,17 +777,17 @@
       if (then === IS_ERROR) {
         return reject(self, LAST_ERROR);
       }
-      if (
-        then === self.then &&
-        newValue instanceof Promise &&
-        newValue.constructor === Promise
-      ) {
-        self._y = 3;
-        self._z = newValue;
-        finale(self);
-        return;
-      } else if (typeof then === 'function') {
-        doResolve(then.bind(newValue), self);
+      if (typeof then === 'function') {
+        // NewPromiseResolveThenableJob: read .then synchronously above,
+        // but invoke it in a later job, even when the value is another
+        // core Promise. Direct state adoption or a synchronous call
+        // changes observable ordering. Capture Reflect.apply so a
+        // user-provided then.call / then.bind property is never read.
+        (useEngineQueue ? HermesInternal.enqueueJob : setImmediate)(function () {
+          doResolve(function (resolveThenable, rejectThenable) {
+            apply(then, newValue, [resolveThenable, rejectThenable]);
+          }, self);
+        });
         return;
       }
     }
@@ -840,6 +843,7 @@
       // rejecting `errorPromise`.
       this.promise = promise;
       this.errorPromise = null;
+      this.capability = null;
     }
   }
 

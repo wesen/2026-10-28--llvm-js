@@ -8,6 +8,7 @@
 #include "hermes/VM/JSObject.h"
 
 #include "SHUnitExt.h"
+#include "hermes/Support/FastStrToDouble.h"
 #include "hermes/VM/BuildMetadata.h"
 #include "hermes/VM/Callable.h"
 #include "hermes/VM/DecoratedObject.h"
@@ -789,6 +790,90 @@ CallResult<Handle<JSArray>> JSObject::getOwnPropertyKeys(
     }                                                     \
   } while (0)
 
+/// ECMA-262 CanonicalNumericIndexString (sec-canonicalnumericindexstring).
+/// All canonical Number strings fit
+/// in NUMBER_TO_STRING_BUF_SIZE. Parsing and round-tripping fixed-size buffers
+/// avoids GC allocation and rejects ordinary names such as "01" and "1.0".
+static OptValue<double> canonicalNumericIndexString(StringView str) {
+  if (str.length() == 0 || str.length() >= NUMBER_TO_STRING_BUF_SIZE)
+    return llvh::None;
+
+  char input[NUMBER_TO_STRING_BUF_SIZE];
+  for (uint32_t i = 0; i < str.length(); ++i) {
+    if (str[i] > 0x7f)
+      return llvh::None;
+    input[i] = static_cast<char>(str[i]);
+  }
+  llvh::StringRef text{input, str.length()};
+  if (text == "-0")
+    return -0.0;
+  if (text == "NaN")
+    return std::numeric_limits<double>::quiet_NaN();
+  if (text == "Infinity")
+    return std::numeric_limits<double>::infinity();
+  if (text == "-Infinity")
+    return -std::numeric_limits<double>::infinity();
+
+  auto parsed = fastStrToDouble(llvh::ArrayRef<char>{input, str.length()});
+  if (!parsed || parsed.ptr != input + str.length())
+    return llvh::None;
+  char output[NUMBER_TO_STRING_BUF_SIZE];
+  if (numberToString(parsed.value, output, sizeof(output)) != text)
+    return llvh::None;
+  return parsed.value;
+}
+
+/// The caller has already performed ToPropertyKey for object keys. Numeric
+/// primitives are retained by that fast path: their -0 becomes the key "0".
+static CallResult<OptValue<double>> canonicalNumericIndex(
+    Runtime &runtime,
+    Handle<> key) {
+  assert(!key->isObject() && "property key must already be primitive");
+  if (key->isNumber()) {
+    double number = key->getNumber();
+    return OptValue<double>{number == 0 ? 0.0 : number};
+  }
+  if (key->isString()) {
+    return canonicalNumericIndexString(StringPrimitive::createStringView(
+        runtime, Handle<StringPrimitive>::vmcast(key)));
+  }
+  if (!key->isBigInt())
+    return OptValue<double>{};
+
+  // BigInt property keys use their decimal string, not a rounded Number.
+  struct : public Locals {
+    PinnedValue<StringPrimitive> str;
+  } lv;
+  LocalsRAII lraii(runtime, &lv);
+  auto result = toString_RJS(runtime, key);
+  if (LLVM_UNLIKELY(result == ExecutionStatus::EXCEPTION))
+    return ExecutionStatus::EXCEPTION;
+  lv.str = std::move(*result);
+  return canonicalNumericIndexString(
+      StringPrimitive::createStringView(runtime, lv.str));
+}
+
+/// UINT32_MAX is outside every TypedArray in this runtime (lengths use
+/// uint32_t). Passing this sentinel to setOwnIndexed still performs the required
+/// ToNumber/ToBigInt conversion before discarding an invalid-index write.
+static uint32_t typedArrayIndexOrInvalid(double number) {
+  uint32_t index;
+  if (std::signbit(number) || !sh_tryfast_f64_to_u32(number, index))
+    return UINT32_MAX;
+  return index;
+}
+
+/// Named-property bytecodes can contain canonical numeric strings too.
+static bool isTypedArrayNumericSymbol(
+    Handle<JSObject> object,
+    Runtime &runtime,
+    SymbolID name) {
+  return llvh::isa<JSTypedArrayBase>(*object) && name.isUniqued() &&
+      canonicalNumericIndexString(
+          runtime.getIdentifierTable().getStringView(runtime, name))
+          .hasValue();
+}
+
 /// Convert a value to an identifier unless already converted
 /// \param nameValHandle [Handle<>] the value to convert
 /// \param id [SymbolID] the identifier is stored there. Must be initialized
@@ -876,6 +961,23 @@ inline CallResult<bool> getOwnComputedPrimitiveDescriptorImpl(
       "nameValHandle passed to "
       "getOwnComputedPrimitiveDescriptor "
       "cannot be an object");
+
+  if (LLVM_UNLIKELY(llvh::isa<JSTypedArrayBase>(*selfHandle))) {
+    auto numericIndex = canonicalNumericIndex(runtime, nameValHandle);
+    if (LLVM_UNLIKELY(numericIndex == ExecutionStatus::EXCEPTION))
+      return ExecutionStatus::EXCEPTION;
+    if (*numericIndex) {
+      uint32_t index = typedArrayIndexOrInvalid(**numericIndex);
+      auto flags = JSObject::Helper::getOwnIndexedPropertyFlags(
+          *selfHandle, runtime, index);
+      if (!flags)
+        return false;
+      desc.flags = *flags;
+      desc.flags.indexed = 1;
+      desc.slot = index;
+      return true;
+    }
+  }
 
   // Try the fast paths first if we have "fast" index properties and the
   // property name is an obvious index.
@@ -1178,6 +1280,16 @@ CallResult<PseudoHandle<>> JSObject::getNamedWithReceiver_RJS(
     Handle<> receiver,
     PropOpFlags opFlags,
     ReadPropertyCacheEntry *cacheEntry) {
+  if (LLVM_UNLIKELY(isTypedArrayNumericSymbol(selfHandle, runtime, name))) {
+    struct : public Locals {
+      PinnedValue<> key;
+    } lv;
+    LocalsRAII lraii(runtime, &lv);
+    lv.key = HermesValue::encodeStringValue(
+        runtime.getStringPrimFromSymbolID(name));
+    return getComputedWithReceiver_RJS(
+        selfHandle, runtime, lv.key, receiver);
+  }
   NamedPropertyDescriptor desc;
   // Locate the descriptor. propObj contains the object which may be anywhere
   // along the prototype chain.
@@ -1302,6 +1414,16 @@ CallResult<PseudoHandle<>> JSObject::getComputedWithReceiver_RJS(
   }
   auto nameValPrimitiveHandle = *converted;
 
+  if (LLVM_UNLIKELY(llvh::isa<JSTypedArrayBase>(*selfHandle))) {
+    auto numericIndex = canonicalNumericIndex(runtime, nameValPrimitiveHandle);
+    if (LLVM_UNLIKELY(numericIndex == ExecutionStatus::EXCEPTION))
+      return ExecutionStatus::EXCEPTION;
+    if (*numericIndex) {
+      return createPseudoHandle(getOwnIndexed(
+          selfHandle, runtime, typedArrayIndexOrInvalid(**numericIndex)));
+    }
+  }
+
   ComputedPropertyDescWithSymStorage desc{MutableHandle<SymbolID>{runtime}};
 
   // Locate the descriptor. propObj contains the object which may be anywhere
@@ -1353,6 +1475,12 @@ CallResult<bool> JSObject::hasNamed(
     Handle<JSObject> selfHandle,
     Runtime &runtime,
     SymbolID name) {
+  if (LLVM_UNLIKELY(isTypedArrayNumericSymbol(selfHandle, runtime, name))) {
+    auto numericIndex = canonicalNumericIndexString(
+        runtime.getIdentifierTable().getStringView(runtime, name));
+    return haveOwnIndexed(
+        *selfHandle, runtime, typedArrayIndexOrInvalid(*numericIndex));
+  }
   NamedPropertyDescriptor desc;
   JSObject *propObj = getNamedDescriptorUnsafe(selfHandle, runtime, name, desc);
   if (propObj == nullptr) {
@@ -1409,6 +1537,16 @@ CallResult<bool> JSObject::hasComputed(
     return ExecutionStatus::EXCEPTION;
   }
   auto nameValPrimitiveHandle = *converted;
+
+  if (LLVM_UNLIKELY(llvh::isa<JSTypedArrayBase>(*selfHandle))) {
+    auto numericIndex = canonicalNumericIndex(runtime, nameValPrimitiveHandle);
+    if (LLVM_UNLIKELY(numericIndex == ExecutionStatus::EXCEPTION))
+      return ExecutionStatus::EXCEPTION;
+    if (*numericIndex) {
+      return haveOwnIndexed(
+          *selfHandle, runtime, typedArrayIndexOrInvalid(**numericIndex));
+    }
+  }
 
   ComputedPropertyDescWithSymStorage desc{MutableHandle<SymbolID>{runtime}};
   MutableHandle<JSObject> propObj{runtime};
@@ -1490,6 +1628,16 @@ CallResult<bool> JSObject::putNamedWithReceiver_RJS(
     RuntimeModule *runtimeModule,
     SHUnit *unit,
     WritePropertyCacheEntry *cacheEntry) {
+  if (LLVM_UNLIKELY(isTypedArrayNumericSymbol(selfHandle, runtime, name))) {
+    struct : public Locals {
+      PinnedValue<> key;
+    } lv;
+    LocalsRAII lraii(runtime, &lv);
+    lv.key = HermesValue::encodeStringValue(
+        runtime.getStringPrimFromSymbolID(name));
+    return putComputedWithReceiver_RJS(
+        selfHandle, runtime, lv.key, valueHandle, receiver, opFlags);
+  }
   NamedPropertyDescriptor desc;
 
   // Look for the property in this object or along the prototype chain.
@@ -1732,6 +1880,21 @@ CallResult<bool> JSObject::putComputedWithReceiver_RJS(
   }
   auto nameValPrimitiveHandle = *converted;
 
+  if (LLVM_UNLIKELY(llvh::isa<JSTypedArrayBase>(*selfHandle))) {
+    auto numericIndex = canonicalNumericIndex(runtime, nameValPrimitiveHandle);
+    if (LLVM_UNLIKELY(numericIndex == ExecutionStatus::EXCEPTION))
+      return ExecutionStatus::EXCEPTION;
+    if (*numericIndex) {
+      uint32_t index = typedArrayIndexOrInvalid(**numericIndex);
+      if (selfHandle.getHermesValue().getRaw() == receiver->getRaw()) {
+        // TypedArray [[Set]] converts the value even for an invalid index.
+        return setOwnIndexed(selfHandle, runtime, index, valueHandle);
+      }
+      if (!haveOwnIndexed(*selfHandle, runtime, index))
+        return true;
+    }
+  }
+
   ComputedPropertyDescWithSymStorage desc{MutableHandle<SymbolID>{runtime}};
 
   // Look for the property in this object or along the prototype chain.
@@ -1924,6 +2087,24 @@ CallResult<bool> JSObject::putComputedWithReceiver_RJS(
     }
   }
 
+  // Ordinary [[Set]] must still use the exotic [[DefineOwnProperty]] of a
+  // distinct typed-array receiver. Invalid numeric keys fail without converting
+  // the value; they must never become ordinary named properties on the receiver.
+  if (LLVM_UNLIKELY(llvh::isa<JSTypedArrayBase>(*receiverHandle))) {
+    auto numericIndex = canonicalNumericIndex(runtime, nameValPrimitiveHandle);
+    if (LLVM_UNLIKELY(numericIndex == ExecutionStatus::EXCEPTION))
+      return ExecutionStatus::EXCEPTION;
+    if (*numericIndex) {
+      return defineOwnComputedPrimitive(
+          receiverHandle,
+          runtime,
+          nameValPrimitiveHandle,
+          DefinePropertyFlags::getDefaultNewPropertyFlags(),
+          valueHandle,
+          opFlags);
+    }
+  }
+
   /// Can we add more properties?
   if (LLVM_UNLIKELY(!receiverHandle->isExtensible(runtime))) {
     if (opFlags.getThrowOnError()) {
@@ -1992,6 +2173,16 @@ CallResult<bool> JSObject::deleteNamed(
     PropOpFlags opFlags) {
   assert(
       !opFlags.getMustExist() && "mustExist cannot be specified when deleting");
+
+  if (LLVM_UNLIKELY(isTypedArrayNumericSymbol(selfHandle, runtime, name))) {
+    struct : public Locals {
+      PinnedValue<> key;
+    } lv;
+    LocalsRAII lraii(runtime, &lv);
+    lv.key = HermesValue::encodeStringValue(
+        runtime.getStringPrimFromSymbolID(name));
+    return deleteComputed(selfHandle, runtime, lv.key, opFlags);
+  }
 
   // Find the property by name.
   NamedPropertyDescriptor desc;
@@ -2159,6 +2350,16 @@ CallResult<bool> JSObject::defineOwnPropertyInternal(
     DefinePropertyFlags dpFlags,
     Handle<> valueOrAccessor,
     PropOpFlags opFlags) {
+  if (LLVM_UNLIKELY(isTypedArrayNumericSymbol(selfHandle, runtime, name))) {
+    struct : public Locals {
+      PinnedValue<> key;
+    } lv;
+    LocalsRAII lraii(runtime, &lv);
+    lv.key = HermesValue::encodeStringValue(
+        runtime.getStringPrimFromSymbolID(name));
+    return defineOwnComputedPrimitive(
+        selfHandle, runtime, lv.key, dpFlags, valueOrAccessor, opFlags);
+  }
   assert(
       !opFlags.getMustExist() && "cannot use mustExist with defineOwnProperty");
   assert(
@@ -2287,6 +2488,27 @@ CallResult<bool> JSObject::defineOwnComputedPrimitive(
   }
 #endif
 
+  if (LLVM_UNLIKELY(llvh::isa<JSTypedArrayBase>(*selfHandle))) {
+    auto numericIndex = canonicalNumericIndex(runtime, nameValHandle);
+    if (LLVM_UNLIKELY(numericIndex == ExecutionStatus::EXCEPTION))
+      return ExecutionStatus::EXCEPTION;
+    if (*numericIndex) {
+      uint32_t index = typedArrayIndexOrInvalid(**numericIndex);
+      if (!haveOwnIndexed(*selfHandle, runtime, index) ||
+          dpFlags.isAccessor() ||
+          (dpFlags.setConfigurable && !dpFlags.configurable) ||
+          (dpFlags.setEnumerable && !dpFlags.enumerable) ||
+          (dpFlags.setWritable && !dpFlags.writable)) {
+        if (opFlags.getThrowOnError())
+          return runtime.raiseTypeError("Cannot define TypedArray index");
+        return false;
+      }
+      if (dpFlags.setValue)
+        return setOwnIndexed(selfHandle, runtime, index, valueOrAccessor);
+      return true;
+    }
+  }
+
   // If the name is a valid integer array index, store it here.
   OptValue<uint32_t> arrayIndex;
 
@@ -2302,7 +2524,6 @@ CallResult<bool> JSObject::defineOwnComputedPrimitive(
   // If not storing a property with an array index name, or if we don't have
   // indexed storage, just pass to the named routine.
   if (!arrayIndex) {
-    // TODO(T125334872): properly handle the case when self is a TypedArray.
     LAZY_TO_IDENTIFIER(runtime, nameValHandle, id);
     return defineOwnPropertyInternal(
         selfHandle, runtime, id, dpFlags, valueOrAccessor, opFlags);

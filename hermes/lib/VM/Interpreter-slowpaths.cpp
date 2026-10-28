@@ -14,6 +14,7 @@
 #include "hermes/VM/Casting.h"
 #include "hermes/VM/Interpreter.h"
 #include "hermes/VM/JSCallableProxy.h"
+#include "hermes/VM/JSLib.h"
 #include "hermes/VM/PropertyAccessor.h"
 #include "hermes/VM/Runtime-inline.h"
 #include "hermes/VM/RuntimeModule-inline.h"
@@ -21,6 +22,8 @@
 #include "hermes/VM/StackFrame-inline.h"
 #include "hermes/VM/StringPrimitive.h"
 #include "hermes/VM/StringPrimitiveValueDenseMapInfo-inline.h"
+#include "hermes/VM/StringView.h"
+#include "llvh/Support/ConvertUTF.h"
 
 #include "Interpreter-internal.h"
 
@@ -198,14 +201,57 @@ ExecutionStatus Interpreter::caseDirectEval(
     return ExecutionStatus::RETURNED;
   }
 
-  GCScopeMarkerRAII gcMarker{runtime};
+  if (!strictCaller)
+    return runtime.raiseSyntaxError(
+        "sloppy direct string eval is unsupported; "
+        "use a strict caller or indirect global eval");
 
-  auto cr = vm::directEval(
+  // The retained debug table describes the physical environment and lexical
+  // scope at this bytecode instruction. Use the same mapping as debugger eval,
+  // so dynamic functions and nested eval do not fall back to global lookup.
+  auto frame = runtime.getCurrentFrame();
+  const CodeBlock *codeBlock = frame.getCalleeCodeBlock();
+  auto location = codeBlock->getSourceLocation(codeBlock->getOffsetOf(ip));
+  if (!location || !location->envIdx)
+    return runtime.raiseSyntaxError(
+        "direct eval requires retained lexical scope metadata");
+  const auto *debugInfo =
+      codeBlock->getRuntimeModule()->getBytecode()->getDebugInfo();
+  auto scoping = debugInfo->getScopingInfoAt(location->envIdx);
+  struct : public Locals {
+    PinnedValue<Environment> environment;
+  } lv;
+  LocalsRAII locals{runtime, &lv};
+  if (scoping.isRegister()) {
+    lv.environment = vmcast<Environment>(frameRegs[scoping.getRegister()]);
+  } else {
+    Environment *parent =
+        frame.getCalleeClosureUnsafe()->getEnvironment(runtime);
+    lv.environment =
+        vmcast<Environment>(parent->slot(scoping.getSpilledSlot()));
+  }
+
+  std::string code;
+  {
+    auto view = StringPrimitive::createStringView(
+        runtime, Handle<StringPrimitive>::vmcast(evalText));
+    if (view.isASCII()) {
+      code.assign(view.begin(), view.end());
+    } else {
+      SmallU16String<4> allocator;
+      convertUTF16ToUTF8WithReplacements(code, view.getUTF16Ref(allocator));
+    }
+  }
+  auto cr = evalInEnvironment(
       runtime,
-      Handle<StringPrimitive>::vmcast(evalText),
-      strictCaller,
-      nullptr,
-      false);
+      code,
+      true,
+      lv.environment,
+      codeBlock,
+      Handle<>(&frame.getThisArgRef()),
+      Handle<>(&frame.getNewTargetRef()),
+      false,
+      scoping.lexicalScopeIdxInParentFunction());
   if (cr == ExecutionStatus::EXCEPTION)
     return ExecutionStatus::EXCEPTION;
 

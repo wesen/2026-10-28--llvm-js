@@ -24,6 +24,15 @@ class BuildError(RuntimeError):
     pass
 
 
+def frontend_argument(value):
+    """Keep output selection and filenames under the driver's control."""
+    if not value.startswith("-X") or len(value) <= 2 or any(c.isspace() for c in value):
+        raise argparse.ArgumentTypeError(
+            "--hermes-arg accepts a single frontend -X option, for example "
+            "--hermes-arg=-Xasync-generators")
+    return value
+
+
 def command(argv, *, env=None, capture=False, timeout=180, log=None):
     argv = [str(x) for x in argv]
     start = time.monotonic()
@@ -123,7 +132,8 @@ def emit_and_verify(args, ll_path, context, log):
         raw = temp / "program.ll"
         bc = temp / "program.bc"
         optimized = temp / "optimized.bc"
-        command([compiler, f"-{args.hermes_opt}", "-Xes6-block-scoping", "-Xenable-tdz", "-emit-llvm", source, "-o", raw],
+        command([compiler, f"-{args.hermes_opt}", "-Xes6-block-scoping", "-Xenable-tdz",
+                 *args.hermes_arg, "-emit-llvm", source, "-o", raw],
                 capture=True, log=log)
         command([tools["llvm-as"], raw, "-o", bc], capture=True, log=log)
         command([tools["opt"], "-passes=verify", "-disable-output", bc], capture=True, log=log)
@@ -151,6 +161,7 @@ def execute(args):
     manifest = {"source": str(source), "source_sha256": sha256(source),
                 "llvm_ir": str(ll_path), "llvm_ir_sha256": sha256(ll_path),
                 "hermes_optimization": args.hermes_opt,
+                "hermes_frontend_arguments": args.hermes_arg,
                 "llvm_optimization": args.llvm_opt,
                 "pipeline": "JavaScript -> Hermes SSA -> LLVM IR -> LLVM",
                 "program_c_generation": False,
@@ -220,6 +231,8 @@ def parser():
         q.add_argument("--llvm-bin", default=os.environ.get("LLVM_BIN"))
         q.add_argument("--compiler")
         q.add_argument("--hermes-opt", choices=("O0", "O"), default="O")
+        q.add_argument("--hermes-arg", action="append", type=frontend_argument, default=[],
+                       help="extra frontend -X option; repeat as --hermes-arg=-Xname")
         q.add_argument("--llvm-opt", choices=("0", "1", "2", "3", "s"), default="2")
         q.add_argument("--no-runtime-build", action="store_true", help="use an already built matching bridge")
         q.add_argument("-o", "--output", help="output .ll (emit) or executable (build/run/jit artifact stem)")

@@ -1,0 +1,69 @@
+[1/156] Generating ExtensionsBytecode.hbc
+[2/156] Generating ExtensionsBytecode.inc
+[3/156] Generating InternalBytecode.hbc
+[4/156] Linking CXX executable bin/shermes
+[5/156] Building CXX object API/hermes/CMakeFiles/hermesapi_obj.dir/extensions/ExtensionsBytecode.cpp.o
+[6/156] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/BigIntPrimitive.cpp.o
+[7/156] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/BoxedDouble.cpp.o
+[8/156] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/ArrayStorage.cpp.o
+[9/156] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/CheckHeapWellFormedAcceptor.cpp.o
+[10/156] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/Callable.cpp.o
+[11/156] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/CodeBlock.cpp.o
+[12/156] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/DictPropertyMap.cpp.o
+[13/156] Building CXX object API/hermes/CMakeFiles/hermesapi_obj.dir/hermes.cpp.o
+[14/156] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/Domain.cpp.o
+[15/156] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/DummyObject.cpp.o
+[16/156] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/LargeDummyObject.cpp.o
+[17/156] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/FastArray.cpp.o
+[18/156] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/HermesValue.cpp.o
+[19/156] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/HeapSnapshot.cpp.o
+[20/156] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/GCBase.cpp.o
+[21/156] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/OrderedHashMap.cpp.o
+[22/156] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/HiddenClass.cpp.o
+[23/156] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/IdentifierTable.cpp.o
+[24/156] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/Interpreter-slowpaths.cpp.o
+FAILED: [code=1] lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/Interpreter-slowpaths.cpp.o 
+/tmp/llvm-direct-toolchain/bin/clang++ -DHERMESVM_ALLOW_CONCURRENT_GC -DHERMESVM_ALLOW_INLINE_ASM -DHERMESVM_INDIRECT_THREADING -DHERMESVM_LOG_HEAP_SEGMENT_SIZE=22 -DHERMES_CHECK_NATIVE_STACK -DHERMES_ENABLE_UNICODE_REGEXP_PROPERTY_ESCAPES -DHERMES_RELEASE_VERSION=\"1.0.0\" -DHERMES_USE_BOOST_CONTEXT=0 -DSTATIC_HERMES -I/workspace/scratch/ea758b58c6af/hermes-llvm-lab/external -I/workspace/scratch/ea758b58c6af/hermes-llvm-lab/include -I/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/include -I/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/lib/config -I/workspace/scratch/ea758b58c6af/hermes-llvm-lab/external/llvh/include -I/workspace/scratch/ea758b58c6af/hermes-llvm-lab/external/llvh/gen/include -I/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/external/llvh/include -I/workspace/scratch/ea758b58c6af/hermes-llvm-lab/public/hermes/Public/../.. -I/workspace/scratch/ea758b58c6af/hermes-llvm-lab/public -I/workspace/scratch/ea758b58c6af/hermes-llvm-lab/API/hermes/.. -I/workspace/scratch/ea758b58c6af/hermes-llvm-lab/API/jsi/jsi/.. -Wall -Wextra -Wno-unused-parameter -Wwrite-strings -Wcast-qual -Wno-invalid-offsetof -Wmissing-field-initializers -Wno-deprecated-copy -Wno-noexcept-type -Wnon-virtual-dtor -Wdelete-non-virtual-dtor -ffp-contract=on -Wno-range-loop-analysis -ffunction-sections -fdata-sections -fsanitize=address -fno-omit-frame-pointer -fvisibility=hidden -fno-strict-aliasing -fno-strict-overflow -Werror=undef -O1 -DNDEBUG -std=c++17 -fPIC -fno-exceptions -fno-rtti -MD -MT lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/Interpreter-slowpaths.cpp.o -MF lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/Interpreter-slowpaths.cpp.o.d -o lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/Interpreter-slowpaths.cpp.o -c /workspace/scratch/ea758b58c6af/hermes-llvm-lab/lib/VM/Interpreter-slowpaths.cpp
+/workspace/scratch/ea758b58c6af/hermes-llvm-lab/lib/VM/Interpreter-slowpaths.cpp:226:20: error: no viable overloaded '='
+  226 |     lv.environment = frameRegs[scoping.getRegister()];
+      |     ~~~~~~~~~~~~~~ ^ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspace/scratch/ea758b58c6af/hermes-llvm-lab/include/hermes/VM/Handle.h:220:16: note: candidate function not viable: no known conversion from 'PinnedHermesValue' to 'PinnedValue<Environment>' for 1st argument
+  220 |   PinnedValue &operator=(PinnedValue &&) = default;
+      |                ^         ~~~~~~~~~~~~~~
+/workspace/scratch/ea758b58c6af/hermes-llvm-lab/include/hermes/VM/Handle.h:221:16: note: candidate function not viable: no known conversion from 'PinnedHermesValue' to 'const PinnedValue<Environment>' for 1st argument
+  221 |   PinnedValue &operator=(const PinnedValue &other) = default;
+      |                ^         ~~~~~~~~~~~~~~~~~~~~~~~~
+/workspace/scratch/ea758b58c6af/hermes-llvm-lab/include/hermes/VM/Handle.h:223:16: note: candidate function not viable: no known conversion from 'PinnedHermesValue' to 'const Handle<Environment>' for 1st argument
+  223 |   PinnedValue &operator=(const Handle<T> &handle) {
+      |                ^         ~~~~~~~~~~~~~~~~~~~~~~~
+/workspace/scratch/ea758b58c6af/hermes-llvm-lab/include/hermes/VM/Handle.h:227:16: note: candidate function not viable: no known conversion from 'PinnedHermesValue' to 'value_type' (aka 'hermes::vm::Environment *') for 1st argument
+  227 |   PinnedValue &operator=(value_type val) {
+      |                ^         ~~~~~~~~~~~~~~
+/workspace/scratch/ea758b58c6af/hermes-llvm-lab/include/hermes/VM/Handle.h:236:16: note: candidate template ignored: could not match 'PseudoHandle<U>' against 'PinnedHermesValue'
+  236 |   PinnedValue &operator=(PseudoHandle<U> &&other) {
+      |                ^
+/workspace/scratch/ea758b58c6af/hermes-llvm-lab/lib/VM/Interpreter-slowpaths.cpp:230:20: error: no viable overloaded '='
+  230 |     lv.environment = parent->slot(scoping.getSpilledSlot());
+      |     ~~~~~~~~~~~~~~ ^ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspace/scratch/ea758b58c6af/hermes-llvm-lab/include/hermes/VM/Handle.h:220:16: note: candidate function not viable: no known conversion from 'GCHermesValue' (aka 'GCHermesValueImpl<HermesValue>') to 'PinnedValue<Environment>' for 1st argument
+  220 |   PinnedValue &operator=(PinnedValue &&) = default;
+      |                ^         ~~~~~~~~~~~~~~
+/workspace/scratch/ea758b58c6af/hermes-llvm-lab/include/hermes/VM/Handle.h:221:16: note: candidate function not viable: no known conversion from 'GCHermesValue' (aka 'GCHermesValueImpl<HermesValue>') to 'const PinnedValue<Environment>' for 1st argument
+  221 |   PinnedValue &operator=(const PinnedValue &other) = default;
+      |                ^         ~~~~~~~~~~~~~~~~~~~~~~~~
+/workspace/scratch/ea758b58c6af/hermes-llvm-lab/include/hermes/VM/Handle.h:223:16: note: candidate function not viable: no known conversion from 'GCHermesValue' (aka 'GCHermesValueImpl<HermesValue>') to 'const Handle<Environment>' for 1st argument
+  223 |   PinnedValue &operator=(const Handle<T> &handle) {
+      |                ^         ~~~~~~~~~~~~~~~~~~~~~~~
+/workspace/scratch/ea758b58c6af/hermes-llvm-lab/include/hermes/VM/Handle.h:227:16: note: candidate function not viable: no known conversion from 'GCHermesValue' (aka 'GCHermesValueImpl<HermesValue>') to 'value_type' (aka 'hermes::vm::Environment *') for 1st argument
+  227 |   PinnedValue &operator=(value_type val) {
+      |                ^         ~~~~~~~~~~~~~~
+/workspace/scratch/ea758b58c6af/hermes-llvm-lab/include/hermes/VM/Handle.h:236:16: note: candidate template ignored: could not match 'PseudoHandle' against 'GCHermesValueImpl'
+  236 |   PinnedValue &operator=(PseudoHandle<U> &&other) {
+      |                ^
+2 errors generated.
+[25/156] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/JSArrayBuffer.cpp.o
+[26/156] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/JSArray.cpp.o
+[27/156] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/JSCallSite.cpp.o
+[28/156] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/Interpreter.cpp.o
+[29/156] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/JSCallableProxy.cpp.o
+ninja: build stopped: subcommand failed.

@@ -1,0 +1,101 @@
+PASS async_basic.js
+PASS async_closures.js
+PASS async_gc.js
+PASS async_exceptions.js
+FAIL async_generator_queue.js
+  c-run O0/: 'queued [{"value":"first","done":false},{"value":"received:sent","done":false},{"value":"caught:problem","done":false}]\nreturn {"value":0,"done":true}\ndone {"done":true}\ndone: async_generator_queue\n'
+  llvm-run O0/0: 'queued [{"value":"first","done":false},{"value":"received:sent","done":false},{"value":"caught:problem","done":false}]\nreturn {"value":0,"done":true}\ndone {"done":true}\ndone: async_generator_queue\n'
+  llvm-run O0/2: 'queued [{"value":"first","done":false},{"value":"received:sent","done":false},{"value":"caught:problem","done":false}]\nreturn {"value":0,"done":true}\ndone {"done":true}\ndone: async_generator_queue\n'
+  c-run O/: 'queued [{"value":"first","done":false},{"value":"received:sent","done":false},{"value":"caught:problem","done":false}]\nreturn {"value":0,"done":true}\ndone {"done":true}\ndone: async_generator_queue\n'
+  llvm-run O/0: 'queued [{"value":"first","done":false},{"value":"received:sent","done":false},{"value":"caught:problem","done":false}]\nreturn {"value":0,"done":true}\ndone {"done":true}\ndone: async_generator_queue\n'
+  llvm-run O/2: 'queued [{"value":"first","done":false},{"value":"received:sent","done":false},{"value":"caught:problem","done":false}]\nreturn {"value":0,"done":true}\ndone {"done":true}\ndone: async_generator_queue\n'
+  lli-jit O/2: 'queued [{"value":"first","done":false},{"value":"received:sent","done":false},{"value":"caught:problem","done":false}]\nreturn {"value":0,"done":true}\ndone {"done":true}\ndone: async_generator_queue\n'
+FAIL async_generators.js
+  c-run O0/: 'for-await 1,2,3,4\nbreak 5\nclosed false\ndone: async_generators\n'
+  llvm-run O0/0: 'for-await 1,2,3,4\nbreak 5\nclosed false\ndone: async_generators\n'
+  llvm-run O0/2: 'for-await 1,2,3,4\nbreak 5\nclosed false\ndone: async_generators\n'
+  c-run O/: 'for-await 1,2,3,4\nbreak 5\nclosed false\ndone: async_generators\n'
+  llvm-run O/0: 'for-await 1,2,3,4\nbreak 5\nclosed false\ndone: async_generators\n'
+  llvm-run O/2: 'for-await 1,2,3,4\nbreak 5\nclosed false\ndone: async_generators\n'
+  lli-jit O/2: 'for-await 1,2,3,4\nbreak 5\nclosed false\ndone: async_generators\n'
+PASS error_promise_executor.js
+PASS error_promise_receiver.js
+PASS features_bigint.js
+PASS features_bigint_typed_arrays.js
+PASS features_private_fields.js
+PASS features_regexp.js
+FAIL features_typed_arrays.js
+  c-run O0/: '120,86,52,18 305419896 2018915346\n99 7 true true\n1,1,2,3,4\ntrue true false\n16 1 4 1\n127,-128,127,0\n255,0,1,0\n0,0,2,2,254,255\n-32768,32767\n65535,0\n-2147483648,2147483647\n4294967295,0\ntrue Infinity -Infinity true 1.25\n1.5,-2.25\n8,6,4,2 10\n1,2,3,4 2,3\nundefined 8 4\nRangeError\nRangeError\nRangeError\nRangeError\n'
+  llvm-run O0/0: '120,86,52,18 305419896 2018915346\n99 7 true true\n1,1,2,3,4\ntrue true false\n16 1 4 1\n127,-128,127,0\n255,0,1,0\n0,0,2,2,254,255\n-32768,32767\n65535,0\n-2147483648,2147483647\n4294967295,0\ntrue Infinity -Infinity true 1.25\n1.5,-2.25\n8,6,4,2 10\n1,2,3,4 2,3\nundefined 8 4\nRangeError\nRangeError\nRangeError\nRangeError\n'
+  llvm-run O0/2: '120,86,52,18 305419896 2018915346\n99 7 true true\n1,1,2,3,4\ntrue true false\n16 1 4 1\n127,-128,127,0\n255,0,1,0\n0,0,2,2,254,255\n-32768,32767\n65535,0\n-2147483648,2147483647\n4294967295,0\ntrue Infinity -Infinity true 1.25\n1.5,-2.25\n8,6,4,2 10\n1,2,3,4 2,3\nundefined 8 4\nRangeError\nRangeError\nRangeError\nRangeError\n'
+  c-run O/: '120,86,52,18 305419896 2018915346\n99 7 true true\n1,1,2,3,4\ntrue true false\n16 1 4 1\n127,-128,127,0\n255,0,1,0\n0,0,2,2,254,255\n-32768,32767\n65535,0\n-2147483648,2147483647\n4294967295,0\ntrue Infinity -Infinity true 1.25\n1.5,-2.25\n8,6,4,2 10\n1,2,3,4 2,3\nundefined 8 4\nRangeError\nRangeError\nRangeError\nRangeError\n'
+  llvm-run O/0: '120,86,52,18 305419896 2018915346\n99 7 true true\n1,1,2,3,4\ntrue true false\n16 1 4 1\n127,-128,127,0\n255,0,1,0\n0,0,2,2,254,255\n-32768,32767\n65535,0\n-2147483648,2147483647\n4294967295,0\ntrue Infinity -Infinity true 1.25\n1.5,-2.25\n8,6,4,2 10\n1,2,3,4 2,3\nundefined 8 4\nRangeError\nRangeError\nRangeError\nRangeError\n'
+  llvm-run O/2: '120,86,52,18 305419896 2018915346\n99 7 true true\n1,1,2,3,4\ntrue true false\n16 1 4 1\n127,-128,127,0\n255,0,1,0\n0,0,2,2,254,255\n-32768,32767\n65535,0\n-2147483648,2147483647\n4294967295,0\ntrue Infinity -Infinity true 1.25\n1.5,-2.25\n8,6,4,2 10\n1,2,3,4 2,3\nundefined 8 4\nRangeError\nRangeError\nRangeError\nRangeError\n'
+  lli-jit O/2: '120,86,52,18 305419896 2018915346\n99 7 true true\n1,1,2,3,4\ntrue true false\n16 1 4 1\n127,-128,127,0\n255,0,1,0\n0,0,2,2,254,255\n-32768,32767\n65535,0\n-2147483648,2147483647\n4294967295,0\ntrue Infinity -Infinity true 1.25\n1.5,-2.25\n8,6,4,2 10\n1,2,3,4 2,3\nundefined 8 4\nRangeError\nRangeError\nRangeError\nRangeError\n'
+PASS features_values_gc.js
+PASS generator_enumeration.js
+PASS generator_delegation.js
+PASS generator_gc.js
+PASS generator_finally.js
+PASS promise_combinators.js
+PASS generator_protocol.js
+PASS promise_order.js
+PASS promise_resolution.js
+PASS reject_invalid_await.js
+FAIL promise_subclass.js
+  c-run O0/: 'identity true false true\nderived 13\nderived-all 14,15\nspecies true true\nspecies-value 17\ndone: promise_subclass\n'
+  llvm-run O0/0: 'identity true false true\nderived 13\nderived-all 14,15\nspecies true true\nspecies-value 17\ndone: promise_subclass\n'
+  llvm-run O0/2: 'identity true false true\nderived 13\nderived-all 14,15\nspecies true true\nspecies-value 17\ndone: promise_subclass\n'
+  c-run O/: 'identity true false true\nderived 13\nderived-all 14,15\nspecies true true\nspecies-value 17\ndone: promise_subclass\n'
+  llvm-run O/0: 'identity true false true\nderived 13\nderived-all 14,15\nspecies true true\nspecies-value 17\ndone: promise_subclass\n'
+  llvm-run O/2: 'identity true false true\nderived 13\nderived-all 14,15\nspecies true true\nspecies-value 17\ndone: promise_subclass\n'
+  lli-jit O/2: 'identity true false true\nderived 13\nderived-all 14,15\nspecies true true\nspecies-value 17\ndone: promise_subclass\n'
+{
+  "schema_version": 1,
+  "complete": true,
+  "started_at_unix": 1793219374.156497,
+  "finished_at_unix": 1793219409.4856372,
+  "source_cases": 24,
+  "passed_cases": 20,
+  "failed_cases": 4,
+  "skipped_cases": 0,
+  "positive_cases": 21,
+  "runtime_error_cases": 2,
+  "compile_error_cases": 1,
+  "native_llvm_executions": 92,
+  "native_llvm_matches": 76,
+  "lli_executions": 23,
+  "lli_matches": 19,
+  "c_oracle_fully_matched_cases": 19,
+  "c_oracle_limitations": [],
+  "input_files_unchanged": false,
+  "changed_input_files": [
+    "test/LLVMNativeExtensions/generator_gc.js"
+  ],
+  "hermes_optimization_levels": [
+    "O0",
+    "O"
+  ],
+  "llvm_optimization_levels": [
+    "0",
+    "2"
+  ],
+  "jit_optimization_levels": {
+    "hermes": "O",
+    "llvm": "2"
+  },
+  "selection": [
+    "async_",
+    "promise_",
+    "generator_",
+    "features_",
+    "reject_"
+  ],
+  "partial_gate": true,
+  "llvm_validation_performed": true,
+  "asan_options": "detect_leaks=0",
+  "lsan_options": "",
+  "scope": "host native and real lli execution; targeted language extension contracts; not device execution or full ECMAScript conformance",
+  "node_semantics": "script via vm.runInThisContext; not a CommonJS module wrapper"
+}
+Evidence: /workspace/scratch/ea758b58c6af/hermes-llvm-lab/docs/llvm/feature-work/extension-first-pass.json

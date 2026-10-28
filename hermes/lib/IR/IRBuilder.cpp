@@ -1058,8 +1058,26 @@ StringSwitchImmInst *IRBuilder::createStringSwitchImmInst(
 
 DirectEvalInst *IRBuilder::createDirectEvalInst(
     Value *evalText,
-    bool strictCaller) {
-  auto *inst = new DirectEvalInst(evalText, getLiteralBool(strictCaller));
+    bool strictCaller,
+    bool globalCaller,
+    bool derivedConstructorContext,
+    VariableScope *variableScope,
+    Value *environment,
+    Value *thisValue,
+    Value *newTarget,
+    Variable *capturedArguments,
+    llvh::ArrayRef<Variable *> capturedVariables) {
+  auto *inst = new DirectEvalInst(
+      evalText,
+      getLiteralBool(strictCaller),
+      globalCaller,
+      derivedConstructorContext,
+      variableScope,
+      environment,
+      thisValue,
+      newTarget,
+      capturedArguments ? (Value *)capturedArguments : getEmptySentinel(),
+      capturedVariables);
   insert(inst);
   return inst;
 }

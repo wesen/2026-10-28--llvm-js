@@ -1,0 +1,128 @@
+[
+  {
+    "name": "generator_in_await",
+    "records": [
+      {
+        "stage": "c-build",
+        "command": [
+          "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/bin/shermes",
+          "-O0",
+          "-Xes6-block-scoping",
+          "-Xenable-tdz",
+          "-Xasync-generators",
+          "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/docs/llvm/feature-work/traversal-probes/generator_in_await.js",
+          "-o",
+          "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/traversal-probe-generator_in_await-c"
+        ],
+        "exit_code": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "stage": "c-run",
+        "exit_code": 0,
+        "stdout": "FAIL TypeError Cannot read property 'next' of undefined\n",
+        "stderr": ""
+      },
+      {
+        "stage": "llvm-emit",
+        "command": [
+          "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/bin/shermes",
+          "-O0",
+          "-Xes6-block-scoping",
+          "-Xenable-tdz",
+          "-Xasync-generators",
+          "-emit-llvm",
+          "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/docs/llvm/feature-work/traversal-probes/generator_in_await.js",
+          "-o",
+          "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/traversal-probe-generator_in_await-c.ll"
+        ],
+        "exit_code": 0,
+        "stdout": "",
+        "stderr": ""
+      }
+    ]
+  },
+  {
+    "name": "generator_in_yield",
+    "records": [
+      {
+        "stage": "c-build",
+        "command": [
+          "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/bin/shermes",
+          "-O0",
+          "-Xes6-block-scoping",
+          "-Xenable-tdz",
+          "-Xasync-generators",
+          "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/docs/llvm/feature-work/traversal-probes/generator_in_yield.js",
+          "-o",
+          "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/traversal-probe-generator_in_yield-c"
+        ],
+        "exit_code": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "stage": "c-run",
+        "exit_code": 0,
+        "stdout": "FAIL TypeError undefined is not a function\n",
+        "stderr": ""
+      },
+      {
+        "stage": "llvm-emit",
+        "command": [
+          "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/bin/shermes",
+          "-O0",
+          "-Xes6-block-scoping",
+          "-Xenable-tdz",
+          "-Xasync-generators",
+          "-emit-llvm",
+          "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/docs/llvm/feature-work/traversal-probes/generator_in_yield.js",
+          "-o",
+          "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/traversal-probe-generator_in_yield-c.ll"
+        ],
+        "exit_code": 0,
+        "stdout": "",
+        "stderr": ""
+      }
+    ]
+  },
+  {
+    "name": "nested_await",
+    "records": [
+      {
+        "stage": "c-build",
+        "command": [
+          "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/bin/shermes",
+          "-O0",
+          "-Xes6-block-scoping",
+          "-Xenable-tdz",
+          "-Xasync-generators",
+          "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/docs/llvm/feature-work/traversal-probes/nested_await.js",
+          "-o",
+          "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/traversal-probe-nested_await-c"
+        ],
+        "exit_code": 1,
+        "stdout": "",
+        "stderr": "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/docs/llvm/feature-work/traversal-probes/nested_await.js:1:41: error: 'await' not in an async function\nasync function* nested() { return await await Promise.resolve(1); }\n                                        ^~~~~~~~~~~~~~~~~~~~~~~~\nEmitted 1 errors. exiting.\n"
+      },
+      {
+        "stage": "llvm-emit",
+        "command": [
+          "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/bin/shermes",
+          "-O0",
+          "-Xes6-block-scoping",
+          "-Xenable-tdz",
+          "-Xasync-generators",
+          "-emit-llvm",
+          "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/docs/llvm/feature-work/traversal-probes/nested_await.js",
+          "-o",
+          "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/traversal-probe-nested_await-c.ll"
+        ],
+        "exit_code": 1,
+        "stdout": "",
+        "stderr": "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/docs/llvm/feature-work/traversal-probes/nested_await.js:1:41: error: 'await' not in an async function\nasync function* nested() { return await await Promise.resolve(1); }\n                                        ^~~~~~~~~~~~~~~~~~~~~~~~\nEmitted 1 errors. exiting.\n"
+      }
+    ]
+  }
+]

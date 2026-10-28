@@ -65,6 +65,11 @@ class CLFlag {
     return defaultValue_;
   }
 
+  /// Whether either spelling was explicitly supplied on the command line.
+  bool isSpecified() const {
+    return yes_.getNumOccurrences() || no_.getNumOccurrences();
+  }
+
   /// Casting to bool always makes sense, so no "explicit" needed here.
   operator bool() const {
     return getValue();

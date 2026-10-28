@@ -1,0 +1,357 @@
+{
+  "time": 1793220099.6430326,
+  "results": [
+    {
+      "name": "eval_closure_gc.js",
+      "passed": true,
+      "node": {
+        "command": [
+          "node",
+          "--expose-gc",
+          "-e",
+          "globalThis.print=(...a)=>console.log(...a);require('vm').runInThisContext(require('fs').readFileSync(process.argv[1],'utf8'),{filename:process.argv[1]});",
+          "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNativeExtensions/eval_closure_gc.js"
+        ],
+        "exit": 0,
+        "stdout": "retained-first 12:11 12\nretained-second 103:101 103\nshared-after-gc 34:31 34\n",
+        "stderr": ""
+      },
+      "native": {
+        "command": [
+          "python3",
+          "utils/shllvm.py",
+          "run",
+          "--no-runtime-build",
+          "--hermes-opt",
+          "O0",
+          "-o",
+          "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/feature-probes/eval_closure_gc-initial",
+          "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNativeExtensions/eval_closure_gc.js"
+        ],
+        "exit": 0,
+        "stdout": "retained-first 12:11 12\nretained-second 103:101 103\nshared-after-gc 34:31 34\n",
+        "stderr": ""
+      }
+    },
+    {
+      "name": "eval_derived_context_boundary.js",
+      "passed": false,
+      "node": {
+        "command": [
+          "node",
+          "--expose-gc",
+          "-e",
+          "globalThis.print=(...a)=>console.log(...a);require('vm').runInThisContext(require('fs').readFileSync(process.argv[1],'utf8'),{filename:process.argv[1]});",
+          "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNativeExtensions/eval_derived_context_boundary.js"
+        ],
+        "exit": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      "native": {
+        "command": [
+          "python3",
+          "utils/shllvm.py",
+          "run",
+          "--no-runtime-build",
+          "--hermes-opt",
+          "O0",
+          "-o",
+          "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/feature-probes/eval_derived_context_boundary-initial",
+          "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNativeExtensions/eval_derived_context_boundary.js"
+        ],
+        "exit": 2,
+        "stdout": "",
+        "stderr": "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNativeExtensions/eval_derived_context_boundary.js:5:5: warning: Direct call to eval(), but lexical scope is not supported.\n    eval(\"1 + 2\");\n    ^~~~\n/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNativeExtensions/eval_derived_context_boundary.js:5:9: error: direct LLVM backend: direct eval in a derived constructor is not supported\n    eval(\"1 + 2\");\n        ^\nshllvm: command failed (1): /workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/bin/shermes -O0 -Xes6-block-scoping -Xenable-tdz -emit-llvm /workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNativeExtensions/eval_derived_context_boundary.js -o /workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/feature-probes/shllvm-nwzyl4pc/program.ll\n"
+      }
+    },
+    {
+      "name": "eval_global.js",
+      "passed": true,
+      "node": {
+        "command": [
+          "node",
+          "--expose-gc",
+          "-e",
+          "globalThis.print=(...a)=>console.log(...a);require('vm').runInThisContext(require('fs').readFileSync(process.argv[1],'utf8'),{filename:process.argv[1]});",
+          "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNativeExtensions/eval_global.js"
+        ],
+        "exit": 0,
+        "stdout": "indirect 12\ncomma 21\nglobal-scope undefined 21\nnon-string-indirect true 42\nsyntax SyntaxError\nthrow RangeError from dynamic code\n",
+        "stderr": ""
+      },
+      "native": {
+        "command": [
+          "python3",
+          "utils/shllvm.py",
+          "run",
+          "--no-runtime-build",
+          "--hermes-opt",
+          "O0",
+          "-o",
+          "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/feature-probes/eval_global-initial",
+          "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNativeExtensions/eval_global.js"
+        ],
+        "exit": 0,
+        "stdout": "indirect 12\ncomma 21\nglobal-scope undefined 21\nnon-string-indirect true 42\nsyntax SyntaxError\nthrow RangeError from dynamic code\n",
+        "stderr": ""
+      }
+    },
+    {
+      "name": "eval_lexical_bindings.js",
+      "passed": true,
+      "node": {
+        "command": [
+          "node",
+          "--expose-gc",
+          "-e",
+          "globalThis.print=(...a)=>console.log(...a);require('vm').runInThisContext(require('fs').readFileSync(process.argv[1],'utf8'),{filename:process.argv[1]});",
+          "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNativeExtensions/eval_lexical_bindings.js"
+        ],
+        "exit": 0,
+        "stdout": "read-write 7 7 10 2\nnative-to-dynamic 20\ndynamic-to-native 31\ntype-change string changed type\ninner 8\ninner-write 10\nouter 1 1\ninside 100\noutside undefined\nnon-string-direct true 37 undefined\noverridden ordinary!\n",
+        "stderr": ""
+      },
+      "native": {
+        "command": [
+          "python3",
+          "utils/shllvm.py",
+          "run",
+          "--no-runtime-build",
+          "--hermes-opt",
+          "O0",
+          "-o",
+          "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/feature-probes/eval_lexical_bindings-initial",
+          "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNativeExtensions/eval_lexical_bindings.js"
+        ],
+        "exit": 0,
+        "stdout": "read-write 7 7 10 2\nnative-to-dynamic 20\ndynamic-to-native 31\ntype-change string changed type\ninner 8\ninner-write 10\nouter 1 1\ninside 100\noutside undefined\nnon-string-direct true 37 undefined\noverridden ordinary!\n",
+        "stderr": ""
+      }
+    },
+    {
+      "name": "eval_lexical_errors.js",
+      "passed": true,
+      "node": {
+        "command": [
+          "node",
+          "--expose-gc",
+          "-e",
+          "globalThis.print=(...a)=>console.log(...a);require('vm').runInThisContext(require('fs').readFileSync(process.argv[1],'utf8'),{filename:process.argv[1]});",
+          "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNativeExtensions/eval_lexical_errors.js"
+        ],
+        "exit": 0,
+        "stdout": "const TypeError 4\ntdz ReferenceError\ninitialized 17\neval-local-const TypeError\ncaught Error cross-boundary 8\nfinally 8\nsyntax SyntaxError\nafter-errors 25\nglobal-new-target SyntaxError\nglobal-function-new-target true\n",
+        "stderr": ""
+      },
+      "native": {
+        "command": [
+          "python3",
+          "utils/shllvm.py",
+          "run",
+          "--no-runtime-build",
+          "--hermes-opt",
+          "O0",
+          "-o",
+          "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/feature-probes/eval_lexical_errors-initial",
+          "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNativeExtensions/eval_lexical_errors.js"
+        ],
+        "exit": 0,
+        "stdout": "const TypeError 4\ntdz ReferenceError\ninitialized 17\neval-local-const TypeError\ncaught Error cross-boundary 8\nfinally 8\nsyntax SyntaxError\nafter-errors 25\nglobal-new-target SyntaxError\nglobal-function-new-target true\n",
+        "stderr": ""
+      }
+    },
+    {
+      "name": "eval_nested.js",
+      "passed": false,
+      "node": {
+        "command": [
+          "node",
+          "--expose-gc",
+          "-e",
+          "globalThis.print=(...a)=>console.log(...a);require('vm').runInThisContext(require('fs').readFileSync(process.argv[1],'utf8'),{filename:process.argv[1]});",
+          "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNativeExtensions/eval_nested.js"
+        ],
+        "exit": 0,
+        "stdout": "nested-initial 8\nescaped-nested 12 12\nnested-shared 32 32\nnested-completion 42\nnested-non-string 13\n",
+        "stderr": ""
+      },
+      "native": {
+        "command": [
+          "python3",
+          "utils/shllvm.py",
+          "run",
+          "--no-runtime-build",
+          "--hermes-opt",
+          "O0",
+          "-o",
+          "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/feature-probes/eval_nested-initial",
+          "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNativeExtensions/eval_nested.js"
+        ],
+        "exit": 1,
+        "stdout": "",
+        "stderr": "Uncaught ReferenceError: Property 'value' doesn't exist\n    at eval (:1:1)\n    at anonymous (eval:1:20)\n    at makeNested (native)\n    at global (native)\n"
+      }
+    },
+    {
+      "name": "eval_private_context_boundary.js",
+      "passed": false,
+      "node": {
+        "command": [
+          "node",
+          "--expose-gc",
+          "-e",
+          "globalThis.print=(...a)=>console.log(...a);require('vm').runInThisContext(require('fs').readFileSync(process.argv[1],'utf8'),{filename:process.argv[1]});",
+          "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNativeExtensions/eval_private_context_boundary.js"
+        ],
+        "exit": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      "native": {
+        "command": [
+          "python3",
+          "utils/shllvm.py",
+          "run",
+          "--no-runtime-build",
+          "--hermes-opt",
+          "O0",
+          "-o",
+          "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/feature-probes/eval_private_context_boundary-initial",
+          "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNativeExtensions/eval_private_context_boundary.js"
+        ],
+        "exit": 1,
+        "stdout": "",
+        "stderr": "Uncaught SyntaxError: 1:6:the private name \"#value\" was not declared in any enclosing class\n    at read (native)\n    at global (native)\n"
+      }
+    },
+    {
+      "name": "eval_sloppy_boundary.js",
+      "passed": true,
+      "node": {
+        "command": [
+          "node",
+          "--expose-gc",
+          "-e",
+          "globalThis.print=(...a)=>console.log(...a);require('vm').runInThisContext(require('fs').readFileSync(process.argv[1],'utf8'),{filename:process.argv[1]});",
+          "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNativeExtensions/eval_sloppy_boundary.js"
+        ],
+        "exit": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      "native": {
+        "command": [
+          "python3",
+          "utils/shllvm.py",
+          "run",
+          "--no-runtime-build",
+          "--hermes-opt",
+          "O0",
+          "-o",
+          "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/feature-probes/eval_sloppy_boundary-initial",
+          "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNativeExtensions/eval_sloppy_boundary.js"
+        ],
+        "exit": 1,
+        "stdout": "",
+        "stderr": "Uncaught SyntaxError: LLVM backend: sloppy direct string eval is unsupported; use a strict caller or indirect global eval\n    at needsDynamicBindings (native)\n    at global (native)\n"
+      }
+    },
+    {
+      "name": "eval_super_context_boundary.js",
+      "passed": false,
+      "node": {
+        "command": [
+          "node",
+          "--expose-gc",
+          "-e",
+          "globalThis.print=(...a)=>console.log(...a);require('vm').runInThisContext(require('fs').readFileSync(process.argv[1],'utf8'),{filename:process.argv[1]});",
+          "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNativeExtensions/eval_super_context_boundary.js"
+        ],
+        "exit": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      "native": {
+        "command": [
+          "python3",
+          "utils/shllvm.py",
+          "run",
+          "--no-runtime-build",
+          "--hermes-opt",
+          "O0",
+          "-o",
+          "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/feature-probes/eval_super_context_boundary-initial",
+          "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNativeExtensions/eval_super_context_boundary.js"
+        ],
+        "exit": 1,
+        "stdout": "",
+        "stderr": "Uncaught SyntaxError: 1:1:super not allowed here\n    at value (native)\n    at global (native)\n"
+      }
+    },
+    {
+      "name": "eval_this_arguments.js",
+      "passed": true,
+      "node": {
+        "command": [
+          "node",
+          "--expose-gc",
+          "-e",
+          "globalThis.print=(...a)=>console.log(...a);require('vm').runInThisContext(require('fs').readFileSync(process.argv[1],'utf8'),{filename:process.argv[1]});",
+          "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNativeExtensions/eval_this_arguments.js"
+        ],
+        "exit": 0,
+        "stdout": "receiver bound 13\narrow bound:7\nordinary-new-target true\nconstruct 44 true 44\nstrict-null true\n",
+        "stderr": ""
+      },
+      "native": {
+        "command": [
+          "python3",
+          "utils/shllvm.py",
+          "run",
+          "--no-runtime-build",
+          "--hermes-opt",
+          "O0",
+          "-o",
+          "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/feature-probes/eval_this_arguments-initial",
+          "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNativeExtensions/eval_this_arguments.js"
+        ],
+        "exit": 0,
+        "stdout": "receiver bound 13\narrow bound:7\nordinary-new-target true\nconstruct 44 true 44\nstrict-null true\n",
+        "stderr": ""
+      }
+    },
+    {
+      "name": "function_constructor.js",
+      "passed": true,
+      "node": {
+        "command": [
+          "node",
+          "--expose-gc",
+          "-e",
+          "globalThis.print=(...a)=>console.log(...a);require('vm').runInThisContext(require('fs').readFileSync(process.argv[1],'utf8'),{filename:process.argv[1]});",
+          "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNativeExtensions/function_constructor.js"
+        ],
+        "exit": 0,
+        "stdout": "parameters 12 2 anonymous\nglobal-closure 14|undefined\ndynamic-closure 22 27\nconstruct 33 true true\nthis true\nsyntax SyntaxError\n",
+        "stderr": ""
+      },
+      "native": {
+        "command": [
+          "python3",
+          "utils/shllvm.py",
+          "run",
+          "--no-runtime-build",
+          "--hermes-opt",
+          "O0",
+          "-o",
+          "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/feature-probes/function_constructor-initial",
+          "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNativeExtensions/function_constructor.js"
+        ],
+        "exit": 0,
+        "stdout": "parameters 12 2 anonymous\nglobal-closure 14|undefined\ndynamic-closure 22 27\nconstruct 33 true true\nthis true\nsyntax SyntaxError\n",
+        "stderr": ""
+      }
+    }
+  ]
+}

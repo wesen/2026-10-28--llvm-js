@@ -1,0 +1,42 @@
+{
+  "passed": 0,
+  "total": 4,
+  "compiler_sha256": "1cdffcd7a2c2a9737f9809134452be7e64696f01c1a0d88fe2ba03dbca07377a",
+  "records": [
+    {
+      "flags": [],
+      "exit_code": 1,
+      "stderr": "Failed to write file /dev/null: Device or resource busy\n",
+      "expected_warning": false,
+      "passed": false
+    },
+    {
+      "flags": [
+        "-Wdirect-eval"
+      ],
+      "exit_code": 1,
+      "stderr": "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNativeExtensions/eval_lexical_bindings.js:8:12: warning: Direct call to eval requires caller scope metadata.\n    return eval(\n           ^~~~\n/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNativeExtensions/eval_lexical_bindings.js:20:3: warning: Direct call to eval requires caller scope metadata.\n  eval(\"value = 'changed type'\");\n  ^~~~\n/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNativeExtensions/eval_lexical_bindings.js:28:20: warning: Direct call to eval requires caller scope metadata.\n    print(\"inner\", eval(\"item\"));\n                   ^~~~\n/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNativeExtensions/eval_lexical_bindings.js:29:5: warning: Direct call to eval requires caller scope metadata.\n    eval(\"item += 2\");\n    ^~~~\n/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNativeExtensions/eval_lexical_bindings.js:32:24: warning: Direct call to eval requires caller scope metadata.\n  print(\"outer\", item, eval(\"item\"));\n                       ^~~~\n/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNativeExtensions/eval_lexical_bindings.js:37:20: warning: Direct call to eval requires caller scope metadata.\n  print(\"outside\", eval(\"typeof invisible\"));\n                   ^~~~\n/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNativeExtensions/eval_lexical_bindings.js:42:30: warning: Direct call to eval requires caller scope metadata.\n  print(\"non-string-direct\", eval(object) === object, eval(37), eval());\n                             ^~~~\n/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNativeExtensions/eval_lexical_bindings.js:42:55: warning: Direct call to eval requires caller scope metadata.\n  print(\"non-string-direct\", eval(object) === object, eval(37), eval());\n                                                      ^~~~\n/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNativeExtensions/eval_lexical_bindings.js:42:65: warning: Direct call to eval requires caller scope metadata.\n  print(\"non-string-direct\", eval(object) === object, eval(37), eval());\n                                                                ^~~~\n/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNativeExtensions/eval_lexical_bindings.js:46:23: warning: Direct call to eval requires caller scope metadata.\n  print(\"overridden\", eval(\"ordinary\"));\n                      ^~~~\nFailed to write file /dev/null: Device or resource busy\n",
+      "expected_warning": true,
+      "passed": false
+    },
+    {
+      "flags": [
+        "-Wno-direct-eval"
+      ],
+      "exit_code": 1,
+      "stderr": "Failed to write file /dev/null: Device or resource busy\n",
+      "expected_warning": false,
+      "passed": false
+    },
+    {
+      "flags": [
+        "-Wdirect-eval",
+        "-Wno-direct-eval"
+      ],
+      "exit_code": 1,
+      "stderr": "Failed to write file /dev/null: Device or resource busy\n",
+      "expected_warning": false,
+      "passed": false
+    }
+  ]
+}

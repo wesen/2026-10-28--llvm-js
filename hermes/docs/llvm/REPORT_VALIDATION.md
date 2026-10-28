@@ -2,15 +2,15 @@
 
 ## 3.1 What each validation layer establishes
 
-LLVM assembly and verification check the representation: types, instructions, blocks, and control flow must form a valid module. They cannot determine whether a getter ran in the right order or two closures share the right binding. The native differential suite therefore compares the program's actual output with both Node and the unchanged Static Hermes C backend. Node provides an independent language implementation; the C backend holds the Hermes frontend and runtime largely constant while changing the code generator.
+LLVM assembly and verification check the representation: types, instructions, blocks and control flow must form a valid module. They cannot determine whether a getter ran in the right order or two closures share the right binding. The differential suites therefore compare actual output with Node and the existing Static Hermes C backend where that backend has the required semantics. Node is an independent language implementation. The C backend compares code generators while using the same patched frontend and runtime. Its inherited direct-eval helper lacks lexical environment support and is explicitly excluded as an oracle for those cases.
 
 The comparison controls matter. Both Hermes paths use ES6 block scoping and temporal-dead-zone checks. Without matching configuration, a difference may be a frontend-mode difference rather than a backend error. Tests use deterministic output; collection is explicitly requested where it is part of the test. A timeout limits the external test process, and does not claim that native guest execution has instruction fuel.
 
 <!-- VALIDATION_TABLE -->
 
-The main suite counts source cases separately from executions. Sixteen positive sources, two Hermes optimization settings, and two LLVM optimization settings produce 64 native comparisons. Three additional source cases exercise runtime errors at both Hermes settings, producing six executions. Three source cases are expected compile rejections. The three `lli` comparisons are another execution path for selected positive programs, not three more source cases.
+The suites count source cases separately from executions. Each positive extension source is run at two Hermes optimization settings and two LLVM optimization settings, producing four native comparisons, plus an `lli` execution. Expected runtime errors use error-class contracts. Explicit unsupported-language boundaries use a separate rejection contract: a Node-valid program rejected by this backend is not counted as a successful language-semantic comparison. Compile rejections also check preservation of previously published output.
 
-The counter example is a separate successful native/JIT demonstration. It is not silently added to the suite's 64-comparison or three-JIT counts. The driver and lexical-default suites also have their own denominators.
+The historical 22-case baseline and its 64 native comparisons remain in `evidence/final-validation.json`. The extension release reruns the updated core suite and the new extension suite against the current build. The counter demonstration, driver checks, lexical-default checks and directed specification probes retain separate denominators.
 
 ## 3.2 Functions, shared capture, and collection
 
@@ -58,6 +58,16 @@ The diary retains failed attempts because they explain why the final design cont
 | Explicit object prototypes lacked runtime cache state | Added a registered weak empty-shape cache to the unit | Class and inherited-object allocation must use the actual runtime contract |
 | Root admission was too permissive | Limited combined root/argument slots to 1,024 | A source function must not request an enormous explicit native frame |
 | Specialized object instructions could change semantics | Rejected unsupported typed forms before ordinary-object lowering | A valid-looking substitute can silently change property attributes |
+| Promise.all collapsed a reaction job | Always invoked each input's then method | Microtask order and observable then access are language behavior |
+| Promise species and subclass paths diverged | Added species selection and direct capability settlement | Constructor choice and reaction-job count are observable |
+| Thenables ran synchronously; public primitive Promises were cached | Queued resolution jobs and returned fresh public wrappers | Callback order and object identity must match the language |
+| Async-generator return interrupted an awaited finally | Resumed internal awaits with next | Cleanup and the original pending completion survive suspension |
+| Negative typed-array keys became ordinary properties | Classified canonical numeric indexes before property fallback | Typed arrays have different indexed-property rules from ordinary objects |
+| Static direct eval had no caller environment | Added scope descriptors, retained compiler metadata and shared environment execution | Native and evaluated closures must share live cells |
+| Nested eval lost its scope or arguments alias | Restored lexical scope and captured argument metadata during runtime compilation | Dynamic closures must retain their caller bindings after return and collection |
+| Optimized eval-visible bindings lost TDZ checks | Widened ordinary values while retaining internal Empty/Uninit states | An unknown value is not an initialized binding |
+| Artificial eval parents admitted global new.target | Marked synthetic script parents as program scopes | Implementation scaffolding must not change source syntax context |
+| Unused results exhausted the root-slot limit | Shared one rooted discard slot while retaining separate slots for used values | Larger unoptimized async functions fit without relaxing the frame bound |
 
 The native frame limit bounds only its explicit tagged payload to approximately 8 KiB. Native headers, jump buffers, compiler spills, recursion and runtime frames add further use. Both the native stack checks and the admission limit are useful safeguards; neither is a complete resource budget.
 
@@ -69,7 +79,7 @@ The validated dynamic backend is Linux x86-64 with LLVM/Clang 18.1.3 and a 64-bi
 
 ## 3.6 What this release does not establish
 
-The supported ordinary function, object, closure and class cases are substantial, but the emitter does not cover every Hermes instruction or every ECMAScript construct. Generators and direct eval are explicit negative fixtures; regular-expression literal creation is also rejected by the driver tests. BigInt literal lowering, specialized typed objects/fast arrays and private-field operations remain outside the implemented set. No Test262 pass, full upstream suite pass, or exhaustive class-feature coverage is claimed.
+The emitter now supports the requested generator and value operations and exercises async execution in the extension suite. Remaining limits include specialized internal typed-object/fast-array instructions and the explicit direct-eval boundaries explained in Chapter 7. General sloppy direct string eval would need dynamic caller binding injection. Evaluated class-private names and super references require additional class context. Dynamic source compiles to Hermes bytecode, not runtime LLVM. No Test262 pass, full upstream suite pass, exhaustive class-feature coverage, or performance improvement is claimed.
 
 The host JIT path uses an external `lli` process. It is a real LLVM JIT execution path, but it is not a new embedded ORC API, a native-code sandbox, or a hot-reload manager. Compilation units, code and constant storage must remain alive for the runtime's lifetime. The host backend has no automatic rollback of arbitrary heap mutation and no world capability boundary. Those concerns are addressed as integration work in Chapter 4.
 
@@ -77,6 +87,6 @@ The PicoCalc lane's final 24-test run establishes the inherited bounded integer-
 
 ## 3.7 Reading the evidence
 
-The final host results are `docs/llvm/evidence/validation.json` and `validation.log`. The command-publication and lexical-default records are `driver-validation.json` and `lexical-defaults-validation.json`. `validated-files.json` connects the execution evidence to hashes of the actual inputs and binaries. Selected emitted IR, disassembly and build metadata are in `evidence/samples/`. Toolchain package provenance and the native callback ABI probe are in `evidence/toolchain/`.
+The extension release gates are `docs/llvm/feature-work/core-final-validation.json` and `extension-final-validation.json`, with companion logs. Command-publication and lexical-default records are `driver-final-validation.json` and `lexical-defaults-final-validation.json` in the same directory. `final-validated-files.json` connects those records to the actual compiler, VM, bridge, driver and implementation sources. The extension harness also records input hashes before and after execution. Earlier baseline and first-pass records remain intact. Selected emitted IR, disassembly and build metadata are in `evidence/samples/`; toolchain provenance and the callback ABI probe are in `evidence/toolchain/`.
 
 The device results are `picocalc/logs/direct-llvm-validation.json` and `direct-llvm-tests-with-sockets-final.txt`, together with the replay trace and ELF audit. Earlier failures and incomplete attempts are explicitly named and retained for the diary; they are not the final gate. The release manifest hashes the packaged files, and the patch verification records an application to the exact upstream base with an identical resulting source tree.

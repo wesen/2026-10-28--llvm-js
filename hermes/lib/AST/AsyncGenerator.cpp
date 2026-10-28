@@ -50,6 +50,7 @@ class AsyncGenerator : public TransformationsBase {
             ->isLazyFunctionBody)
       return;
 
+    recurseFunctionParameters(funcDecl->_params, funcDecl);
     if (funcDecl->_async && funcDecl->_generator) {
       recurseFunctionBody(funcDecl->_body, true);
       auto *refFunc = transformAsyncGeneratorFunction(
@@ -76,6 +77,7 @@ class AsyncGenerator : public TransformationsBase {
             ->isLazyFunctionBody)
       return;
 
+    recurseFunctionParameters(funcExpr->_params, funcExpr);
     if (funcExpr->_async && funcExpr->_generator) {
       recurseFunctionBody(funcExpr->_body, true);
       auto *refFunc = transformAsyncGeneratorFunction(
@@ -96,7 +98,40 @@ class AsyncGenerator : public TransformationsBase {
     }
   }
 
+  void visit(ESTree::ArrowFunctionExpressionNode *arrow, ESTree::Node **) {
+    // An arrow is a separate function context. Its returns and awaits must
+    // not be rewritten as operations of an enclosing async generator.
+    bool oldInsideAsyncGenerator = insideAsyncGenerator;
+    insideAsyncGenerator = false;
+    visitESTreeChildren(*this, arrow);
+    insideAsyncGenerator = oldInsideAsyncGenerator;
+  }
+
+  void visit(ESTree::ReturnStatementNode *ret, ESTree::Node **) {
+    // Visit the expression itself so direct await/yield roots and nested
+    // function expressions are transformed before adding the return await.
+    if (ret->_argument) {
+      visitESTreeNode(*this, ret->_argument, ret);
+    }
+    if (!insideAsyncGenerator || !ret->_argument) {
+      return;
+    }
+
+    // Async generator return expressions are awaited before leaving their
+    // source try/catch/finally context. Awaiting the final iterator result
+    // in the driver is too late: rejection can no longer enter a catch,
+    // and finally may already have executed.
+    auto *awaitCall = makeHermesInternalCall(
+        ret, "_awaitAsyncGenerator", NodeVector{ret->_argument});
+    ret->_argument = createTransformedNode<ESTree::YieldExpressionNode>(
+        ret, awaitCall, false);
+  }
+
   void visit(ESTree::AwaitExpressionNode *awaitExpr, ESTree::Node **ppNode) {
+    // Transform the operand root, not only its children. This handles
+    // nested awaits and async generators inside an awaited expression,
+    // including awaits belonging to an ordinary async function.
+    visitESTreeNode(*this, awaitExpr->_argument, awaitExpr);
     if (!insideAsyncGenerator) {
       return;
     }
@@ -108,6 +143,12 @@ class AsyncGenerator : public TransformationsBase {
   }
 
   void visit(ESTree::YieldExpressionNode *yieldExpr, ESTree::Node **ppNode) {
+    // Visit each original operand exactly once before adding helper calls.
+    // In particular, `yield await value` must keep its explicit await and
+    // `yield* await value` must transform that root before delegation.
+    if (yieldExpr->_argument) {
+      visitESTreeNode(*this, yieldExpr->_argument, yieldExpr);
+    }
     if (!insideAsyncGenerator) {
       return;
     }
@@ -136,40 +177,15 @@ class AsyncGenerator : public TransformationsBase {
       // next call to return that result directly, completing the sync
       // iteration step. The cycle repeats until the inner iterator is done.
       //
-      // Special case: yield* await expr
-      //   The await must resolve before delegation. visit() only recurses
-      //   into children of _argument, so a direct AwaitExpression isn't
-      //   transformed. We handle it explicitly:
-      //     yield* await expr
-      //       → yield* _asyncGeneratorDelegate(yield
-      //       _awaitAsyncGenerator(expr))
-      //   The inner yield awaits the promise via the AsyncGenerator driver,
-      //   then the resolved iterable is passed to _asyncGeneratorDelegate.
-      visit(yieldExpr->_argument);
-      ESTree::Node *delegateArg = yieldExpr->_argument;
-      if (auto *awaitExpr = llvh::dyn_cast_or_null<ESTree::AwaitExpressionNode>(
-              delegateArg)) {
-        auto *awaitCall = makeHermesInternalCall(
-            yieldExpr,
-            "_awaitAsyncGenerator",
-            NodeVector{awaitExpr->_argument});
-        delegateArg = createTransformedNode<ESTree::YieldExpressionNode>(
-            yieldExpr, awaitCall, false);
-      }
       auto *delegateCall = makeHermesInternalCall(
-          yieldExpr, "_asyncGeneratorDelegate", NodeVector{delegateArg});
+          yieldExpr,
+          "_asyncGeneratorDelegate",
+          NodeVector{yieldExpr->_argument});
       *ppNode = createTransformedNode<ESTree::YieldExpressionNode>(
           yieldExpr, delegateCall, true);
       return;
     }
 
-    auto awaitExpr = llvh::dyn_cast_or_null<ESTree::AwaitExpressionNode>(
-        yieldExpr->_argument);
-    if (awaitExpr) {
-      visit(awaitExpr->_argument);
-      *ppNode = createTransformedNode<ESTree::YieldExpressionNode>(
-          yieldExpr, awaitExpr->_argument, false);
-    }
   }
 
   void visit(ESTree::Node *node) {
@@ -177,6 +193,18 @@ class AsyncGenerator : public TransformationsBase {
   }
 
  private:
+  void recurseFunctionParameters(
+      ESTree::NodeList &params,
+      ESTree::Node *function) {
+    // Default expressions can contain async generator functions too. They
+    // must be visited before moving the parameters into the wrapper, and
+    // must not inherit an enclosing async generator's await/return context.
+    bool oldInsideAsyncGenerator = insideAsyncGenerator;
+    insideAsyncGenerator = false;
+    visitESTreeNodeList(*this, params, function);
+    insideAsyncGenerator = oldInsideAsyncGenerator;
+  }
+
   void recurseFunctionBody(ESTree::Node *body, bool insideAsyncGenerator) {
     // recursively transforms all nested async generators and async expressions
     bool oldInsideAsyncGenerator = this->insideAsyncGenerator;
@@ -200,10 +228,10 @@ class AsyncGenerator : public TransformationsBase {
         true, // generator
         false); // async
 
-    auto *wrappedRef = isBodyEmpty(body)
-        ? refFunc
-        : makeHermesInternalCall(
-              funcNode, "_wrapAsyncGenerator", NodeVector{refFunc});
+    // Empty async generators still require Promise-returning iterator
+    // methods and Symbol.asyncIterator, so they must use the driver too.
+    auto *wrappedRef = makeHermesInternalCall(
+        funcNode, "_wrapAsyncGenerator", NodeVector{refFunc});
 
     // Create a function body that calls apply on the wrapped function
     auto appliedBody = createTransformedNode<ESTree::BlockStatementNode>(
@@ -228,11 +256,6 @@ class AsyncGenerator : public TransformationsBase {
         /* implicit */ false);
 
     return appliedBody;
-  }
-
-  bool isBodyEmpty(ESTree::Node *body) {
-    auto *blockStmt = llvh::dyn_cast<ESTree::BlockStatementNode>(body);
-    return blockStmt && blockStmt->_body.empty();
   }
 
   ESTree::Node *getHermesInternalIdentifier(ESTree::Node *srcNode) override {

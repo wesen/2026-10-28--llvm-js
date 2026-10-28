@@ -1,0 +1,149 @@
+{
+  "time": 1793220989.8556674,
+  "results": [
+    {
+      "name": "llvm_eval_transient_parent",
+      "hermes_opt": "O0",
+      "command": [
+        "python3",
+        "utils/shllvm.py",
+        "run",
+        "--no-runtime-build",
+        "--hermes-opt",
+        "O0",
+        "--llvm-opt",
+        "2",
+        "--llvm-bin",
+        "/tmp/llvm-direct-toolchain/bin",
+        "-o",
+        "/tmp/llvm_eval_transient_parent-O0",
+        "/tmp/llvm_eval_transient_parent.js"
+      ],
+      "exit_code": 0,
+      "stdout": "after-parent-gc 7\nafter-second-gc 10\n",
+      "stderr": "",
+      "node_stdout": "after-parent-gc 7\nafter-second-gc 10\n",
+      "passed": true
+    },
+    {
+      "name": "llvm_eval_transient_parent",
+      "hermes_opt": "O",
+      "command": [
+        "python3",
+        "utils/shllvm.py",
+        "run",
+        "--no-runtime-build",
+        "--hermes-opt",
+        "O",
+        "--llvm-opt",
+        "2",
+        "--llvm-bin",
+        "/tmp/llvm-direct-toolchain/bin",
+        "-o",
+        "/tmp/llvm_eval_transient_parent-O",
+        "/tmp/llvm_eval_transient_parent.js"
+      ],
+      "exit_code": 0,
+      "stdout": "after-parent-gc 7\nafter-second-gc 10\n",
+      "stderr": "",
+      "node_stdout": "after-parent-gc 7\nafter-second-gc 10\n",
+      "passed": true
+    },
+    {
+      "name": "llvm_eval_nested_global",
+      "hermes_opt": "O0",
+      "command": [
+        "python3",
+        "utils/shllvm.py",
+        "run",
+        "--no-runtime-build",
+        "--hermes-opt",
+        "O0",
+        "--llvm-opt",
+        "2",
+        "--llvm-bin",
+        "/tmp/llvm-direct-toolchain/bin",
+        "-o",
+        "/tmp/llvm_eval_nested_global-O0",
+        "/tmp/llvm_eval_nested_global.js"
+      ],
+      "exit_code": 1,
+      "stdout": "nested-global-new-target SyntaxError\n",
+      "stderr": "Uncaught SyntaxError: direct eval requires retained lexical scope metadata\n    at anonymous (eval:1:5)\n    at global (native)\n",
+      "node_stdout": "nested-global-new-target SyntaxError\nnested-global-arguments undefined\nnested-constructor-new-target true\n",
+      "passed": false
+    },
+    {
+      "name": "llvm_eval_nested_global",
+      "hermes_opt": "O",
+      "command": [
+        "python3",
+        "utils/shllvm.py",
+        "run",
+        "--no-runtime-build",
+        "--hermes-opt",
+        "O",
+        "--llvm-opt",
+        "2",
+        "--llvm-bin",
+        "/tmp/llvm-direct-toolchain/bin",
+        "-o",
+        "/tmp/llvm_eval_nested_global-O",
+        "/tmp/llvm_eval_nested_global.js"
+      ],
+      "exit_code": 1,
+      "stdout": "nested-global-new-target SyntaxError\n",
+      "stderr": "Uncaught SyntaxError: direct eval requires retained lexical scope metadata\n    at anonymous (eval:1:5)\n    at global (native)\n",
+      "node_stdout": "nested-global-new-target SyntaxError\nnested-global-arguments undefined\nnested-constructor-new-target true\n",
+      "passed": false
+    },
+    {
+      "name": "llvm_eval_tdz_type",
+      "hermes_opt": "O0",
+      "command": [
+        "python3",
+        "utils/shllvm.py",
+        "run",
+        "--no-runtime-build",
+        "--hermes-opt",
+        "O0",
+        "--llvm-opt",
+        "2",
+        "--llvm-bin",
+        "/tmp/llvm-direct-toolchain/bin",
+        "-o",
+        "/tmp/llvm_eval_tdz_type-O0",
+        "/tmp/llvm_eval_tdz_type.js"
+      ],
+      "exit_code": 0,
+      "stdout": "uninitialized-closure ReferenceError\n",
+      "stderr": "",
+      "node_stdout": "uninitialized-closure ReferenceError\n",
+      "passed": true
+    },
+    {
+      "name": "llvm_eval_tdz_type",
+      "hermes_opt": "O",
+      "command": [
+        "python3",
+        "utils/shllvm.py",
+        "run",
+        "--no-runtime-build",
+        "--hermes-opt",
+        "O",
+        "--llvm-opt",
+        "2",
+        "--llvm-bin",
+        "/tmp/llvm-direct-toolchain/bin",
+        "-o",
+        "/tmp/llvm_eval_tdz_type-O",
+        "/tmp/llvm_eval_tdz_type.js"
+      ],
+      "exit_code": 0,
+      "stdout": "incorrectly-returned NaN\n",
+      "stderr": "",
+      "node_stdout": "uninitialized-closure ReferenceError\n",
+      "passed": false
+    }
+  ]
+}

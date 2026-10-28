@@ -1,0 +1,87 @@
+PASS async_basic.js
+PASS async_closures.js
+PASS async_gc.js
+PASS async_exceptions.js
+FAIL async_generator_finally.js
+  llvm-build O0/0: /workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNativeExtensions/async_generator_finally.js:3:1: error: direct LLVM backend: function exceeds 1024 combined root/argument-slot admission limit
+async function* cleanup(mode) {
+^
+shllvm: command failed (1): /workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/bin/shermes -O0 -Xes6-block-scoping -Xenable-tdz -Xasync-generators -emit-llvm /workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNativeExtensions/async_generator_finally.js -o /workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-extension-tests/shllvm-x1fkvza0/program.ll
+  llvm-build O0/2: /workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNativeExtensions/async_generator_finally.js:3:1: error: direct LLVM backend: function exceeds 1024 combined root/argument-slot admission limit
+async function* cleanup(mode) {
+^
+shllvm: command failed (1): /workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/bin/shermes -O0 -Xes6-block-scoping -Xenable-tdz -Xasync-generators -emit-llvm /workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNativeExtensions/async_generator_finally.js -o /workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-extension-tests/shllvm-7red5jio/program.ll
+PASS async_generator_queue.js
+PASS async_generator_queue_completion.js
+PASS async_generator_return_order.js
+PASS async_generators.js
+FAIL async_generator_return_values.js
+  llvm-build O0/0: /workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNativeExtensions/async_generator_return_values.js:37:1: error: direct LLVM backend: function exceeds 1024 combined root/argument-slot admission limit
+async function main() {
+^
+shllvm: command failed (1): /workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/bin/shermes -O0 -Xes6-block-scoping -Xenable-tdz -Xasync-generators -emit-llvm /workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNativeExtensions/async_generator_return_values.js -o /workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-extension-tests/shllvm-ixkmr3em/program.ll
+  llvm-build O0/2: /workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNativeExtensions/async_generator_return_values.js:37:1: error: direct LLVM backend: function exceeds 1024 combined root/argument-slot admission limit
+async function main() {
+^
+shllvm: command failed (1): /workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/bin/shermes -O0 -Xes6-block-scoping -Xenable-tdz -Xasync-generators -emit-llvm /workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNativeExtensions/async_generator_return_values.js -o /workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-extension-tests/shllvm-muxul9q3/program.ll
+PASS error_promise_executor.js
+PASS async_timers.js
+PASS error_promise_receiver.js
+PASS error_promise_species.js
+PASS promise_combinators.js
+PASS promise_order.js
+PASS promise_resolution.js
+PASS promise_species.js
+PASS promise_subclass.js
+PASS promise_subclass_order.js
+PASS promise_thenable_jobs.js
+{
+  "schema_version": 1,
+  "complete": true,
+  "started_at_unix": 1793220994.3947313,
+  "finished_at_unix": 1793221025.4305518,
+  "source_cases": 21,
+  "passed_cases": 19,
+  "failed_cases": 2,
+  "skipped_cases": 0,
+  "positive_cases": 18,
+  "runtime_error_cases": 3,
+  "runtime_rejection_cases": 0,
+  "compile_error_cases": 0,
+  "native_llvm_executions": 80,
+  "native_llvm_matches": 80,
+  "native_llvm_vs_node_matches": 80,
+  "native_llvm_expected_rejections": 0,
+  "lli_executions": 21,
+  "lli_matches": 21,
+  "lli_vs_node_matches": 21,
+  "lli_expected_rejections": 0,
+  "c_oracle_fully_matched_cases": 21,
+  "c_oracle_limitations": [],
+  "input_files_unchanged": true,
+  "changed_input_files": [],
+  "hermes_optimization_levels": [
+    "O0",
+    "O"
+  ],
+  "llvm_optimization_levels": [
+    "0",
+    "2"
+  ],
+  "jit_optimization_levels": {
+    "hermes": "O",
+    "llvm": "2"
+  },
+  "selection": [
+    "async_",
+    "promise_",
+    "error_promise"
+  ],
+  "partial_gate": true,
+  "llvm_validation_performed": true,
+  "asan_options": "detect_leaks=0",
+  "lsan_options": "",
+  "scope": "host native and real lli execution; targeted language extension contracts; not device execution or full ECMAScript conformance",
+  "node_semantics": "script via vm.runInThisContext; not a CommonJS module wrapper"
+}
+Evidence: /workspace/scratch/ea758b58c6af/hermes-llvm-lab/docs/llvm/feature-work/async-promise-return-pass.json

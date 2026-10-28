@@ -1,0 +1,20 @@
+[1/161] Building CXX object lib/AST/CMakeFiles/hermesAST_obj.dir/AsyncGenerator.cpp.o
+[2/161] Linking CXX static library lib/libhermescompiler.a
+[3/161] Generating InternalBytecode.js
+[4/161] Linking CXX executable bin/hermesc
+[5/161] Generating ExtensionsBytecode.hbc
+FAILED: [code=1] API/hermes/extensions/ExtensionsBytecode.hbc /workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/API/hermes/extensions/ExtensionsBytecode.hbc 
+cd /workspace/scratch/ea758b58c6af/hermes-llvm-lab/API/hermes/extensions && /workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/bin/./hermesc -O -Wno-undefined-variable -g0 -emit-binary -out=/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/API/hermes/extensions/ExtensionsBytecode.hbc /workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/API/hermes/extensions/ExtensionsBytecode.js
+==24==Can't open /proc/23/task for reading.
+==23==LeakSanitizer has encountered a fatal error.
+==23==HINT: For debugging, try setting environment variable LSAN_OPTIONS=verbosity=1:log_threads=1
+==23==HINT: LeakSanitizer does not work under ptrace (strace, gdb, etc)
+[6/161] Generating InternalBytecode.hbc
+FAILED: [code=1] lib/InternalJavaScript/InternalBytecode.hbc /workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/lib/InternalJavaScript/InternalBytecode.hbc 
+cd /workspace/scratch/ea758b58c6af/hermes-llvm-lab/lib/InternalJavaScript && /workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/bin/./hermesc -O -Wno-undefined-variable -g0 -emit-binary -out=/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/lib/InternalJavaScript/InternalBytecode.hbc /workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/lib/InternalJavaScript/InternalBytecode.js
+==25==Can't open /proc/22/task for reading.
+==22==LeakSanitizer has encountered a fatal error.
+==22==HINT: For debugging, try setting environment variable LSAN_OPTIONS=verbosity=1:log_threads=1
+==22==HINT: LeakSanitizer does not work under ptrace (strace, gdb, etc)
+[7/161] Building CXX object tools/shermes/CMakeFiles/shermes.dir/shermes.cpp.o
+ninja: build stopped: subcommand failed.

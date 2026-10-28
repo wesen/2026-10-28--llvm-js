@@ -1,0 +1,525 @@
+{
+  "created_at": "2026-10-28T14:04:51.191593+00:00",
+  "project": "Static Hermes direct LLVM IR backend",
+  "upstream": "https://github.com/facebook/hermes.git",
+  "base_commit": "f837b9dd8396ebf5c4e8115412417d273565f0fe",
+  "release_form": "patch against pinned upstream; no new release commit assumed",
+  "patch": {
+    "filename": "Static-Hermes-direct-LLVM.patch",
+    "bytes": 177507,
+    "sha256": "96e60e6773a883c05708bee5e3636e8f72e0f15f0209521df7b38bd7cd98471f",
+    "file_count": 40
+  },
+  "verification": {
+    "base_index_initialized_from": "f837b9dd8396ebf5c4e8115412417d273565f0fe",
+    "git_apply_cached_check": true,
+    "git_apply_to_independent_private_index": true,
+    "result_tree_matches_proposed_tree": true,
+    "result_tree": "7a091c6a393ce8304ce071c0cc0ddcd48e8f584d",
+    "main_index_unchanged": true,
+    "historical_matrix_and_focused_review_evidence_preserved": true,
+    "unchanged_entries_from_original_full_matrix_capture": 31,
+    "changed_since_original_full_matrix_capture": [
+      {
+        "path": "build-llvm/bin/shermes",
+        "original_full_matrix": {
+          "path": "build-llvm/bin/shermes",
+          "bytes": 10854968,
+          "sha256": "0c0541c75d1d9826df860e7277577b8ec01838ebafd1dde5763605d30cbed347"
+        },
+        "final_release": {
+          "path": "build-llvm/bin/shermes",
+          "bytes": 10855056,
+          "sha256": "29c967d6ec9212051d0e38d5d952d8e10e7175d2d2977a42a250a6dbfdcfb7f8"
+        }
+      },
+      {
+        "path": "build-llvm/lib/libhermesvm.so",
+        "original_full_matrix": {
+          "path": "build-llvm/lib/libhermesvm.so",
+          "bytes": 15279944,
+          "sha256": "227fbd757a1b86974c78a46418e9be5d78a51860b2a1c6c83c0d64add30b2763"
+        },
+        "final_release": {
+          "path": "build-llvm/lib/libhermesvm.so",
+          "bytes": 15280032,
+          "sha256": "dac68c34fed2114807d88ab6ae34d556b49c695305391c55550a00b195f24b1e"
+        }
+      },
+      {
+        "path": "lib/BCGen/SH/LLVMNative/LLVMBackend.cpp",
+        "original_full_matrix": {
+          "path": "lib/BCGen/SH/LLVMNative/LLVMBackend.cpp",
+          "bytes": 42119,
+          "sha256": "0209190e48cadde302d3237615f6972e5a3c65a3c1d86a7f454cd5b49d816c15"
+        },
+        "final_release": {
+          "path": "lib/BCGen/SH/LLVMNative/LLVMBackend.cpp",
+          "bytes": 42406,
+          "sha256": "04569fe6e459ef02a43eddf0e4883748151581955857d9143e03c5ea405b8126"
+        }
+      }
+    ],
+    "expected_post_review_changes_only": true,
+    "final_full_matrix_passed_on_exact_release_implementation_and_binaries": true,
+    "final_source_and_binary_identity_count": 42,
+    "all_final_source_and_binary_files_match_capture": true,
+    "final_source_and_binaries_unchanged_during_validation": true
+  },
+  "versions": {
+    "python": "3.12.14",
+    "host": "Linux-6.18.55-x86_64-with-glibc2.39",
+    "clang": "Ubuntu clang version 18.1.3 (1ubuntu1)",
+    "llvm": "Ubuntu LLVM version 18.1.3",
+    "cmake": "cmake version 4.4.4",
+    "ninja": "1.13.2.git.kitware.jobserver-pipe-1",
+    "node": "v24.22.1"
+  },
+  "validation_summary": {
+    "generated_at_unix": 1793196216.2946854,
+    "source_cases": 22,
+    "passed_cases": 22,
+    "failed_cases": 0,
+    "native_llvm_vs_node_and_c_comparisons": 64,
+    "hermes_optimization_levels": [
+      "O0",
+      "O"
+    ],
+    "llvm_optimization_levels": [
+      "0",
+      "2"
+    ],
+    "asan_options": "detect_leaks=0",
+    "lsan_options": "",
+    "scope": "host native and optional lli execution; not device execution or full ECMAScript conformance",
+    "positive_programs": 16,
+    "lli_jit_comparisons": 3,
+    "runtime_error_executions": 6,
+    "compile_rejection_cases": 3,
+    "identity_note": "Final complete differential matrix after the verifier guard, automatic static/shared bridge build correction and final VM dependency refresh. The 42 tested implementation/tool/fixture/compiler/runtime/bridge identities are recorded in final-validated-files.json and did not change during the gate."
+  },
+  "qualification": "Host Linux x86-64 tests; runtime/bridge ASan enabled with leak checking disabled in this sandbox. Generated LLVM bodies are not fully ASan instrumented. No device execution or hot reload claim. Both the original and exact final release implementation/binaries passed complete differential matrices. The verifier guard was also checked separately for flag plumbing/output invariance; upstream full Hermes verification is Debug-only and malformed-Hermes-IR rejection was not exercised in this Release build.",
+  "files": [
+    {
+      "path": "docs/llvm/ARCHITECTURE.md",
+      "bytes": 34483,
+      "sha256": "5eceba3d32db33548e150ff10b81fdbfa58689c1d1ea40f8874ff627b578b17e"
+    },
+    {
+      "path": "docs/llvm/DRIVER.md",
+      "bytes": 7108,
+      "sha256": "6089c457d331a7b6e05a4a5074e20e32144d70a88ff8d40c6406bdfeca1072d2"
+    },
+    {
+      "path": "docs/llvm/PICOCALC_INTEGRATION.md",
+      "bytes": 10717,
+      "sha256": "307c530f221ae3c50cba9d233e43fb9a890dfca76e2d03ae0dd8474a115de4f8"
+    },
+    {
+      "path": "examples/llvm/counter.js",
+      "bytes": 1171,
+      "sha256": "8f66bb6972d2589367ecda1c00346451506413988f124a174b3fe5edb241c3af"
+    },
+    {
+      "path": "include/hermes/BCGen/SH/LLVM.h",
+      "bytes": 515,
+      "sha256": "20226b8859272821b6d4284ad1b9b953cf308ee753523670ab3edd72ca280199"
+    },
+    {
+      "path": "include/hermes/BCGen/SH/SH.h",
+      "bytes": 885,
+      "sha256": "1510e4ea450edad6d8f97071eac27cd57a7782dec0ade54cb17eed78b336b80f"
+    },
+    {
+      "path": "lib/BCGen/SH/CMakeLists.txt",
+      "bytes": 1602,
+      "sha256": "a69dc352318fe001abd12c62c08179fd8eb7d8a164369b17d8abd79bd1dfa2d5"
+    },
+    {
+      "path": "lib/BCGen/SH/LLVMNative/LLVMBackend.cpp",
+      "bytes": 42406,
+      "sha256": "04569fe6e459ef02a43eddf0e4883748151581955857d9143e03c5ea405b8126"
+    },
+    {
+      "path": "lib/BCGen/SH/LLVMNative/runtime.c",
+      "bytes": 19703,
+      "sha256": "0eb8ddecad472265a09990a19c57a2debdcc046affa9a7d89dadc3ec5b0fce80"
+    },
+    {
+      "path": "lib/BCGen/SH/LLVMNative/runtime.h",
+      "bytes": 6556,
+      "sha256": "f0d71c2c51dd2f7d449ed7b127264a1850ae170530e86dab23ed74d00842c864"
+    },
+    {
+      "path": "lib/BCGen/SH/SH.cpp",
+      "bytes": 113312,
+      "sha256": "930b34a91172b876a1b96a3951eb5e44579123fbc800fa1bd8f21abab61cc4ec"
+    },
+    {
+      "path": "test/LLVMNative/accessors.js",
+      "bytes": 319,
+      "sha256": "c9def10323c3c8bd57bc05e7d4394d33bc90313a2b2206caf5a13a18006ebee4"
+    },
+    {
+      "path": "test/LLVMNative/arguments.js",
+      "bytes": 330,
+      "sha256": "399fbad80233c6d5ca6144cdee6251d42032f9dcc50cf7e3127d5701f3cce556"
+    },
+    {
+      "path": "test/LLVMNative/arrays_callbacks.js",
+      "bytes": 404,
+      "sha256": "edd6f726dd865490f8f6d50f28ca391c7da1ee59ba89c96c647144a1cecb3861"
+    },
+    {
+      "path": "test/LLVMNative/arrows_this.js",
+      "bytes": 298,
+      "sha256": "4b300e3b4092ed7f29a338849b037ac8391a50459c08050920dca0ded1cf6a72"
+    },
+    {
+      "path": "test/LLVMNative/catch_basic.js",
+      "bytes": 41,
+      "sha256": "feafe1e7368a0fc6b3eeffa67c78c771766d91a4d817438e69f770d0dfd547dd"
+    },
+    {
+      "path": "test/LLVMNative/classes.js",
+      "bytes": 512,
+      "sha256": "7a20389b833dbad5fa7dc9590236a201da92be56b279c9d80e57a110ec441b03"
+    },
+    {
+      "path": "test/LLVMNative/closures.js",
+      "bytes": 442,
+      "sha256": "3126dfc6d63f9e39d70316b9d99ae46b730ac4cb3526a69d82df3022c81cc7c7"
+    },
+    {
+      "path": "test/LLVMNative/coercion.js",
+      "bytes": 356,
+      "sha256": "920a30759cff382450bf40c2264aed91f31fb76c9ab71139806ab3542f153bc3"
+    },
+    {
+      "path": "test/LLVMNative/constructors.js",
+      "bytes": 480,
+      "sha256": "6577b9221628cce1cbd6e6a907c6027bc50d946edb64967c363006767d735598"
+    },
+    {
+      "path": "test/LLVMNative/control_phi.js",
+      "bytes": 429,
+      "sha256": "853085848d87f76f749b664142fb4d89b7ed775f5b54bc70acf92de9e8125e29"
+    },
+    {
+      "path": "test/LLVMNative/error_arrow_constructor.js",
+      "bytes": 28,
+      "sha256": "5171a16af00699428192c27464090baa49ff95e3d74365f44f6054fca0a3f33c"
+    },
+    {
+      "path": "test/LLVMNative/error_missing_global.js",
+      "bytes": 33,
+      "sha256": "d9e5148c22206aa07500f6da20baad64534b43b27537a2106a82b8ed03c2b8b3"
+    },
+    {
+      "path": "test/LLVMNative/error_noncallable.js",
+      "bytes": 37,
+      "sha256": "13d20dd20bd6af487802aad077b1f949d707ec7e44f1b9bf1747b4a8e62eaf6f"
+    },
+    {
+      "path": "test/LLVMNative/exceptions.js",
+      "bytes": 629,
+      "sha256": "86ef5d86a2e5c3e8dc01d769271dfaae72ce6650469076b1b6e15dc60d6b12a0"
+    },
+    {
+      "path": "test/LLVMNative/functions.js",
+      "bytes": 382,
+      "sha256": "5344c3e6cb57e25eaa167944eef6059573c185bd35e5a4b9493053312a0da97f"
+    },
+    {
+      "path": "test/LLVMNative/gc_closures.js",
+      "bytes": 436,
+      "sha256": "e2cc29627ab8b921aff3e70f1d8ef95d7314f9be040c56bfa87769b68b732dfd"
+    },
+    {
+      "path": "test/LLVMNative/lexical_tdz.js",
+      "bytes": 267,
+      "sha256": "17649e0fd19e538d264e5b7f28b8b10a602a12f704e52a5d30a5b379a3b37efd"
+    },
+    {
+      "path": "test/LLVMNative/objects.js",
+      "bytes": 385,
+      "sha256": "b5921cd8bcc10666245ca233b553f44fb50bae0130848090b48aec0172b22301"
+    },
+    {
+      "path": "test/LLVMNative/strings.js",
+      "bytes": 254,
+      "sha256": "585c59480c253588eb55326e2c1d3d318a96284a8e81a392a522ee2b79c481f1"
+    },
+    {
+      "path": "test/LLVMNative/unsupported_const_assignment.js",
+      "bytes": 65,
+      "sha256": "ec85bb2ad8a58c470d548e20649507b4304c6428749362c4299c2d939e6f8639"
+    },
+    {
+      "path": "test/LLVMNative/unsupported_eval.js",
+      "bytes": 43,
+      "sha256": "fb6711e26c13e8a2534f41e9c7606b05cfc96c2eb7be9b14eebb740fd7f08f4e"
+    },
+    {
+      "path": "test/LLVMNative/unsupported_generator.js",
+      "bytes": 75,
+      "sha256": "11fca38f67c2fa38050b0a177c28e391ff87408b1466df1bed5790cc3f09f72b"
+    },
+    {
+      "path": "tools/shermes/compile.cpp",
+      "bytes": 17747,
+      "sha256": "46c87d7417317cdfdd99e143bcbab0f488fdaf2f0b26cdd40c24cef543beb4a7"
+    },
+    {
+      "path": "tools/shermes/compile.h",
+      "bytes": 1738,
+      "sha256": "1e082feec6235af6d6ef4b8e327f8fe65ad10a9bc9a87c0e81d493591b8dcf62"
+    },
+    {
+      "path": "tools/shermes/shermes.cpp",
+      "bytes": 36402,
+      "sha256": "66d4fb5836fe4fcf5e5088afb0e61ece1cf75c6783166775c784ca9c32ceebfb"
+    },
+    {
+      "path": "utils/shllvm.py",
+      "bytes": 11099,
+      "sha256": "dc3e04a08fcfafadaf585884880b5a30bee39579520d5b57ffc0ebbf7614a291"
+    },
+    {
+      "path": "utils/test_shllvm.py",
+      "bytes": 9101,
+      "sha256": "2d57414c3de72875719a38acdccf3de3306cd830ac9803702d27f4b83adf187a"
+    },
+    {
+      "path": "utils/test_shllvm_defaults.py",
+      "bytes": 4716,
+      "sha256": "71b6341b739e8c74fc9d5090484eb23054227759cdec747dd7f332314371aa42"
+    },
+    {
+      "path": "utils/test_shllvm_driver.py",
+      "bytes": 4229,
+      "sha256": "c27e825b73108c6b8c4deeeac1ab19fbcbe160b7f9435f80100432620a490e9c"
+    }
+  ],
+  "evidence": [
+    {
+      "path": "docs/llvm/evidence/toolchain/native-value-abi-probe.c",
+      "bytes": 207,
+      "sha256": "499e5f6d5069de63f206b12ea25f294d7ffd9fe68eba3f7ef555fc328b297e60"
+    },
+    {
+      "path": "docs/llvm/evidence/toolchain/native-value-abi-probe.ll",
+      "bytes": 2000,
+      "sha256": "ebbec99e28baa36e5ee1172f4ecedfe8a52a5a38c32aeb9db3517c1efb8e6697"
+    },
+    {
+      "path": "docs/llvm/evidence/toolchain/packages.json",
+      "bytes": 3243,
+      "sha256": "9cc2af160a2f51e4e704c324161ab6b1bfdc668e48efe011a167b1a65a0892d2"
+    },
+    {
+      "path": "docs/llvm/evidence/toolchain/validation.json",
+      "bytes": 4588,
+      "sha256": "909214cabdbc7917d585f92bb969400f7f4143586d070035017d5ceac53c1de7"
+    }
+  ],
+  "full_matrix_evidence": [
+    {
+      "path": "docs/llvm/evidence/validated-files.json",
+      "bytes": 5830,
+      "sha256": "250267d486edf49c04fe1e789fa5dea51516ca893fa019591a933c1f745e7915"
+    },
+    {
+      "path": "docs/llvm/evidence/validation.json",
+      "bytes": 152749,
+      "sha256": "d5264f84e52dc213cd9a07d39e62dd067b9786ba5be9b412cbf5c8d928f8f87d"
+    }
+  ],
+  "post_review_validation": {
+    "scope": "Post-review lowered-Hermes-IR verifier guard only. Positive fixture emission equality and LLVM verification, plus one counter native run and one lli JIT run. No repeat of the broad native differential matrix.",
+    "diagnostic_only_change": "Added IRVerifier include and options.verifyIR guard after lowerModuleIRForLLVM; no lowering/emission semantics were changed.",
+    "source_edit_is_exactly_include_and_lowered_verifier_guard": true,
+    "emission_pairs": 32,
+    "passed_emission_pairs": 32,
+    "llvm_modules_assembled_and_verified": 64,
+    "passed_counter_modes": 2,
+    "all_passed": true,
+    "build_qualification": "Release ASan build. Upstream verifyModule executes full Hermes checks only with HERMES_SLOW_DEBUG, which CMake enables only in Debug configuration. This run checks flag plumbing and LLVM output invariance; actual LLVM assembly and verification do execute. It does not exercise malformed-Hermes-IR rejection in a Debug build.",
+    "evidence": [
+      {
+        "path": "docs/llvm/evidence/post-review-before.json",
+        "bytes": 12579,
+        "sha256": "f9826823d37abedbeb963c3c773c50229b2ca5e48c3a10273f88ec46226c0920"
+      },
+      {
+        "path": "docs/llvm/evidence/post-review-build.log",
+        "bytes": 201,
+        "sha256": "d9caf10bd1334f91d81fe9e0e2ee3a58f4ab5668e3c591ba04e424652b2d7419"
+      },
+      {
+        "path": "docs/llvm/evidence/post-review-counter-jit-stderr.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "path": "docs/llvm/evidence/post-review-counter-jit.txt",
+        "bytes": 79,
+        "sha256": "dc6c1f649822e561dd9e0f6e37e2f76242c5fe571f951e0966d34f5b87354c1f"
+      },
+      {
+        "path": "docs/llvm/evidence/post-review-counter-native-stderr.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "path": "docs/llvm/evidence/post-review-counter-native.txt",
+        "bytes": 79,
+        "sha256": "dc6c1f649822e561dd9e0f6e37e2f76242c5fe571f951e0966d34f5b87354c1f"
+      },
+      {
+        "path": "docs/llvm/evidence/post-review-verifier.json",
+        "bytes": 145042,
+        "sha256": "8b1ad7024c0041cffd93d992f2b941facb4d201e6ab733e2132e121396b79c73"
+      },
+      {
+        "path": "docs/llvm/evidence/post-review-verifier.log",
+        "bytes": 972,
+        "sha256": "460f315b72404520624eb224047665dfe39296ef558091cf8ed57424f69005bb"
+      }
+    ],
+    "current_compiler": {
+      "path": "build-llvm/bin/shermes",
+      "bytes": 10855056,
+      "sha256": "29c967d6ec9212051d0e38d5d952d8e10e7175d2d2977a42a250a6dbfdcfb7f8"
+    },
+    "subsequent_final_gate": "The verifier-focused records remain unchanged. A later driver dependency refresh relinked the VM, followed by the complete final-validation matrix recorded separately."
+  },
+  "historical_validation_summary": {
+    "generated_at_unix": 1793194841.803631,
+    "source_cases": 22,
+    "passed_cases": 22,
+    "failed_cases": 0,
+    "native_llvm_vs_node_and_c_comparisons": 64,
+    "hermes_optimization_levels": [
+      "O0",
+      "O"
+    ],
+    "llvm_optimization_levels": [
+      "0",
+      "2"
+    ],
+    "asan_options": "detect_leaks=0",
+    "lsan_options": "",
+    "scope": "host native and optional lli execution; not device execution or full ECMAScript conformance",
+    "identity_note": "Original complete differential matrix before the lowered-Hermes-IR verifier guard and final driver dependency rebuild. Its original source and binary hashes remain preserved; the final release was tested again in the separate final full gate."
+  },
+  "final_full_matrix_evidence": [
+    {
+      "path": "docs/llvm/evidence/final-validation.json",
+      "bytes": 152747,
+      "sha256": "c1b8d7afc000589a8c0b88805ff466a754967e99bb61147a9e4f00070e8dac22"
+    },
+    {
+      "path": "docs/llvm/evidence/final-validation.log",
+      "bytes": 1284,
+      "sha256": "157c0c580dd1669c191df49e0ea31f5c21b1fddaa23b8ec22d0d398749007cb1"
+    },
+    {
+      "path": "docs/llvm/evidence/final-validated-files.json",
+      "bytes": 9025,
+      "sha256": "bfaaa8679d3eb2990070c73bfbe53d32d91b3890232bac54d296ee214fe4f844"
+    }
+  ],
+  "post_review_driver_validation": {
+    "scope": "Final driver build-dependency correction only: automatically build both static and shared bridge targets, and update the representative initial build command. No compiler/runtime source change and no repeat of the broad matrix.",
+    "files_before": [
+      {
+        "path": "utils/shllvm.py",
+        "sha256": "ed3f17fd1ff5b8beb67857fb4c5514492e629e4ac896332fd9f5a88acae4a456",
+        "bytes": 11065
+      },
+      {
+        "path": "docs/llvm/DRIVER.md",
+        "sha256": "7f37c8210d0108401098ce319a353dae506745103b514034bd64b338d14d18a5",
+        "bytes": 6453
+      }
+    ],
+    "files_after_focused_driver_check": [
+      {
+        "path": "utils/shllvm.py",
+        "sha256": "dc3e04a08fcfafadaf585884880b5a30bee39579520d5b57ffc0ebbf7614a291",
+        "bytes": 11099
+      },
+      {
+        "path": "docs/llvm/DRIVER.md",
+        "sha256": "d163f0b328846ea35cf8ed6584d891043902e610e3e1a39ba30ea5d6a79a94c9",
+        "bytes": 6468
+      }
+    ],
+    "documentation_followup": "After the final full matrix passed, DRIVER.md was updated to identify both the original and final evidence. Its final hash is in the selected release files list.",
+    "native_first_run_simulation": {
+      "method": "Temporarily moved the existing static archive to a private backup before the native run; kept the shared bridge and compiler. The automatic driver build had to recreate the missing archive.",
+      "static_archive_absent_before_native": true,
+      "archive_sha256_before": "b65ecc0f2f667f673a6f569ae9a090acb8891233fdfe344bd57c213c43ee82e3",
+      "archive_sha256_after": "b65ecc0f2f667f673a6f569ae9a090acb8891233fdfe344bd57c213c43ee82e3",
+      "rebuilt_archive_identical": true
+    },
+    "passed_modes": 2,
+    "all_passed": true,
+    "automatic_build_commands": [
+      [
+        "/tmp/llvm-direct-toolchain/python-tools/cmake/data/bin/cmake",
+        "--build",
+        "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm",
+        "--target",
+        "shllvm_runtime",
+        "shllvm_runtime_shared",
+        "--parallel",
+        "3"
+      ],
+      [
+        "/tmp/llvm-direct-toolchain/python-tools/cmake/data/bin/cmake",
+        "--build",
+        "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm",
+        "--target",
+        "shllvm_runtime",
+        "shllvm_runtime_shared",
+        "--parallel",
+        "3"
+      ]
+    ],
+    "both_targets_requested_in_both_modes": true,
+    "automatic_build_dependency_refresh": {
+      "note": "The first normal automatic build completed 13 dependency steps left pending by the compiler-only verifier followup: hermesc relink, internal bytecode generation/recompile, VM and console/bridge relinks. Compared with the post-verifier capture, only libhermesvm.so has a new checksum; runtime source, final compiler, static/shared bridge and fixtures remain unchanged. The two focused executions used the final rebuilt runtime. Earlier full-matrix and verifier evidence remain unchanged. No binary-equivalence claim is made for the relinked VM.",
+      "changed_identities": [
+        {
+          "path": "build-llvm/lib/libhermesvm.so",
+          "post_verifier": {
+            "path": "build-llvm/lib/libhermesvm.so",
+            "bytes": 15279944,
+            "sha256": "227fbd757a1b86974c78a46418e9be5d78a51860b2a1c6c83c0d64add30b2763"
+          },
+          "after_automatic_build": {
+            "path": "build-llvm/lib/libhermesvm.so",
+            "bytes": 15280032,
+            "sha256": "dac68c34fed2114807d88ab6ae34d556b49c695305391c55550a00b195f24b1e"
+          }
+        }
+      ],
+      "steps": 13
+    },
+    "final_gate_note": "The observed VM checksum change prompted the separate full final-validation matrix; that matrix passed on the final binary.",
+    "evidence": [
+      {
+        "path": "docs/llvm/evidence/post-review-driver.json",
+        "bytes": 14390,
+        "sha256": "75fa7ebe8444a9fa077a8c0b0bc60e4f4be69111ff3f92d3ff9dcab58e5904b2"
+      },
+      {
+        "path": "docs/llvm/evidence/post-review-driver.log",
+        "bytes": 1882,
+        "sha256": "bccdb6dbefaedd16c96366e8cb88c168f2a643a5f593688b3c50a355dcdaeae3"
+      }
+    ]
+  }
+}

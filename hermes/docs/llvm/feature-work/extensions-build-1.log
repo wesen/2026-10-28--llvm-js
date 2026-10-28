@@ -1,0 +1,21 @@
+[0/1] Re-running CMake...
+-- Threads enabled.
+-- Doxygen disabled.
+-- Go bindings disabled.
+-- Could NOT find Python module pygments
+-- Could NOT find Python module pygments.lexers.c_cpp
+-- Found Python module yaml
+-- Configuring done (0.5s)
+-- Generating done (0.5s)
+-- Build files have been written to: /workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm
+[1/20] Building C object lib/BCGen/SH/CMakeFiles/shllvm_runtime_obj.dir/LLVMNative/value_extensions.c.o
+[2/20] Building C object lib/BCGen/SH/CMakeFiles/shllvm_runtime_obj.dir/LLVMNative/runtime.c.o
+[3/20] Linking C static library lib/libshllvm_runtime.a
+[4/20] Building CXX object lib/BCGen/SH/CMakeFiles/hermesSHBackend_obj.dir/LLVMNative/LLVMBackend.cpp.o
+FAILED: [code=1] lib/BCGen/SH/CMakeFiles/hermesSHBackend_obj.dir/LLVMNative/LLVMBackend.cpp.o 
+/tmp/llvm-direct-toolchain/bin/clang++ -DHERMESVM_ALLOW_CONCURRENT_GC -DHERMESVM_ALLOW_INLINE_ASM -DHERMESVM_INDIRECT_THREADING -DHERMESVM_LOG_HEAP_SEGMENT_SIZE=22 -DHERMES_CHECK_NATIVE_STACK -DHERMES_ENABLE_UNICODE_REGEXP_PROPERTY_ESCAPES -DHERMES_RELEASE_VERSION=\"1.0.0\" -DHERMES_USE_BOOST_CONTEXT=0 -DSTATIC_HERMES -I/workspace/scratch/ea758b58c6af/hermes-llvm-lab/external -I/workspace/scratch/ea758b58c6af/hermes-llvm-lab/include -I/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/include -I/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/lib/config -I/workspace/scratch/ea758b58c6af/hermes-llvm-lab/external/llvh/include -I/workspace/scratch/ea758b58c6af/hermes-llvm-lab/external/llvh/gen/include -I/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/external/llvh/include -Wall -Wextra -Wno-unused-parameter -Wwrite-strings -Wcast-qual -Wno-invalid-offsetof -Wmissing-field-initializers -Wno-deprecated-copy -Wno-noexcept-type -Wnon-virtual-dtor -Wdelete-non-virtual-dtor -ffp-contract=on -Wno-range-loop-analysis -ffunction-sections -fdata-sections -fsanitize=address -fno-omit-frame-pointer -fvisibility=hidden -fno-strict-aliasing -fno-strict-overflow -Werror=undef -O1 -DNDEBUG -std=c++17 -fPIC -fno-exceptions -fno-rtti -MD -MT lib/BCGen/SH/CMakeFiles/hermesSHBackend_obj.dir/LLVMNative/LLVMBackend.cpp.o -MF lib/BCGen/SH/CMakeFiles/hermesSHBackend_obj.dir/LLVMNative/LLVMBackend.cpp.o.d -o lib/BCGen/SH/CMakeFiles/hermesSHBackend_obj.dir/LLVMNative/LLVMBackend.cpp.o -c /workspace/scratch/ea758b58c6af/hermes-llvm-lab/lib/BCGen/SH/LLVMNative/LLVMBackend.cpp
+/workspace/scratch/ea758b58c6af/hermes-llvm-lab/lib/BCGen/SH/LLVMNative/LLVMBackend.cpp:647:39: error: use of undeclared identifier 'BinaryPrivateInInst'
+  647 |   } else if (auto *x = llvh::dyn_cast<BinaryPrivateInInst>(&i)) {
+      |                                       ^
+1 error generated.
+ninja: build stopped: subcommand failed.

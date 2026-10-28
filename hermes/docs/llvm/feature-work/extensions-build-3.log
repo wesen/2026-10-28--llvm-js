@@ -1,0 +1,262 @@
+[0/1] Re-running CMake...
+-- Threads enabled.
+-- Doxygen disabled.
+-- Go bindings disabled.
+-- Could NOT find Python module pygments
+-- Could NOT find Python module pygments.lexers.c_cpp
+-- Found Python module yaml
+-- Configuring done (0.4s)
+-- Generating done (0.7s)
+-- Build files have been written to: /workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm
+[1/248] Building CXX object lib/CMakeFiles/hermesOptimizer_obj.dir/Optimizer/PassManager/Pipeline.cpp.o
+[2/248] Building CXX object lib/CMakeFiles/hermesOptimizer_obj.dir/Optimizer/PassManager/PassManager.cpp.o
+[3/248] Building CXX object lib/CMakeFiles/hermesOptimizer_obj.dir/Optimizer/Scalar/SimplifyCFG.cpp.o
+[4/248] Building CXX object lib/CMakeFiles/hermesOptimizer_obj.dir/Optimizer/Scalar/CSE.cpp.o
+[5/248] Building CXX object lib/CMakeFiles/hermesOptimizer_obj.dir/Optimizer/Scalar/CodeMotion.cpp.o
+[6/248] Building CXX object lib/CMakeFiles/hermesOptimizer_obj.dir/Optimizer/Scalar/DCE.cpp.o
+[7/248] Building CXX object lib/CMakeFiles/hermesOptimizer_obj.dir/Optimizer/Scalar/MetroRequireOpt.cpp.o
+[8/248] Building CXX object lib/CMakeFiles/hermesOptimizer_obj.dir/Optimizer/Scalar/LowerGeneratorFunction.cpp.o
+[9/248] Building CXX object lib/CMakeFiles/hermesOptimizer_obj.dir/Optimizer/Scalar/Mem2Reg.cpp.o
+[10/248] Building CXX object lib/CMakeFiles/hermesOptimizer_obj.dir/Optimizer/Scalar/SimpleMem2Reg.cpp.o
+[11/248] Building CXX object lib/CMakeFiles/hermesOptimizer_obj.dir/Optimizer/Scalar/FrameLoadStoreOpts.cpp.o
+[12/248] Building CXX object lib/CMakeFiles/hermesOptimizer_obj.dir/Optimizer/Scalar/LowerBuiltinCalls.cpp.o
+[13/248] Building CXX object lib/CMakeFiles/hermesOptimizer_obj.dir/Optimizer/Scalar/ScopeElimination.cpp.o
+[14/248] Building CXX object lib/CMakeFiles/hermesOptimizer_obj.dir/Optimizer/Scalar/ScopeHoisting.cpp.o
+[15/248] Building CXX object lib/CMakeFiles/hermesOptimizer_obj.dir/Optimizer/Scalar/SimpleStackPromotion.cpp.o
+[16/248] Building CXX object lib/CMakeFiles/hermesOptimizer_obj.dir/Optimizer/Scalar/TypeInference.cpp.o
+[17/248] Building CXX object lib/CMakeFiles/hermesOptimizer_obj.dir/Optimizer/Scalar/ObjectMergeNewStores.cpp.o
+[18/248] Building CXX object lib/CMakeFiles/hermesOptimizer_obj.dir/Optimizer/Scalar/ObjectStackPromotion.cpp.o
+[19/248] Building CXX object lib/CMakeFiles/hermesOptimizer_obj.dir/Optimizer/Scalar/InstSimplify.cpp.o
+[20/248] Building CXX object lib/CMakeFiles/hermesOptimizer_obj.dir/Optimizer/Scalar/Auditor.cpp.o
+[21/248] Building CXX object lib/CMakeFiles/hermesOptimizer_obj.dir/Optimizer/Scalar/ResolveStaticRequire.cpp.o
+[22/248] Building CXX object lib/CMakeFiles/hermesOptimizer_obj.dir/Optimizer/Scalar/FuncSigOpts.cpp.o
+[23/248] Building CXX object lib/CMakeFiles/hermesOptimizer_obj.dir/Optimizer/Scalar/Utils.cpp.o
+[24/248] Building CXX object lib/CMakeFiles/hermesOptimizer_obj.dir/Optimizer/Scalar/FunctionAnalysis.cpp.o
+[25/248] Building CXX object lib/CMakeFiles/hermesOptimizer_obj.dir/Optimizer/Scalar/Inlining.cpp.o
+[26/248] Building CXX object lib/CMakeFiles/hermesOptimizer_obj.dir/Optimizer/Scalar/InstructionEscapeAnalysis.cpp.o
+[27/248] Building CXX object lib/CMakeFiles/hermesOptimizer_obj.dir/Optimizer/Scalar/TDZDedup.cpp.o
+[28/248] Building CXX object lib/CMakeFiles/hermesOptimizer_obj.dir/Optimizer/Scalar/StripDebugInsts.cpp.o
+[29/248] Building CXX object lib/CMakeFiles/hermesOptimizer_obj.dir/Optimizer/Scalar/PrivateBrandCheckDedup.cpp.o
+[30/248] Building CXX object lib/CMakeFiles/hermesFrontend_obj.dir/IRGen/IRGen.cpp.o
+[31/248] Building CXX object lib/CMakeFiles/hermesFrontend_obj.dir/IRGen/ESTreeIRGen.cpp.o
+[32/248] Building CXX object lib/CMakeFiles/hermesFrontend_obj.dir/IRGen/ESTreeIRGen-expr.cpp.o
+[33/248] Building CXX object lib/CMakeFiles/hermesFrontend_obj.dir/IRGen/ESTreeIRGen-stmt.cpp.o
+[34/248] Building CXX object lib/CMakeFiles/hermesFrontend_obj.dir/IRGen/ESTreeIRGen-except.cpp.o
+[35/248] Building CXX object lib/CMakeFiles/hermesFrontend_obj.dir/IRGen/ESTreeIRGen-func.cpp.o
+[36/248] Building CXX object lib/CMakeFiles/hermesFrontend_obj.dir/IRGen/ESTreeIRGen-typed-class.cpp.o
+[37/248] Building CXX object lib/CMakeFiles/hermesFrontend_obj.dir/IRGen/ESTreeIRGen-legacy-class.cpp.o
+[38/248] Building CXX object lib/CMakeFiles/hermesFrontend_obj.dir/IR/Analysis.cpp.o
+[39/248] Building CXX object lib/CMakeFiles/hermesFrontend_obj.dir/IR/TypeContext.cpp.o
+[40/248] Building CXX object lib/CMakeFiles/hermesFrontend_obj.dir/IR/IREval.cpp.o
+[41/248] Building CXX object lib/CMakeFiles/hermesFrontend_obj.dir/IR/IR.cpp.o
+[42/248] Building CXX object lib/CMakeFiles/hermesFrontend_obj.dir/IR/IRHash.cpp.o
+[43/248] Building CXX object lib/CMakeFiles/hermesFrontend_obj.dir/IR/IRBuilder.cpp.o
+[44/248] Building CXX object lib/CMakeFiles/hermesFrontend_obj.dir/IR/IRVerifier.cpp.o
+[45/248] Building CXX object lib/CMakeFiles/hermesFrontend_obj.dir/IR/CFG.cpp.o
+[46/248] Building CXX object lib/CMakeFiles/hermesFrontend_obj.dir/IR/IRUtils.cpp.o
+[47/248] Building CXX object lib/CMakeFiles/hermesFrontend_obj.dir/IR/Instrs.cpp.o
+[48/248] Building CXX object lib/CMakeFiles/hermesFrontend_obj.dir/Utils/Dumper.cpp.o
+[49/248] Building CXX object lib/AST/CMakeFiles/hermesAST_obj.dir/Context.cpp.o
+[50/248] Building CXX object lib/BCGen/CMakeFiles/hermesBackend_obj.dir/Lowering.cpp.o
+[51/248] Building CXX object lib/BCGen/CMakeFiles/hermesBackend_obj.dir/RegAlloc.cpp.o
+[52/248] Building CXX object lib/BCGen/CMakeFiles/hermesBackend_obj.dir/LowerScopes.cpp.o
+[53/248] Building CXX object lib/BCGen/CMakeFiles/hermesBackend_obj.dir/Exceptions.cpp.o
+[54/248] Building CXX object lib/BCGen/CMakeFiles/hermesBackend_obj.dir/SerializedLiteralGenerator.cpp.o
+[55/248] Building CXX object lib/BCGen/CMakeFiles/hermesBackend_obj.dir/OptEnvironmentInit.cpp.o
+[56/248] Building CXX object lib/BCGen/CMakeFiles/hermesBackend_obj.dir/LiteralBufferBuilder.cpp.o
+[57/248] Building CXX object lib/BCGen/HBC/CMakeFiles/hermesHBCBackend_obj.dir/HBC.cpp.o
+[58/248] Building CXX object lib/BCGen/HBC/CMakeFiles/hermesHBCBackend_obj.dir/BytecodeStream.cpp.o
+[59/248] Building CXX object lib/BCGen/HBC/CMakeFiles/hermesHBCBackend_obj.dir/Bytecode.cpp.o
+[60/248] Building CXX object lib/BCGen/HBC/CMakeFiles/hermesHBCBackend_obj.dir/BCProvider.cpp.o
+[61/248] Building CXX object lib/BCGen/HBC/CMakeFiles/hermesHBCBackend_obj.dir/BytecodeGenerator.cpp.o
+[62/248] Building CXX object lib/BCGen/HBC/CMakeFiles/hermesHBCBackend_obj.dir/ISel.cpp.o
+[63/248] Building CXX object lib/BCGen/HBC/CMakeFiles/hermesHBCBackend_obj.dir/BCProviderFromSrc.cpp.o
+[64/248] Building CXX object lib/BCGen/HBC/CMakeFiles/hermesHBCBackend_obj.dir/BytecodeFormConverter.cpp.o
+[65/248] Building CXX object lib/BCGen/HBC/CMakeFiles/hermesHBCBackend_obj.dir/BytecodeDisassembler.cpp.o
+[66/248] Building CXX object lib/BCGen/HBC/CMakeFiles/hermesHBCBackend_obj.dir/ConsecutiveStringStorage.cpp.o
+[67/248] Building CXX object lib/BCGen/HBC/CMakeFiles/hermesHBCBackend_obj.dir/DebugInfo.cpp.o
+[68/248] Building CXX object lib/BCGen/HBC/CMakeFiles/hermesHBCBackend_obj.dir/DebugInfoNonLean.cpp.o
+[69/248] Building CXX object lib/BCGen/HBC/CMakeFiles/hermesHBCBackend_obj.dir/SimpleBytecodeBuilder.cpp.o
+[70/248] Building CXX object lib/BCGen/HBC/CMakeFiles/hermesHBCBackend_obj.dir/UniquingStringLiteralTable.cpp.o
+[71/248] Building CXX object lib/BCGen/HBC/CMakeFiles/hermesHBCBackend_obj.dir/Passes.cpp.o
+[72/248] Building CXX object lib/BCGen/HBC/CMakeFiles/hermesHBCBackend_obj.dir/LoweringPipelines.cpp.o
+[73/248] Building CXX object lib/BCGen/HBC/CMakeFiles/hermesHBCBackend_obj.dir/Passes/InsertProfilePoint.cpp.o
+[74/248] Building CXX object lib/BCGen/HBC/CMakeFiles/hermesHBCBackend_obj.dir/Passes/OptParentEnvironment.cpp.o
+[75/248] Building CXX object lib/BCGen/HBC/CMakeFiles/hermesHBCBackend_obj.dir/Passes/PeepholeLowering.cpp.o
+[76/248] Building CXX object lib/BCGen/SH/CMakeFiles/hermesSHBackend_obj.dir/LowerCalls.cpp.o
+[77/248] Building CXX object lib/BCGen/HBC/CMakeFiles/hermesHBCBackend_obj.dir/Passes/ReorderRegisters.cpp.o
+[78/248] Building CXX object lib/BCGen/SH/CMakeFiles/hermesSHBackend_obj.dir/LoadConstants.cpp.o
+[79/248] Building CXX object lib/BCGen/SH/CMakeFiles/hermesSHBackend_obj.dir/RecreateCheapValues.cpp.o
+[80/248] Building CXX object lib/BCGen/SH/CMakeFiles/hermesSHBackend_obj.dir/LowerNanBoxedUnionNarrowT.cpp.o
+[81/248] Building CXX object lib/BCGen/SH/CMakeFiles/hermesSHBackend_obj.dir/PeepholeLowering.cpp.o
+[82/248] Building CXX object lib/BCGen/SH/CMakeFiles/hermesSHBackend_obj.dir/SHRegAlloc.cpp.o
+[83/248] Building CXX object lib/BCGen/SH/CMakeFiles/hermesSHBackend_obj.dir/LLVMNative/LLVMBackend.cpp.o
+[84/248] Building CXX object lib/BCGen/SH/CMakeFiles/hermesSHBackend_obj.dir/SH.cpp.o
+[85/248] Linking CXX static library lib/libhermescompiler.a
+[86/248] Generating InternalBytecode.js
+[87/248] Building CXX object tools/hermesc/CMakeFiles/hermesc.dir/hermesc.cpp.o
+[88/248] Building CXX object tools/shermes/CMakeFiles/shermes.dir/compile.cpp.o
+[89/248] Building CXX object tools/shermes/CMakeFiles/shermes.dir/shermes.cpp.o
+[90/248] Building CXX object lib/CompilerDriver/CMakeFiles/hermesCompilerDriver_obj.dir/CompilerDriver.cpp.o
+[91/248] Linking CXX executable bin/shermes
+[92/248] Linking CXX executable bin/hermesc
+[93/248] Generating ExtensionsBytecode.hbc
+[94/248] Generating ExtensionsBytecode.inc
+[95/248] Generating InternalBytecode.hbc
+[96/248] Building CXX object API/hermes/CMakeFiles/hermesapi_obj.dir/extensions/ExtensionsBytecode.cpp.o
+[97/248] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/ArrayStorage.cpp.o
+[98/248] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/BigIntPrimitive.cpp.o
+[99/248] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/BoxedDouble.cpp.o
+[100/248] Building CXX object API/hermes/CMakeFiles/hermesapi_obj.dir/hermes.cpp.o
+[101/248] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/Callable.cpp.o
+[102/248] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/CheckHeapWellFormedAcceptor.cpp.o
+[103/248] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/CodeBlock.cpp.o
+[104/248] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/DictPropertyMap.cpp.o
+[105/248] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/Domain.cpp.o
+[106/248] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/DummyObject.cpp.o
+[107/248] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/LargeDummyObject.cpp.o
+[108/248] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/FastArray.cpp.o
+[109/248] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/GCBase.cpp.o
+[110/248] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/OrderedHashMap.cpp.o
+[111/248] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/HeapSnapshot.cpp.o
+[112/248] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/HermesValue.cpp.o
+[113/248] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/HiddenClass.cpp.o
+[114/248] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/IdentifierTable.cpp.o
+[115/248] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/JSArray.cpp.o
+[116/248] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/Interpreter.cpp.o
+[117/248] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/Interpreter-slowpaths.cpp.o
+[118/248] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/JSCallSite.cpp.o
+[119/248] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/JSArrayBuffer.cpp.o
+[120/248] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/JSCallableProxy.cpp.o
+[121/248] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/JSDataView.cpp.o
+[122/248] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/JSDate.cpp.o
+[123/248] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/JSError.cpp.o
+[124/248] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/JSGeneratorObject.cpp.o
+[125/248] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/JSObject.cpp.o
+[126/248] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/JSProxy.cpp.o
+[127/248] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/JSRegExp.cpp.o
+[128/248] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/JSRegExpStringIterator.cpp.o
+[129/248] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/JSMapImpl.cpp.o
+[130/248] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/JSNativeFunctions.cpp.o
+[131/248] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/JSTypedArray.cpp.o
+[132/248] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/JSWeakMapImpl.cpp.o
+[133/248] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/JSWeakRef.cpp.o
+[134/248] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/JSFinalizationRegistry.cpp.o
+[135/248] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/DecoratedObject.cpp.o
+[136/248] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/HostModel.cpp.o
+[137/248] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/ModuleExportsCache.cpp.o
+[138/248] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/NativeState.cpp.o
+[139/248] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/PrimitiveBox.cpp.o
+[140/248] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/PropertyAccessor.cpp.o
+[141/248] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/Operations.cpp.o
+[142/248] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/Runtime-profilers.cpp.o
+[143/248] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/RuntimeFlags.cpp.o
+[144/248] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/Runtime.cpp.o
+[145/248] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/RuntimeModule.cpp.o
+[146/248] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/Profiler/TraceSerializer.cpp.o
+[147/248] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/Profiler/CodeCoverageProfiler.cpp.o
+[148/248] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/Profiler/ProfileGenerator.cpp.o
+[149/248] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/Profiler/SamplingProfiler.cpp.o
+[150/248] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/Profiler/SamplingProfilerPosix.cpp.o
+[151/248] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/Profiler/SamplingProfilerWindows.cpp.o
+[152/248] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/Profiler/SamplingProfilerSampler.cpp.o
+[153/248] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/SerializedValue.cpp.o
+[154/248] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/SingleObject.cpp.o
+[155/248] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/StringPrimitive.cpp.o
+[156/248] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/StringView.cpp.o
+[157/248] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/SymbolRegistry.cpp.o
+[158/248] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/TimeLimitMonitor.cpp.o
+[159/248] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/TwineChar16.cpp.o
+[160/248] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/WeakValueObjectMap.cpp.o
+[161/248] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/StaticHInit.cpp.o
+[162/248] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/StaticH.cpp.o
+[163/248] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/StaticHUnit.cpp.o
+[164/248] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/JIT/DiscoverBB.cpp.o
+[165/248] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/detail/IdentifierHashTable.cpp.o
+[166/248] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/JSLib/Array.cpp.o
+[167/248] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/JSLib/ArrayIterator.cpp.o
+[168/248] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/JSLib/ArrayBuffer.cpp.o
+[169/248] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/JSLib/AsyncFunction.cpp.o
+[170/248] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/JSLib/Base64Util.cpp.o
+[171/248] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/JSLib/Base64.cpp.o
+[172/248] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/JSLib/BigInt.cpp.o
+[173/248] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/JSLib/CallSite.cpp.o
+[174/248] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/JSLib/DataView.cpp.o
+[175/248] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/JSLib/Error.cpp.o
+[176/248] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/JSLib/TypedArray.cpp.o
+[177/248] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/JSLib/GeneratorFunction.cpp.o
+[178/248] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/JSLib/GeneratorPrototype.cpp.o
+[179/248] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/JSLib/GlobalObject.cpp.o
+[180/248] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/JSLib/IteratorPrototype.cpp.o
+[181/248] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/JSLib/HermesInternal.cpp.o
+[182/248] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/JSLib/Intl.cpp.o
+[183/248] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/JSLib/HermesBuiltin.cpp.o
+[184/248] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/JSLib/JSLibStorage.cpp.o
+[185/248] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/JSLib/JSLibInternal.cpp.o
+[186/248] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/JSLib/Map.cpp.o
+[187/248] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/JSLib/Math.cpp.o
+[188/248] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/JSLib/JSON.cpp.o
+[189/248] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/JSLib/RuntimeJSONParse.cpp.o
+[190/248] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/JSLib/RuntimeJSONStringify.cpp.o
+[191/248] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/JSLib/JSONLexer.cpp.o
+[192/248] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/JSLib/Object.cpp.o
+[193/248] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/JSLib/Proxy.cpp.o
+[194/248] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/JSLib/Reflect.cpp.o
+[195/248] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/JSLib/Set.cpp.o
+[196/248] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/JSLib/StringIterator.cpp.o
+[197/248] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/JSLib/String.cpp.o
+[198/248] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/JSLib/Function.cpp.o
+[199/248] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/JSLib/Number.cpp.o
+[200/248] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/JSLib/Boolean.cpp.o
+[201/248] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/JSLib/RegExp.cpp.o
+[202/248] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/JSLib/DateUtil.cpp.o
+[203/248] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/JSLib/RegExpStringIterator.cpp.o
+[204/248] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/JSLib/DateCache.cpp.o
+[205/248] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/JSLib/Symbol.cpp.o
+[206/248] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/JSLib/Date.cpp.o
+[207/248] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/JSLib/WeakMap.cpp.o
+[208/248] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/JSLib/WeakRef.cpp.o
+[209/248] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/JSLib/WeakSet.cpp.o
+[210/248] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/JSLib/FinalizationRegistry.cpp.o
+[211/248] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/JSLib/print.cpp.o
+[212/248] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/JSLib/eval.cpp.o
+[213/248] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/gcs/AlignedHeapSegment.cpp.o
+[214/248] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/JSLib/require.cpp.o
+[215/248] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/JSLib/escape.cpp.o
+[216/248] Generating InternalBytecode.inc
+[217/248] Linking CXX static library API/hermes/libhermesapi.a
+[218/248] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/gcs/FillerCell.cpp.o
+[219/248] Building CXX object lib/CMakeFiles/hermesvm_a.dir/BCGen/SH/LLVMNative/eval_extensions.cpp.o
+[220/248] Building CXX object lib/InternalJavaScript/CMakeFiles/hermesInternalBytecode_obj.dir/InternalBytecode.cpp.o
+[221/248] Building CXX object lib/VM/CMakeFiles/hermesVMRuntime_obj.dir/gcs/HadesGC.cpp.o
+[222/248] Linking CXX static library lib/VM/libhermesVMRuntime.a
+[223/248] Building CXX object API/napi/CMakeFiles/hermesNapi_obj.dir/hermes_napi_arraybuffer.cpp.o
+[224/248] Building CXX object API/napi/CMakeFiles/hermesNapi_obj.dir/hermes_napi.cpp.o
+[225/248] Building CXX object API/napi/CMakeFiles/hermesNapi_obj.dir/hermes_napi_async_context.cpp.o
+[226/248] Building CXX object API/napi/CMakeFiles/hermesNapi_obj.dir/hermes_napi_async_work.cpp.o
+[227/248] Building CXX object API/napi/CMakeFiles/hermesNapi_obj.dir/hermes_napi_bigint.cpp.o
+[228/248] Building CXX object API/napi/CMakeFiles/hermesNapi_obj.dir/hermes_napi_buffer.cpp.o
+[229/248] Building CXX object API/napi/CMakeFiles/hermesNapi_obj.dir/hermes_napi_dataview.cpp.o
+[230/248] Building CXX object API/napi/CMakeFiles/hermesNapi_obj.dir/hermes_napi_error.cpp.o
+[231/248] Building CXX object API/napi/CMakeFiles/hermesNapi_obj.dir/hermes_napi_external.cpp.o
+[232/248] Building CXX object API/napi/CMakeFiles/hermesNapi_obj.dir/hermes_napi_function.cpp.o
+[233/248] Building CXX object API/napi/CMakeFiles/hermesNapi_obj.dir/hermes_napi_promise.cpp.o
+[234/248] Building CXX object API/napi/CMakeFiles/hermesNapi_obj.dir/hermes_napi_object.cpp.o
+[235/248] Building CXX object API/napi/CMakeFiles/hermesNapi_obj.dir/hermes_napi_reference.cpp.o
+[236/248] Building CXX object API/napi/CMakeFiles/hermesNapi_obj.dir/hermes_napi_scope.cpp.o
+[237/248] Building CXX object API/napi/CMakeFiles/hermesNapi_obj.dir/hermes_napi_string.cpp.o
+[238/248] Building CXX object API/napi/CMakeFiles/hermesNapi_obj.dir/hermes_napi_tsfn.cpp.o
+[239/248] Building CXX object API/napi/CMakeFiles/hermesNapi_obj.dir/hermes_napi_typedarray.cpp.o
+[240/248] Building CXX object API/napi/CMakeFiles/hermesNapi_obj.dir/hermes_napi_typetag.cpp.o
+[241/248] Linking CXX static library lib/libhermesvm_a.a
+[242/248] Building CXX object API/napi/CMakeFiles/hermesNapi_obj.dir/hermes_napi_value.cpp.o
+[243/248] Building CXX object API/napi/CMakeFiles/hermesNapi_obj.dir/hermes_napi_wrap.cpp.o
+[244/248] Linking CXX static library API/napi/libhermesNapi.a
+[245/248] Linking CXX shared library lib/libhermesvm.so
+FAILED: [code=1] lib/libhermesvm.so 
+: && /tmp/llvm-direct-toolchain/bin/clang++ -fPIC -Wall -Wextra -Wno-unused-parameter -Wwrite-strings -Wcast-qual -Wno-invalid-offsetof -Wmissing-field-initializers -Wno-deprecated-copy -Wno-noexcept-type -Wnon-virtual-dtor -Wdelete-non-virtual-dtor -ffp-contract=on -Wno-range-loop-analysis -ffunction-sections -fdata-sections -fsanitize=address -fno-omit-frame-pointer -fvisibility=hidden -fno-strict-aliasing -fno-strict-overflow -Werror=undef -O1 -DNDEBUG  -shared -Xlinker --gc-sections -Xlinker --dependency-file=lib/CMakeFiles/hermesvm.dir/link.d -Wl,-soname,libhermesvm.so -o lib/libhermesvm.so lib/CMakeFiles/hermesvm.dir/dummy.cpp.o  -Wl,--whole-archive  lib/libhermesvm_a.a  -Wl,--no-whole-archive  -Wl,--whole-archive  API/napi/libhermesNapi.a  -Wl,--no-whole-archive  lib/VM/libhermesVMRuntime.a  API/hermes/libhermesapi.a  jsi/libjsi.a  public/hermes/Public/libhermesPublic.a && :
+/usr/bin/ld: lib/libhermesvm_a.a(eval_extensions.cpp.o): warning: relocation against `shllvm_eval_direct' in read-only section `.text.shllvm_eval_direct'
+/usr/bin/ld: lib/libhermesvm_a.a(eval_extensions.cpp.o): relocation R_X86_64_PC32 against symbol `shllvm_eval_direct' can not be used when making a shared object; recompile with -fPIC
+/usr/bin/ld: final link failed: bad value
+clang++: error: linker command failed with exit code 1 (use -v to see invocation)
+ninja: build stopped: subcommand failed.

@@ -1906,9 +1906,55 @@ Value *ESTreeIRGen::genCallEvalExpr(ESTree::CallExpressionNode *call) {
 
   // Perform a direct eval.
   Builder.setInsertionBlock(evalBlock);
+  // Record the precise lexical view at this source location. VariableScope
+  // itself can contain bindings from several blocks, including shadowed or
+  // out-of-scope names, so enumerating its variables would be incorrect.
+  llvh::DenseSet<UniqueString *> seenNames;
+  llvh::SmallVector<Variable *, 8> evalVariables;
+  Variable *evalArguments = nullptr;
+  for (auto *lexicalScope = *function->getLexicalScope(); lexicalScope;
+       lexicalScope = lexicalScope->parentScope) {
+    for (auto *decl : lexicalScope->decls) {
+      if (!seenNames.insert(decl->name.getUnderlyingPointer()).second)
+        continue;
+      if (decl->special == sema::Decl::Special::Arguments) {
+        evalArguments = curFunction()->capturedState.arguments;
+        continue;
+      }
+      if (sema::Decl::isKindPrivateName(decl->kind))
+        continue;
+      if (auto *variable =
+              llvh::dyn_cast_or_null<Variable>(getDeclCustomData(decl)))
+        evalVariables.push_back(variable);
+    }
+  }
+  auto *nonArrowCaller =
+      semCtx_.nearestNonArrow(curFunction()->getSemInfo());
+  bool derivedConstructorContext = nonArrowCaller->constructorKind ==
+      sema::FunctionInfo::ConstructorKind::Derived;
+  Value *evalThis;
+  if (derivedConstructorContext && curFunction()->capturedState.thisVal) {
+    // Merely calling eval before super() must not read-check this. The native
+    // backend diagnoses this currently unsupported context; a metadata-aware
+    // bytecode eval uses the captured-this rules when its text actually
+    // accesses this.
+    auto *variable = curFunction()->capturedState.thisVal;
+    evalThis = Builder.createLoadFrameInst(
+        emitResolveScopeInstIfNeeded(variable->getParent()), variable);
+  } else {
+    evalThis = genThisExpression();
+  }
   Value *evalRes = Builder.createDirectEvalInst(
       args.empty() ? Builder.getLiteralUndefined() : args[0],
-      curFunction()->function->isStrictMode());
+      curFunction()->function->isStrictMode(),
+      nonArrowCaller == semCtx_.getGlobalFunction(),
+      derivedConstructorContext,
+      curFunction()->curScope()->getVariableScope(),
+      curFunction()->curScope(),
+      evalThis,
+      genNewTarget(),
+      evalArguments,
+      evalVariables);
   Builder.createBranchInst(nextBlock);
 
   // Perform a normal call.

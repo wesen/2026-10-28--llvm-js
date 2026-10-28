@@ -1,0 +1,6 @@
+{
+  "name": "async_nested_expressions.js",
+  "exit_code": 0,
+  "stdout": "nested-await {\"value\":1,\"done\":true}\ndelegated-await 2,3\nawait-operand 4\nyield-operand {\"value\":5,\"done\":true}\nordinary-yield-operand {\"value\":6,\"done\":true}\nyield-await-order tick-1|tick-2|yield\ndone: async_nested_expressions\n",
+  "stderr": ""
+}

@@ -684,6 +684,14 @@ std::shared_ptr<Context> createContext() {
       Warning::name, cli::name##Warning);
 #include "hermes/Support/Warnings.def"
 
+  // Direct LLVM emission now carries caller scope metadata. Keep an explicit
+  // -Wdirect-eval request, but do not issue the legacy unsupported-scope
+  // warning by default for this backend. Its remaining boundaries have
+  // specific compiler/runtime diagnostics.
+  if (cli::OutputLevel == OutputLevelKind::LLVM &&
+      !cli::DirectEvalWarning.isSpecified())
+    context->getSourceErrorManager().setWarningStatus(Warning::DirectEval, false);
+
   if (cli::DisableAllWarnings)
     context->getSourceErrorManager().disableAllWarnings();
   context->getSourceErrorManager().setErrorLimit(cli::ErrorLimit);

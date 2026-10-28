@@ -1146,7 +1146,7 @@ void SemanticResolver::visit(ESTree::CallExpressionNode *node) {
           sm_.warning(
               Warning::DirectEval,
               node->_callee->getSourceRange(),
-              "Direct call to eval(), but lexical scope is not supported.");
+              "Direct call to eval requires caller scope metadata.");
         }
         registerLocalEval(curScope_);
       } else {

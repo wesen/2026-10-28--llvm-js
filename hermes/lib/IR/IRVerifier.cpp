@@ -599,9 +599,10 @@ bool Verifier::verifyBeforeVisitInstruction(const Instruction &Inst) {
           Inst,
           llvh::isa<LoadFrameInst>(Inst) || llvh::isa<StoreFrameInst>(Inst) ||
               llvh::isa<LazyCompilationDataInst>(Inst) ||
-              llvh::isa<EvalCompilationDataInst>(Inst),
+              llvh::isa<EvalCompilationDataInst>(Inst) ||
+              llvh::isa<DirectEvalInst>(Inst),
           "Variable can only be accessed in "
-          "LoadFrame/StoreFrame/LazyData/EvalData Inst.");
+          "LoadFrame/StoreFrame/LazyData/EvalData/DirectEval Inst.");
     }
 
     // Most instructions that accepts a stack operand must write to it. If it
@@ -1424,7 +1425,25 @@ bool Verifier::visitDebuggerInst(DebuggerInst const &Inst) {
 }
 
 bool Verifier::visitDirectEvalInst(DirectEvalInst const &Inst) {
-  // Nothing to verify at this point.
+  AssertIWithMsg(
+      Inst,
+      llvh::isa<VariableScope>(
+          Inst.getOperand(DirectEvalInst::VariableScopeIdx)),
+      "Direct eval requires its lexical VariableScope");
+  AssertIWithMsg(
+      Inst,
+      llvh::isa<Variable>(
+          Inst.getOperand(DirectEvalInst::CapturedArgumentsIdx)) ||
+          llvh::isa<EmptySentinel>(
+              Inst.getOperand(DirectEvalInst::CapturedArgumentsIdx)),
+      "Direct eval arguments capture must be a Variable or empty");
+  for (unsigned i = DirectEvalInst::FirstCapturedVariableIdx;
+       i != Inst.getNumOperands();
+       ++i)
+    AssertIWithMsg(
+        Inst,
+        llvh::isa<Variable>(Inst.getOperand(i)),
+        "Direct eval captured binding must be a Variable");
   return true;
 }
 

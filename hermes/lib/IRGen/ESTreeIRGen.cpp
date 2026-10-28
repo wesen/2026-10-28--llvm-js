@@ -258,8 +258,12 @@ Function *ESTreeIRGen::doItInScope(EvalCompilationDataInst *evalDataInst) {
 
   // Function context for topLevelFunction.
   FunctionContext mainFunctionContext{this, newFunc, Program->getSemInfo()};
+  Function::ScopedLexicalScopeChange lexScopeChange(
+      newFunc, Program->getSemInfo()->getFunctionBodyScope());
   curFunction()->capturedState.newTarget = evalDataInst->getCapturedNewTarget();
   curFunction()->capturedState.thisVal = evalDataInst->getCapturedThis();
+  curFunction()->capturedState.arguments =
+      evalDataInst->getCapturedArguments();
   curFunction()->capturedState.homeObject = evalDataInst->getHomeObject();
 
   // If there was class context, restore it.
@@ -272,7 +276,9 @@ Function *ESTreeIRGen::doItInScope(EvalCompilationDataInst *evalDataInst) {
   emitFunctionPrologue(
       Program,
       Builder.createBasicBlock(newFunc),
-      InitES5CaptureState::Yes,
+      defKind == Function::DefinitionKind::ES6Arrow
+          ? InitES5CaptureState::No
+          : InitES5CaptureState::Yes,
       DoEmitDeclarations::Yes,
       varScope);
 

@@ -1,0 +1,416 @@
+[
+  {
+    "source": "test/LLVMNativeExtensions/features_bigint.js",
+    "node": {
+      "command": [
+        "node",
+        "--expose-gc",
+        "-e",
+        "globalThis.print=(...a)=>console.log(...a);require(process.argv[1]);",
+        "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNativeExtensions/features_bigint.js"
+      ],
+      "exit_code": 0,
+      "stdout": "bigint 0 -1\n123456789012345678901234567890\n18446744073709551615 9223372036854775807 42\ntrue\n12345678901234567897 12345678901234567883 86419752308641975230\n1763668414462081127 1 -1763668414462081127 -1\n1881676372353657772490265749424677022198701224860897069000 -12345678901234567891\n2 12345678901234567895 12345678901234567893\n1821900632858158512180493664091289681920 -1543209862654320987 3086419725308641972\n12345678901234567890 12345678901234567892 12345678901234567892 12345678901234567890\ntrue true true false false\n-1 255\nTypeError\nTypeError\nTypeError\nRangeError\nRangeError\nRangeError\n",
+      "stderr": ""
+    },
+    "c": [
+      {
+        "optimization": "O0",
+        "compile": {
+          "command": [
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/bin/shermes",
+            "-O0",
+            "-Xes6-block-scoping",
+            "-Xenable-tdz",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNativeExtensions/features_bigint.js",
+            "-o",
+            "/workspace/scratch/ea758b58c6af/tmp/value-feature-oracles/features_bigint-O0"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        "run": {
+          "command": [
+            "/workspace/scratch/ea758b58c6af/tmp/value-feature-oracles/features_bigint-O0"
+          ],
+          "exit_code": 0,
+          "stdout": "bigint 0 -1\n123456789012345678901234567890\n18446744073709551615 9223372036854775807 42\ntrue\n12345678901234567897 12345678901234567883 86419752308641975230\n1763668414462081127 1 -1763668414462081127 -1\n1881676372353657772490265749424677022198701224860897069000 -12345678901234567891\n2 12345678901234567895 12345678901234567893\n1821900632858158512180493664091289681920 -1543209862654320987 3086419725308641972\n12345678901234567890 12345678901234567892 12345678901234567892 12345678901234567890\ntrue true true false false\n-1 255\nTypeError\nTypeError\nTypeError\nRangeError\nRangeError\nRangeError\n",
+          "stderr": ""
+        },
+        "matches_node": true
+      },
+      {
+        "optimization": "O",
+        "compile": {
+          "command": [
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/bin/shermes",
+            "-O",
+            "-Xes6-block-scoping",
+            "-Xenable-tdz",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNativeExtensions/features_bigint.js",
+            "-o",
+            "/workspace/scratch/ea758b58c6af/tmp/value-feature-oracles/features_bigint-O"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        "run": {
+          "command": [
+            "/workspace/scratch/ea758b58c6af/tmp/value-feature-oracles/features_bigint-O"
+          ],
+          "exit_code": 0,
+          "stdout": "bigint 0 -1\n123456789012345678901234567890\n18446744073709551615 9223372036854775807 42\ntrue\n12345678901234567897 12345678901234567883 86419752308641975230\n1763668414462081127 1 -1763668414462081127 -1\n1881676372353657772490265749424677022198701224860897069000 -12345678901234567891\n2 12345678901234567895 12345678901234567893\n1821900632858158512180493664091289681920 -1543209862654320987 3086419725308641972\n12345678901234567890 12345678901234567892 12345678901234567892 12345678901234567890\ntrue true true false false\n-1 255\nTypeError\nTypeError\nTypeError\nRangeError\nRangeError\nRangeError\n",
+          "stderr": ""
+        },
+        "matches_node": true
+      }
+    ]
+  },
+  {
+    "source": "test/LLVMNativeExtensions/features_bigint_typed_arrays.js",
+    "node": {
+      "command": [
+        "node",
+        "--expose-gc",
+        "-e",
+        "globalThis.print=(...a)=>console.log(...a);require(process.argv[1]);",
+        "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNativeExtensions/features_bigint_typed_arrays.js"
+      ],
+      "exit_code": 0,
+      "stdout": "-1,-9223372036854775808,1 18446744073709551615,9223372036854775808,1\n-2 18446744073709551614\n-1234567890123456789\n123456789abcdef\n-4,2,3 -8,4,6\n1\nTypeError\nTypeError\nTypeError\n",
+      "stderr": ""
+    },
+    "c": [
+      {
+        "optimization": "O0",
+        "compile": {
+          "command": [
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/bin/shermes",
+            "-O0",
+            "-Xes6-block-scoping",
+            "-Xenable-tdz",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNativeExtensions/features_bigint_typed_arrays.js",
+            "-o",
+            "/workspace/scratch/ea758b58c6af/tmp/value-feature-oracles/features_bigint_typed_arrays-O0"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        "run": {
+          "command": [
+            "/workspace/scratch/ea758b58c6af/tmp/value-feature-oracles/features_bigint_typed_arrays-O0"
+          ],
+          "exit_code": 0,
+          "stdout": "-1,-9223372036854775808,1 18446744073709551615,9223372036854775808,1\n-2 18446744073709551614\n-1234567890123456789\n123456789abcdef\n-4,2,3 -8,4,6\n1\nTypeError\nTypeError\nTypeError\n",
+          "stderr": ""
+        },
+        "matches_node": true
+      },
+      {
+        "optimization": "O",
+        "compile": {
+          "command": [
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/bin/shermes",
+            "-O",
+            "-Xes6-block-scoping",
+            "-Xenable-tdz",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNativeExtensions/features_bigint_typed_arrays.js",
+            "-o",
+            "/workspace/scratch/ea758b58c6af/tmp/value-feature-oracles/features_bigint_typed_arrays-O"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        "run": {
+          "command": [
+            "/workspace/scratch/ea758b58c6af/tmp/value-feature-oracles/features_bigint_typed_arrays-O"
+          ],
+          "exit_code": 0,
+          "stdout": "-1,-9223372036854775808,1 18446744073709551615,9223372036854775808,1\n-2 18446744073709551614\n-1234567890123456789\n123456789abcdef\n-4,2,3 -8,4,6\n1\nTypeError\nTypeError\nTypeError\n",
+          "stderr": ""
+        },
+        "matches_node": true
+      }
+    ]
+  },
+  {
+    "source": "test/LLVMNativeExtensions/features_private_fields.js",
+    "node": {
+      "command": [
+        "node",
+        "--expose-gc",
+        "-e",
+        "globalThis.print=(...a)=>console.log(...a);require(process.argv[1]);",
+        "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNativeExtensions/features_private_fields.js"
+      ],
+      "exit_code": 0,
+      "stdout": "26 13 90 105 3\n31 30 30\ntrue true false 0\nTypeError\nTypeError\na\nTypeError\n17 0\nTypeError\n",
+      "stderr": ""
+    },
+    "c": [
+      {
+        "optimization": "O0",
+        "compile": {
+          "command": [
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/bin/shermes",
+            "-O0",
+            "-Xes6-block-scoping",
+            "-Xenable-tdz",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNativeExtensions/features_private_fields.js",
+            "-o",
+            "/workspace/scratch/ea758b58c6af/tmp/value-feature-oracles/features_private_fields-O0"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        "run": {
+          "command": [
+            "/workspace/scratch/ea758b58c6af/tmp/value-feature-oracles/features_private_fields-O0"
+          ],
+          "exit_code": 0,
+          "stdout": "26 13 90 105 3\n31 30 30\ntrue true false 0\nTypeError\nTypeError\na\nTypeError\n17 0\nTypeError\n",
+          "stderr": ""
+        },
+        "matches_node": true
+      },
+      {
+        "optimization": "O",
+        "compile": {
+          "command": [
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/bin/shermes",
+            "-O",
+            "-Xes6-block-scoping",
+            "-Xenable-tdz",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNativeExtensions/features_private_fields.js",
+            "-o",
+            "/workspace/scratch/ea758b58c6af/tmp/value-feature-oracles/features_private_fields-O"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        "run": {
+          "command": [
+            "/workspace/scratch/ea758b58c6af/tmp/value-feature-oracles/features_private_fields-O"
+          ],
+          "exit_code": 0,
+          "stdout": "26 13 90 105 3\n31 30 30\ntrue true false 0\nTypeError\nTypeError\na\nTypeError\n17 0\nTypeError\n",
+          "stderr": ""
+        },
+        "matches_node": true
+      }
+    ]
+  },
+  {
+    "source": "test/LLVMNativeExtensions/features_regexp.js",
+    "node": {
+      "command": [
+        "node",
+        "--expose-gc",
+        "-e",
+        "globalThis.print=(...a)=>console.log(...a);require(process.argv[1]);",
+        "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNativeExtensions/features_regexp.js"
+      ],
+      "exit_code": 0,
+      "stdout": "true hello i\nOne-12 One 12 0 6\nTWO-34 TWO 34 7 13\nnull 0\ntrue 2\nfalse 0\ntrue true 0\ntrue false\ntrue true\nitem 2048\nA2 B3\none|two|three\nSyntaxError\nSyntaxError\n",
+      "stderr": ""
+    },
+    "c": [
+      {
+        "optimization": "O0",
+        "compile": {
+          "command": [
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/bin/shermes",
+            "-O0",
+            "-Xes6-block-scoping",
+            "-Xenable-tdz",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNativeExtensions/features_regexp.js",
+            "-o",
+            "/workspace/scratch/ea758b58c6af/tmp/value-feature-oracles/features_regexp-O0"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        "run": {
+          "command": [
+            "/workspace/scratch/ea758b58c6af/tmp/value-feature-oracles/features_regexp-O0"
+          ],
+          "exit_code": 0,
+          "stdout": "true hello i\nOne-12 One 12 0 6\nTWO-34 TWO 34 7 13\nnull 0\ntrue 2\nfalse 0\ntrue true 0\ntrue false\ntrue true\nitem 2048\nA2 B3\none|two|three\nSyntaxError\nSyntaxError\n",
+          "stderr": ""
+        },
+        "matches_node": true
+      },
+      {
+        "optimization": "O",
+        "compile": {
+          "command": [
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/bin/shermes",
+            "-O",
+            "-Xes6-block-scoping",
+            "-Xenable-tdz",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNativeExtensions/features_regexp.js",
+            "-o",
+            "/workspace/scratch/ea758b58c6af/tmp/value-feature-oracles/features_regexp-O"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        "run": {
+          "command": [
+            "/workspace/scratch/ea758b58c6af/tmp/value-feature-oracles/features_regexp-O"
+          ],
+          "exit_code": 0,
+          "stdout": "true hello i\nOne-12 One 12 0 6\nTWO-34 TWO 34 7 13\nnull 0\ntrue 2\nfalse 0\ntrue true 0\ntrue false\ntrue true\nitem 2048\nA2 B3\none|two|three\nSyntaxError\nSyntaxError\n",
+          "stderr": ""
+        },
+        "matches_node": true
+      }
+    ]
+  },
+  {
+    "source": "test/LLVMNativeExtensions/features_typed_arrays.js",
+    "node": {
+      "command": [
+        "node",
+        "--expose-gc",
+        "-e",
+        "globalThis.print=(...a)=>console.log(...a);require(process.argv[1]);",
+        "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNativeExtensions/features_typed_arrays.js"
+      ],
+      "exit_code": 0,
+      "stdout": "120,86,52,18 305419896 2018915346\n99 7 true true\n1,1,2,3,4\ntrue true false\n16 1 4 1\n127,-128,127,0\n255,0,1,0\n0,0,2,2,254,255\n-32768,32767\n65535,0\n-2147483648,2147483647\n4294967295,0\ntrue Infinity -Infinity true 1.25\n1.5,-2.25\n8,6,4,2 10\n1,2,3,4 2,3\nundefined undefined 4\nRangeError\nRangeError\nRangeError\nRangeError\n",
+      "stderr": ""
+    },
+    "c": [
+      {
+        "optimization": "O0",
+        "compile": {
+          "command": [
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/bin/shermes",
+            "-O0",
+            "-Xes6-block-scoping",
+            "-Xenable-tdz",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNativeExtensions/features_typed_arrays.js",
+            "-o",
+            "/workspace/scratch/ea758b58c6af/tmp/value-feature-oracles/features_typed_arrays-O0"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        "run": {
+          "command": [
+            "/workspace/scratch/ea758b58c6af/tmp/value-feature-oracles/features_typed_arrays-O0"
+          ],
+          "exit_code": 0,
+          "stdout": "120,86,52,18 305419896 2018915346\n99 7 true true\n1,1,2,3,4\ntrue true false\n16 1 4 1\n127,-128,127,0\n255,0,1,0\n0,0,2,2,254,255\n-32768,32767\n65535,0\n-2147483648,2147483647\n4294967295,0\ntrue Infinity -Infinity true 1.25\n1.5,-2.25\n8,6,4,2 10\n1,2,3,4 2,3\nundefined 8 4\nRangeError\nRangeError\nRangeError\nRangeError\n",
+          "stderr": ""
+        },
+        "matches_node": false
+      },
+      {
+        "optimization": "O",
+        "compile": {
+          "command": [
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/bin/shermes",
+            "-O",
+            "-Xes6-block-scoping",
+            "-Xenable-tdz",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNativeExtensions/features_typed_arrays.js",
+            "-o",
+            "/workspace/scratch/ea758b58c6af/tmp/value-feature-oracles/features_typed_arrays-O"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        "run": {
+          "command": [
+            "/workspace/scratch/ea758b58c6af/tmp/value-feature-oracles/features_typed_arrays-O"
+          ],
+          "exit_code": 0,
+          "stdout": "120,86,52,18 305419896 2018915346\n99 7 true true\n1,1,2,3,4\ntrue true false\n16 1 4 1\n127,-128,127,0\n255,0,1,0\n0,0,2,2,254,255\n-32768,32767\n65535,0\n-2147483648,2147483647\n4294967295,0\ntrue Infinity -Infinity true 1.25\n1.5,-2.25\n8,6,4,2 10\n1,2,3,4 2,3\nundefined 8 4\nRangeError\nRangeError\nRangeError\nRangeError\n",
+          "stderr": ""
+        },
+        "matches_node": false
+      }
+    ]
+  },
+  {
+    "source": "test/LLVMNativeExtensions/features_values_gc.js",
+    "node": {
+      "command": [
+        "node",
+        "--expose-gc",
+        "-e",
+        "globalThis.print=(...a)=>console.log(...a);require(process.argv[1]);",
+        "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNativeExtensions/features_values_gc.js"
+      ],
+      "exit_code": 0,
+      "stdout": "1234567890123458|1234567890123456,1234567890123457|value|42\n99|99,100|value|7\n",
+      "stderr": ""
+    },
+    "c": [
+      {
+        "optimization": "O0",
+        "compile": {
+          "command": [
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/bin/shermes",
+            "-O0",
+            "-Xes6-block-scoping",
+            "-Xenable-tdz",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNativeExtensions/features_values_gc.js",
+            "-o",
+            "/workspace/scratch/ea758b58c6af/tmp/value-feature-oracles/features_values_gc-O0"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        "run": {
+          "command": [
+            "/workspace/scratch/ea758b58c6af/tmp/value-feature-oracles/features_values_gc-O0"
+          ],
+          "exit_code": 0,
+          "stdout": "1234567890123458|1234567890123456,1234567890123457|value|42\n99|99,100|value|7\n",
+          "stderr": ""
+        },
+        "matches_node": true
+      },
+      {
+        "optimization": "O",
+        "compile": {
+          "command": [
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/bin/shermes",
+            "-O",
+            "-Xes6-block-scoping",
+            "-Xenable-tdz",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNativeExtensions/features_values_gc.js",
+            "-o",
+            "/workspace/scratch/ea758b58c6af/tmp/value-feature-oracles/features_values_gc-O"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        "run": {
+          "command": [
+            "/workspace/scratch/ea758b58c6af/tmp/value-feature-oracles/features_values_gc-O"
+          ],
+          "exit_code": 0,
+          "stdout": "1234567890123458|1234567890123456,1234567890123457|value|42\n99|99,100|value|7\n",
+          "stderr": ""
+        },
+        "matches_node": true
+      }
+    ]
+  }
+]

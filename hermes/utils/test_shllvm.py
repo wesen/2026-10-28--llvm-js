@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """Differential integration tests for the direct LLVM backend.
 
-Each successful source case is compared with Node and the unchanged Static
-Hermes C backend, then run through direct LLVM at both frontend and LLVM
+Each successful source case is compared with Node and the existing Static
+Hermes C backend using the patched shared runtime, then run through direct LLVM
+at both frontend and LLVM
 optimization levels. Failing/unsupported programs are separate contracts.
 """
 from __future__ import annotations
@@ -148,7 +149,8 @@ def main():
         output.write_bytes(sentinel)
         compilation = run([compiler, "-O0", "-emit-llvm", src, "-o", output], env=env)
         preserved = output.read_bytes() == sentinel
-        expected_diagnostic = "invalid assignment left-hand side" if "const_assignment" in src.name else "unsupported"
+        expected_diagnostic = ("invalid assignment left-hand side" if "const_assignment" in src.name
+                               else "admission limit" if "root_limit" in src.name else "unsupported")
         passed = compilation["exit_code"] != 0 and expected_diagnostic in compilation["stderr"].lower() and preserved
         results.append({"name": src.name, "kind": "compile-rejection", "passed": passed,
                         "existing_output_preserved": preserved, "records": [compilation]})

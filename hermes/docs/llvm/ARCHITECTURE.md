@@ -76,7 +76,7 @@ Constants also cross this boundary deliberately. Numeric bit patterns become val
 
 A **garbage-collector root** is a location from which the collector begins tracing live objects. A native machine register containing an object address is not automatically such a location. Moreover, a moving collector can relocate an object and update its registered references. Generated code must subsequently use the updated value.
 
-This backend adopts a conservative storage policy: every Hermes instruction receives a root slot, and encountered constants receive slots too. Side-effect-only instructions also receive unused slots to keep numbering simple. A scratch slot supports temporary helper operations. All slots are initialized to undefined before they are exposed to collection. [1] [2]
+This backend adopts a conservative storage policy: each Hermes instruction whose result has IR users receives its own root slot, and encountered constants receive slots too. Unused produced values share a separate rooted discard slot while their instruction is emitted; side-effect-only instructions need no result storage. A distinct scratch slot supports temporary helper operations. All slots are initialized to undefined before they are exposed to collection. [1] [2]
 
 At entry, generated code asks `shllvm_frame_size` for the required native storage size, allocates aligned stack storage, and calls `shllvm_enter`. The bridge initializes the `SHLocals` header, links this root frame through `_sh_enter`, and reserves the outgoing Hermes argument/frame area. The emitter obtains the root-array address through `shllvm_roots`; it never guesses the offset of that array inside `SHLocals`.
 
@@ -90,7 +90,7 @@ Short-lived raw values are permissible between safepoints. A phi-edge transfer, 
 
 Normal return reads the result, removes any function-level exception handler, leaves the runtime frame, and returns its bits. Those cleanup operations do not allocate managed objects. Exceptional unwinding needs a different restoration path, explained in Section 10.
 
-This design favors inspectable correctness over compact frames. Values can remain rooted after their last semantic use, delaying collection until return. Precise liveness, slot reuse, or LLVM stack maps would be later optimizations requiring new proofs. The current admission limit is 1,024 combined root and argument slots, including scratch/minimum argument storage: at most 8 KiB of explicit tagged payload. Headers, exception buffers, machine spills, runtime frames, and recursion consume additional stack. The limit and native stack checks are not a total memory budget.
+This design favors inspectable correctness over compact frames. Used values can remain rooted after their last semantic use, delaying collection until return. General liveness-based slot reuse or LLVM stack maps would be later optimizations requiring new proofs. The discard slot removes unnecessary storage without merging independently used SSA values. The current admission limit is 1,024 combined root and argument slots, including scratch, discard and minimum argument storage: at most 8 KiB of explicit tagged payload. Headers, exception buffers, machine spills, runtime frames, and recursion consume additional stack. The limit and native stack checks are not a total memory budget.
 
 ## 5. Branches and simultaneous phi assignments
 
@@ -128,7 +128,7 @@ This distinction explains method calls. In `object.method(3)`, the function valu
 
 Construction also uses the existing protocol. Helpers implement `CreateThis`, `GetNewTarget`, and selection between the allocated receiver and an explicit object returned by the constructor. Function metadata distinguishes permitted invocation forms: an arrow cannot be constructed, and a class constructor cannot be called as an ordinary function. The generated prologue checks these restrictions.
 
-Class creation delegates to `_sh_ljs_create_class`, passing the native function, its environment and metadata, the home-object output, and an optional superclass. Receiver-sensitive property helpers support operations whose lookup object differs from their receiver. These mechanisms describe the implemented path; they do not imply that every class extension, such as private-field lowering, is accepted. Argument objects likewise retain Hermes's lazy/reified and strict/loose helper paths. [1] [2] [5]
+Class creation delegates to `_sh_ljs_create_class`, passing the native function, its environment and metadata, the home-object output, and an optional superclass. Receiver-sensitive property helpers support operations whose lookup object differs from their receiver. Chapter 7 explains the additional private-name and private-field lowering. Class coverage remains defined by the tested mechanisms and explicit boundaries. Argument objects likewise retain Hermes's lazy/reified and strict/loose helper paths. [1] [2] [5]
 
 ## 7. Closures are code plus shared bindings
 
@@ -189,7 +189,7 @@ Objects are allocated by Hermes. The emitter uses helpers for named or computed 
 
 Assignment and definition are distinct. Assigning a property may invoke an inherited setter; defining an own property creates or changes a property on the object itself. Strict and non-strict writes also differ in failure behavior. The emitter chooses corresponding helper variants, including operations with an explicit receiver. The `try_flag` on global-property helpers concerns errors for missing global bindings, not JavaScript `try` syntax.
 
-Object literals lowered into buffers are expanded into ordinary allocation and property definitions in this first backend. Where the lowered IR contains named fixed-property operations, the emitter preserves the property name instead of assuming the optimized C backend's storage offsets. Explicit prototypes use the runtime's parent-aware allocation helper and a registered empty-shape cache. Typed object allocation and private fixed-slot properties are rejected rather than silently translated with ordinary object semantics.
+Object literals lowered into buffers are expanded into ordinary allocation and property definitions in this first backend. Where the lowered IR contains named fixed-property operations, the emitter preserves the property name instead of assuming the optimized C backend's storage offsets. Explicit prototypes use the runtime's parent-aware allocation helper and a registered empty-shape cache. Specialized internal typed-object allocation and fixed-slot property instructions remain rejected. These internal forms are distinct from JavaScript `#private` fields, whose supported brand and access operations are explained in Chapter 7.
 
 Arrays require a subtle distinction:
 

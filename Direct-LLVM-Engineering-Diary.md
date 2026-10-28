@@ -1,29 +1,1187 @@
 # Direct LLVM engineering diary
 
 
-28 October 2026. Consolidated from contemporaneous component records. This is a record of implementation decisions, observable actions, experiments, failures and fixes. It is not a private reasoning transcript. Component chronology and original timestamps are retained; later final results supersede preliminary attempts without deleting them.
+28 October 2026. Consolidated from contemporaneous component records. This is a record of implementation decisions, observable actions, experiments, failures and fixes. Component chronology and original timestamps are retained; later final results supersede preliminary attempts without deleting them.
 
 
-The host dynamic-JavaScript backend and the scalar RV32 PicoCalc lane have separate validation claims. Earlier GoJSLab/Wazevo work is not part of this implementation release.
+The host dynamic-JavaScript backend and the scalar RV32 PicoCalc lane have separate validation claims.
 
 
 ## Contents
 
 
-1. Project diary
+1. Language extension integration diary
 
-2. Compiler integration and validation diary
+2. Async and Promise validation diary
 
-3. Runtime bridge and test diary
+3. Dynamic evaluation implementation diary
 
-4. PicoCalc direct LLVM diary
+4. Rich values and typed-array diary
 
-5. PicoCalc review diary
+5. Project diary
 
-6. LLVM toolchain preparation
+6. Compiler integration and validation diary
+
+7. Runtime bridge and test diary
+
+8. PicoCalc direct LLVM diary
+
+9. PicoCalc review diary
+
+10. LLVM toolchain preparation
 
 
-# Component record 1: Project diary
+# Component record 1: Language extension integration diary
+
+
+# Language-extension engineering diary
+
+Date: 28 October 2026. This continues the direct LLVM implementation release.
+It records decisions, observable changes, commands, failures and results.
+
+## 1. Scope and source checkpoint
+
+The requested extension covers generator functions and yield, async/await and
+Promises, RegExp literals, BigInt, private fields, typed arrays, dynamic eval
+and Function. The previous release's sources and final validation identities
+were captured before editing. Earlier evidence remains historical and intact.
+
+The existing compiler is the pinned Static Hermes source plus the direct LLVM
+backend; the baseline includes 22 passing source cases and the separate
+PicoCalc integer-world implementation. This phase extends the host dynamic
+backend. It does not imply a new physical-device runtime port.
+
+## 2. Reuse existing language machinery
+
+Source inspection found that shared SH lowering already calls
+LowerGeneratorFunction, which translates suspension and resumption to a heap
+environment/state machine. CreateGeneratorInst remains for runtime object
+creation. Async lowering drives these generators through the existing Promise
+and console job queue. The first implementation step is to preserve that
+lowering and emit the missing creation operation, then exercise next, throw,
+return, delegation, finally and collector lifetime.
+
+RegExp, BigInt and private fields have existing SH runtime helpers. The new
+bridge must pass rooted operands and avoid guessing heap layouts. The
+repository's gc-safe-coding guidance was read before runtime work.
+
+Dynamic eval needs separate investigation: upstream DirectEvalInst has source
+and strictness operands, and the Static Hermes runtime path does not currently
+carry a caller lexical environment. Wiring this path as-is would not establish
+correct local lexical evaluation. Global/indirect eval and Function can use the
+existing dynamic compiler, while lexical integration must preserve binding
+identity, mutation, strictness and lifetime.
+
+## 3. First executable generator and value integration
+
+The first generator protocol program compiled to LLVM IR, passed LLVM
+verification in the driver, linked and ran successfully. Its output includes
+sent values, caught throws, early returns, finally cleanup, completed-generator
+behavior and a TypeError for a reentrant next call. The actual output and
+compiler stderr are retained as generator-protocol-native.txt and its stderr
+companion. The build log is generator-build.log.
+
+Added iterator begin/next/close bridges, plus property-name enumeration bridges.
+The for-in operations write caller-owned root slots and return a boolean used
+by the LLVM terminator. Their successor branches still use the emitter's phi
+edge-copy mechanism. This matters when loops and generator state machines
+share mutable state. Additional fixtures cover yield-star delegation, iterator
+closing on abrupt exits, suspended finally clauses, enumeration and collection
+while generator/closure environments remain live.
+
+Integrated exact ParsedBigInt byte constants and RegExp/private-name operations
+using the existing runtime helpers. BigInt bytes have a separate immutable
+module pool; no conversion through Number is involved. Private operations use
+the runtime's supported uncached path and preserve brands rather than string
+properties. CMake includes value_extensions.c in both bridge libraries.
+
+Independent oracle probes exposed two shared-runtime issues worth investigating:
+Promise.all settled already-fulfilled inputs too early relative to another
+queued reaction, and typed-array negative-index assignment diverged from Node.
+The Promise implementation has been corrected to schedule each then reaction;
+the new runtime build and regression fixtures will validate the change.
+
+## 4. Preserve failed experiments and distinguish shared-runtime defects
+
+The first integrated extension matrix tested 24 source fixtures. Twenty
+passed and four failed. The failures were async-generator cleanup after
+return, async-generator completion state, typed-array negative-index
+assignment, and Promise subclass species behavior. The same discrepancies
+appeared through the C backend, establishing that they were shared-runtime
+semantics rather than LLVM-only instruction selection errors. The records
+remain in extension-first-pass.json and its log.
+
+That early run also detected a changed fixture fingerprint: the generator
+GC test was strengthened from an optional collection call to an unconditional
+one while the run was active. It is diagnostic evidence, not a frozen release
+gate. Final validation must start only after all source and fixture edits
+are complete.
+
+The first compiler build exposed an instruction representation mistake:
+BinaryPrivateInInst is a tagged BinaryOperatorInst case, not a separate C++
+instruction class. Handling its ValueKind in the binary emitter fixed the
+compile error. The build failure and subsequent successful build are retained
+as extensions-build-1.log and extensions-build-2.log.
+
+## 5. Native lexical evaluation and runtime ownership
+
+The direct-eval implementation now carries the exact visible declarations,
+physical scope chain, receiver, new target and arguments alias through IR.
+The runtime reconstructs a non-executed compiler scope scaffold, maps its
+variables to the existing environment slots, and compiles the eval source
+to Hermes bytecode. Native and evaluated closures share cells; no snapshot
+or copy-back protocol is involved.
+
+The helper uses VM/compiler implementation APIs and therefore belongs in
+the full VM archive. The first full link failed because that archive's new
+directly compiled source was not position-independent. Setting the archive's
+POSITION_INDEPENDENT_CODE property corrected the shared-library link.
+extensions-build-3.log preserves the failure, and extensions-build-4.log
+records the successful correction.
+
+Actual O0-frontend / LLVM-O2 native probes passed lexical reads and writes,
+shadowing, inaccessible out-of-scope declarations, replacement of eval,
+non-string eval arguments, TDZ, const mutation errors, exceptions, receiver
+and arguments capture, constructor new.target, and escaping closures across
+explicit collection. eval-initial-native-probes.json records these executions.
+It also preserves the then-unfixed nested-eval failure and raw boundary
+probe outcomes; the generic probe did not yet classify every deliberate
+boundary using the final fixture metadata.
+
+Optimized emission then exposed a scope-hoisting dependency omitted from
+the initial implementation. The optimizer had moved an eval-visible binding
+outside the retained environment chain. ScopeHoisting now follows the
+captured Variable parents and arguments parent as dependencies. Source-site
+global/derived-constructor context is retained explicitly so inlining cannot
+silently change new.target legality or the derived-constructor boundary.
+
+A lifetime review found that retaining the synthetic parent's shared Module
+alone did not preserve its FunctionIR: BytecodeFunction destruction deletes
+the associated function. The bridge now transfers that ownership to the
+module before destroying the temporary provider. Nested interpreted eval
+uses retained scope/debug metadata to find the actual current environment.
+These follow-up changes require the next consolidated build and matrix.
+
+## 6. Async, Promise and typed-array corrections
+
+Focused validation after build 4 passed all 17 selected async/Promise cases:
+68 native contracts and 17 real lli executions, with C checks at both frontend
+optimization levels. The source and binary fingerprints were unchanged
+during that focused gate. Its filename is async-promise-fixed-pass.json;
+selection makes it a partial gate, not the final complete extension result.
+
+The fixes address demonstrated Promise.all scheduling, species construction,
+thenable invocation timing, subclass reaction timing, Promise.resolve object
+identity, and continuation of an internal await reached during generator
+return/finally. A further external-return rejection probe showed that the
+return argument must be awaited before injecting the completion into a
+suspended async generator. Source return expressions must likewise await
+inside their original try/catch/finally context. The frontend and driver
+follow-up is included in the next build, with new regression fixtures.
+
+Typed-array canonical numeric-index handling now prevents negative,
+fractional, NaN and infinite numeric keys from becoming ordinary properties.
+Build-4 probes passed across C, native LLVM and lli. A specification-directed
+distinct-receiver probe records a Node-version difference honestly rather
+than silently changing the expected output. Another probe found that an
+ordinary target with a typed-array receiver bypassed exotic definition.
+The additional receiver guard and regression are queued for the next build.
+
+## 7. Consolidated build and final-gate preparation
+
+After the three implementation streams reached source freeze, the root
+started extensions-build-5.log with CMake targets shermes, shllvm_runtime and
+shllvm_runtime_shared, using six parallel build jobs. This rebuild includes
+all IR metadata, optimizer, runtime, typed-array and async frontend changes.
+Agents do not run competing CMake builds against the shared directory.
+
+The report now has a textbook chapter explaining the new mechanisms, source
+reading pointers, explicit remaining eval contexts and laboratory exercises.
+The PDF assembler reads named final evidence files and refuses failed,
+partial or changed-input extension gates. Counts will be inserted from actual
+completed records. The final run and artifact checks will be appended below.
+
+Build 5 stopped because the warning wrapper type is CLFlag, not llvh::cl::opt;
+it lacked getNumOccurrences. Added CLFlag::isSpecified, which checks both the
+positive and negative spellings, and retained explicit warning overrides.
+Independent review also caught an arrow visitor that skipped default-parameter
+expressions; it now visits all arrow children while isolating function context.
+
+Build 6 compiled those changes, then its internal hermesc subprocess hit the
+known LeakSanitizer sandbox restriction because the build command omitted the
+environment workaround. Build 7 uses ASAN_OPTIONS=detect_leaks=0 for the build
+as well as execution. AddressSanitizer remains enabled; this is not a source
+fix or a passing test result. All three build logs are retained.
+
+## 8. Complete rebuild and focused post-build checks
+
+Build 7 exposed two C++ type errors in the interpreter bridge: a typed
+PinnedValue<Environment> cannot be assigned a generic pinned/GC HermesValue.
+Both assignments now use the existing vmcast extraction, with no allocating
+operation before assignment to the local root. This matches the established
+debugger environment-extraction pattern.
+
+Build 8 required resumed shell invocations. A session reported completion
+while the log stopped before the final targets; a CMake/Ninja dry run still
+listed outstanding work. The remaining work was resumed with four jobs. The
+final resumed log ends with VM, console and shared-bridge links, and a fresh
+dry run reported 'ninja: no work to do.' Only then were agents told to run
+their native/JIT probes. The completion check avoids assuming that a shell
+status alone establishes a fully refreshed runtime.
+
+Four direct-eval warning-option checks passed: default suppression, explicit
+enable, explicit disable and last-option precedence. Their evidence is
+eval-warning-options.json. The first probe mistakenly used /dev/null as a
+publication destination; atomic replacement correctly could not replace that
+device. That failed invocation remains in eval-warning-options-initial.json.
+The corrected probe uses stdout and checks that real LLVM definitions were
+emitted along with the expected diagnostic behavior.
+
+The value component's six focused C/native/lli executions passed after the
+complete build. The new typed-array receiver guard rejects an invalid numeric
+definition without coercing its value; a valid element write coerces once.
+The specification-directed distinct-receiver probe also matches the intended
+algorithm. values-final-probes.json records actual output and unchanged hashes
+across these focused checks; its Node discrepancy remains explicit.
+
+The async component reproduced a frontend traversal gap using three small
+programs. Nested await was rejected as being outside an async function, and
+async-generator expressions inside await/yield operands reached execution
+without the required transformation. Both C and LLVM exposed the frontend
+problem. traversal-probe-build8.json preserves those failures. The operand
+visitors will be corrected after the current focused gate completes, and the
+new regressions will join the final gate.
+
+## 9. Final integration corrections before source freeze
+
+Build 9 completed all requested links. A subsequent Ninja dry run reported
+no remaining work. Its eval probes now pass nested lexical evaluation,
+Function-local arguments, escaped arrow receiver/arguments after collection,
+and optimized closure TDZ behavior. The fixes restore lexical context and
+captured arguments during dynamic compilation, and preserve Empty/Uninit
+alongside the ordinary Any type during conservative type inference.
+
+One probe still exposed global context leaking through the non-executed eval
+scaffold: eval of another eval of new.target was accepted at script level.
+The final helper correction marks every synthetic script parent as a program
+scope. A permanent fixture checks both rejection in global/arrow contexts
+and valid native/dynamic constructor contexts. The Node oracle passes; the
+rebuilt native matrix is the release gate for that correction.
+
+Two larger async fixtures had exceeded the 1,024 combined root/argument-slot
+limit only with the unoptimized frontend. The emitter previously allocated
+a distinct root to every instruction, including side-effect-only operations
+and values with no users. It now retains unique slots for used results and
+constants, plus a separate rooted discard slot for unused results and a
+scratch slot. No instruction is deleted and the admission limit is unchanged.
+An independent review checked helper reentrancy, allocation sequences, phi
+transfers and frame initialization. The formerly oversized modules now pass
+LLVM assembly and verification with maximum combined counts of 642 and 826.
+
+The next focused async run was interrupted before final completion. Its
+incremental record contains 11 passing positive fixtures, 44 native runs,
+11 lli runs and 22 matching C runs, including both formerly oversized cases.
+It has complete:false and no final fingerprint check, so it is retained only
+as partial evidence. The final complete gate will replace its validation role.
+
+Read-only review then identified one remaining AST traversal gap: async
+generators in default parameters of ordinary declarations, expressions,
+async functions and async generators. A small probe confirmed that Node
+returned valid Promise-based iterators while both frontend optimization
+levels produced caught TypeErrors on the current build. Ordinary async
+function defaults worked. The permanent correction visits parameter nodes
+under their own function context before the body transformation. The failed
+probe remains in async-parameter-traversal-build9.json.
+
+The documentation review corrected stale private-field wording, clarified the
+difference between JavaScript private fields and internal fixed-slot IR, and
+reversed a diagram arrow to show bridge calls entering the managed runtime.
+Source filenames were added to the new reference entries so the PDF retains
+useful reading pointers even when a local Markdown link cannot be opened.
+
+## 10. Completed frozen release gates
+
+Build 10 completed all 16 steps, ending with the full VM, console and shared
+bridge links. A fresh Ninja dry run reported no work. The final source freeze
+then covered 679 implementation, configuration, fixture, harness and binary
+identities. The complete gates ran against that single build, with no case
+filter, quick mode, JIT skip or oracle-only mode. All 679 identities remained
+unchanged through the run.
+
+The core suite passed 22 of 22 source contracts: 17 positive programs, three
+runtime-error contracts and two compile-rejection contracts. It recorded 68
+positive native comparisons across the four frontend/LLVM combinations,
+three real lli executions and six separate runtime-error executions.
+
+The extension suite passed 53 of 53 source contracts: 44 positive programs,
+three language-error cases, three explicit runtime-boundary cases and three
+compile-error cases. Its 200 native executions comprise 176 successful-output
+comparisons, 12 language-error checks and 12 expected unsupported-context
+rejections. Its 50 lli executions comprise 44 successful programs, three
+language-error checks and three boundary rejections. Every applicable LLVM
+module went through the driver's assembly and verification pipeline.
+
+Forty extension cases matched the required C oracle at both frontend levels.
+Ten executable cases explicitly excluded the inherited C direct-eval helper;
+their evidence explains why its missing native environment is not a semantic
+oracle. The three compile-error cases use publication/diagnostic contracts.
+The distinction matters: an unsupported-context rejection is not a successful
+Node semantic comparison. The core and extension paths share the patched
+frontend and runtime where C comparisons are required.
+
+The command-publication suite passed six of six checks; the raw lexical-default
+suite passed five of five. The authoritative records are core-final-validation,
+extension-final-validation, driver-final-validation and
+lexical-defaults-final-validation JSON files and logs. final-validated-files.json
+records successful commands, unchanged hashes and the full 679-file identity
+map. These are the release results; interrupted or selected earlier probes
+remain historical evidence. No Test262 suite, physical device execution or
+performance benchmark was run in this phase.
+
+## 11. Report and release review
+
+The regenerated report contains 35 pages, approximately 15,124 words and two
+vector architecture figures. Every page was rendered to PNG. The integration
+owner reviewed pages 1-18 through contact sheets and inspected the feature
+map, architecture figure and validation tables at full-page resolution. An
+independent reviewer inspected pages 19-35, including the new language chapter
+and source-reading guide. A text/bounds check found no empty text layers,
+replacement glyphs, placeholders or text outside page boundaries.
+
+The first rendered review caught another stale host-feature paragraph in the
+PicoCalc integration chapter. It was updated to the current implementation
+and final evidence filenames. The small generator-state table was kept on
+one page. All pages were re-rendered and the changed layouts reviewed again.
+The final PDF is 221,967 bytes with SHA-256
+4d4a02e3d60defbf44dfaf968983685db1f676807c487fda4c22194dbca99c68.
+PDF_REVIEW.md and pdf-text-check.json retain the review scope and results.
+
+The release builder uses a private Git index and private object directory to
+construct the patch against the pinned upstream base. It checks application
+to a second independent index and requires an identical resulting tree,
+without staging the working repository. The source archive includes the
+complete compiler/runtime sources, both test suites, raw evidence, the report
+and this consolidated diary. Its verification reads every ZIP member and
+compares both CRC and SHA-256. Final packaging results follow this entry.
+
+The patch verification completed successfully for 124 paths and a 421,828-byte
+patch. Applying it to the independent base index produced tree
+01e2d894b12153ddd4dd0a5e04ed06d5c70d987a, exactly matching the proposed changes.
+The repository index was unchanged, and every one of the 679 tested inputs
+still matched. The first assembled archive passed CRC and SHA-256 readback
+for all 13,192 members. It contained 13,090 Hermes source/documentation/evidence
+files and 95 PicoCalc files, plus the top-level release artifacts.
+
+After appending these observed results, the metadata and archive builders are
+run once more to incorporate this diary entry and refresh its hashes. The
+same patch, tested-input and per-member checks are required before the four
+updated deliverables are saved. RELEASE_VALIDATION.json beside the archive
+records its final byte count and hash without introducing a self-hash cycle
+inside the ZIP.
+
+
+
+# Component record 2: Async and Promise validation diary
+
+
+# Async, Promise, and extension validation diary
+
+Date: 28 October 2026. This log records observable engineering work and
+decisions; it does not contain a private reasoning transcript.
+
+## Baseline inspection
+
+The existing direct backend calls the real Static Hermes runtime and its
+console event loop. `StaticHInit.cpp` enables the native microtask queue for
+CLI execution. `ConsoleBindings.cpp::run_event_loop` drains microtasks before
+processing timers and after each timer task. Therefore ordinary Promise jobs
+already have an execution mechanism.
+
+The frontend lowers async functions to a generator closure passed to the
+`HermesBuiltin_spawnAsync` builtin. `lib/InternalJavaScript/02-AsyncFn.js`
+drives that generator with `next` and `throw`, resolves the async return value,
+and rejects uncaught exceptions. The missing native generator emission is
+therefore the central backend dependency for async/await.
+
+## Reproduced inherited Promise.all ordering defect
+
+The existing Promise implementation deliberately optimized an already-fulfilled
+input in `Promise.all` by invoking the element resolver synchronously unless
+the runtime enabled test262 mode. The source comment itself acknowledged that
+this collapses an observable microtask step.
+
+The two-line probe in `promise-all-order-probe.js` schedules a resolved
+`Promise.all` callback and a separate resolved-Promise callback. Actual output
+before the change:
+
+- Node: `tick`, then `all`.
+- Unmodified C-emission path with the original Hermes runtime: `all`, then `tick`.
+
+Both processes exited successfully, so an exit-code-only test would miss this
+semantic difference. The new Promise fixture preserves this ordering check.
+
+The fix always invokes `nextPromise.then(resolveElement, capReject)`, matching
+the required PromiseReactionJob ordering and observable `then` access. It
+removes the test262-only correctness gate; it does not add a new scheduling
+system or change the LLVM bridge.
+
+Reference: ECMAScript `PerformPromiseAll` in
+https://tc39.es/ecma262/multipage/control-abstraction-objects.html#sec-performpromiseall.
+The runtime rebuild and post-change execution are performed by the parent
+build owner; this entry records the reproduced failure and source correction,
+not an unperformed success claim.
+
+## Test harness and first integration pass
+
+Added ten initial asynchronous/Promise fixtures with explicit completion
+markers. Node executed all ten successfully. Coverage includes primitive and
+thenable awaits, closures, lexical `this` and `arguments`, try/catch/finally,
+retention across `gc()`, async iteration, queued generator requests, Promise
+combinators, resolution/rejection, and subclasses. Separate fixtures exercise
+uncaught errors and invalid syntax.
+
+Implemented `utils/test_shllvm_extensions.py`. The default gate uses two
+frontend optimization settings, two LLVM optimization settings, and the real
+`lli` JIT for every executable fixture. Node runs each source as a script via
+`vm.runInThisContext`; this avoids accidentally testing CommonJS lexical scope
+when validating dynamic eval. The inherited C backend is required by default.
+Explicit C-oracle limitations are recorded separately with a reason and actual
+outcome; they never become successful C comparisons.
+
+Added repeatable frontend `--hermes-arg=-X...` options to the Python driver for
+async-generator fixtures. Validation rejects output/backend switches in this
+option, and build manifests retain the arguments. The rejection of
+`--hermes-arg=-emit-c` was checked before runtime tests.
+
+The build owner ran the first integration matrix: 20 of 24 selected source
+cases passed. All generator and initial value features except the known typed
+array indexing case passed. The shared runtime produced three asynchronous
+failures: async-generator finalization in two fixtures and Promise subclass
+species selection. Both C and direct LLVM reproduced them. The first pass is
+diagnostic evidence, not the release gate: the input fingerprint also detected
+the generator GC fixture being strengthened during that run.
+
+Evidence: `extension-first-pass.json`, `extension-first-pass.log`,
+`initial-native-probes.json`, and `async-generator-close-c-probe.json` in this
+directory. The corrected `Promise.all` order was already successful in the
+first direct LLVM probes and matrix.
+
+## Async-generator return and finally correction
+
+`04-AsyncIterator.js` drives the transformed synchronous generator with a
+Promise request queue. A yield tagged as kind 0 represents an internal await.
+The old code reused a pending `return` request when that await completed. If
+`return("closed")` entered a `finally` block containing `await 0`, it resumed
+with `return(0)`. This skipped the remainder of cleanup and replaced the
+original return value.
+
+Changed kind-0 fulfillment to resume with `next(resolvedValue)`. The underlying
+generator retains its pending completion while the finally body executes.
+Rejection still resumes with `throw(error)`, which can replace that completion.
+No IRGen or event-loop change was needed.
+
+Added `async_generator_finally.js` to check normal cleanup, a finally return
+overriding the original return, a finally throw, yielding during cleanup,
+rejection during cleanup, injected throw after an await, and original loop-body
+exception precedence during async iterator close. Node's complete expected
+outputs are saved in `async-promise-node-oracles.json`.
+
+## Promise species and reaction scheduling
+
+The previous `then` and `finally` implementation explicitly ignored
+`Symbol.species`. Added the default static species getter and shared
+SpeciesConstructor selection with null/undefined fallback, observable lookup
+ordering, and invalid-constructor rejection. `finally` now uses the abstract
+PromiseResolve operation instead of reading a user-overridable `C.resolve`.
+
+The existing subclass path also routed results through an intermediate core
+Promise. This introduced a second reaction job. The corrected handler settles
+the selected constructor's capability in the original reaction job. Added
+`promise_species.js` and `promise_subclass_order.js` to cover selection,
+single-read getters, invalid species, generic finally validation without a
+premature `then` read, proxy constructor inspection, and relative microtask
+ordering between core and subclass Promises.
+
+The JavaScript builtin requires a side-effect-free constructor predicate. Added
+`HermesInternal.isConstructor` using the existing VM operation and predefined
+symbol. The new native wrapper performs no allocation and reads an argument
+already rooted in the native call frame. Before editing VM code, read the
+repository's `gc-safe-coding` skill and complete `doc/GCSafeCoding.md`; no new
+legacy GCScope or unrooted value was introduced.
+
+## Thenable jobs and public Promise identity
+
+A focused probe found two additional shared-runtime defects. For a thenable,
+Node printed `sync|then|tick|resolved:4`; the C runtime printed
+`then|sync|resolved:4|tick`. The runtime invoked the thenable synchronously.
+The same probe found `Promise.resolve(0) === Promise.resolve(0)` true in Hermes
+and false in Node because public resolve returned a cached Promise.
+
+Changed resolution to read `then` synchronously but invoke it in a queued
+NewPromiseResolveThenableJob, including adoption of another core Promise.
+Captured intrinsic `Reflect.apply` avoids observing a then function's user
+`call` or `bind` properties. Public `Promise.resolve` now allocates a fresh
+wrapper for non-Promise values; private await caches remain inaccessible.
+Added `promise_thenable_jobs.js` to check thenable lookup/invocation order,
+adoption order, fresh primitive wrappers, exact-Promise identity, and negative
+zero preservation.
+
+The pre-change commands and actual output are preserved in
+`promise-thenable-order-probe.json`; the source probe is kept alongside it.
+After adding these regressions, all 14 positive async/Promise fixtures pass
+Node. Rebuilt C/native LLVM/JIT validation is pending the coordinated runtime
+rebuild at this diary entry.
+
+## Reference material checked
+
+The implementation decisions were checked against the following primary
+ECMAScript algorithms, accessed 28 October 2026. Stable section anchors are
+used because section numbers change between specification editions.
+
+- [SpeciesConstructor](https://tc39.es/ecma262/multipage/abstract-operations.html#sec-speciesconstructor): constructor and species lookup, default selection, and constructibility validation.
+- [NewPromiseReactionJob](https://tc39.es/ecma262/multipage/control-abstraction-objects.html#sec-newpromisereactionjob): settling a reaction's capability within the same job.
+- [NewPromiseResolveThenableJob](https://tc39.es/ecma262/multipage/control-abstraction-objects.html#sec-newpromiseresolvethenablejob): deferring invocation of a thenable until surrounding execution completes.
+- [PromiseResolve](https://tc39.es/ecma262/multipage/control-abstraction-objects.html#sec-promise-resolve): exact-Promise identity and fresh capabilities for other resolutions.
+- [Promise.prototype.finally](https://tc39.es/ecma262/multipage/control-abstraction-objects.html#sec-promise.prototype.finally): species selection and abstract PromiseResolve, without consulting a public resolve override.
+- [AsyncGeneratorYield](https://tc39.es/ecma262/multipage/control-abstraction-objects.html#sec-asyncgeneratoryield): queued resumptions and normal/abrupt completion handling.
+
+These algorithms support the targeted contract choices; the regression suite
+does not assert complete Promise branding, cross-realm behavior, or full
+ECMAScript conformance.
+
+## Rebuilt focused gate: all initial corrections pass
+
+After the coordinated fourth build, ran the async/Promise selection with both
+frontend settings, both native LLVM settings, and real `lli`. The process
+exited 0: **17/17 source contracts, 68/68 native contracts, and 17/17 JIT
+contracts passed**. This comprises 14 positive programs and three expected
+uncaught errors. Every C oracle matched Node at both frontend levels. Input
+fingerprints were unchanged throughout this focused run.
+
+Evidence: `async-promise-fixed-pass.json` and
+`async-promise-fixed-pass.log`. These are preserved as historical validation of
+that build, not overwritten by the subsequent return-protocol work.
+
+## Return values, source cleanup, and async request completion
+
+A further focused helper probe found a distinct case: passing a rejected
+Promise to `asyncGenerator.return()` must deliver its rejection at the suspended
+yield, where an enclosing catch may recover. The old helper called the
+underlying synchronous generator's return immediately, skipped that catch, and
+only observed the rejection after the generator had closed. The native Node
+generator recovered and yielded a value; the helper rejected instead.
+
+Fixing only request entry would still add an extra microtask when the driver
+awaited the final iterator value. The correction therefore makes the two
+required await points explicit:
+
+1. The AST transformation rewrites a source `return expression` to await the
+   expression within the source generator's try/catch/finally context.
+2. The runtime awaits an external `return(value)` argument before injecting
+   its return or throw completion into the suspended generator.
+
+Once the underlying generator reports completion, the driver can complete the
+request directly. It does not add an extra await or unwrap a Promise that an
+async delegate legitimately returns as the final result's value. Completed
+next/throw requests are drained iteratively, preventing a long queued tail
+from consuming recursive native stack frames. Return requests in that tail
+still await their arguments.
+
+The AST visitor treats nested arrows as separate function contexts. It also
+wraps empty async generators, whose iterator methods still must return
+Promises and expose `Symbol.asyncIterator`.
+
+Added `async_generator_return_values.js`, `async_generator_return_order.js`,
+`async_generator_queue_completion.js`, and `async_timers.js`. The last case
+checks cancellation, microtasks between timer callbacks, and awaiting a timer
+resolution. The queue case creates 2,052 requests and runs `gc()` before
+settlement. All four new sources pass Node; their outputs are retained in
+`async-return-node-oracles.json`.
+
+The helper-only before/after evidence is
+`async-return-rejection-helper-probe.json` and
+`async-return-fixed-helper-probe.json`. The corrected helper matches native
+Node for return-argument rejection, return-expression rejection, and relative
+return/tick ordering. This isolates the JavaScript driver behavior; rebuilt
+AST-to-C and AST-to-LLVM validation remains the next gate.
+
+Reference:
+[AsyncGeneratorUnwrapYieldResumption](https://tc39.es/ecma262/multipage/control-abstraction-objects.html#sec-asyncgeneratorunwrapyieldresumption).
+
+## Final review: interrupted gate and parameter-expression traversal
+
+The build-9 focused gate was interrupted after eleven positive cases had
+completed. Its retained JSON explicitly says `complete: false`: the eleven
+cases passed all 44 native executions, eleven real `lli` executions, and 22 C
+oracle executions. Both previously oversized unoptimized programs,
+`async_generator_finally.js` and `async_generator_return_values.js`, are among
+these completed cases. No failure is recorded, but this partial run does not
+provide a completed input-identity check or a release result. The final full
+gate must establish those independently. The partial evidence remains in
+`async-promise-final-pass.json` and its log.
+
+A source review then found that function declarations and function expressions
+visited only their bodies. Arrow functions already visited their parameters,
+but a nested async generator in another function's default parameter could
+remain untransformed. A concrete build-9 probe covered defaults in ordinary
+declarations, ordinary function expressions, async functions, and async
+generators. Node returned Promise-valued iterator results yielding 1, 2, 3,
+and 4. Both Hermes frontend O0 and O with LLVM O2 produced caught TypeErrors
+for all four cases. An ordinary async-function default remained correct.
+The source and outputs are preserved in
+`traversal-probes/generator_in_parameters.js` and
+`async-parameter-traversal-build9.json`.
+
+The correction visits every parameter node before transforming or moving a
+function's parameters. Parameter traversal uses a fresh non-async-generator
+context, so an enclosing generator cannot rewrite another function's default
+expressions as its own suspension points. Nested functions still establish
+their own context, and the visitor restores the previous state before visiting
+the body. The existing early return for lazy function bodies is preserved.
+The permanent `async_parameter_expressions.js` fixture covers all four failed
+forms and the working ordinary-async control. Runtime validation of the
+correction awaits the coordinated final build; no passing result is inferred
+from the source change itself.
+
+## Final frozen validation: async and Promise contracts pass
+
+The coordinated final build and complete extension matrix are now verified.
+`extension-final-validation.json` records 53/53 source contracts passing,
+`complete: true`, `partial_gate: false`, no skipped cases, and unchanged input
+fingerprints. Filtering its actual records by the `async`, `async-generators`,
+and `promises` families yields **24/24 contracts**: twenty positive programs,
+three expected runtime errors, and one invalid-await compiler rejection.
+
+The 23 executable async/Promise contracts passed all **92 native executions**
+(frontend O0/O crossed with LLVM O0/O2), **23 real `lli` executions**, and
+**46 C oracle executions**. These totals include the three expected-error
+contracts; the positive-program totals are 80 native, twenty `lli`, and forty
+C executions. Every executable contract matched Node's declared result.
+The invalid-await fixture passed all six compiler/driver publication checks
+across the two frontend settings.
+
+Coverage includes await values and exceptions, captures and GC, timer/job
+ordering, async-generator queues and delegation, return/finally behavior,
+completed requests, Promise combinators and resolution, species and subclass
+ordering, thenable jobs, and expected Promise errors. Both
+`async_nested_expressions.js` and `async_parameter_expressions.js` matched Node
+through all four native combinations, real `lli`, and both C configurations.
+This closes the pending validation for operand and parameter traversal. The
+earlier interrupted focused evidence remains unchanged. These are targeted
+host contracts, not a full ECMAScript conformance result.
+
+
+
+# Component record 3: Dynamic evaluation implementation diary
+
+
+# Dynamic evaluation implementation diary
+
+## 2026-10-28 — Baseline investigation
+
+The direct LLVM backend initially rejected `DirectEvalInst`. Indirect eval and
+the `Function` constructor already have VM builtins, so their missing work is
+end-to-end validation and keeping the runtime compiler enabled. The upstream C
+backend's `_sh_ljs_direct_eval` calls `vm::directEval` with a null environment.
+Consequently its results are not a valid oracle for lexical direct eval.
+
+Read the IR builder, semantic resolver, SH instruction selector, native VM
+environment helpers, `evalInEnvironment`, `compileEvalModule`, and the GC-safe
+coding skill before selecting the implementation. Native SH environments are
+real Hermes `Environment` objects, which can be captured by bytecode closures.
+This is the key interoperability point.
+
+## Design decision — strict lexical eval uses the existing runtime compiler
+
+The runtime compiler's local-eval entry point requires retained IR and semantic
+scope data. A generated LLVM unit has no bytecode parent to supply that data.
+The extension therefore reconstructs a small **non-executed scope parent** from
+native binding descriptors. The descriptors record identifier names, lexical
+rules, environment order, and actual native slot indexes. The scope parent is
+compiled with metadata retained; its variables are then mapped to the native
+slot indexes. `compileEvalModule` resolves the requested string in these scopes.
+`Runtime::runBytecode` receives the actual native environment and the caller's
+`this` and `new.target` values. Evaluated closures therefore share the original
+bindings instead of capturing a copied snapshot.
+
+Dynamic strings compile to Hermes bytecode and execute in the existing VM. The
+surrounding statically known program still compiles directly to LLVM IR. This
+distinction must be explicit in the architecture report.
+
+Sloppy direct string eval can introduce new `var` bindings into its caller.
+The upstream native frontend has no dynamic lookup machinery for this operation.
+The bridge will reject that case with a `SyntaxError` until that machinery exists.
+Non-string eval arguments still return unchanged, as JavaScript requires.
+
+## Optimization and GC constraints
+
+Direct eval must retain visible variables even when no static expression reads
+them. It may also assign a different value or type to a local variable. Explicit
+IR operands and conservative optimizer handling keep these variables in shared
+environments and invalidate cached frame values across calls. Environment and
+argument operands are rooted by the generated LLVM frame. The runtime extension
+must finish C++ RAII cleanup before invoking SH's non-local exception transfer.
+
+## Validation record
+
+Implementation and differential validation are in progress. This section will
+be updated with commands, observed failures, corrections, and final results;
+no unrun test is claimed as passing.
+
+## 2026-10-28 — First implementation completed
+
+Added `eval_extensions.h/.cpp`. The bridge is compiled inside the full VM, where
+the intentionally hidden compiler and VM symbols can be called. Only its C
+entry point is exported to generated LLVM modules. The compiler scaffold uses
+one anonymous function per physical environment, including environments with
+zero visible bindings. It never invents a JavaScript-visible marker variable.
+
+An important correction came from reading IRGen: ordinary source blocks can
+share one `VariableScope`. Listing all variables in that scope would expose
+names outside their lexical block and select the wrong shadowed declaration.
+The new `DirectEvalInst` records the nearest semantic declaration for each
+visible name at the original source location. Descriptor generation groups
+those selected bindings by their actual physical environment. Implicit
+`arguments` is eagerly captured when eval is present, and its hidden native
+slot is given the one intentional source-level alias `arguments`.
+
+Added conservative handling in store-once analysis, stack promotion, frame
+load/store optimization, and function analysis. An eval-visible binding cannot
+be treated as a constant or cached forever in a native stack slot. Existing
+memory type inference already treats an unknown user as an arbitrary value,
+so it did not need a new special case.
+
+Two semantic traps were addressed before the first native build. First, using
+`const` declarations in the scaffold would make the existing semantic checker
+reject writes during compilation; JavaScript instead requires a catchable
+runtime `TypeError`. The scaffold now uses `let` and restores the native
+Variable's constness before eval compilation. Eval compilation also enables
+the existing deferred-check mode for constants declared inside the evaluated
+source. Second, a function scaffold could accidentally make `new.target` legal
+in global eval. Global eval text receives a separate non-executed global-syntax
+validation before the lexical compile.
+
+Added six positive differential fixtures and one explicit feature-boundary
+fixture. All seven scripts ran successfully in Node with `--expose-gc`. The
+positive expectations include shared writes in both directions, changes of
+value type, block shadowing, out-of-scope names, const errors, TDZ errors,
+ordinary/arrow `this` and `arguments`, constructor `new.target`, thrown values,
+and escaped dynamic closures after garbage collection. The sloppy-boundary
+script is valid JavaScript in Node and is deliberately labeled as a native
+feature restriction, not a language-conformance error.
+
+Remaining explicit boundaries under review: constructor eval before `super`,
+class home-object/private-name metadata, and direct eval invoked from dynamic
+bytecode (whose inherited opcode still lacks lexical integration). They must
+receive diagnostics or a real metadata path before support is claimed.
+
+## 2026-10-28 — Emission probes and ownership review
+
+Ran every eval fixture through the newly built compiler at frontend `-O0` and
+`-O`, followed by LLVM 18 `llvm-as` for successful modules. The unoptimized
+positive fixtures assembled. The intended derived-constructor diagnostic
+appeared at both optimization settings. Several optimized fixtures correctly
+failed the emitter's environment-chain check; this exposed an additional
+optimizer assumption in `ScopeHoisting`. That pass knew about explicit
+`ResolveScopeInst` uses but not about environments reached by an evaluated
+string. An optimized closure could therefore lose its lexical parent's
+environment even while `DirectEvalInst` still retained its variables. The
+queued fix adds captured-binding parent scopes to the existing dependency
+analysis, preserving optimization for unrelated scopes.
+
+A lifetime review found another subtlety beyond ordinary shared ownership:
+`BytecodeFunction::~BytecodeFunction` destroys its associated IR Function.
+Destroying the non-executed synthetic provider would therefore destroy the
+Module's remembered top-level Function while the eval provider still shared
+the Module. The planned ownership transfer clears the synthetic bytecode
+functions' `functionIR` pointers only after successful eval compilation.
+The shared Module's owning compiled-functions list then releases those
+metadata-only functions at Module destruction. The error path keeps its
+ordinary cleanup. A second reviewer independently checked that ownership
+relationship in the source.
+
+Prepared separate nested-eval tests, including a returned bytecode closure that
+performs another eval after the original native caller has returned and after
+GC, and a strict `Function`-created function whose eval captures locals. Both
+fixtures match their expected output in Node. They are awaiting the interpreter
+metadata integration and native validation.
+
+## 2026-10-28 — First native results and nested-eval integration
+
+The coordinated build compiled the new IR, bridge, and emitter successfully.
+Its shared-library link first exposed a CMake integration issue: the new source
+was added directly to the full VM static archive without PIC. The build owner
+enabled PIC on that target and relinked successfully. This was a build-system
+problem, not a language semantic failure.
+
+The first unoptimized native probes match Node for
+`eval_closure_gc.js`, `eval_global.js`, `eval_lexical_bindings.js`,
+`eval_lexical_errors.js`, `eval_this_arguments.js`, and
+`function_constructor.js`. Evidence is recorded in
+`eval-initial-native-probes.json`. In particular, the const/TDZ error classes,
+mutation in both directions, arguments captured through an arrow, constructor
+`new.target`, and closure survival after GC all match. The initial nested-eval
+probe produced the predicted missing-global `ReferenceError`, confirming that
+the inherited interpreter opcode also needed lexical integration. Boundary
+fixtures rejected as designed; the initial simple probe script labeled them
+as failures because it had no boundary-metadata logic. Those records remain
+unaltered and must not be cited as positive semantic passes.
+
+Implemented the additional scope-hoisting dependency and ownership transfer
+described above. Native descriptor sizes and member offsets now have compile
+time assertions matching the LLVM host64 ABI. Global/derived-constructor
+context is stored at the original eval site and copied during IR cloning,
+rather than inferred from the function that happens to own the instruction
+after optimization. This preserves top-level-arrow rules and remains correct
+if a function is inlined. Scaffolding declarations now use `var`; actual TDZ and
+const rules still come from the original Variable metadata. This also allows
+an inherited non-strict identifier such as `let` to be represented without
+introducing a synthetic-source syntax error.
+
+The interpreter's direct-eval slow path now reads `DebugScopingInfo` at the
+current bytecode instruction, obtains its environment from the recorded frame
+register or spilled environment slot, roots it with `Locals`/`PinnedValue`, and
+calls `evalInEnvironment` with the caller's `this` and `new.target`. Missing
+metadata receives an explicit error; it never silently substitutes the global
+environment. Runtime source compilation now retains scope metadata even in a
+build with `HERMES_ENABLE_DEBUGGER=OFF`, and enables TDZ/deferred const checks.
+Lazy compilation and the full runtime optimization pipeline are disabled on
+this path until they have an equivalent metadata-preservation contract. This
+is a deliberate memory/compilation-speed tradeoff for correct local eval.
+
+The new build and the full optimized/native/JIT differential gate remain
+pending at this entry.
+
+## 2026-10-28 — Complete focused matrix, first iteration
+
+The interpreter change initially failed to compile because
+`PinnedValue<Environment>` requires a typed object value, not assignment of a
+generic `PinnedHermesValue`/`GCHermesValue`. Corrected both extractions with
+`vmcast<Environment>` followed immediately by assignment to the existing local
+root, matching the debugger's established representation. There is no
+allocating call between extracting the raw pointer and rooting it.
+
+Ran the complete focused eval/Function matrix against build 8: both Hermes
+frontend levels, both LLVM levels, all native executions, and real `lli`, with
+Node and required C oracles. Input fingerprints remained unchanged. The result
+was **12 of 14 case contracts passed**, including all five explicit boundaries.
+The failed evidence is retained in `eval-build8-validation.json`, not overwritten
+with a success summary.
+
+Two failures were informative. First, nested eval immediately inside an
+eval-program body reported missing scope metadata. Comparing `doItInScope` with
+ordinary program/function generation revealed that it did not establish the
+current lexical scope. Its bytecode locations therefore had no usable scope
+index. Second, a `Function`-created function's direct eval shared ordinary
+locals correctly, but its caller-arguments expression produced `NaN`. The
+saved `EvalCompilationData` deliberately contained a null arguments operand,
+and eval IRGen never restored a caller arguments capture. Both paths now retain
+and restore that metadata. Eval through an arrow also preserves its inherited
+capture state instead of constructing a new ES5 argument/this context.
+
+Three additional focused probes are recorded in
+`eval-build8-extra-probes.json`. A transient `Function` parent whose returned
+eval closure performs another eval after GC passed at both frontend settings;
+no speculative generic-provider ownership change was made. Nested global
+context testing was blocked by the missing lexical-scope metadata and will be
+repeated after that correction. The third probe demonstrated a real optimizer
+bug: a closure reading a never-initialized `let` threw `ReferenceError` at O0,
+but returned an invalid value printed as `NaN` at O. Type inference's early
+`Any` return for an eval user discarded the `Empty` possibility from the
+binding's initialization stores. The correction unions arbitrary JavaScript
+values while continuing to scan those stores. Synthetic variable types now
+also include `Empty` whenever the original binding obeys TDZ.
+
+Added permanent regressions for the TDZ optimization failure, the passing
+transient-parent lifetime case, and an escaped arrow from a `Function` body
+performing nested eval of its inherited `this` and `arguments` after GC.
+These corrections await the next coordinated build.
+
+## 2026-10-28 — Nested global context retained through eval
+
+Build 9's concrete native probes now match Node at both frontend optimization
+levels for nested lexical eval, `Function` caller arguments and escaped arrows,
+and the never-initialized captured `let` regression. The evidence is preserved
+in `eval-build9-concrete-probes.json`. One remaining probe exposed a distinct
+semantic-context bug: `eval("eval('new.target')")` in a strict script was
+incorrectly accepted, even though the first-level global syntax check correctly
+rejected a direct `new.target` expression. Nested global `arguments` remained
+undefined, and the real constructor control already passed.
+
+The scaffold's anonymous functions are only metadata containers; none runs.
+Their retained `FunctionInfo` records nevertheless looked like real function
+contexts to `SemContext::nearestNonArrow` during a second eval compilation.
+The bridge now marks every synthetic parent as a program node when the original
+caller has global context. The existing semantic walk then skips those levels
+and reaches the actual global function. Ordinary and constructor callers keep
+their function context. Functions introduced inside the evaluated string also
+keep their own normal metadata.
+
+Added `eval_nested_global.js` with direct and arrow-origin nested global
+rejections, a nested global-arguments check, and both native and dynamically
+created constructor controls. This change is confined to compile-time metadata;
+it introduces no new GC roots, allocations, or runtime ownership changes. The
+fixture's Node oracle passed, printing both expected `SyntaxError` results,
+undefined global `arguments`, and true for both constructor controls. Native
+validation is pending the next coordinated build at this entry.
+
+## 2026-10-28 — Final frozen validation
+
+The completed `extension-final-validation.json` records **53 of 53 extension
+contracts passed**, with no skipped cases, no partial selection, and unchanged
+source/binary fingerprints. The eval/Function portion contains **12 positive
+programs, three runtime boundary rejections, and two compiler boundary
+rejections**. Each positive program matched Node under all four native
+combinations of Hermes O0/O and LLVM O0/O2, and under the real `lli` JIT at
+Hermes O / LLVM O2: **48 native comparisons and 12 JIT comparisons**. This
+includes nested global `new.target` rejection and both real-constructor
+controls, shared lexical mutation, captured TDZ errors, and escaped eval
+closures after GC.
+
+The three runtime boundaries (sloppy caller, enclosing class private names,
+and method `super`) produced the declared rejection in **12 native runs and
+three JIT runs**. Direct eval in derived constructors and their arrow contexts
+passed the separate compiler-rejection and output-publication contracts at
+both frontend optimization levels. These are explicit support boundaries,
+not successful comparisons with Node's behavior for those valid programs.
+
+Five positive programs also matched the existing C backend at both frontend
+levels. Seven positive lexical/context fixtures and the three runtime
+boundary fixtures exclude that C oracle for documented reasons: its native
+direct-eval entry does not supply the required caller environment or context.
+Those exclusions do not skip LLVM execution or the applicable Node oracle.
+The C and LLVM paths share the patched runtime and frontend, so their
+agreement is a useful second code-generation check, not an independent
+language implementation. This targeted host matrix does not establish full
+ECMAScript conformance or a device execution result.
+
+
+
+# Component record 4: Rich values and typed-array diary
+
+
+# Value features engineering diary
+
+Date: 28 October 2026. Observable actions, design decisions and results are
+recorded here; this is not a private reasoning transcript.
+
+## Runtime contracts inspected
+
+Read the repository's GitHub development guidance and GC-safe coding skill.
+Inspected the original C emitter's BigInt serialization, RegExp creation,
+private-name creation and private-field operations. Inspected the actual
+StaticH runtime implementations to establish null-cache behavior and root
+requirements.
+
+The existing root-slot ABI can expose all of these operations without creating
+a second value representation. Added `value_extensions.c` and
+`value_extensions.h`; the wrappers accept caller-owned rooted values and write
+the result directly back to a rooted slot. RegExp pattern/flag symbols remain
+rooted by the registered compilation unit. BigInt literal bytes have native
+unit lifetime and do not contain heap pointers.
+
+## BigInt representation
+
+The implementation plan uses the same ParsedBigInt byte representation as the
+upstream C emitter. The LLVM emitter must intern these exact bytes separately
+from strings, add LiteralBigInt to the rooted-constant set, and call the bridge
+to create the managed BigInt. Converting a literal through double would lose
+precision. Calling the global BigInt constructor would introduce observable
+dependence on a user-replaced global.
+
+Existing runtime arithmetic helpers cover BigInt arithmetic and errors;
+exponentiation is already lowered through a builtin by the shared pipeline.
+Tests include values larger than 64 bits, alternate radices, signed
+division/remainder, shifts, exponentiation and mixed-type errors.
+
+## Private access and caches
+
+The SH private-field helper APIs explicitly permit a null inline cache. The
+first lowering therefore uses that correct path and requires no new unit
+cache allocation or weak-cache rooting. This also avoids an important trap:
+private-membership caches store a boolean in their slot field, while field
+access caches store an actual field offset. Those two operation kinds must
+never share one cache entry.
+
+Private names are preserved as the runtime's private-name values, not public
+strings. Shared lowering already expands PrivateBrandCheckInst. Fixtures
+exercise private fields, methods, accessors, static storage, inherited access,
+independent same-spelling brands, failed receiver checks, duplicate stamping
+and non-extensible object stamping.
+
+## Typed arrays and RegExp
+
+Ordinary typed-array construction and methods already use the existing generic
+constructor/property/call path. New fixtures exercise real buffer and view
+semantics, overlapping set, clamping, numeric conversion and bounds. BigInt
+typed arrays depend on the newly added BigInt literal path.
+
+RegExp tests check literal identity, captures, lastIndex, sticky/global flags,
+Unicode code points, dotAll/multiline behavior, replacement callbacks, named
+captures, and invalid runtime RegExp construction. A replaced global RegExp
+constructor must not intercept literal creation.
+
+## Validation in progress
+
+Created six source fixtures and began independent Node and unchanged C-backend
+probes at Hermes O0/O. Results are retained in values-initial-oracles.json,
+including failures and differences if present. Direct LLVM validation follows
+emitter integration and rebuild by the parent task.
+
+## Initial oracle results and corrective work
+
+The six initial programs compiled successfully through the original C backend
+at Hermes O0 and O. Five matched Node exactly: RegExp, BigInt, private fields,
+BigInt typed arrays, and the combined GC stress program. The ordinary typed
+array program disagreed on one observable value: after `a[-1] = 8`, Hermes
+returned `8` and Node returned `undefined`. All other output in that program
+matched. The complete initial JSON is retained without overwriting it.
+
+Source inspection traced the discrepancy to the ordinary property fallback in
+`JSObject::putComputedWithReceiver_RJS` and an existing typed-array TODO in
+`defineOwnComputedPrimitive`. After coordinating file ownership, added a
+focused fix in `lib/VM/JSObject.cpp`. A fixed stack buffer and Hermes's existing
+number parser/formatter implement the canonical numeric string roundtrip;
+ordinary names such as `"01"` and `"1.0"` remain ordinary properties. No object
+layout or GC metadata changed. New string roots use Locals and PinnedValue.
+
+The property operations now preserve the distinction between numeric `-0`
+(property `"0"`) and string `"-0"` (invalid typed-array index). Invalid writes
+still call the existing typed-array setter so ToNumber/ToBigInt conversion,
+observable valueOf calls, exceptions, and detached-buffer checks remain in
+the runtime's established implementation. Definitions validate the index and
+attributes before attempting value conversion.
+
+Added `features_typed_array_indices.js` for invalid numeric keys, canonical
+versus noncanonical spellings, own descriptors, nonextensible arrays, same-
+receiver conversion failures, GC during key/value conversion, distinct
+Reflect.set receivers, and shadowed numeric prototype entries. Node completes
+this differential fixture successfully. A syntax-only C++ compile using the
+actual build compilation flags passes.
+
+## Independent-reference limitation
+
+A focused test uncovered a separate Node v24.22.1 discrepancy with the current
+ECMA-262 TypedArray [[Set]] algorithm. For an invalid canonical numeric index
+and a distinct Receiver, the specified operation succeeds without converting
+the value. This Node build instead invokes valueOf, and throws for Symbol or
+Number-to-BigInt values in that case. The VM fix follows the specification.
+This difference is preserved in `typed-array-receiver-spec-probe.js` and
+`typed-array-receiver-spec-probe.md`, separate from the ordinary differential
+matrix. The matrix still exercises a distinct receiver using a primitive
+numeric value on which both implementations agree.
+
+The initial emitter integration note mistakenly treated BinaryPrivateInInst
+as a C++ class. The integrated build identified it as an instruction tag;
+the correct dispatch is a ValueKind case within BinaryOperatorInst. The
+integration note has been corrected and the runtime bridge contract did not
+change.
+
+## Cross-component review
+
+Reviewed the integrated generator, iterator, for-in, BigInt and private-field
+LLVM emission against the original C emitter and the actual StaticH helper
+signatures. Confirmed operand order, mutable iterator slots, branch polarity,
+registered root-slot storage, native function metadata lifetime, and BigInt
+pool ownership. No concrete ABI or GC blocker was found in these new paths.
+
+Reviewed the dynamic-evaluation bridge without editing its owner's files.
+Confirmed that the child bytecode provider shares the compiler Module and
+retains the parent semantic context. Caller values are borrowed from existing
+LLVM root slots, and C++ owners are destroyed before the SH exception longjmp.
+
+Reported two concrete concerns to the evaluation owner and parent task: the
+ordinary-function metadata scaffold does not supply class home-object or
+private-name lexical context for valid method eval expressions, and the
+documented EvalError for unsupported sloppy string eval initially differed
+from the implementation's SyntaxError. Their final handling belongs to the
+evaluation component's report and tests.
+
+The evaluation owner then identified an ownership detail missed by the first
+review: BytecodeFunction's destructor explicitly deletes its FunctionIR, even
+when the containing Module is shared. Rechecked the full destruction path.
+deleteBodyExceptEvalData moves retained synthetic functions, including the
+global function, into Module's owning compiledFunctions list. Nulling only
+the synthetic parent's BytecodeFunction FunctionIR links after successful
+eval compilation transfers cleanup to that Module list and preserves the
+top-level metadata pointer needed by nested eval. The evaluated provider
+continues to own its own FunctionIR normally, and unsuccessful compilation
+keeps the original cleanup path. This corrected review was sent to the
+evaluation owner and parent task before the final build.
+
+## 2026-10-28 — Focused execution and final receiver correction
+
+After coordinated build 4, the original typed-array program, canonical-index
+boundary program, and specification-directed receiver probe all passed
+through C at Hermes O, native LLVM at Hermes O / LLVM O2, and lli at the same
+settings. The two normal fixtures matched Node; the receiver probe matched
+all four specification-derived lines. Complete commands, output and artifact
+hashes are retained in `values-build4-probes.json`.
+
+Read-only inspection also identified the reverse receiver case:
+`Reflect.set({}, "-1", value, typedArrayReceiver)`. The target is ordinary, so
+the early typed-array target check cannot enforce the receiver's exotic
+definition rules. Prepared a focused patch while the shared build ran, then
+applied it after completion and the checks above. It delegates canonical keys
+on typed receivers to `defineOwnComputedPrimitive` before ordinary property
+addition. The fixture now checks invalid and valid reverse-receiver writes
+and their conversion counts.
+
+Using the expanded fixture with the still-unmodified build 4 binary preserved
+the concrete remaining failure: invalid assignment returned true instead of
+false. Neither implementation converted the value, and valid-index writes
+matched. The actual before-guard results are in
+`typed-array-receiver-before-guard.json`. Source is now stable for the next
+coordinated rebuild and final matrix. No result from the pending guard build
+is claimed here.
+
+## 2026-10-28 — Async transformation review
+
+During the consolidated build, independently reviewed the new async-generator
+return transformation and request driver without editing their owner's
+files. Found that the new arrow-function visitor isolated its body correctly
+but skipped default parameter expressions, unlike the prior generic visitor.
+A nested async generator in an arrow default would therefore escape this
+transformation. Reported the narrow correction—traverse the arrow's children
+while the enclosing-generator flag is false—to the async owner and parent.
+The owner confirmed the issue and will add the corresponding regression at
+the next coordinated source-edit checkpoint.
+
+## 2026-10-28 — Final value-component verification and freeze
+
+After coordinated build 8 completed and the parent verified that Ninja had
+no remaining work, reran the expanded canonical-index/receiver fixture and
+the normative distinct-receiver probe through all three routes: the C
+emitter with the shared updated runtime, direct native LLVM, and lli.
+All six Hermes executions exited successfully and matched their expected
+output. The reverse receiver regression now returns false without conversion
+for the invalid key and converts once for the valid element.
+
+The normal fixture matches Node v24.22.1. The normative probe continues to
+match the specification's four lines on all three Hermes routes while
+preserving the known Node difference as an explicit nonmatching reference
+record. This is an oracle limitation, not a suppressed assertion.
+
+`values-final-probes.json` records commands, full outputs, exit statuses,
+timings and SHA-256 hashes of the checked source files, compiler and bridge/
+VM binaries before and after execution. The hashes were unchanged throughout
+the run. Source and regression fixtures for this component are now frozen;
+the parent task owns the full combined optimization matrix and release
+packaging.
+
+## Final frozen extension gate
+
+The complete extension-final-validation.json records 7 of 7 passing
+rich-value fixtures, with 28 native LLVM output comparisons, 7 real lli
+comparisons and 14 matching C executions. All are positive language cases.
+The complete 53-case gate used unchanged source and binary inputs and no
+selection, quick mode or JIT skip. The separate typed-array distinct-receiver
+specification probe and its recorded Node-version discrepancy remain separate
+from these differential fixture results. Earlier failures are retained.
+
+
+
+# Component record 5: Project diary
 
 
 # Direct LLVM backend engineering diary
@@ -261,7 +1419,7 @@ diagnostic/dependency checks. No further implementation changes followed it.
 
 
 
-# Component record 2: Compiler integration and validation diary
+# Component record 6: Compiler integration and validation diary
 
 
 # Compiler driver and build diary
@@ -409,7 +1567,7 @@ AddressSanitizer remained configured for the compiler/runtime/bridge. `ASAN_OPTI
 
 
 
-# Component record 3: Runtime bridge and test diary
+# Component record 7: Runtime bridge and test diary
 
 
 # Direct LLVM runtime bridge diary
@@ -498,7 +1656,7 @@ Refreshed the 40-file compact patch against pinned upstream `f837b9dd8396ebf5c4e
 
 
 
-# Component record 4: PicoCalc direct LLVM diary
+# Component record 8: PicoCalc direct LLVM diary
 
 
 # Direct LLVM backend engineering diary
@@ -563,7 +1721,7 @@ The artifact collector assembled and verified six direct LLVM modules, linked th
 
 
 
-# Component record 5: PicoCalc review diary
+# Component record 9: PicoCalc review diary
 
 
 # PicoCalc integration and independent backend review
@@ -621,7 +1779,7 @@ ESP32-P4 execution or dynamic-heap device support is claimed.
 
 
 
-# Component record 6: LLVM toolchain preparation
+# Component record 10: LLVM toolchain preparation
 
 
 # LLVM toolchain investigation diary

@@ -1,0 +1,47 @@
+{
+  "return-argument": {
+    "expected": [
+      "caught:return rejected",
+      "{\"value\":\"recovered\",\"done\":false}",
+      "finally",
+      "{\"done\":true}"
+    ],
+    "actual": [
+      "caught:return rejected",
+      "{\"value\":\"recovered\",\"done\":false}",
+      "finally",
+      "{\"done\":true}"
+    ],
+    "matched": true
+  },
+  "return-expression": {
+    "expected": [
+      "caught:return expression",
+      "finally",
+      "{\"value\":42,\"done\":true}"
+    ],
+    "actual": [
+      "caught:return expression",
+      "finally",
+      "{\"value\":42,\"done\":true}"
+    ],
+    "matched": true
+  },
+  "return-order": {
+    "expected": [
+      "caller",
+      "finally",
+      "tick-1",
+      "returned",
+      "tick-2"
+    ],
+    "actual": [
+      "caller",
+      "finally",
+      "tick-1",
+      "returned",
+      "tick-2"
+    ],
+    "matched": true
+  }
+}

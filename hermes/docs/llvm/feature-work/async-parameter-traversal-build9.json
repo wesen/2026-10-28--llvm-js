@@ -1,0 +1,85 @@
+{
+  "source_sha256": "f79504317e04e4873ceebe7de676cc05dc8177b6060363ba781c8478a688fe4c",
+  "compiler_sha256": "24322b99a9683a1f56dd6180de313eab48039bf634862a89f51dbe411891cfd9",
+  "records": [
+    {
+      "stage": "node",
+      "command": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
+        "-e",
+        "globalThis.print=(...a)=>console.log(...a);require(\"vm\").runInThisContext(require(\"fs\").readFileSync(process.argv[1],\"utf8\"),{filename:process.argv[1]});",
+        "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/docs/llvm/feature-work/traversal-probes/generator_in_parameters.js"
+      ],
+      "exit_code": 0,
+      "stdout": "declaration true {\"value\":1,\"done\":false}\nexpression true {\"value\":2,\"done\":false}\nasync-function true {\"value\":3,\"done\":false}\nasync-generator true {\"value\":4,\"done\":false}\nordinary-async-default 5\ndone: generator_in_parameters\n",
+      "stderr": "",
+      "seconds": 0.037
+    },
+    {
+      "stage": "llvm-build-O0",
+      "command": [
+        "python3",
+        "utils/shllvm.py",
+        "build",
+        "--no-runtime-build",
+        "--llvm-bin",
+        "/tmp/llvm-direct-toolchain/bin",
+        "--hermes-opt",
+        "O0",
+        "--llvm-opt",
+        "2",
+        "--hermes-arg=-Xasync-generators",
+        "-o",
+        "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-extension-tests/parameter-traversal-O0",
+        "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/docs/llvm/feature-work/traversal-probes/generator_in_parameters.js"
+      ],
+      "exit_code": 0,
+      "stdout": "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-extension-tests/parameter-traversal-O0\n",
+      "stderr": "",
+      "seconds": 0.541
+    },
+    {
+      "stage": "llvm-run-O0",
+      "command": [
+        "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-extension-tests/parameter-traversal-O0"
+      ],
+      "exit_code": 0,
+      "stdout": "declaration TypeError Cannot read property 'next' of undefined\nexpression TypeError Cannot read property 'next' of undefined\nasync-function TypeError Cannot read property 'next' of undefined\nasync-generator TypeError undefined is not a function\nordinary-async-default 5\ndone: generator_in_parameters\n",
+      "stderr": "",
+      "seconds": 0.03
+    },
+    {
+      "stage": "llvm-build-O",
+      "command": [
+        "python3",
+        "utils/shllvm.py",
+        "build",
+        "--no-runtime-build",
+        "--llvm-bin",
+        "/tmp/llvm-direct-toolchain/bin",
+        "--hermes-opt",
+        "O",
+        "--llvm-opt",
+        "2",
+        "--hermes-arg=-Xasync-generators",
+        "-o",
+        "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-extension-tests/parameter-traversal-O",
+        "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/docs/llvm/feature-work/traversal-probes/generator_in_parameters.js"
+      ],
+      "exit_code": 0,
+      "stdout": "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-extension-tests/parameter-traversal-O\n",
+      "stderr": "",
+      "seconds": 0.524
+    },
+    {
+      "stage": "llvm-run-O",
+      "command": [
+        "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-extension-tests/parameter-traversal-O"
+      ],
+      "exit_code": 0,
+      "stdout": "declaration TypeError Cannot read property 'next' of undefined\nexpression TypeError Cannot read property 'next' of undefined\nasync-function TypeError Cannot read property 'next' of undefined\nasync-generator TypeError undefined is not a function\nordinary-async-default 5\ndone: generator_in_parameters\n",
+      "stderr": "",
+      "seconds": 0.022
+    }
+  ]
+}

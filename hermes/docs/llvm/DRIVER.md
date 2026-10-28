@@ -49,6 +49,10 @@ python3 utils/shllvm.py jit test/LLVMNative/gc_closures.js
 # Select frontend and LLVM optimization independently.
 python3 utils/shllvm.py run --hermes-opt O0 --llvm-opt 0 \
   test/LLVMNative/exceptions.js
+
+# Enable the frontend's async-generator syntax and lowering.
+python3 utils/shllvm.py run --hermes-arg=-Xasync-generators \
+  test/LLVMNativeExtensions/async_generators.js
 ```
 
 The driver enables ES6 block scoping and temporal-dead-zone checks explicitly.
@@ -91,31 +95,33 @@ checking automatically.
 
 ```sh
 python3 utils/test_shllvm.py --jobs 2
+python3 utils/test_shllvm_extensions.py --jobs 2
 ```
 
-Node must be on PATH. The runner executes Node with `--expose-gc`, defines
-`print` as `console.log`, and compares each successful program with the original
+Node must be on PATH. The runners execute Node with `--expose-gc`, define
+`print` as `console.log`, and compare successful programs with the existing
 C-emission backend and the direct LLVM backend. Both Hermes optimization levels
-(`O0`, `O`) and both LLVM levels (`0`, `2`) are exercised. The suite also executes
+(`O0`, `O`) and both LLVM levels (`0`, `2`) are exercised. The core suite executes
 three programs through `lli`, verifies runtime error classes, and checks that
 rejected constructs preserve an existing output file.
 
-The final release run passed **22 source cases**: **16 positive programs**, **3 runtime
-error programs**, and **3 explicit compile rejections**. There were **64 native
-LLVM comparisons** with Node and the C backend, **3 successful `lli` JIT
-comparisons**, and **6 checked runtime-error executions**. The allocation test
-creates 50,000 temporary object/array structures, retains closures, confirms
-that `gc` exists, invokes it unconditionally, and reads the captured state
-successfully afterward. These are integration tests, not a full ECMAScript
-conformance certificate.
+The extension harness uses script semantics through Node's `vm.runInThisContext`
+so global and eval tests do not accidentally acquire a CommonJS module scope.
+Every positive extension fixture also runs through real `lli`; async fixtures
+must print a completion marker. C-oracle limitations for lexical direct eval
+are explicit fixture metadata. Deliberate unsupported-language rejections are
+separate contracts and are not counted as matching Node semantics.
 
-Final release results are in `evidence/final-validation.json` and
-`evidence/final-validation.log`; `evidence/final-validated-files.json` identifies
-the exact tested implementation, compiler, runtime and bridge. The complete
-suite was rerun after the final verifier guard, automatic static/shared bridge
-build correction and dependent VM rebuild. The original run remains unchanged
-in `evidence/validation.json`, `evidence/validation.log` and
-`evidence/validated-files.json`.
+The current host release gates are `feature-work/core-final-validation.json`
+and `feature-work/extension-final-validation.json`, with companion logs and
+`feature-work/final-validated-files.json`. The extension runner records the
+sources, compiler and runtime hashes and checks for changes during a gate.
+The historical first-release results remain in `evidence/final-validation.json`:
+22 cases, 64 native comparisons, three JIT comparisons and six runtime-error
+executions. Current counts come from the new gate files and the report's
+validation table. The original 50,000-allocation closure test still calls `gc`
+unconditionally; new fixtures collect suspended generators and async/eval
+closures too. These are integration tests, not full ECMAScript conformance.
 
 `evidence/post-review-verifier.json` records the focused verifier-flag and LLVM
 output checks. `evidence/post-review-driver.json` records a missing-static-archive
@@ -126,13 +132,22 @@ and corrected during implementation.
 
 ## Explicit boundaries
 
-Generators and dynamic `eval` are rejected by this backend. The pinned upstream
-frontend also rejects an assignment to a `const` binding during compilation,
-even inside a `try` block; standard JavaScript can instead raise a catchable
-runtime TypeError. That limitation is retained and tested as an explicit
-compile rejection. The implementation is an experimental backend over the
-pinned Static Hermes language/runtime pipeline, not a claim that every
-ECMAScript program is accepted.
+Generators, RegExp/BigInt literals and private-field operations now have direct
+LLVM emission. Typed-array objects use the existing runtime through generic
+calls and property operations, with the included indexed-property corrections.
+Direct string eval in a strict caller uses actual native environment cells;
+dynamically supplied eval and Function strings compile to Hermes bytecode. A
+strict directive only inside a string from a sloppy caller is also rejected.
+General sloppy
+direct string eval, evaluated super/private-name context and direct eval in
+derived constructors have explicit remaining limits described in the report.
+
+The pinned native frontend still rejects direct source assignment to a `const`
+binding during compilation, even inside `try`; standard JavaScript can raise
+a catchable runtime TypeError. Dynamic strict evaluation uses runtime const
+checks. Specialized internal typed-object/fast-array IR remains distinct from
+ordinary JavaScript typed arrays. This is an experimental backend over a
+pinned language/runtime pipeline, with targeted evidence for its features.
 
 The current bridge uses the existing Static Hermes unit lifecycle: a unit and
 its code/string storage must remain alive until its runtime is destroyed.

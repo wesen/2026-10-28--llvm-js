@@ -1,4 +1,4 @@
-# Direct LLVM Implementation: Functions, Objects, Closures, and PicoCalc
+# Direct LLVM Implementation: JavaScript Language Extensions and PicoCalc
 
 Technical report and undergraduate compiler laboratory. 28 October 2026.
 
@@ -6,7 +6,7 @@ Technical report and undergraduate compiler laboratory. 28 October 2026.
 
 ## 1.1 The result
 
-This release adds a working direct LLVM backend to Static Hermes and updates the earlier PicoCalc integer-world compiler to emit LLVM IR directly. The larger backend accepts real JavaScript functions, objects, escaping lambdas, mutable captured bindings, ordinary constructors and classes, and exception control flow. It has been compiled and executed against the actual Hermes runtime on a Linux x86-64 host, including execution through LLVM's `lli` JIT. The smaller PicoCalc backend generates RV32IM code and preserves the existing simulated world's transaction and generation protocol.
+This release adds a working direct LLVM backend to Static Hermes and updates the earlier PicoCalc integer-world compiler to emit LLVM IR directly. The host backend includes functions, objects, escaping lambdas, mutable captures, constructors, classes and exceptions. This extension adds generators, async/await, Promise validation and runtime corrections, RegExp literals, BigInt, private fields, typed arrays, and lexical evaluation support. It runs against the actual Hermes runtime on Linux x86-64, including LLVM's `lli` JIT. The smaller PicoCalc backend generates RV32IM code and preserves the existing simulated world's transaction and generation protocol.
 
 The distinction between these two targets is essential. The host backend supplies the dynamic language mechanisms requested in this update. The device-oriented prototype supplies a bounded integer ABI and an RV32 execution environment. They are both implemented, but the host's managed JavaScript heap has not been ported into the device world. No physical PicoCalc or ESP32-P4 execution is claimed.
 
@@ -16,7 +16,7 @@ The source baseline is Facebook's Static Hermes branch at commit `f837b9dd8396eb
 
 The previous Static Hermes path translated Hermes IR into C, then relied on a C compiler to translate that program into LLVM IR and machine code. The new path translates Hermes IR into LLVM IR itself. The JavaScript frontend, semantic analysis, and useful module lowering remain; the program-specific C representation and C parser stage are removed.
 
-A fixed C bridge remains as part of the runtime implementation. It is compiled once for a particular runtime configuration. This bridge implements stable entry points for the tagged value representation, root frames, environments, object operations, calls, and compilation units. Calling such a prebuilt runtime from generated LLVM is the same architectural pattern used when native code calls a standard library. It does not regenerate a C translation of each guest program.
+A fixed C bridge remains as part of the runtime implementation. It is compiled once for a particular runtime configuration. This bridge implements stable entry points for tagged values, root frames, environments, object operations, calls and compilation units. A C++ lexical-eval helper is built into the full Hermes VM. Calling this prebuilt runtime from generated LLVM does not regenerate a C translation of each guest program. Dynamically supplied eval/Function strings use Hermes's bytecode compiler; runtime LLVM compilation of those strings is not claimed.
 
 The first implementation emits textual `.ll` files. LLVM still parses those files, verifies their structure, optimizes them, and emits native code. This choice makes the translation inspectable in a teaching laboratory and avoids linking the compiler frontend to LLVM's C++ libraries. An in-memory LLVM API or bitcode writer could remove the textual IR parsing step later, after the runtime contracts are stable. The current implementation makes no measured compilation-speed or execution-speed claim.
 
@@ -36,9 +36,13 @@ The table names mechanisms exercised by the delivered tests. It is a feature inv
 | Control and exceptions | Branches, loops, phi transfers, nested catch/finally, return and loop control through finally | `control_phi.js`; `exceptions.js` |
 | Dynamic values | Strings, UTF-16 data, coercion, arithmetic and runtime error classes | `strings.js`; `coercion.js`; error fixtures |
 | Collection | Escaping closures retain live state after allocation churn and explicit collection | `gc_closures.js` |
+| Generators | Next/throw/return, yield-star delegation, suspended finally clauses, iterator cleanup and collection | `generator_*.js`; `shllvm_generator` |
+| Async and Promises | Await, thenables, jobs, rejection, combinators, species, async-generator queues and cleanup | `async_*.js`; `promise_*.js` |
+| Rich values | Exact BigInt literals, RegExp literals, private names/fields/methods, buffers and typed arrays | `features_*.js`; `value_extensions.c` |
+| Dynamic source | Global eval, Function and direct eval from strict callers sharing native environment cells | `eval_*.js`; `function_*.js`; `eval_extensions.cpp` |
 | Device world | Direct LLVM integer code, capability ecalls, bounded RV32 execution, transactional reload | PicoCalc compiler and supervisor tests |
 
-All host fixture names in this table are relative to `hermes/test/LLVMNative/` in the complete release.
+Original host fixtures are in `hermes/test/LLVMNative/`. Extension fixtures are in `hermes/test/LLVMNativeExtensions/`. The direct-eval boundaries and precise test contracts are described in Chapters 3 and 7.
 
 ## 1.4 A complete worked program
 
@@ -179,7 +183,7 @@ Constants also cross this boundary deliberately. Numeric bit patterns become val
 
 A **garbage-collector root** is a location from which the collector begins tracing live objects. A native machine register containing an object address is not automatically such a location. Moreover, a moving collector can relocate an object and update its registered references. Generated code must subsequently use the updated value.
 
-This backend adopts a conservative storage policy: every Hermes instruction receives a root slot, and encountered constants receive slots too. Side-effect-only instructions also receive unused slots to keep numbering simple. A scratch slot supports temporary helper operations. All slots are initialized to undefined before they are exposed to collection. [1] [2]
+This backend adopts a conservative storage policy: each Hermes instruction whose result has IR users receives its own root slot, and encountered constants receive slots too. Unused produced values share a separate rooted discard slot while their instruction is emitted; side-effect-only instructions need no result storage. A distinct scratch slot supports temporary helper operations. All slots are initialized to undefined before they are exposed to collection. [1] [2]
 
 At entry, generated code asks `shllvm_frame_size` for the required native storage size, allocates aligned stack storage, and calls `shllvm_enter`. The bridge initializes the `SHLocals` header, links this root frame through `_sh_enter`, and reserves the outgoing Hermes argument/frame area. The emitter obtains the root-array address through `shllvm_roots`; it never guesses the offset of that array inside `SHLocals`.
 
@@ -193,7 +197,7 @@ Short-lived raw values are permissible between safepoints. A phi-edge transfer, 
 
 Normal return reads the result, removes any function-level exception handler, leaves the runtime frame, and returns its bits. Those cleanup operations do not allocate managed objects. Exceptional unwinding needs a different restoration path, explained in Section 2.10.
 
-This design favors inspectable correctness over compact frames. Values can remain rooted after their last semantic use, delaying collection until return. Precise liveness, slot reuse, or LLVM stack maps would be later optimizations requiring new proofs. The current admission limit is 1,024 combined root and argument slots, including scratch/minimum argument storage: at most 8 KiB of explicit tagged payload. Headers, exception buffers, machine spills, runtime frames, and recursion consume additional stack. The limit and native stack checks are not a total memory budget.
+This design favors inspectable correctness over compact frames. Used values can remain rooted after their last semantic use, delaying collection until return. General liveness-based slot reuse or LLVM stack maps would be later optimizations requiring new proofs. The discard slot removes unnecessary storage without merging independently used SSA values. The current admission limit is 1,024 combined root and argument slots, including scratch, discard and minimum argument storage: at most 8 KiB of explicit tagged payload. Headers, exception buffers, machine spills, runtime frames, and recursion consume additional stack. The limit and native stack checks are not a total memory budget.
 
 ## 2.5. Branches and simultaneous phi assignments
 
@@ -231,7 +235,7 @@ This distinction explains method calls. In `object.method(3)`, the function valu
 
 Construction also uses the existing protocol. Helpers implement `CreateThis`, `GetNewTarget`, and selection between the allocated receiver and an explicit object returned by the constructor. Function metadata distinguishes permitted invocation forms: an arrow cannot be constructed, and a class constructor cannot be called as an ordinary function. The generated prologue checks these restrictions.
 
-Class creation delegates to `_sh_ljs_create_class`, passing the native function, its environment and metadata, the home-object output, and an optional superclass. Receiver-sensitive property helpers support operations whose lookup object differs from their receiver. These mechanisms describe the implemented path; they do not imply that every class extension, such as private-field lowering, is accepted. Argument objects likewise retain Hermes's lazy/reified and strict/loose helper paths. [1] [2] [5]
+Class creation delegates to `_sh_ljs_create_class`, passing the native function, its environment and metadata, the home-object output, and an optional superclass. Receiver-sensitive property helpers support operations whose lookup object differs from their receiver. Chapter 7 explains the additional private-name and private-field lowering. Class coverage remains defined by the tested mechanisms and explicit boundaries. Argument objects likewise retain Hermes's lazy/reified and strict/loose helper paths. [1] [2] [5]
 
 ## 2.7. Closures are code plus shared bindings
 
@@ -292,7 +296,7 @@ Objects are allocated by Hermes. The emitter uses helpers for named or computed 
 
 Assignment and definition are distinct. Assigning a property may invoke an inherited setter; defining an own property creates or changes a property on the object itself. Strict and non-strict writes also differ in failure behavior. The emitter chooses corresponding helper variants, including operations with an explicit receiver. The `try_flag` on global-property helpers concerns errors for missing global bindings, not JavaScript `try` syntax.
 
-Object literals lowered into buffers are expanded into ordinary allocation and property definitions in this first backend. Where the lowered IR contains named fixed-property operations, the emitter preserves the property name instead of assuming the optimized C backend's storage offsets. Explicit prototypes use the runtime's parent-aware allocation helper and a registered empty-shape cache. Typed object allocation and private fixed-slot properties are rejected rather than silently translated with ordinary object semantics.
+Object literals lowered into buffers are expanded into ordinary allocation and property definitions in this first backend. Where the lowered IR contains named fixed-property operations, the emitter preserves the property name instead of assuming the optimized C backend's storage offsets. Explicit prototypes use the runtime's parent-aware allocation helper and a registered empty-shape cache. Specialized internal typed-object allocation and fixed-slot property instructions remain rejected. These internal forms are distinct from JavaScript `#private` fields, whose supported brand and access operations are explained in Chapter 7.
 
 Arrays require a subtle distinction:
 
@@ -405,24 +409,26 @@ Each technique answers a different question. LLVM verification checks IR structu
 
 ## 3.1 What each validation layer establishes
 
-LLVM assembly and verification check the representation: types, instructions, blocks, and control flow must form a valid module. They cannot determine whether a getter ran in the right order or two closures share the right binding. The native differential suite therefore compares the program's actual output with both Node and the unchanged Static Hermes C backend. Node provides an independent language implementation; the C backend holds the Hermes frontend and runtime largely constant while changing the code generator.
+LLVM assembly and verification check the representation: types, instructions, blocks and control flow must form a valid module. They cannot determine whether a getter ran in the right order or two closures share the right binding. The differential suites therefore compare actual output with Node and the existing Static Hermes C backend where that backend has the required semantics. Node is an independent language implementation. The C backend compares code generators while using the same patched frontend and runtime. Its inherited direct-eval helper lacks lexical environment support and is explicitly excluded as an oracle for those cases.
 
 The comparison controls matter. Both Hermes paths use ES6 block scoping and temporal-dead-zone checks. Without matching configuration, a difference may be a frontend-mode difference rather than a backend error. Tests use deterministic output; collection is explicitly requested where it is part of the test. A timeout limits the external test process, and does not claim that native guest execution has instruction fuel.
 
 | Evidence layer | Recorded final outcome | Scope |
 |---|---|---|
-| Host source cases | 22 / 22 passed | 16 positive, 3 runtime-error, 3 compile-rejection |
-| Native differential executions | 64 / 64 comparisons passed | Hermes O0 and O, each at LLVM O0 and O2; compared with Node and C |
-| LLVM JIT executions | 3 / 3 comparisons passed | Functions, mutable closures and forced collection |
-| Runtime-error executions | 6 / 6 expected errors | Three sources at both Hermes frontend settings |
+| Core source cases | 22 / 22 passed | 17 positive, 3 runtime-error, 2 compile-rejection contracts |
+| Core native comparisons | 68 passed | Hermes O0/O, LLVM O0/O2; Node and patched C backend |
+| Core JIT and errors | 3 JIT; 6 runtime-error executions passed | Separate execution contracts |
+| Extension source cases | 53 / 53 passed | 44 positive, 3 language-error, 3 explicit runtime-boundary, 3 compile-error contracts |
+| Extension native execution | 176 output comparisons; 12 language-error checks; 12 expected rejections | Four frontend/LLVM combinations per executable fixture |
+| Extension LLVM JIT | 47 Node-contract matches; 3 expected rejections | Real lli execution at Hermes O / LLVM O2 |
 | Compiler publication checks | 6 / 6 passed | Default/stdout/exported output, C bypass and preservation on failure |
 | Raw lexical-default checks | 5 / 5 passed | Default behavior, explicit overrides and static TDZ diagnostic |
-| RV32 integer-world regression | 24 / 24 passed; no skips | Complete recorded socket-enabled simulator/service run |
-| RV32 replay artifacts | 6 verified modules; 11 trace records | Linked ELF images, actual instruction execution and reload trace |
+| RV32 integer-world regression | Earlier 24 / 24 verified; unchanged lane | 200 C-vs-LLVM event comparisons, 160 original Node oracle events |
+| RV32 replay artifacts | 6 verified modules; 11 trace records | Linked ELF images, instruction execution and reload trace |
 
-The main suite counts source cases separately from executions. Sixteen positive sources, two Hermes optimization settings, and two LLVM optimization settings produce 64 native comparisons. Three additional source cases exercise runtime errors at both Hermes settings, producing six executions. Three source cases are expected compile rejections. The three `lli` comparisons are another execution path for selected positive programs, not three more source cases.
+The suites count source cases separately from executions. Each positive extension source is run at two Hermes optimization settings and two LLVM optimization settings, producing four native comparisons, plus an `lli` execution. Expected runtime errors use error-class contracts. Explicit unsupported-language boundaries use a separate rejection contract: a Node-valid program rejected by this backend is not counted as a successful language-semantic comparison. Compile rejections also check preservation of previously published output.
 
-The counter example is a separate successful native/JIT demonstration. It is not silently added to the suite's 64-comparison or three-JIT counts. The driver and lexical-default suites also have their own denominators.
+The historical 22-case baseline and its 64 native comparisons remain in `evidence/final-validation.json`. The extension release reruns the updated core suite and the new extension suite against the current build. The counter demonstration, driver checks, lexical-default checks and directed specification probes retain separate denominators.
 
 ## 3.2 Functions, shared capture, and collection
 
@@ -470,6 +476,16 @@ The diary retains failed attempts because they explain why the final design cont
 | Explicit object prototypes lacked runtime cache state | Added a registered weak empty-shape cache to the unit | Class and inherited-object allocation must use the actual runtime contract |
 | Root admission was too permissive | Limited combined root/argument slots to 1,024 | A source function must not request an enormous explicit native frame |
 | Specialized object instructions could change semantics | Rejected unsupported typed forms before ordinary-object lowering | A valid-looking substitute can silently change property attributes |
+| Promise.all collapsed a reaction job | Always invoked each input's then method | Microtask order and observable then access are language behavior |
+| Promise species and subclass paths diverged | Added species selection and direct capability settlement | Constructor choice and reaction-job count are observable |
+| Thenables ran synchronously; public primitive Promises were cached | Queued resolution jobs and returned fresh public wrappers | Callback order and object identity must match the language |
+| Async-generator return interrupted an awaited finally | Resumed internal awaits with next | Cleanup and the original pending completion survive suspension |
+| Negative typed-array keys became ordinary properties | Classified canonical numeric indexes before property fallback | Typed arrays have different indexed-property rules from ordinary objects |
+| Static direct eval had no caller environment | Added scope descriptors, retained compiler metadata and shared environment execution | Native and evaluated closures must share live cells |
+| Nested eval lost its scope or arguments alias | Restored lexical scope and captured argument metadata during runtime compilation | Dynamic closures must retain their caller bindings after return and collection |
+| Optimized eval-visible bindings lost TDZ checks | Widened ordinary values while retaining internal Empty/Uninit states | An unknown value is not an initialized binding |
+| Artificial eval parents admitted global new.target | Marked synthetic script parents as program scopes | Implementation scaffolding must not change source syntax context |
+| Unused results exhausted the root-slot limit | Shared one rooted discard slot while retaining separate slots for used values | Larger unoptimized async functions fit without relaxing the frame bound |
 
 The native frame limit bounds only its explicit tagged payload to approximately 8 KiB. Native headers, jump buffers, compiler spills, recursion and runtime frames add further use. Both the native stack checks and the admission limit are useful safeguards; neither is a complete resource budget.
 
@@ -481,7 +497,7 @@ The validated dynamic backend is Linux x86-64 with LLVM/Clang 18.1.3 and a 64-bi
 
 ## 3.6 What this release does not establish
 
-The supported ordinary function, object, closure and class cases are substantial, but the emitter does not cover every Hermes instruction or every ECMAScript construct. Generators and direct eval are explicit negative fixtures; regular-expression literal creation is also rejected by the driver tests. BigInt literal lowering, specialized typed objects/fast arrays and private-field operations remain outside the implemented set. No Test262 pass, full upstream suite pass, or exhaustive class-feature coverage is claimed.
+The emitter now supports the requested generator and value operations and exercises async execution in the extension suite. Remaining limits include specialized internal typed-object/fast-array instructions and the explicit direct-eval boundaries explained in Chapter 7. General sloppy direct string eval would need dynamic caller binding injection. Evaluated class-private names and super references require additional class context. Dynamic source compiles to Hermes bytecode, not runtime LLVM. No Test262 pass, full upstream suite pass, exhaustive class-feature coverage, or performance improvement is claimed.
 
 The host JIT path uses an external `lli` process. It is a real LLVM JIT execution path, but it is not a new embedded ORC API, a native-code sandbox, or a hot-reload manager. Compilation units, code and constant storage must remain alive for the runtime's lifetime. The host backend has no automatic rollback of arbitrary heap mutation and no world capability boundary. Those concerns are addressed as integration work in Chapter 4.
 
@@ -489,17 +505,30 @@ The PicoCalc lane's final 24-test run establishes the inherited bounded integer-
 
 ## 3.7 Reading the evidence
 
-The final host results are `docs/llvm/evidence/final-validation.json` and `final-validation.log`. The original `validation.json` and `validation.log` remain as historical evidence. The command-publication and lexical-default records are `driver-validation.json` and `lexical-defaults-validation.json`. `final-validated-files.json` connects the final execution evidence to hashes of the actual inputs and binaries; `validated-files.json` preserves the earlier capture. Selected emitted IR, disassembly and build metadata are in `evidence/samples/`. Toolchain package provenance and the native callback ABI probe are in `evidence/toolchain/`.
+The extension release gates are `docs/llvm/feature-work/core-final-validation.json` and `extension-final-validation.json`, with companion logs. Command-publication and lexical-default records are `driver-final-validation.json` and `lexical-defaults-final-validation.json` in the same directory. `final-validated-files.json` connects those records to the actual compiler, VM, bridge, driver and implementation sources. The extension harness also records input hashes before and after execution. Earlier baseline and first-pass records remain intact. Selected emitted IR, disassembly and build metadata are in `evidence/samples/`; toolchain provenance and the callback ABI probe are in `evidence/toolchain/`.
 
 The device results are `picocalc-llvm-poc/logs/direct-llvm-validation.json` and `direct-llvm-tests-with-sockets-final.txt`, together with the replay trace and ELF audit. Earlier failures and incomplete attempts are explicitly named and retained for the diary; they are not the final gate. The release manifest hashes the packaged files, and the patch verification records an application to the exact upstream base with an identical resulting source tree.
 
-## 3.8 Post-review diagnostic parity
+## 3.8 Extension evidence and oracle boundaries
 
-Final review identified one diagnostic parity gap: direct emission did not consult the requested lowered-Hermes-IR verification option. The emitter now follows the existing C backend's verifier sequence before assigning environment indices. The original full-matrix records and hashes are preserved. The separate post-review record identifies the final source/compiler hashes: 32 enabled/disabled emission pairs were byte-identical, all 64 modules assembled and passed LLVM verification, and both counter executions (native and JIT) matched the prior output. That focused guard check initially left the broad native matrix unchanged. The pinned Release build compiles the upstream Hermes verifier as a no-op unless HERMES_SLOW_DEBUG is enabled; these checks therefore establish flag plumbing and output invariance, not a malformed-Hermes-IR rejection experiment. LLVM assembly and LLVM verification remain real checks in this build.
+The final extension gate used no selection filter, quick mode, JIT skip or oracle-only option. It recorded unchanged source and binary fingerprints before and after execution. The positive fixture output, expected exception classes, explicit unsupported boundaries and output-publication checks remain separate records. A rejected Node-valid program is a passing rejection contract, not a passing JavaScript semantic comparison.
 
-Final reproduction review also found that the wrapper's automatic CMake command refreshed only the shared bridge, while native linking uses the static archive. It now requests both bridge targets. Separate native and JIT counter runs with automatic building enabled verified the dependency correction and matched the prior output. This driver-only change is recorded separately from the full differential matrix and does not change the emitter's instruction translation.
+The updated core suite supplied 68 native comparisons and the extension suite supplied 176. The latter includes lexical-eval cases compared directly with Node because the inherited C helper lacks caller environment semantics. For ordinary shared features, C and LLVM use the same rebuilt runtime including the Promise, async-generator and typed-array fixes.
 
-The subsequent automatic dependency build also refreshed the Hermes VM binary. To validate that concrete final artifact, the complete host matrix was then repeated with the final compiler, driver, runtime and bridges: all 22 cases passed, including 64 native comparisons, three JIT comparisons and six checked runtime-error executions. No quick mode or JIT skip was used. The final matrix is the release gate; earlier and focused records remain available to explain how the implementation reached it.
+The compiler and runtime were built with AddressSanitizer; leak checking was disabled only for the documented sandbox restriction. The pinned Release build makes the upstream Hermes IR verifier a no-op unless HERMES_SLOW_DEBUG is enabled. The wrapper's LLVM assembly and opt verification are real structural checks, and the executions are real host native/JIT runs.
+
+The machine-readable result explicitly lists these C-oracle limitations; they are not reported as matched C executions:
+
+- `eval_closure_gc.js`: Escaped eval closures must capture the actual native Environment, which the inherited C helper does not pass.
+- `eval_lexical_bindings.js`: The inherited C DirectEval helper does not receive the caller lexical environment.
+- `eval_lexical_errors.js`: The inherited C direct-eval path lacks lexical binding and TDZ metadata.
+- `eval_nested.js`: The static C DirectEval entry lacks the native caller Environment; nested dynamic calls use the shared interpreter metadata path.
+- `eval_nested_global.js`: The LLVM direct-eval extension retains the original global or function context through nested dynamic calls.
+- `eval_private_context_boundary.js`: The inherited C direct-eval path also lacks enclosing class lexical metadata.
+- `eval_sloppy_boundary.js`: The inherited C helper silently evaluates globally instead of injecting caller bindings.
+- `eval_super_context_boundary.js`: The inherited C direct-eval path also lacks the method home object.
+- `eval_source_context.js`: Source-site lexical and new.target context is recorded only by the LLVM direct-eval extension.
+- `eval_this_arguments.js`: The inherited C direct-eval helper substitutes global this and has no caller argument environment.
 
 
 # 4. PicoCalc integration and the device boundary
@@ -534,14 +563,19 @@ that objects or closures run in the RV32 interpreter or on physical PicoCalc
 hardware.
 
 The host backend reuses the full dynamic Hermes runtime, including its heap,
-collector, objects, and closure machinery, through a selected set of emitted
-instructions. This does not mean complete ECMAScript acceptance. Generators,
-direct `eval`, and regular-expression literals are rejected; typed-object
-and private fixed-slot operations are outside this backend. The pinned frontend
-also rejects the supplied `const` reassignment and some statically provable TDZ
-violations during compilation, even inside `try`. Runtime TDZ behavior through
-captured bindings is tested separately. See `evidence/validation.json`,
-`evidence/driver-validation.json`, and `evidence/lexical-defaults-validation.json`.
+collector, objects and closure machinery. The extension implements generators,
+async execution, RegExp literals, BigInt, private fields, typed arrays and
+direct lexical eval from strict callers. Dynamic strings use the Hermes
+bytecode compiler. Chapter 7 explains these mechanisms and the remaining
+eval context restrictions. Specialized internal typed-object and fixed-slot
+instructions remain outside the admitted subset. The pinned frontend also
+rejects the supplied static `const` reassignment and some statically provable
+TDZ violations during compilation, even inside `try`. Runtime TDZ behavior
+through captured bindings is tested separately. The current host evidence is
+in `feature-work/core-final-validation.json`,
+`feature-work/extension-final-validation.json`,
+`feature-work/driver-final-validation.json` and
+`feature-work/lexical-defaults-final-validation.json`.
 
 ## 4.1. The shared architectural idea
 
@@ -671,7 +705,7 @@ does demonstrate the new direct backend's behavior against the actual
 Hermes runtime, within the recorded feature and test scope.
 
 
-Source-reading pointers for these contracts are collected in Chapter 6. The standalone integration chapter retains its own local reference list.
+Source-reading pointers for these contracts are collected in Chapter 6. The standalone integration chapter retains its local reference list. This extension phase did not modify that lane.
 
 
 # 5. Build, inspect, execute, and reproduce
@@ -725,6 +759,10 @@ python3 utils/shllvm.py jit test/LLVMNative/gc_closures.js
 # Select frontend and LLVM optimization independently.
 python3 utils/shllvm.py run --hermes-opt O0 --llvm-opt 0 \
   test/LLVMNative/exceptions.js
+
+# Enable the frontend's async-generator syntax and lowering.
+python3 utils/shllvm.py run --hermes-arg=-Xasync-generators \
+  test/LLVMNativeExtensions/async_generators.js
 ```
 
 The driver enables ES6 block scoping and temporal-dead-zone checks explicitly.
@@ -767,31 +805,33 @@ checking automatically.
 
 ```sh
 python3 utils/test_shllvm.py --jobs 2
+python3 utils/test_shllvm_extensions.py --jobs 2
 ```
 
-Node must be on PATH. The runner executes Node with `--expose-gc`, defines
-`print` as `console.log`, and compares each successful program with the original
+Node must be on PATH. The runners execute Node with `--expose-gc`, define
+`print` as `console.log`, and compare successful programs with the existing
 C-emission backend and the direct LLVM backend. Both Hermes optimization levels
-(`O0`, `O`) and both LLVM levels (`0`, `2`) are exercised. The suite also executes
+(`O0`, `O`) and both LLVM levels (`0`, `2`) are exercised. The core suite executes
 three programs through `lli`, verifies runtime error classes, and checks that
 rejected constructs preserve an existing output file.
 
-The final release run passed **22 source cases**: **16 positive programs**, **3 runtime
-error programs**, and **3 explicit compile rejections**. There were **64 native
-LLVM comparisons** with Node and the C backend, **3 successful `lli` JIT
-comparisons**, and **6 checked runtime-error executions**. The allocation test
-creates 50,000 temporary object/array structures, retains closures, confirms
-that `gc` exists, invokes it unconditionally, and reads the captured state
-successfully afterward. These are integration tests, not a full ECMAScript
-conformance certificate.
+The extension harness uses script semantics through Node's `vm.runInThisContext`
+so global and eval tests do not accidentally acquire a CommonJS module scope.
+Every positive extension fixture also runs through real `lli`; async fixtures
+must print a completion marker. C-oracle limitations for lexical direct eval
+are explicit fixture metadata. Deliberate unsupported-language rejections are
+separate contracts and are not counted as matching Node semantics.
 
-Final release results are in `evidence/final-validation.json` and
-`evidence/final-validation.log`; `evidence/final-validated-files.json` identifies
-the exact tested implementation, compiler, runtime and bridge. The complete
-suite was rerun after the final verifier guard, automatic static/shared bridge
-build correction and dependent VM rebuild. The original run remains unchanged
-in `evidence/validation.json`, `evidence/validation.log` and
-`evidence/validated-files.json`.
+The current host release gates are `feature-work/core-final-validation.json`
+and `feature-work/extension-final-validation.json`, with companion logs and
+`feature-work/final-validated-files.json`. The extension runner records the
+sources, compiler and runtime hashes and checks for changes during a gate.
+The historical first-release results remain in `evidence/final-validation.json`:
+22 cases, 64 native comparisons, three JIT comparisons and six runtime-error
+executions. Current counts come from the new gate files and the report's
+validation table. The original 50,000-allocation closure test still calls `gc`
+unconditionally; new fixtures collect suspended generators and async/eval
+closures too. These are integration tests, not full ECMAScript conformance.
 
 `evidence/post-review-verifier.json` records the focused verifier-flag and LLVM
 output checks. `evidence/post-review-driver.json` records a missing-static-archive
@@ -802,13 +842,22 @@ and corrected during implementation.
 
 ## 5.5. Explicit boundaries
 
-Generators and dynamic `eval` are rejected by this backend. The pinned upstream
-frontend also rejects an assignment to a `const` binding during compilation,
-even inside a `try` block; standard JavaScript can instead raise a catchable
-runtime TypeError. That limitation is retained and tested as an explicit
-compile rejection. The implementation is an experimental backend over the
-pinned Static Hermes language/runtime pipeline, not a claim that every
-ECMAScript program is accepted.
+Generators, RegExp/BigInt literals and private-field operations now have direct
+LLVM emission. Typed-array objects use the existing runtime through generic
+calls and property operations, with the included indexed-property corrections.
+Direct string eval in a strict caller uses actual native environment cells;
+dynamically supplied eval and Function strings compile to Hermes bytecode. A
+strict directive only inside a string from a sloppy caller is also rejected.
+General sloppy
+direct string eval, evaluated super/private-name context and direct eval in
+derived constructors have explicit remaining limits described in the report.
+
+The pinned native frontend still rejects direct source assignment to a `const`
+binding during compilation, even inside `try`; standard JavaScript can raise
+a catchable runtime TypeError. Dynamic strict evaluation uses runtime const
+checks. Specialized internal typed-object/fast-array IR remains distinct from
+ordinary JavaScript typed arrays. This is an experimental backend over a
+pinned language/runtime pipeline, with targeted evidence for its features.
 
 The current bridge uses the existing Static Hermes unit lifecycle: a unit and
 its code/string storage must remain alive until its runtime is destroyed.
@@ -817,54 +866,33 @@ supported. Device integration, an RV32 runtime ABI, capability confinement,
 transactional OS state updates and generation-based hot reload need their own
 implementation and validation.
 
-## 5.6 Exact release layout and patch route
 
-The complete archive has a `hermes/` source tree and a `picocalc-llvm-poc/`
-tree. Run host commands from `hermes/`. The archive omits build outputs,
-Git history, package caches and `node_modules`. It retains the relevant
-upstream licences, dependency sources, the PicoCalc lockfile, recorded
-evidence and report sources. Rebuild binaries for your installation.
+## 5.7 Release layout and exact patch reproduction
 
-For an existing clone, check out the pinned base in a separate worktree and
-apply `Static-Hermes-direct-LLVM.patch` with `git apply --check` followed by
-`git apply`. The delivered provenance records a successful independent-index
-application to that base and an exact resulting-tree comparison. Do not
-assume that a moving upstream branch accepts the patch unchanged.
+The archive contains `hermes/` and `picocalc-llvm-poc/` source trees,
+`Static-Hermes-direct-LLVM.patch`, the PDF report, consolidated diary,
+`PROVENANCE.json` and `SHA256SUMS.txt`. Host commands run from `hermes/`.
+Build directories, downloaded toolchain binaries, Git history and Node
+dependencies are omitted; rebuild those for the local installation.
 
-To reproduce the individual compiler gates after the build:
+The patch applies to Static Hermes commit
+`f837b9dd8396ebf5c4e8115412417d273565f0fe`. Reproduction was checked with
+separate Git indexes: applying the patch to the exact base produced the
+same source tree as the packaged modifications, without staging the
+working repository. The recorded patch hash and resulting tree identity
+are in `PROVENANCE.json`. Every packaged ZIP member was read back with CRC
+and SHA-256 checks.
 
-```sh
-python3 utils/test_shllvm_driver.py
-python3 utils/test_shllvm_defaults.py
-python3 utils/test_shllvm.py --jobs 2
-```
+`docs/llvm/feature-work/` preserves the extension diary, original failures,
+final test records and input identities. The old `evidence/` directory
+preserves the first release's tests and toolchain provenance. These are
+different stages of the same project; only the named final records support
+the current host counts.
 
-For a nondefault installation, configure each test entry point explicitly:
-
-```sh
-python3 utils/test_shllvm_driver.py \
-  --compiler /path/to/build/bin/shermes
-python3 utils/test_shllvm_defaults.py \
-  --build-dir /path/to/build --clang /path/to/llvm/bin/clang
-python3 utils/test_shllvm.py \
-  --build-dir /path/to/build --llvm-bin /path/to/llvm/bin --jobs 2
-```
-
-The main differential runner also honors `LLVM_BIN` and `HERMES_BUILD_DIR`.
-The raw driver check uses `--compiler`; the lexical-default check uses
-`--build-dir` and `--clang` (with `CLANG` supplying its default compiler).
-The original evidence contains absolute paths from the recording environment;
-these are provenance, not paths that must exist on another machine.
-The Python drivers resolve current tool and runtime locations.
-
-The PicoCalc README gives its own toolchain variables, dependency installation,
-test commands and replay format. Its original C-oriented technical report is
-retained as historical context; `docs/DIRECT_LLVM.md` and the present report
-describe the updated compiler. The two projects' test runners are independent.
-
-PDF regeneration uses `python3 docs/llvm/build_report.py` from the Hermes
-source root with ReportLab and DejaVu fonts installed. This renders the saved
-chapters and evidence; it does not rerun or synthesize validation results.
+Regenerate the PDF with `python3 docs/llvm/build_report.py` using ReportLab
+and DejaVu fonts. The script reads completed final evidence and refuses
+failed, partial or changed-input extension gates. It renders documentation;
+it does not manufacture test results or rerun the compiler.
 
 
 # 6. References and source-reading guide
@@ -901,21 +929,520 @@ Local links identify the implementation accompanying this chapter. Upstream link
 [13]: https://llvm.org/docs/RISCVUsage.html
 
 
-## Additional evidence-reading references
+## How to connect source and evidence
 
-The numbered sources above support the architecture chapter. Implementation
-and experiment claims also refer to the delivered source and logs named in
-Chapter 3. Read `test/LLVMNative/gc_closures.js` together with the upstream
-`lib/VM/JSLib/GlobalObject.cpp` collector hook when assessing the forced-GC
-test. Follow source code to its runtime implementation when an inline header
-declaration does not establish allocation or lifetime behavior.
+Chapter 7 adds source pointers for generator lowering, Promise jobs,
+typed-array properties and lexical evaluation. Follow each bridge call to
+the runtime implementation when a header declaration does not establish
+allocation or lifetime behavior. The test harness defines exactly which
+outputs and errors are compared.
 
-For further study, use the official
-[LLVM garbage-collection documentation](https://releases.llvm.org/18.1.8/docs/GarbageCollection.html)
-to compare this explicit-root bridge with compiler-supported collector
-interfaces. The present implementation does not use LLVM statepoints.
-Use the official
-[ECMAScript specification](https://tc39.es/ecma262/)
-when distinguishing language semantics from retained Static Hermes
-frontend restrictions. A specification describes the required language;
-the test matrix describes the subset actually exercised here.
+The official [LLVM garbage-collection documentation](https://releases.llvm.org/18.1.8/docs/GarbageCollection.html)
+provides a useful comparison with this explicit-root design. The current
+emitter does not use LLVM statepoints or coroutine intrinsics. The
+[ECMAScript specification](https://tc39.es/ecma262/) describes the language;
+the delivered source and targeted tests establish what this implementation
+actually supports.
+
+
+# 7. Language extensions and dynamic evaluation
+
+This chapter follows the extension of the direct LLVM backend from ordinary
+functions, objects and closures to generators, asynchronous execution, richer
+values and runtime compilation. Read it with the implementation and the
+extension validation records. The compiler remains based on Static Hermes
+commit `f837b9dd8396ebf5c4e8115412417d273565f0fe`. Changes to the shared runtime
+and frontend are included in the patch, alongside the LLVM emitter.
+
+The central design rule is to preserve one managed JavaScript value model.
+Generators, Promise reactions, private fields and dynamically compiled
+closures all need to keep references to objects after an ordinary native
+function returns. Reusing Hermes environments and its collector makes those
+references interoperable. A second heap or a copied closure representation
+would introduce synchronization and lifetime problems that LLVM alone cannot
+solve. [14] [15]
+
+## 7.1. Generator functions become resumable native functions
+
+Consider a small generator:
+
+```javascript
+function* counter(start) {
+  let value = start;
+  const increment = yield value;
+  value += increment;
+  return value;
+}
+const iterator = counter(10);
+print(JSON.stringify(iterator.next()));
+print(JSON.stringify(iterator.next(7)));
+```
+
+Calling `counter(10)` creates a generator object. The first `next()` enters
+the body and produces an iterator-result object containing 10 and a false
+completion flag. The second call provides 7 as the result of the suspended
+`yield` expression, then completes with 17. An ordinary native function call
+cannot retain its automatic local variables after returning, so the compiler
+must make the suspension state explicit. [14] [20]
+
+Hermes already has a suitable transformation,
+`lib/Optimizer/Scalar/LowerGeneratorFunction.cpp`. The direct backend invokes
+the shared module-lowering pipeline, which runs this transformation before
+instruction selection. It creates an outer function that allocates the
+persistent environment and an inner resumption function. The environment
+holds the continuation index, execution state, exception-handler index, and
+values that must survive suspension. The continuation index selects a block
+of the inner function when it is called again.
+
+A `SaveAndYieldInst` therefore does not survive into LLVM emission. Lowering
+replaces it with stores of the next continuation and suspended state, followed
+by a normal return of an iterator-result object. A later invocation loads
+those cells and branches to the saved continuation. LLVM sees ordinary
+functions, calls, loads, stores and control-flow edges; this implementation
+does not use LLVM coroutine intrinsics. [14] [1]
+
+| Stored execution state | Meaning | Relevant transition |
+|---|---|---|
+| Suspended start | The body has not begun | A normal next call starts execution |
+| Executing | The resumption function is active | A reentrant resume raises TypeError |
+| Suspended yield | The body returned a yielded value | Next, throw or return supplies a completion to the continuation |
+| Completed | The body has finished or failed | Further operations follow the completed-generator protocol |
+
+The new emitter case is `CreateGeneratorInst`. It supplies the generated
+LLVM function address, the managed environment and the function descriptor
+to `shllvm_generator`. The bridge delegates allocation and prototype behavior
+to `_sh_ljs_create_generator_object`. The function descriptor remains owned
+by the compilation unit; the environment remains managed by Hermes. The
+bridge rejects a missing environment because the lowering must have created
+one before this operation. [1] [2] [5]
+
+This division is useful pedagogically. The lowering pass answers, “What
+state must survive?” The emitter answers, “How is the resulting control flow
+represented in LLVM?” The runtime answers, “How is the generator object
+allocated, identified, and invoked?” Keeping these responsibilities separate
+lets one inspect a generated `.ll` file without reconstructing the entire
+JavaScript iterator protocol from machine instructions.
+
+## 7.2. Abrupt completions, delegation and iterator cleanup
+
+Suspension becomes more difficult when it occurs inside exception handling.
+A generator's `return(value)` request may enter a `finally` block that itself
+yields. That yield postpones the pending return; it does not erase it. A
+`throw(error)` request can likewise suspend during cleanup before the error
+eventually escapes. The generator tests explicitly exercise both patterns.
+
+The shared lowering rewrites generator exception regions into a resumption
+dispatcher and an exception dispatcher. It cannot simply jump into an old
+native stack frame whose exception handler has already been removed. The
+saved handler state identifies where execution should continue after the
+next exception. The direct emitter then uses the same caller-owned jump
+buffer and volatile-root discipline described in the exception chapter.
+The generator environment and the native exception frame solve different
+lifetime problems. [14] [1] [2]
+
+Delegation with `yield*` adds another object whose `next`, `throw` and
+`return` methods can run user code. It also makes iterator closing observable.
+A `for...of` loop that exits with `break` must give its iterator the
+appropriate cleanup opportunity. Destructuring can close an iterator after
+consuming only part of it. The new bridge exposes the existing iterator
+begin, next and close operations rather than expanding their semantics into
+unrooted native temporaries.
+
+| Hermes instruction | LLVM bridge | Mutable state |
+|---|---|---|
+| `IteratorBeginInst` | `shllvm_iterator_begin` | Source slot may become the next-method slot |
+| `IteratorNextInst` | `shllvm_iterator_next` | Iterator/index slot advances |
+| `IteratorCloseInst` | `shllvm_iterator_close` | Runtime performs close and exception handling |
+| `GetPNamesInst` | `shllvm_pnames` | Base, index, size and property-list slots |
+| `GetNextPNameInst` | `shllvm_pname_next` | Current property and enumeration index |
+
+The last two operations support `for...in` property enumeration. Their
+bridges return a small integer condition after updating the rooted slots.
+The emitter branches through its existing phi-copy edge mechanism. This
+detail matters: a terminator that updates several pieces of iteration state
+must write the slots before taking the successor edge, including when the
+loop lives inside a generator state machine. [1] [2] [5]
+
+The fixtures separate protocol concerns from lifetime concerns.
+`generator_protocol.js` checks sent values, early completion, thrown
+exceptions and reentrancy. `generator_delegation.js` checks delegated methods,
+missing throw handlers, loop cleanup and destructuring. The finally fixture
+checks pending completions. The enumeration fixture checks inherited and
+deleted properties. The GC fixture suspends generators, collects, resumes
+them and verifies that a native closure still shares the same mutable cell.
+
+## 7.3. Async functions use generators and Promise jobs
+
+In this implementation an async function is lowered into a generator driven
+by `HermesBuiltin_spawnAsync`. A yielded await operand is normalized to a
+Promise. Fulfillment resumes the generator normally, rejection resumes it
+with a throw, final return resolves the async result, and an uncaught error
+rejects that result. The driver lives in
+`lib/InternalJavaScript/02-AsyncFn.js`. The new LLVM generator creation path
+therefore enables the central execution mechanism for ordinary async
+functions as well. [16]
+
+There are three distinct mechanisms to follow. First, frontend lowering
+identifies suspension points and produces the generator. Second, Promise
+reaction jobs decide when the continuation is eligible to run. Third, the
+host's event loop drains those jobs. A correct lowering with a missing job
+drain can terminate a process without producing the awaited output; a
+correct job queue with an incorrect continuation can produce the wrong
+values. The test harness checks explicit completion markers as well as
+process exit codes and full output.
+
+The console host already enables and drains Hermes's microtask queue. The
+extension reuses that path through `shllvm_run`; it does not introduce a
+second scheduler. Async tests cover ordinary values, fulfilled and rejected
+Promises, thenables, nested scheduling, caught errors, cleanup, receiver
+capture and collection while continuations remain pending. The native and
+`lli` paths use the same runtime queue. [16] [17]
+
+The first differential run found a shared-runtime ordering defect:
+`Promise.all` handled already-fulfilled inputs synchronously on its ordinary
+path. A minimal program queued a `Promise.all` reaction and a separate
+resolved-Promise reaction. Node printed `tick` before `all`; the original
+Hermes runtime reversed those lines. The fix always invokes the input's
+`then` method and allows its reaction to run through the job queue. The
+original failure and corrected runs are kept as separate evidence. [17]
+
+Further targeted tests exercise subclass capabilities, the constructor's
+`Symbol.species` property, thenable resolution, and fresh Promise identity.
+These are runtime semantics, not LLVM instruction-selection details. The
+shared Promise implementation was changed where the tests demonstrated a
+concrete divergence. Consequently the C backend is still a valuable
+comparison of code generators, but its runtime is now the patched runtime,
+not an untouched upstream oracle.
+
+Async generators add a queue of next, throw and return requests. A
+particularly revealing regression enters an async generator's `finally`
+block using `return("closed")`, then suspends on `await 0` inside that block.
+The old async-generator driver resumed with another `return(0)`. This
+abandoned the remaining cleanup and replaced the pending return value.
+Resuming an internal await with `next(resolvedValue)` lets the generator
+continue its saved cleanup and retain the original completion. The rejection
+path still resumes with a throw. [18]
+
+External return requests have a related but different rule: their argument
+must be awaited before the resulting return or throw is injected into the
+suspended generator. Source return expressions must also await inside their
+original try/catch/finally region. Waiting only after the body has completed
+is too late for a rejection to reach a surrounding catch. The frontend now
+inserts the internal await at a return expression, and the queue driver awaits
+an external return argument. Completed results do not acquire a redundant
+second await job. Empty async generators still receive the Promise-returning
+driver, and nested arrows retain their own return/await context. [18] [26] [27]
+
+The transformation must visit expression roots as well as their children.
+An await operand may itself be another await or an async-generator expression;
+visiting only the operand's children skips that outer operation. Default
+parameters can also contain nested function expressions. The visitor now
+traverses parameter roots before body transformation and isolates each
+function's context, including arrows. These rules prevent a nested function
+from accidentally inheriting an enclosing async generator's return rewriting.
+The parameter, nested-await and nested-yield fixtures exercise these cases
+through both code generators. [26]
+
+Async-generator syntax is selected with `-Xasync-generators`. The wrapper's
+repeatable `--hermes-arg=-X...` option forwards such frontend choices and
+records them in the build manifest. It accepts only frontend `-X` options so
+that additional arguments cannot override output selection or replace the
+direct backend with the C path. The tests keep the option explicit.
+
+## 7.4. BigInt, regular expressions and private state
+
+BigInt literals need an exact representation. Converting
+`123456789012345678901234567890n` through a floating-point Number would lose
+information before the runtime ever received it. The emitter uses
+`ParsedBigInt`, the same serialization facility used by the upstream C
+backend, and copies its bytes into an immutable module-global byte pool.
+The bridge receives both the address and exact byte count and constructs
+the managed BigInt. Empty zero encodings have a harmless storage byte while
+retaining their true logical count. [1] [15]
+
+Arithmetic continues through the existing dynamic-value helpers. They
+perform numeric conversion, choose Number or BigInt operations, and raise
+the appropriate errors. Exponentiation is already lowered to a builtin in
+the shared pipeline. The fixtures exercise alternate radices, integers
+beyond 64 bits, signed division and remainder, shifts, exponentiation and
+mixed-type errors. Merely demonstrating `1n + 2n` would not establish that
+the literal representation or conversion rules are correct.
+
+A RegExp literal similarly must not be implemented by calling the mutable
+global `RegExp` binding. The new `CreateRegExpInst` case interns pattern and
+flag strings in the compilation unit and calls the runtime literal helper.
+Each execution creates a fresh RegExp object. The fixture checks captures,
+global and sticky state, Unicode, replacement callbacks and independence
+from a user-replaced global constructor. [1] [15]
+
+Private fields require an unforgeable private-name identity and brand
+checks. They are not ordinary properties whose names happen to begin with
+a hash sign. The emitter now handles private-name creation, own-field add,
+load and store, and the private-in operator. Shared lowering expands the
+private-brand check before emission. Private methods and accessors use
+these mechanisms through the existing frontend transformations.
+
+The first bridge deliberately uses the runtime's supported uncached private
+access path. This avoids guessing cache layout or lifetime. It also avoids
+sharing an entry between two incompatible meanings: the field-access helper
+uses the cache's slot field as an offset, whereas private membership can
+use it as a boolean. A later optimization can add separate registered
+caches after preserving those contracts. [15] [5]
+
+The private-field fixture includes same-spelling names from different
+classes, inheritance, static state, accessors, methods, failed receivers,
+duplicate branding and stamping a non-extensible object. The combined GC
+fixture retains a class instance containing a private BigInt, RegExp and
+BigInt typed array through escaping native closures and an explicit
+collection.
+
+## 7.5. Typed arrays reuse calls but require exotic property semantics
+
+Ordinary `Uint8Array`, `Float64Array`, `BigInt64Array`, `ArrayBuffer` and
+`DataView` expressions already lower to constructor, property and call
+operations. They do not require a separate LLVM vector representation.
+The backing store and view semantics belong to the managed runtime. This
+is distinct from Hermes's internal specialized typed-object and fast-array
+IR operations, which are not automatically covered by support for
+JavaScript typed-array objects.
+
+Validation covers shared buffers, view offsets, byte order, overlapping
+copies, integer wrapping, clamping, floating values, callbacks, subarrays,
+BigInt conversions and bounds errors. This revealed a shared-runtime
+problem: writing `array[-1]` could create an ordinary property in Hermes.
+The runtime's typed-array object path now classifies canonical numeric
+index strings before ordinary property fallback. [19]
+
+| Key | Classification | Consequence for a short typed array |
+|---|---|---|
+| Numeric `-0` | Converted property key is `"0"` | Addresses element zero |
+| String `"-0"` | Canonical numeric index, invalid integer index | Does not become an ordinary property |
+| `"-1"`, `"1.5"`, `"NaN"` | Canonical numeric indexes, invalid elements | Follow typed-array index rules |
+| `"01"`, `"1.0"` | Not canonical Number spellings | Can be ordinary named properties |
+| A valid in-range integer spelling | Canonical valid element index | Reads or writes the view's element |
+
+The classification uses a fixed-size parsing buffer and the runtime's
+Number-to-string round trip. It handles the special spellings for negative
+zero, NaN and infinities. BigInt keys are converted through their exact
+decimal strings, avoiding an incorrect preliminary rounding to Number.
+The operation's stable specification name is
+`CanonicalNumericIndexString`. [19] [21]
+
+Even an invalid write can have observable conversion effects. Assigning an
+object as a value may call its conversion method before the index is
+discarded. The fix therefore uses the existing typed-array element setter,
+with an out-of-range sentinel where appropriate, rather than returning early
+and skipping conversion. Definitions and operations with a distinct
+receiver have their own rules. The boundary fixture and separate
+spec-directed receiver probe distinguish those cases.
+
+The separate receiver probe records an observed difference between the
+installed Node version and the current specification for an invalid index
+with a distinct receiver. That difference is not hidden by changing the
+Node oracle. The ordinary differential fixture uses a primitive right-hand
+side for that case; the additional probe states its specification-derived
+expected result and reports each engine's actual output. The applicable
+distinct-receiver rule comes from the typed array's `[[Set]]` algorithm,
+in addition to numeric-key classification. [19] [25]
+
+The reverse direction matters too. An ordinary target with a typed-array
+receiver must invoke the receiver's exotic definition operation. An invalid
+canonical numeric key returns false without converting the value. The
+runtime now routes that case through the typed-array definition path rather
+than adding an ordinary property. The regression fixture checks both the
+result and the absence of conversion side effects. [19] [25]
+
+## 7.6. Dynamic evaluation shares native environment cells
+
+The existing runtime already implements indirect eval and the `Function`
+constructor with its source compiler. The missing direct-backend mechanism
+was lexical direct eval: evaluated code must be able to resolve and mutate
+the caller's local bindings, including bindings that no static expression
+otherwise uses. Passing only the source string to the old Static Hermes
+helper would instead evaluate without the caller's lexical environment.
+
+The extension adds explicit metadata and operands to `DirectEvalInst`.
+Besides source and strictness, it carries the current physical scope,
+environment, receiver, new target, captured arguments where applicable, and
+the variables visible at that source location. The distinction between a
+physical environment and a lexical scope is essential. Hermes can merge
+several source blocks into one physical scope, so enumerating all physical
+slots would expose out-of-scope names or select the wrong shadowed binding.
+IR generation first determines the nearest visible declaration for each
+identifier. The emitter then groups those bindings by their physical
+environment. [22]
+
+| Descriptor field | Purpose |
+|---|---|
+| UTF-8 identifier name | Resolves an identifier in the evaluated string |
+| Native environment slot | Connects the resolved name to its actual mutable cell |
+| TDZ and constness flags | Retains binding access and mutation rules |
+| Scope order and slot count | Preserves physical environment depth and validates slot references |
+| Rooted receiver and new target | Supplies caller invocation context to executed code |
+
+The runtime compiler expects retained compiler scope metadata from a
+bytecode parent. An AOT LLVM function has no such parent. The bridge builds
+a small, non-executed synthetic parent from the descriptors, retains its
+semantic and IR data, and maps its variables to the existing native
+environment slots. It then invokes `compileEvalModule` and runs the resulting
+bytecode with the caller's actual environment. The synthetic parent's code
+is never executed after this remapping.
+
+This design preserves cell identity. If evaluated code returns a closure
+that changes a variable, a native closure reading that variable sees the
+change. If the native function changes the variable later, the evaluated
+closure sees the new value. Copying values into a temporary object and
+copying them back after eval would fail for escaping closures and would
+require special treatment of exceptions; the shared environment avoids
+those problems. The resulting bytecode provider retains the compiler module.
+The synthetic parent's `FunctionIR` ownership is transferred to that module
+before the temporary parent provider is destroyed. Retaining only a shared
+module pointer is insufficient: the temporary `BytecodeFunction` destructor
+would otherwise delete its associated IR function. The explicit transfer
+keeps the lexical metadata available for escaping closures and nested eval.
+[22]
+
+The optimizer also needs to know about this visibility. A binding used only
+by eval cannot be deleted as unused. A binding assigned in evaluated code
+cannot retain a stale native stack copy or a previously inferred constant.
+The changes conservatively mark captured eval bindings as unknown reads and
+writes, prevent their constant/stack promotion, and invalidate the relevant
+frame-value knowledge. Scope hoisting must also retain the physical ancestors
+of every eval-visible binding. The dependency is carried by the variables,
+so a pass that examines only runtime scope values can miss it. Optimization
+remains enabled for unrelated values.
+
+Unknown JavaScript values and uninitialized bindings are different concepts.
+Type inference therefore keeps the internal Empty/Uninit states while widening
+an eval-visible binding to any ordinary value. Dropping Empty would erase a
+required TDZ check in an optimized closure. Runtime compilation also restores
+the caller's captured `arguments` binding and lexical scope when compiling a
+nested eval; a synthetic parent must not initialize a replacement arguments
+object over the shared native slot.
+
+Nested direct eval needs the same environment identity after execution has
+entered dynamically compiled bytecode. The interpreter now obtains the
+current lexical scope from retained `DebugScopingInfo`, selects its register
+or spilled environment, and calls `evalInEnvironment`. Dynamic compilation
+retains semantic, IR and scope metadata even when the debugger is disabled.
+It is eager and unoptimized in this implementation; rebuilding the synthetic
+parent on each call is a clear performance tradeoff, not a cached JIT design.
+[22]
+
+Global invocation context is preserved through the synthetic metadata chain.
+All artificial parents for a script caller are marked as program scopes, so
+another nested eval cannot mistake them for real functions and accept global
+`new.target`. Actual native constructors and functions introduced by evaluated
+source still supply their own function context. This is an example of a
+compiler implementation detail that must remain invisible to the language.
+
+The helper is compiled into the full Hermes VM because the compiler and VM
+implementation symbols are intentionally hidden from ordinary shared
+library clients. It exposes one rooted-slot bridge entry point. Any C++
+strings, compiler owners and RAII guards are destroyed before the bridge
+uses Static Hermes's non-local exception transfer; jumping over live C++
+destructors would otherwise invalidate cleanup assumptions. [22]
+
+Dynamic source strings in this implementation compile to **Hermes
+bytecode**. The statically known program and its native callbacks still
+compile directly to LLVM IR. Runtime LLVM compilation of arbitrary strings
+is not implemented. The full runtime compiler must therefore remain
+available when using eval or Function.
+
+## 7.7. Validation and explicit language boundaries
+
+The extension harness records Node script execution, the C backend where it
+is a valid semantic oracle, four native LLVM combinations, and real `lli`
+execution. It uses Hermes frontend `O0` and `O` and LLVM `O0` and `O2`
+independently. For lexical eval, the old C helper's lack of local environment
+support is recorded as an oracle limitation; it is not accepted as a passing
+comparison. Runtime errors, compiler rejections and boundary probes are
+recorded separately from successful source programs.
+
+The final counts and file hashes appear in the validation chapter and
+`docs/llvm/feature-work/` evidence. The first 24-case run is retained as
+diagnostic history: it exposed four shared-runtime failures and is not the
+release gate. Source fingerprints detect edits during a purported frozen
+test run. The report must be regenerated only after the identified final
+gate, rather than inferring success from an earlier partial run.
+
+This remains a targeted host implementation. Direct string eval requires a
+strict caller. A strict directive only inside the supplied string does not
+currently bypass that restriction. General sloppy direct eval requires
+dynamic introduction and lookup of caller `var` bindings; the bridge rejects
+that case explicitly. Non-string arguments still pass through unchanged in
+either caller mode. Class-private names and `super`
+inside evaluated strings require additional class-context metadata.
+Derived-constructor direct eval needs correct handling of the uninitialized
+receiver before `super()` and is rejected by the LLVM emitter. Other
+boundaries established by the final fixtures are stated with the evidence.
+No complete ECMAScript or Test262 result, physical PicoCalc runtime port,
+or compilation/performance speedup is claimed.
+
+## 7.8. Laboratory exercises
+
+1. Compile `generator_finally.js` at both frontend optimization levels.
+   Locate the generated resumption functions and the stores that precede
+   their iterator-result returns. Explain which state must live on the heap.
+2. Add a side effect to an iterator's `return` method. Predict the output
+   for normal loop exhaustion, break, throw and one-element destructuring,
+   then compare the prediction with native and JIT runs.
+3. Write two Promise reactions whose order would change if a thenable were
+   invoked synchronously. Explain which queued job accounts for each line.
+4. Compare typed-array keys `"0"`, `"-0"`, `"00"` and numeric `-0`.
+   Inspect own-property descriptors and explain why a dictionary model alone
+   is insufficient.
+5. Write a strict function that returns one native closure and one
+   eval-created closure sharing a variable. Mutate through each closure,
+   collect, and verify the other closure's observation.
+6. Remove the eval-visible variable's protection from stack promotion in a
+   disposable checkout. Construct a program that reveals the resulting stale
+   native value. Restore the protection and explain the aliasing invariant.
+
+## 7.9. Extension references and source-reading guide
+
+14. [Generator state-machine lowering][14], `lib/Optimizer/Scalar/LowerGeneratorFunction.cpp`. Follow scope creation, resumption,
+    exception dispatch and crossing-value promotion.
+15. [Value bridge implementation][15], `lib/BCGen/SH/LLVMNative/value_extensions.c`. Compare literal bytes, private-name
+    operations and the documented cache choice with the public SH helpers.
+16. [Async-function driver][16], `lib/InternalJavaScript/02-AsyncFn.js`. Trace one fulfilled and one rejected await
+    through the generator resumption functions.
+17. [Patched Promise implementation][17], `lib/InternalJavaScript/01-Promise.js`. Read the changes with the recorded
+    ordering, species and thenable regression fixtures.
+18. [Patched async-generator driver][18], `lib/InternalJavaScript/04-AsyncIterator.js`. Follow internal-await continuation
+    separately from the queue's external return request.
+19. [Typed-array property integration][19], `lib/VM/JSObject.cpp`. Read the canonical numeric-index
+    helpers and the guarded paths in property access/definition.
+20. [ECMAScript generator objects][20]. Normative protocol reference.
+21. [ECMAScript canonical numeric index strings][21]. Stable operation anchor;
+    section numbering can change in the living draft.
+22. [Native lexical-eval runtime bridge][22], `lib/BCGen/SH/LLVMNative/eval_extensions.cpp`. Read together with the new IR
+    operands, optimizer guards and eval fixtures.
+23. [ECMAScript PerformEval][23]. Distinguishes direct/indirect evaluation and
+    caller context.
+24. [Extension test harness][24], `utils/test_shllvm_extensions.py`. Defines actual oracles, completion checks,
+    optimization combinations, errors, fingerprints and result records.
+25. [ECMAScript typed-array Set][25]. Distinguishes an element write from
+    an operation with a different receiver.
+26. [Async-generator frontend transformation][26], `lib/AST/AsyncGenerator.cpp`. Follow return expressions
+    and nested function contexts before generator state-machine lowering.
+27. [ECMAScript async-generator return resumption][27]. Normative reference
+    for awaiting an external return argument.
+
+[1]: ../../lib/BCGen/SH/LLVMNative/LLVMBackend.cpp
+[2]: ../../lib/BCGen/SH/LLVMNative/runtime.c
+[5]: https://github.com/facebook/hermes/blob/f837b9dd8396ebf5c4e8115412417d273565f0fe/include/hermes/VM/static_h.h
+[14]: ../../lib/Optimizer/Scalar/LowerGeneratorFunction.cpp
+[15]: ../../lib/BCGen/SH/LLVMNative/value_extensions.c
+[16]: ../../lib/InternalJavaScript/02-AsyncFn.js
+[17]: ../../lib/InternalJavaScript/01-Promise.js
+[18]: ../../lib/InternalJavaScript/04-AsyncIterator.js
+[19]: ../../lib/VM/JSObject.cpp
+[20]: https://tc39.es/ecma262/multipage/control-abstraction-objects.html#sec-generator-objects
+[21]: https://tc39.es/ecma262/multipage/abstract-operations.html#sec-canonicalnumericindexstring
+[22]: ../../lib/BCGen/SH/LLVMNative/eval_extensions.cpp
+[23]: https://tc39.es/ecma262/multipage/global-object.html#sec-performeval
+[24]: ../../utils/test_shllvm_extensions.py
+[25]: https://tc39.es/ecma262/2026/multipage/ordinary-and-exotic-objects-behaviours.html#sec-typedarray-exotic-objects-set-p-v-receiver
+[26]: ../../lib/AST/AsyncGenerator.cpp
+[27]: https://tc39.es/ecma262/2026/multipage/control-abstraction-objects.html#sec-asyncgeneratorunwrapyieldresumption

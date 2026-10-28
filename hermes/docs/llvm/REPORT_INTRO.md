@@ -2,7 +2,7 @@
 
 ## 1.1 The result
 
-This release adds a working direct LLVM backend to Static Hermes and updates the earlier PicoCalc integer-world compiler to emit LLVM IR directly. The larger backend accepts real JavaScript functions, objects, escaping lambdas, mutable captured bindings, ordinary constructors and classes, and exception control flow. It has been compiled and executed against the actual Hermes runtime on a Linux x86-64 host, including execution through LLVM's `lli` JIT. The smaller PicoCalc backend generates RV32IM code and preserves the existing simulated world's transaction and generation protocol.
+This release adds a working direct LLVM backend to Static Hermes and updates the earlier PicoCalc integer-world compiler to emit LLVM IR directly. The host backend includes functions, objects, escaping lambdas, mutable captures, constructors, classes and exceptions. This extension adds generators, async/await, Promise validation and runtime corrections, RegExp literals, BigInt, private fields, typed arrays, and lexical evaluation support. It runs against the actual Hermes runtime on Linux x86-64, including LLVM's `lli` JIT. The smaller PicoCalc backend generates RV32IM code and preserves the existing simulated world's transaction and generation protocol.
 
 The distinction between these two targets is essential. The host backend supplies the dynamic language mechanisms requested in this update. The device-oriented prototype supplies a bounded integer ABI and an RV32 execution environment. They are both implemented, but the host's managed JavaScript heap has not been ported into the device world. No physical PicoCalc or ESP32-P4 execution is claimed.
 
@@ -12,7 +12,7 @@ The source baseline is Facebook's Static Hermes branch at commit `f837b9dd8396eb
 
 The previous Static Hermes path translated Hermes IR into C, then relied on a C compiler to translate that program into LLVM IR and machine code. The new path translates Hermes IR into LLVM IR itself. The JavaScript frontend, semantic analysis, and useful module lowering remain; the program-specific C representation and C parser stage are removed.
 
-A fixed C bridge remains as part of the runtime implementation. It is compiled once for a particular runtime configuration. This bridge implements stable entry points for the tagged value representation, root frames, environments, object operations, calls, and compilation units. Calling such a prebuilt runtime from generated LLVM is the same architectural pattern used when native code calls a standard library. It does not regenerate a C translation of each guest program.
+A fixed C bridge remains as part of the runtime implementation. It is compiled once for a particular runtime configuration. This bridge implements stable entry points for tagged values, root frames, environments, object operations, calls and compilation units. A C++ lexical-eval helper is built into the full Hermes VM. Calling this prebuilt runtime from generated LLVM does not regenerate a C translation of each guest program. Dynamically supplied eval/Function strings use Hermes's bytecode compiler; runtime LLVM compilation of those strings is not claimed.
 
 The first implementation emits textual `.ll` files. LLVM still parses those files, verifies their structure, optimizes them, and emits native code. This choice makes the translation inspectable in a teaching laboratory and avoids linking the compiler frontend to LLVM's C++ libraries. An in-memory LLVM API or bitcode writer could remove the textual IR parsing step later, after the runtime contracts are stable. The current implementation makes no measured compilation-speed or execution-speed claim.
 
@@ -32,9 +32,13 @@ The table names mechanisms exercised by the delivered tests. It is a feature inv
 | Control and exceptions | Branches, loops, phi transfers, nested catch/finally, return and loop control through finally | `control_phi.js`; `exceptions.js` |
 | Dynamic values | Strings, UTF-16 data, coercion, arithmetic and runtime error classes | `strings.js`; `coercion.js`; error fixtures |
 | Collection | Escaping closures retain live state after allocation churn and explicit collection | `gc_closures.js` |
+| Generators | Next/throw/return, yield-star delegation, suspended finally clauses, iterator cleanup and collection | `generator_*.js`; `shllvm_generator` |
+| Async and Promises | Await, thenables, jobs, rejection, combinators, species, async-generator queues and cleanup | `async_*.js`; `promise_*.js` |
+| Rich values | Exact BigInt literals, RegExp literals, private names/fields/methods, buffers and typed arrays | `features_*.js`; `value_extensions.c` |
+| Dynamic source | Global eval, Function and direct eval from strict callers sharing native environment cells | `eval_*.js`; `function_*.js`; `eval_extensions.cpp` |
 | Device world | Direct LLVM integer code, capability ecalls, bounded RV32 execution, transactional reload | PicoCalc compiler and supervisor tests |
 
-All host fixture names in this table are relative to `hermes/test/LLVMNative/` in the complete release.
+Original host fixtures are in `hermes/test/LLVMNative/`. Extension fixtures are in `hermes/test/LLVMNativeExtensions/`. The direct-eval boundaries and precise test contracts are described in Chapters 3 and 7.
 
 ## 1.4 A complete worked program
 

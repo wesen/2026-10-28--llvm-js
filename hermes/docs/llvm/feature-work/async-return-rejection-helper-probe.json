@@ -1,0 +1,13 @@
+{
+  "native": [
+    "caught:return rejected",
+    "{\"value\":\"recovered\",\"done\":false}",
+    "finally",
+    "{\"done\":true}"
+  ],
+  "helper": [
+    "finally",
+    "rejected:return rejected",
+    "{\"done\":true}"
+  ]
+}

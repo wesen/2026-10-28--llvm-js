@@ -317,7 +317,10 @@ bool runFrameLoadStoreOpts(Module *M) {
   for (auto &VS : M->getVariableScopes()) {
     for (Variable *V : VS.getVariables()) {
       for (Instruction *I : V->getUsers()) {
-        if (auto *LFI = llvh::dyn_cast<LoadFrameInst>(I)) {
+        if (llvh::isa<DirectEvalInst>(I)) {
+          cv.loads.insert(V);
+          cv.stores.insert(V);
+        } else if (auto *LFI = llvh::dyn_cast<LoadFrameInst>(I)) {
           if (!llvh::isa<CreateScopeInst>(LFI->getScope()))
             cv.loads.insert(V);
         } else {

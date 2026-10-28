@@ -987,6 +987,15 @@ class Variable : public Value {
     assert(!hasIndexInVariableList() && "Index can only be set once");
     index_ = index;
   }
+  /// Map a retained, non-executed source scope onto an existing native
+  /// Environment for local eval. This is not a normal layout operation: the
+  /// synthetic parent bytecode must never execute after its indexes change.
+  /// Its already-generated code is only a carrier for compiler metadata.
+  void setNativeEvalEnvironmentIndex(uint32_t index) {
+    assert(hasIndexInVariableList() && "Native eval maps a finalized scope");
+    assert(index != kUnresolvedIndex && "Invalid native environment index");
+    index_ = index;
+  }
   /// \return whether the index of the variable has been set.
   bool hasIndexInVariableList() const {
     return index_ != kUnresolvedIndex;

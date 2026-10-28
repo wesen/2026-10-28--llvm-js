@@ -1,0 +1,86 @@
+[
+  {
+    "name": "async_basic.js",
+    "exit_code": 0,
+    "stdout": "values 7 18\nthenable 20\nprimitive null undefined false\norder before|caller|after\ndone: async_basic\n",
+    "stderr": ""
+  },
+  {
+    "name": "async_closures.js",
+    "exit_code": 0,
+    "stdout": "captures 41 43 43 105 43\nlexical receiver:19\nmethod 22\ndone: async_closures\n",
+    "stderr": ""
+  },
+  {
+    "name": "async_exceptions.js",
+    "exit_code": 0,
+    "stdout": "caught rejected\nrecovered 5\nreturn 9\nRangeError final\nTypeError await getter\ngetter 23\ndone: async_exceptions\n",
+    "stderr": ""
+  },
+  {
+    "name": "async_gc.js",
+    "exit_code": 0,
+    "stdout": "retained [[30,33],[60,63]]\ndone: async_gc\n",
+    "stderr": ""
+  },
+  {
+    "name": "async_generator_finally.js",
+    "exit_code": 0,
+    "stdout": "normal {\"value\":\"closed\",\"done\":true}\ncleanup-events start|awaited|end\nnext {\"done\":true}\nreturn {\"value\":\"override\",\"done\":true}\ncleanup-events start|awaited|end\nnext {\"done\":true}\nthrow RangeError finally\ncleanup-events start|awaited|end\nnext {\"done\":true}\nyield {\"value\":\"cleanup\",\"done\":false}\ncleanup-events start|awaited|end\nnext {\"value\":\"closed\",\"done\":true}\nrejecting TypeError cleanup rejected\nrejecting-done {\"done\":true}\nthrown Error injected\nthrow-events start|awaited|end\nbody 1\nclose-precedence Error body wins\ndone: async_generator_finally\n",
+    "stderr": ""
+  },
+  {
+    "name": "async_generator_queue.js",
+    "exit_code": 0,
+    "stdout": "queued [{\"value\":\"first\",\"done\":false},{\"value\":\"received:sent\",\"done\":false},{\"value\":\"caught:problem\",\"done\":false}]\nfinalized\nreturn {\"value\":\"closed\",\"done\":true}\ndone {\"done\":true}\ndone: async_generator_queue\n",
+    "stderr": ""
+  },
+  {
+    "name": "async_generators.js",
+    "exit_code": 0,
+    "stdout": "for-await 1,2,3,4\nbreak 5\nclosed true\ndone: async_generators\n",
+    "stderr": ""
+  },
+  {
+    "name": "promise_combinators.js",
+    "exit_code": 0,
+    "stdout": "all 1,2,3\nsettled [{\"status\":\"fulfilled\",\"value\":4},{\"status\":\"rejected\",\"reason\":\"bad\"},{\"status\":\"fulfilled\",\"value\":5}]\nrace first\nany yes\nany-error AggregateError a,b\nempty-all 0\nempty-settled 0\ndone: promise_combinators\n",
+    "stderr": ""
+  },
+  {
+    "name": "promise_order.js",
+    "exit_code": 0,
+    "stdout": "sync|tick|outer|all:3|inner\nthen-get 1 7\ndone: promise_order\n",
+    "stderr": ""
+  },
+  {
+    "name": "promise_resolution.js",
+    "exit_code": 0,
+    "stdout": "once 1 11\nRangeError executor\nfinally-value\npreserved 12\nfinally-reason\npreserved-reason reason\nTypeError replacement\nSyntaxError then getter\ncycle TypeError\ndone: promise_resolution\n",
+    "stderr": ""
+  },
+  {
+    "name": "promise_species.js",
+    "exit_code": 0,
+    "stdout": "selection true false 1\nselection-value 4\nlookups 1 1\nlookups-value 6\nnull-species true 7\nundefined-constructor 8\nundefined-species 9\nconstructor-error TypeError\nconstructor-error TypeError\nconstructor-error TypeError\nspecies-error TypeError\nspecies-error TypeError\nspecies-error TypeError\ngeneric-validation TypeError 0\nconstructor-no-get generic-result 0\nfinally-constructor true\nfinally-ran\nfinally-value 12\ndone: promise_species\n",
+    "stderr": ""
+  },
+  {
+    "name": "promise_subclass.js",
+    "exit_code": 0,
+    "stdout": "identity true false true\nderived 13\nderived-all 14,15\nspecies true false\nspecies-value 17\ndone: promise_subclass\n",
+    "stderr": ""
+  },
+  {
+    "name": "promise_subclass_order.js",
+    "exit_code": 0,
+    "stdout": "derived:1|core:1|derived:2|core:2\ndone: promise_subclass_order\n",
+    "stderr": ""
+  },
+  {
+    "name": "promise_thenable_jobs.js",
+    "exit_code": 0,
+    "stdout": "thenable-order get|sync|then|tick|resolved:4\nadoption-order tick-1|tick-2|adopted\nfresh 0 true true true\nfresh 1 true true true\nfresh 2 true true true\nfresh 3 true true true\nfresh 4 true true true\nfresh 5 true true true\nfresh 6 true true true\ndone: promise_thenable_jobs\n",
+    "stderr": ""
+  }
+]

@@ -58,9 +58,14 @@ bool tryPromoteConstVariable(Variable *var) {
 /// \return true if the variable was promoted.
 bool tryCopyToStack(Module *M, Variable *var) {
   bool hasIndirectStore = false;
-  for (auto *U : var->getUsers())
+  for (auto *U : var->getUsers()) {
+    // An evaluated string can write this shared environment after the native
+    // function has cached its initial value on the stack.
+    if (llvh::isa<DirectEvalInst>(U))
+      return false;
     if (auto *SFI = llvh::dyn_cast<StoreFrameInst>(U))
       hasIndirectStore |= !llvh::isa<CreateScopeInst>(SFI->getScope());
+  }
 
   // If the variable is stored to by resolving from an inner scope, we cannot
   // attempt to create a copy of it on the stack. Note that this applies even if

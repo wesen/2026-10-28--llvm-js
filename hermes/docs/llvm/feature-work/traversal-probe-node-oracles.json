@@ -1,0 +1,26 @@
+[
+  {
+    "name": "nested_await",
+    "node": {
+      "exit_code": 0,
+      "stdout": "{\"value\":1,\"done\":true}\ndone: nested_await\n",
+      "stderr": ""
+    }
+  },
+  {
+    "name": "generator_in_await",
+    "node": {
+      "exit_code": 0,
+      "stdout": "{\"value\":2,\"done\":false}\ndone: generator_in_await\n",
+      "stderr": ""
+    }
+  },
+  {
+    "name": "generator_in_yield",
+    "node": {
+      "exit_code": 0,
+      "stdout": "{\"value\":3,\"done\":true}\ndone: generator_in_yield\n",
+      "stderr": ""
+    }
+  }
+]

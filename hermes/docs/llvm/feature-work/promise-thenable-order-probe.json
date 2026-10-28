@@ -1,0 +1,35 @@
+[
+  {
+    "command": [
+      "node",
+      "-e",
+      "globalThis.print=(...a)=>console.log(...a);require(\"vm\").runInThisContext(require(\"fs\").readFileSync(process.argv[1],\"utf8\"));",
+      "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/docs/llvm/feature-work/promise-thenable-order-probe.js"
+    ],
+    "exit_code": 0,
+    "stdout": "sync|then|tick|resolved:4\nfresh true\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/bin/shermes",
+      "-O0",
+      "-Xes6-block-scoping",
+      "-Xenable-tdz",
+      "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/docs/llvm/feature-work/promise-thenable-order-probe.js",
+      "-o",
+      "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/promise-thenable-order-c-probe"
+    ],
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/promise-thenable-order-c-probe"
+    ],
+    "exit_code": 0,
+    "stdout": "then|sync|resolved:4|tick\nfresh false\n",
+    "stderr": ""
+  }
+]
