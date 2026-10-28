@@ -53,6 +53,12 @@ class ClassificationTests(unittest.TestCase):
 
 
 class PreparationTests(unittest.TestCase):
+    def test_empty_metadata_lists_do_not_create_empty_includes(self):
+        meta = metadata('/*---\nflags: []\nfeatures: [ ]\nincludes: []\n---*/', 'empty.js')
+        for field in ('flags', 'features', 'includes'):
+            self.assertEqual(meta[field], [])
+        self.assertEqual(variants(meta), ['sloppy', 'strict'])
+
     def test_variants_and_missing_metadata(self):
         self.assertEqual(variants({}), ['sloppy','strict'])
         self.assertEqual(variants({'flags':['onlyStrict']}), ['strict'])

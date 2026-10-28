@@ -120,7 +120,7 @@ def myReadOneLine(value):
 
 def myFlowList(value):
     result = mYamlListPattern.match(value)
-    values = result.group(1).split(",") if result else []
+    values = result.group(1).split(",") if result and result.group(1).strip() else []
     return [myReadOneLine(v.strip()) for v in values]
 
 

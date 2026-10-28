@@ -138,3 +138,84 @@ Read `docs/llvm/TEST262.md`, the Python runner/classifier, and the opt-in runtim
 
 ### Technical details
 Pinned suite: `0b4e0812022b18236b5276d2804948fdd9f71603`. Baseline: 353 variants, 348 pass, 4 semantic_failure, 1 unsupported. The native probe evidence has a separate schema and does not inflate these totals.
+
+## Step 3: Represent sloppy arguments reassignment as a mutable environment binding
+
+The runner milestone was committed as `82b943c` — “Add pinned direct LLVM Test262 runner and native error classification.” The first source correction targets the measured Function-constructor failure. The frontend explicitly prohibited assignment to the implicit arguments binding; simply removing that diagnostic would leave IRGen returning the original arguments object on subsequent reads.
+
+### Prompt Context
+See Step 1. This step implements a measured language gap and retains the strict-mode error contract.
+
+### What I did
+- Added `FunctionInfo::argumentsMayBeAssigned` and preserved it in semantic metadata cloning.
+- Marked the owning function when a sloppy assignment targets its implicit arguments declaration, including nested arrow writes.
+- Made capture-state initialization allocate mutable, Any-typed arguments storage for those functions and bind declaration data to it.
+- Added `arguments_reassignment.js` covering assignment, compound/update/destructuring writes, arrows, escaping closures with GC, default parameters, generators, dynamic Function bodies, parameter shadowing, and strict rejection.
+- Started the compiler/runtime rebuild before executing the new fixture.
+
+### Why
+The binding must be distinct from the arguments object. Reassigning it must preserve old references to the object while subsequent reads observe the replacement. A semantic assignment bit avoids forcing every ordinary arguments read into eagerly mutable storage.
+
+### What worked
+Source tracing identified the existing captured-arguments path as the correct shared-cell mechanism. Its declaration mapping already supports loads and stores, and cloning explicitly carries the new metadata. Validation results follow in the next checkpoint.
+
+### What didn't work
+No new execution result is claimed yet; the rebuild and regression runs are pending.
+
+### What I learned
+The previous captured-arguments slot had Object type. A mutable binding can hold numbers, strings, or any other value, so retaining that type would permit incorrect optimizer assumptions.
+
+### What was tricky to build
+An arrow's assignment must mark the declaration's owning function, not the arrow's own FunctionInfo. Semantic metadata also survives cloned ASTs used by other lowering paths. Default parameter evaluation must see initialized arguments storage before evaluating its expression.
+
+### What warrants a second pair of eyes
+Review ownership marking, metadata cloning, and generator/async prologue behavior. Broader var-arguments aliasing and mapped argument/parameter semantics remain distinct concerns.
+
+### What should be done in the future
+Run the new fixture through all frontend/LLVM combinations and real lli; rerun the pinned baseline and affected shared compiler regression gates.
+
+### Code review instructions
+Read the new FunctionInfo field, the sloppy branch of semantic assignment validation, and `initCaptureStateInES5FunctionHelper` together. Then read the new fixture before interpreting the test receipts.
+
+### Technical details
+The new field is set only for an implicit Arguments-special declaration and a non-strict assignment. Strict-mode eval/arguments assignments remain rejected before this branch. Existing ordinary shadowing declarations continue to use their own binding path.
+
+## Step 4: Correct empty metadata lists and inventory the full pinned suite
+
+While the shared semantic-header rebuild ran, I inventoried the entire pinned suite without executing it. The inventory exposed a concrete parser defect: `flags: []` became `['']`. The same inherited parser handles includes, so an empty include list could attempt to open the harness directory as a file. Correcting the parser itself avoids a runner-specific workaround.
+
+### Prompt Context
+See Step 1. This is a separately reviewable conformance-tooling checkpoint; the arguments implementation remains under validation.
+
+### What I did
+- Fixed `myFlowList` in `_monkeyYaml.py` to produce an empty list for empty or whitespace-only flow-list contents.
+- Added an adversarial metadata regression; the Python runner checks now pass 12/12.
+- Added ticket script `02-inventory-test262.py` and retained the resulting inventory summary.
+- Downloaded the edition-specific single-page specification and recorded its digest in the suite lock: SHA-256 `0119d5a26afb504f4a7aba84d9d8288912044cc459c0552ea5f22f911cb87f40`, 7,530,216 bytes, retrieved 2026-10-28. The downloaded HTML is in `/tmp/llvm-ecma262-2026.html`; the durable lock records URL and digest, not a vendored copy.
+
+### Why
+Metadata defines the test contract. An empty list must not create an empty feature or a nonexistent include. Pinning the specification bytes also makes changes to the edition URL detectable.
+
+### What worked
+The corrected inventory has 53,615 test files, 102,992 variants, 294 fixture files, and no metadata errors. The previous 268 empty flag entries disappeared. The suite includes 843 module-tagged files and 5,624 async-tagged files; these are inventory counts, not executed passes.
+
+### What didn't work
+The original inventory silently included an empty-string flag 268 times. Source inspection traced this to splitting an empty string on commas. The regression now exercises flags, features, and includes together.
+
+### What I learned
+Reusing the upstream-derived parser does not eliminate the need to validate its edge cases against the pinned suite. The inventory supplies scope, not implementation status.
+
+### What was tricky to build
+The inventory must keep fixture files separate and distinguish source-file counts from expanded variants. Its output explicitly states inventory_only.
+
+### What warrants a second pair of eyes
+Review the spec snapshot's identity and the remaining need to partition proposals and edition-required tests. The URL plus digest is a pin; long-term offline retention remains an artifact-storage choice.
+
+### What should be done in the future
+Use the complete inventory to plan execution shards and classify host/profile exclusions without hiding required language gaps.
+
+### Code review instructions
+Run `python3 hermes/utils/test_shllvm_test262_runner.py` and the ticket inventory script with the pinned suite. The latter performs no program execution.
+
+### Technical details
+Inventory phases: 48,881 positive files, 4,660 parse-negative files, 40 runtime-negative files, and 34 resolution-negative files. Full inventory output remains `/tmp/llvm-test262-inventory.json`; the committed summary retains its hash and complete feature frequencies.
