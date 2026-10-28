@@ -1,0 +1,15 @@
+{
+  "scope": "host-only end-to-end compile source->node AST->clang->lld->ELF sanity (not device CPU)",
+  "samples_ms": [
+    223.75,
+    237.48,
+    218.37,
+    213.12,
+    212.0,
+    210.22,
+    221.66
+  ],
+  "median_ms": 218.37,
+  "artifact_bytes": 4996,
+  "architecture": "riscv32-unknown-elf rv32im"
+}

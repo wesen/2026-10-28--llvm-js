@@ -1,0 +1,185 @@
+# LLVM-generated RISC-V disassembly (selected modules)
+### counter_v1
+
+artifacts/counter_v1.elf:	file format elf32-littleriscv
+
+Disassembly of section .text:
+
+00100000 <pico_world_step>:
+  100000: 00200693     	li	a3, 0x2
+  100004: 02d58c63     	beq	a1, a3, 0x10003c <pico_world_step+0x3c>
+  100008: 00100693     	li	a3, 0x1
+  10000c: 04d59463     	bne	a1, a3, 0x100054 <pico_world_step+0x54>
+  100010: 00452583     	lw	a1, 0x4(a0)
+  100014: 00852683     	lw	a3, 0x8(a0)
+  100018: 00c58633     	add	a2, a1, a2
+  10001c: 00c52223     	sw	a2, 0x4(a0)
+  100020: 00168693     	addi	a3, a3, 0x1
+  100024: 00d52423     	sw	a3, 0x8(a0)
+  100028: 00100893     	li	a7, 0x1
+  10002c: 00060513     	mv	a0, a2
+  100030: 00000073     	ecall
+  100034: 00000513     	li	a0, 0x0
+  100038: 00008067     	ret
+  10003c: 00452583     	lw	a1, 0x4(a0)
+  100040: 00159593     	slli	a1, a1, 0x1
+  100044: 00b52223     	sw	a1, 0x4(a0)
+  100048: 00100893     	li	a7, 0x1
+  10004c: 00058513     	mv	a0, a1
+  100050: 00000073     	ecall
+  100054: 00000513     	li	a0, 0x0
+  100058: 00008067     	ret
+
+0010005c <pico_world_migrate>:
+  10005c: 00100593     	li	a1, 0x1
+  100060: 00b52023     	sw	a1, 0x0(a0)
+  100064: 00000513     	li	a0, 0x0
+  100068: 00008067     	ret
+### counter_v2
+
+artifacts/counter_v2.elf:	file format elf32-littleriscv
+
+Disassembly of section .text:
+
+00200000 <pico_world_step>:
+  200000: 00200693     	li	a3, 0x2
+  200004: 04d58063     	beq	a1, a3, 0x200044 <pico_world_step+0x44>
+  200008: 00100693     	li	a3, 0x1
+  20000c: 04d59a63     	bne	a1, a3, 0x200060 <pico_world_step+0x60>
+  200010: 00452583     	lw	a1, 0x4(a0)
+  200014: 00a00693     	li	a3, 0xa
+  200018: 00852703     	lw	a4, 0x8(a0)
+  20001c: 02d60633     	mul	a2, a2, a3
+  200020: 00c585b3     	add	a1, a1, a2
+  200024: 00b52223     	sw	a1, 0x4(a0)
+  200028: 00170713     	addi	a4, a4, 0x1
+  20002c: 00e52423     	sw	a4, 0x8(a0)
+  200030: 00100893     	li	a7, 0x1
+  200034: 00058513     	mv	a0, a1
+  200038: 00000073     	ecall
+  20003c: 00000513     	li	a0, 0x0
+  200040: 00008067     	ret
+  200044: 00452583     	lw	a1, 0x4(a0)
+  200048: 00159613     	slli	a2, a1, 0x1
+  20004c: 00b605b3     	add	a1, a2, a1
+  200050: 00b52223     	sw	a1, 0x4(a0)
+  200054: 00100893     	li	a7, 0x1
+  200058: 00058513     	mv	a0, a1
+  20005c: 00000073     	ecall
+  200060: 00000513     	li	a0, 0x0
+  200064: 00008067     	ret
+
+00200068 <pico_world_migrate>:
+  200068: 00100613     	li	a2, 0x1
+  20006c: 00c59a63     	bne	a1, a2, 0x200080 <pico_world_migrate+0x18>
+  200070: 02a00593     	li	a1, 0x2a
+  200074: 00b52623     	sw	a1, 0xc(a0)
+  200078: 00200593     	li	a1, 0x2
+  20007c: 00b52023     	sw	a1, 0x0(a0)
+  200080: 00000513     	li	a0, 0x0
+  200084: 00008067     	ret
+### native_counter
+
+artifacts/native_counter.elf:	file format elf32-littleriscv
+
+Disassembly of section .text:
+
+00100000 <pico_world_step>:
+  100000: 00100693     	li	a3, 0x1
+  100004: 04d59663     	bne	a1, a3, 0x100050 <pico_world_step+0x50>
+  100008: ff010113     	addi	sp, sp, -0x10
+  10000c: 00112623     	sw	ra, 0xc(sp)
+  100010: 00812423     	sw	s0, 0x8(sp)
+  100014: 00050413     	mv	s0, a0
+  100018: 00060513     	mv	a0, a2
+  10001c: 00000097     	auipc	ra, 0x0
+  100020: 03c080e7     	jalr	0x3c(ra) <multiply_three>
+  100024: 00442583     	lw	a1, 0x4(s0)
+  100028: 00842603     	lw	a2, 0x8(s0)
+  10002c: 00a58533     	add	a0, a1, a0
+  100030: 00a42223     	sw	a0, 0x4(s0)
+  100034: 00160613     	addi	a2, a2, 0x1
+  100038: 00c42423     	sw	a2, 0x8(s0)
+  10003c: 00100893     	li	a7, 0x1
+  100040: 00000073     	ecall
+  100044: 00c12083     	lw	ra, 0xc(sp)
+  100048: 00812403     	lw	s0, 0x8(sp)
+  10004c: 01010113     	addi	sp, sp, 0x10
+  100050: 00000513     	li	a0, 0x0
+  100054: 00008067     	ret
+
+00100058 <multiply_three>:
+  100058: 00151593     	slli	a1, a0, 0x1
+  10005c: 00a58533     	add	a0, a1, a0
+  100060: 00008067     	ret
+
+00100064 <pico_world_migrate>:
+  100064: 00100593     	li	a1, 0x1
+  100068: 00b52023     	sw	a1, 0x0(a0)
+  10006c: 00000513     	li	a0, 0x0
+  100070: 00008067     	ret
+### display_v1
+
+artifacts/display_v1.elf:	file format elf32-littleriscv
+
+Disassembly of section .text:
+
+00100000 <pico_world_step>:
+  100000: 00300613     	li	a2, 0x3
+  100004: 08c58e63     	beq	a1, a2, 0x1000a0 <pico_world_step+0xa0>
+  100008: 00100613     	li	a2, 0x1
+  10000c: 0ac59e63     	bne	a1, a2, 0x1000c8 <pico_world_step+0xc8>
+  100010: 00010737     	lui	a4, 0x10
+  100014: fff70713     	addi	a4, a4, -0x1
+  100018: 14000613     	li	a2, 0x140
+  10001c: 14000693     	li	a3, 0x140
+  100020: 00300893     	li	a7, 0x3
+  100024: 00000593     	li	a1, 0x0
+  100028: 00050793     	mv	a5, a0
+  10002c: 00000513     	li	a0, 0x0
+  100030: 00000073     	ecall
+  100034: 01f00713     	li	a4, 0x1f
+  100038: 00b71713     	slli	a4, a4, 0xb
+  10003c: 14000613     	li	a2, 0x140
+  100040: 01600693     	li	a3, 0x16
+  100044: 00300893     	li	a7, 0x3
+  100048: 00000593     	li	a1, 0x0
+  10004c: 00000513     	li	a0, 0x0
+  100050: 00000073     	ecall
+  100054: 02800593     	li	a1, 0x28
+  100058: 0b400613     	li	a2, 0xb4
+  10005c: 00e00693     	li	a3, 0xe
+  100060: 01f00713     	li	a4, 0x1f
+  100064: 00300893     	li	a7, 0x3
+  100068: 00800513     	li	a0, 0x8
+  10006c: 00000073     	ecall
+  100070: 04100593     	li	a1, 0x41
+  100074: 01000613     	li	a2, 0x10
+  100078: 01000693     	li	a3, 0x10
+  10007c: 7e000713     	li	a4, 0x7e0
+  100080: 00300893     	li	a7, 0x3
+  100084: 00800513     	li	a0, 0x8
+  100088: 00000073     	ecall
+  10008c: 0087a503     	lw	a0, 0x8(a5)
+  100090: 00150513     	addi	a0, a0, 0x1
+  100094: 00a7a423     	sw	a0, 0x8(a5)
+  100098: 00000513     	li	a0, 0x0
+  10009c: 00008067     	ret
+  1000a0: 14000613     	li	a2, 0x140
+  1000a4: 14000693     	li	a3, 0x140
+  1000a8: 00300893     	li	a7, 0x3
+  1000ac: 00000593     	li	a1, 0x0
+  1000b0: 00000713     	li	a4, 0x0
+  1000b4: 00000513     	li	a0, 0x0
+  1000b8: 00000073     	ecall
+  1000bc: 00200893     	li	a7, 0x2
+  1000c0: 06300513     	li	a0, 0x63
+  1000c4: 00000073     	ecall
+  1000c8: 00000513     	li	a0, 0x0
+  1000cc: 00008067     	ret
+
+001000d0 <pico_world_migrate>:
+  1000d0: 00100593     	li	a1, 0x1
+  1000d4: 00b52023     	sw	a1, 0x0(a0)
+  1000d8: 00000513     	li	a0, 0x0
+  1000dc: 00008067     	ret

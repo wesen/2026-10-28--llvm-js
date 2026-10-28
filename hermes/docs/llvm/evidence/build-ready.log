@@ -1,0 +1,17 @@
+[1/17] Building C object lib/BCGen/SH/CMakeFiles/shllvm_runtime_obj.dir/LLVMNative/runtime.c.o
+[2/17] Linking CXX executable bin/hermesc
+[3/17] Generating ExtensionsBytecode.hbc
+[4/17] Generating ExtensionsBytecode.inc
+[5/17] Generating InternalBytecode.hbc
+[6/17] Building CXX object API/hermes/CMakeFiles/hermesapi_obj.dir/extensions/ExtensionsBytecode.cpp.o
+[7/17] Generating InternalBytecode.inc
+[8/17] Linking CXX static library API/hermes/libhermesapi.a
+[9/17] Building CXX object tools/shermes/CMakeFiles/shermes.dir/compile.cpp.o
+[10/17] Linking C static library lib/libshllvm_runtime.a
+[11/17] Building CXX object lib/InternalJavaScript/CMakeFiles/hermesInternalBytecode_obj.dir/InternalBytecode.cpp.o
+[12/17] Linking CXX static library lib/libhermesvm_a.a
+[13/17] Linking CXX shared library lib/libhermesvm.so
+[14/17] Linking CXX shared library tools/shermes/libshermes_console.so
+[15/17] Linking C shared library lib/libshllvm_runtime.so
+[16/17] Building CXX object tools/shermes/CMakeFiles/shermes.dir/shermes.cpp.o
+[17/17] Linking CXX executable bin/shermes

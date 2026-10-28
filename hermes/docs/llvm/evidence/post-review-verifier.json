@@ -1,0 +1,3913 @@
+{
+  "captured_utc": "2026-10-28T13:50:25.079083+00:00",
+  "scope": "Post-review lowered-Hermes-IR verifier guard only. Positive fixture emission equality and LLVM verification, plus one counter native run and one lli JIT run. No repeat of the broad native differential matrix.",
+  "flag": "-verify-ir=true / -verify-ir=false",
+  "build": {
+    "command": [
+      "/tmp/llvm-direct-toolchain/bin/cmake",
+      "--build",
+      "build-llvm",
+      "--target",
+      "shermes",
+      "--parallel",
+      "3"
+    ],
+    "exit_code": 0,
+    "log": "docs/llvm/evidence/post-review-build.log"
+  },
+  "build_qualification": "Release ASan build. Upstream verifyModule executes full Hermes checks only with HERMES_SLOW_DEBUG, which CMake enables only in Debug configuration. This run checks flag plumbing and LLVM output invariance; actual LLVM assembly and verification do execute. It does not exercise malformed-Hermes-IR rejection in a Debug build.",
+  "asan_options": "detect_leaks=0",
+  "historical_evidence_preserved": true,
+  "historical_evidence_identity": [
+    {
+      "path": "docs/llvm/evidence/validated-files.json",
+      "bytes": 5830,
+      "sha256": "250267d486edf49c04fe1e789fa5dea51516ca893fa019591a933c1f745e7915"
+    },
+    {
+      "path": "docs/llvm/evidence/validation.json",
+      "bytes": 152749,
+      "sha256": "d5264f84e52dc213cd9a07d39e62dd067b9786ba5be9b412cbf5c8d928f8f87d"
+    }
+  ],
+  "source_edit_is_exactly_include_and_lowered_verifier_guard": true,
+  "changed_validated_files": [
+    {
+      "path": "build-llvm/bin/shermes",
+      "before": {
+        "path": "build-llvm/bin/shermes",
+        "bytes": 10854968,
+        "sha256": "0c0541c75d1d9826df860e7277577b8ec01838ebafd1dde5763605d30cbed347"
+      },
+      "after": {
+        "path": "build-llvm/bin/shermes",
+        "bytes": 10855056,
+        "sha256": "29c967d6ec9212051d0e38d5d952d8e10e7175d2d2977a42a250a6dbfdcfb7f8"
+      }
+    },
+    {
+      "path": "lib/BCGen/SH/LLVMNative/LLVMBackend.cpp",
+      "before": {
+        "path": "lib/BCGen/SH/LLVMNative/LLVMBackend.cpp",
+        "bytes": 42119,
+        "sha256": "0209190e48cadde302d3237615f6972e5a3c65a3c1d86a7f454cd5b49d816c15"
+      },
+      "after": {
+        "path": "lib/BCGen/SH/LLVMNative/LLVMBackend.cpp",
+        "bytes": 42406,
+        "sha256": "04569fe6e459ef02a43eddf0e4883748151581955857d9143e03c5ea405b8126"
+      }
+    }
+  ],
+  "files_after_change": [
+    {
+      "path": "build-llvm/bin/shermes",
+      "bytes": 10855056,
+      "sha256": "29c967d6ec9212051d0e38d5d952d8e10e7175d2d2977a42a250a6dbfdcfb7f8"
+    },
+    {
+      "path": "build-llvm/lib/libhermesvm.so",
+      "bytes": 15279944,
+      "sha256": "227fbd757a1b86974c78a46418e9be5d78a51860b2a1c6c83c0d64add30b2763"
+    },
+    {
+      "path": "build-llvm/lib/libshllvm_runtime.a",
+      "bytes": 59216,
+      "sha256": "b65ecc0f2f667f673a6f569ae9a090acb8891233fdfe344bd57c213c43ee82e3"
+    },
+    {
+      "path": "build-llvm/lib/libshllvm_runtime.so",
+      "bytes": 79944,
+      "sha256": "b6fecc3f3f0c2f131fa2de6e300a092d9e658f58ef76319cacb479707f67d7e1"
+    },
+    {
+      "path": "build-llvm/tools/shermes/libshermes_console.so",
+      "bytes": 161864,
+      "sha256": "d20899a17c05691e43deefbac4b795a41e5adbccc3bd97b2e34197c1268c5e46"
+    },
+    {
+      "path": "lib/BCGen/SH/LLVMNative/LLVMBackend.cpp",
+      "bytes": 42406,
+      "sha256": "04569fe6e459ef02a43eddf0e4883748151581955857d9143e03c5ea405b8126"
+    },
+    {
+      "path": "lib/BCGen/SH/LLVMNative/runtime.c",
+      "bytes": 19703,
+      "sha256": "0eb8ddecad472265a09990a19c57a2debdcc046affa9a7d89dadc3ec5b0fce80"
+    },
+    {
+      "path": "lib/BCGen/SH/LLVMNative/runtime.h",
+      "bytes": 6556,
+      "sha256": "f0d71c2c51dd2f7d449ed7b127264a1850ae170530e86dab23ed74d00842c864"
+    },
+    {
+      "path": "include/hermes/BCGen/SH/LLVM.h",
+      "bytes": 515,
+      "sha256": "20226b8859272821b6d4284ad1b9b953cf308ee753523670ab3edd72ca280199"
+    },
+    {
+      "path": "tools/shermes/shermes.cpp",
+      "bytes": 36402,
+      "sha256": "66d4fb5836fe4fcf5e5088afb0e61ece1cf75c6783166775c784ca9c32ceebfb"
+    },
+    {
+      "path": "tools/shermes/compile.cpp",
+      "bytes": 17747,
+      "sha256": "46c87d7417317cdfdd99e143bcbab0f488fdaf2f0b26cdd40c24cef543beb4a7"
+    },
+    {
+      "path": "lib/BCGen/SH/SH.cpp",
+      "bytes": 113312,
+      "sha256": "930b34a91172b876a1b96a3951eb5e44579123fbc800fa1bd8f21abab61cc4ec"
+    },
+    {
+      "path": "test/LLVMNative/unsupported_const_assignment.js",
+      "bytes": 65,
+      "sha256": "ec85bb2ad8a58c470d548e20649507b4304c6428749362c4299c2d939e6f8639"
+    },
+    {
+      "path": "test/LLVMNative/accessors.js",
+      "bytes": 319,
+      "sha256": "c9def10323c3c8bd57bc05e7d4394d33bc90313a2b2206caf5a13a18006ebee4"
+    },
+    {
+      "path": "test/LLVMNative/arrays_callbacks.js",
+      "bytes": 404,
+      "sha256": "edd6f726dd865490f8f6d50f28ca391c7da1ee59ba89c96c647144a1cecb3861"
+    },
+    {
+      "path": "test/LLVMNative/exceptions.js",
+      "bytes": 629,
+      "sha256": "86ef5d86a2e5c3e8dc01d769271dfaae72ce6650469076b1b6e15dc60d6b12a0"
+    },
+    {
+      "path": "test/LLVMNative/arrows_this.js",
+      "bytes": 298,
+      "sha256": "4b300e3b4092ed7f29a338849b037ac8391a50459c08050920dca0ded1cf6a72"
+    },
+    {
+      "path": "test/LLVMNative/coercion.js",
+      "bytes": 356,
+      "sha256": "920a30759cff382450bf40c2264aed91f31fb76c9ab71139806ab3542f153bc3"
+    },
+    {
+      "path": "test/LLVMNative/strings.js",
+      "bytes": 254,
+      "sha256": "585c59480c253588eb55326e2c1d3d318a96284a8e81a392a522ee2b79c481f1"
+    },
+    {
+      "path": "test/LLVMNative/classes.js",
+      "bytes": 512,
+      "sha256": "7a20389b833dbad5fa7dc9590236a201da92be56b279c9d80e57a110ec441b03"
+    },
+    {
+      "path": "test/LLVMNative/functions.js",
+      "bytes": 382,
+      "sha256": "5344c3e6cb57e25eaa167944eef6059573c185bd35e5a4b9493053312a0da97f"
+    },
+    {
+      "path": "test/LLVMNative/control_phi.js",
+      "bytes": 429,
+      "sha256": "853085848d87f76f749b664142fb4d89b7ed775f5b54bc70acf92de9e8125e29"
+    },
+    {
+      "path": "test/LLVMNative/constructors.js",
+      "bytes": 480,
+      "sha256": "6577b9221628cce1cbd6e6a907c6027bc50d946edb64967c363006767d735598"
+    },
+    {
+      "path": "test/LLVMNative/error_noncallable.js",
+      "bytes": 37,
+      "sha256": "13d20dd20bd6af487802aad077b1f949d707ec7e44f1b9bf1747b4a8e62eaf6f"
+    },
+    {
+      "path": "test/LLVMNative/arguments.js",
+      "bytes": 330,
+      "sha256": "399fbad80233c6d5ca6144cdee6251d42032f9dcc50cf7e3127d5701f3cce556"
+    },
+    {
+      "path": "test/LLVMNative/gc_closures.js",
+      "bytes": 436,
+      "sha256": "e2cc29627ab8b921aff3e70f1d8ef95d7314f9be040c56bfa87769b68b732dfd"
+    },
+    {
+      "path": "test/LLVMNative/unsupported_generator.js",
+      "bytes": 75,
+      "sha256": "11fca38f67c2fa38050b0a177c28e391ff87408b1466df1bed5790cc3f09f72b"
+    },
+    {
+      "path": "test/LLVMNative/closures.js",
+      "bytes": 442,
+      "sha256": "3126dfc6d63f9e39d70316b9d99ae46b730ac4cb3526a69d82df3022c81cc7c7"
+    },
+    {
+      "path": "test/LLVMNative/lexical_tdz.js",
+      "bytes": 267,
+      "sha256": "17649e0fd19e538d264e5b7f28b8b10a602a12f704e52a5d30a5b379a3b37efd"
+    },
+    {
+      "path": "test/LLVMNative/objects.js",
+      "bytes": 385,
+      "sha256": "b5921cd8bcc10666245ca233b553f44fb50bae0130848090b48aec0172b22301"
+    },
+    {
+      "path": "test/LLVMNative/error_arrow_constructor.js",
+      "bytes": 28,
+      "sha256": "5171a16af00699428192c27464090baa49ff95e3d74365f44f6054fca0a3f33c"
+    },
+    {
+      "path": "test/LLVMNative/unsupported_eval.js",
+      "bytes": 43,
+      "sha256": "fb6711e26c13e8a2534f41e9c7606b05cfc96c2eb7be9b14eebb740fd7f08f4e"
+    },
+    {
+      "path": "test/LLVMNative/catch_basic.js",
+      "bytes": 41,
+      "sha256": "feafe1e7368a0fc6b3eeffa67c78c771766d91a4d817438e69f770d0dfd547dd"
+    },
+    {
+      "path": "test/LLVMNative/error_missing_global.js",
+      "bytes": 33,
+      "sha256": "d9e5148c22206aa07500f6da20baad64534b43b27537a2106a82b8ed03c2b8b3"
+    }
+  ],
+  "emit_pairs": [
+    {
+      "fixture": "test/LLVMNative/accessors.js",
+      "source": {
+        "path": "test/LLVMNative/accessors.js",
+        "bytes": 319,
+        "sha256": "c9def10323c3c8bd57bc05e7d4394d33bc90313a2b2206caf5a13a18006ebee4"
+      },
+      "hermes_optimization": "O0",
+      "variants": [
+        {
+          "verify_ir": false,
+          "commands": [
+            {
+              "command": [
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/bin/shermes",
+                "-O0",
+                "-verify-ir=false",
+                "-emit-llvm",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/accessors.js",
+                "-o",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/accessors-O0-verify-off.ll"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.025523
+            },
+            {
+              "command": [
+                "/tmp/llvm-direct-toolchain/bin/llvm-as",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/accessors-O0-verify-off.ll",
+                "-o",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/accessors-O0-verify-off.bc"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.015796
+            },
+            {
+              "command": [
+                "/tmp/llvm-direct-toolchain/bin/opt",
+                "-passes=verify",
+                "-disable-output",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/accessors-O0-verify-off.bc"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.028833
+            }
+          ],
+          "llvm_ir": {
+            "path": "build-llvm/post-review-verifier/accessors-O0-verify-off.ll",
+            "bytes": 27556,
+            "sha256": "011bd46bf28b18e59d9027a4a8b17399ae539083f27a3c20ba1a6ac8ddfbe80f"
+          },
+          "passed": true
+        },
+        {
+          "verify_ir": true,
+          "commands": [
+            {
+              "command": [
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/bin/shermes",
+                "-O0",
+                "-verify-ir=true",
+                "-emit-llvm",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/accessors.js",
+                "-o",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/accessors-O0-verify-on.ll"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.028766
+            },
+            {
+              "command": [
+                "/tmp/llvm-direct-toolchain/bin/llvm-as",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/accessors-O0-verify-on.ll",
+                "-o",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/accessors-O0-verify-on.bc"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.021976
+            },
+            {
+              "command": [
+                "/tmp/llvm-direct-toolchain/bin/opt",
+                "-passes=verify",
+                "-disable-output",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/accessors-O0-verify-on.bc"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.019817
+            }
+          ],
+          "llvm_ir": {
+            "path": "build-llvm/post-review-verifier/accessors-O0-verify-on.ll",
+            "bytes": 27556,
+            "sha256": "011bd46bf28b18e59d9027a4a8b17399ae539083f27a3c20ba1a6ac8ddfbe80f"
+          },
+          "passed": true
+        }
+      ],
+      "byte_identical": true,
+      "passed": true
+    },
+    {
+      "fixture": "test/LLVMNative/accessors.js",
+      "source": {
+        "path": "test/LLVMNative/accessors.js",
+        "bytes": 319,
+        "sha256": "c9def10323c3c8bd57bc05e7d4394d33bc90313a2b2206caf5a13a18006ebee4"
+      },
+      "hermes_optimization": "O",
+      "variants": [
+        {
+          "verify_ir": false,
+          "commands": [
+            {
+              "command": [
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/bin/shermes",
+                "-O",
+                "-verify-ir=false",
+                "-emit-llvm",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/accessors.js",
+                "-o",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/accessors-O-verify-off.ll"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.014295
+            },
+            {
+              "command": [
+                "/tmp/llvm-direct-toolchain/bin/llvm-as",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/accessors-O-verify-off.ll",
+                "-o",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/accessors-O-verify-off.bc"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.014989
+            },
+            {
+              "command": [
+                "/tmp/llvm-direct-toolchain/bin/opt",
+                "-passes=verify",
+                "-disable-output",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/accessors-O-verify-off.bc"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.025573
+            }
+          ],
+          "llvm_ir": {
+            "path": "build-llvm/post-review-verifier/accessors-O-verify-off.ll",
+            "bytes": 19771,
+            "sha256": "7fdf1abe6396d6b29102f771454c4f78a78bbd08ea1c3e94d8e89a7ed239470e"
+          },
+          "passed": true
+        },
+        {
+          "verify_ir": true,
+          "commands": [
+            {
+              "command": [
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/bin/shermes",
+                "-O",
+                "-verify-ir=true",
+                "-emit-llvm",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/accessors.js",
+                "-o",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/accessors-O-verify-on.ll"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.014814
+            },
+            {
+              "command": [
+                "/tmp/llvm-direct-toolchain/bin/llvm-as",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/accessors-O-verify-on.ll",
+                "-o",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/accessors-O-verify-on.bc"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.01692
+            },
+            {
+              "command": [
+                "/tmp/llvm-direct-toolchain/bin/opt",
+                "-passes=verify",
+                "-disable-output",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/accessors-O-verify-on.bc"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.021748
+            }
+          ],
+          "llvm_ir": {
+            "path": "build-llvm/post-review-verifier/accessors-O-verify-on.ll",
+            "bytes": 19771,
+            "sha256": "7fdf1abe6396d6b29102f771454c4f78a78bbd08ea1c3e94d8e89a7ed239470e"
+          },
+          "passed": true
+        }
+      ],
+      "byte_identical": true,
+      "passed": true
+    },
+    {
+      "fixture": "test/LLVMNative/arguments.js",
+      "source": {
+        "path": "test/LLVMNative/arguments.js",
+        "bytes": 330,
+        "sha256": "399fbad80233c6d5ca6144cdee6251d42032f9dcc50cf7e3127d5701f3cce556"
+      },
+      "hermes_optimization": "O0",
+      "variants": [
+        {
+          "verify_ir": false,
+          "commands": [
+            {
+              "command": [
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/bin/shermes",
+                "-O0",
+                "-verify-ir=false",
+                "-emit-llvm",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/arguments.js",
+                "-o",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/arguments-O0-verify-off.ll"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.015136
+            },
+            {
+              "command": [
+                "/tmp/llvm-direct-toolchain/bin/llvm-as",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/arguments-O0-verify-off.ll",
+                "-o",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/arguments-O0-verify-off.bc"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.014283
+            },
+            {
+              "command": [
+                "/tmp/llvm-direct-toolchain/bin/opt",
+                "-passes=verify",
+                "-disable-output",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/arguments-O0-verify-off.bc"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.023384
+            }
+          ],
+          "llvm_ir": {
+            "path": "build-llvm/post-review-verifier/arguments-O0-verify-off.ll",
+            "bytes": 30792,
+            "sha256": "b5d2e111d066b2cbc6ecfacad366c1eaf0a5362e0667f1cdbacba7603891236f"
+          },
+          "passed": true
+        },
+        {
+          "verify_ir": true,
+          "commands": [
+            {
+              "command": [
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/bin/shermes",
+                "-O0",
+                "-verify-ir=true",
+                "-emit-llvm",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/arguments.js",
+                "-o",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/arguments-O0-verify-on.ll"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.013952
+            },
+            {
+              "command": [
+                "/tmp/llvm-direct-toolchain/bin/llvm-as",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/arguments-O0-verify-on.ll",
+                "-o",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/arguments-O0-verify-on.bc"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.017753
+            },
+            {
+              "command": [
+                "/tmp/llvm-direct-toolchain/bin/opt",
+                "-passes=verify",
+                "-disable-output",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/arguments-O0-verify-on.bc"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.017187
+            }
+          ],
+          "llvm_ir": {
+            "path": "build-llvm/post-review-verifier/arguments-O0-verify-on.ll",
+            "bytes": 30792,
+            "sha256": "b5d2e111d066b2cbc6ecfacad366c1eaf0a5362e0667f1cdbacba7603891236f"
+          },
+          "passed": true
+        }
+      ],
+      "byte_identical": true,
+      "passed": true
+    },
+    {
+      "fixture": "test/LLVMNative/arguments.js",
+      "source": {
+        "path": "test/LLVMNative/arguments.js",
+        "bytes": 330,
+        "sha256": "399fbad80233c6d5ca6144cdee6251d42032f9dcc50cf7e3127d5701f3cce556"
+      },
+      "hermes_optimization": "O",
+      "variants": [
+        {
+          "verify_ir": false,
+          "commands": [
+            {
+              "command": [
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/bin/shermes",
+                "-O",
+                "-verify-ir=false",
+                "-emit-llvm",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/arguments.js",
+                "-o",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/arguments-O-verify-off.ll"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.01502
+            },
+            {
+              "command": [
+                "/tmp/llvm-direct-toolchain/bin/llvm-as",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/arguments-O-verify-off.ll",
+                "-o",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/arguments-O-verify-off.bc"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.018384
+            },
+            {
+              "command": [
+                "/tmp/llvm-direct-toolchain/bin/opt",
+                "-passes=verify",
+                "-disable-output",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/arguments-O-verify-off.bc"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.015901
+            }
+          ],
+          "llvm_ir": {
+            "path": "build-llvm/post-review-verifier/arguments-O-verify-off.ll",
+            "bytes": 23408,
+            "sha256": "eabd9543349e9df8c4ccbea9789bafc236034f3d105b869fbceefbbee09655d6"
+          },
+          "passed": true
+        },
+        {
+          "verify_ir": true,
+          "commands": [
+            {
+              "command": [
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/bin/shermes",
+                "-O",
+                "-verify-ir=true",
+                "-emit-llvm",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/arguments.js",
+                "-o",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/arguments-O-verify-on.ll"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.012272
+            },
+            {
+              "command": [
+                "/tmp/llvm-direct-toolchain/bin/llvm-as",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/arguments-O-verify-on.ll",
+                "-o",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/arguments-O-verify-on.bc"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.015527
+            },
+            {
+              "command": [
+                "/tmp/llvm-direct-toolchain/bin/opt",
+                "-passes=verify",
+                "-disable-output",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/arguments-O-verify-on.bc"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.014139
+            }
+          ],
+          "llvm_ir": {
+            "path": "build-llvm/post-review-verifier/arguments-O-verify-on.ll",
+            "bytes": 23408,
+            "sha256": "eabd9543349e9df8c4ccbea9789bafc236034f3d105b869fbceefbbee09655d6"
+          },
+          "passed": true
+        }
+      ],
+      "byte_identical": true,
+      "passed": true
+    },
+    {
+      "fixture": "test/LLVMNative/arrays_callbacks.js",
+      "source": {
+        "path": "test/LLVMNative/arrays_callbacks.js",
+        "bytes": 404,
+        "sha256": "edd6f726dd865490f8f6d50f28ca391c7da1ee59ba89c96c647144a1cecb3861"
+      },
+      "hermes_optimization": "O0",
+      "variants": [
+        {
+          "verify_ir": false,
+          "commands": [
+            {
+              "command": [
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/bin/shermes",
+                "-O0",
+                "-verify-ir=false",
+                "-emit-llvm",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/arrays_callbacks.js",
+                "-o",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/arrays_callbacks-O0-verify-off.ll"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.020428
+            },
+            {
+              "command": [
+                "/tmp/llvm-direct-toolchain/bin/llvm-as",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/arrays_callbacks-O0-verify-off.ll",
+                "-o",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/arrays_callbacks-O0-verify-off.bc"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.016781
+            },
+            {
+              "command": [
+                "/tmp/llvm-direct-toolchain/bin/opt",
+                "-passes=verify",
+                "-disable-output",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/arrays_callbacks-O0-verify-off.bc"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.015371
+            }
+          ],
+          "llvm_ir": {
+            "path": "build-llvm/post-review-verifier/arrays_callbacks-O0-verify-off.ll",
+            "bytes": 40257,
+            "sha256": "9da0b96193c387a2c9f8a7eb00de07557a40ef78fd2cd87dcee5907c365a7658"
+          },
+          "passed": true
+        },
+        {
+          "verify_ir": true,
+          "commands": [
+            {
+              "command": [
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/bin/shermes",
+                "-O0",
+                "-verify-ir=true",
+                "-emit-llvm",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/arrays_callbacks.js",
+                "-o",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/arrays_callbacks-O0-verify-on.ll"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.016002
+            },
+            {
+              "command": [
+                "/tmp/llvm-direct-toolchain/bin/llvm-as",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/arrays_callbacks-O0-verify-on.ll",
+                "-o",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/arrays_callbacks-O0-verify-on.bc"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.022139
+            },
+            {
+              "command": [
+                "/tmp/llvm-direct-toolchain/bin/opt",
+                "-passes=verify",
+                "-disable-output",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/arrays_callbacks-O0-verify-on.bc"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.022528
+            }
+          ],
+          "llvm_ir": {
+            "path": "build-llvm/post-review-verifier/arrays_callbacks-O0-verify-on.ll",
+            "bytes": 40257,
+            "sha256": "9da0b96193c387a2c9f8a7eb00de07557a40ef78fd2cd87dcee5907c365a7658"
+          },
+          "passed": true
+        }
+      ],
+      "byte_identical": true,
+      "passed": true
+    },
+    {
+      "fixture": "test/LLVMNative/arrays_callbacks.js",
+      "source": {
+        "path": "test/LLVMNative/arrays_callbacks.js",
+        "bytes": 404,
+        "sha256": "edd6f726dd865490f8f6d50f28ca391c7da1ee59ba89c96c647144a1cecb3861"
+      },
+      "hermes_optimization": "O",
+      "variants": [
+        {
+          "verify_ir": false,
+          "commands": [
+            {
+              "command": [
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/bin/shermes",
+                "-O",
+                "-verify-ir=false",
+                "-emit-llvm",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/arrays_callbacks.js",
+                "-o",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/arrays_callbacks-O-verify-off.ll"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.01689
+            },
+            {
+              "command": [
+                "/tmp/llvm-direct-toolchain/bin/llvm-as",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/arrays_callbacks-O-verify-off.ll",
+                "-o",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/arrays_callbacks-O-verify-off.bc"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.018493
+            },
+            {
+              "command": [
+                "/tmp/llvm-direct-toolchain/bin/opt",
+                "-passes=verify",
+                "-disable-output",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/arrays_callbacks-O-verify-off.bc"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.017321
+            }
+          ],
+          "llvm_ir": {
+            "path": "build-llvm/post-review-verifier/arrays_callbacks-O-verify-off.ll",
+            "bytes": 23209,
+            "sha256": "bf3cf309695cfeb8a332f4991dc96629cdd2c76dd470ff2ddc23bcd90115dcaa"
+          },
+          "passed": true
+        },
+        {
+          "verify_ir": true,
+          "commands": [
+            {
+              "command": [
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/bin/shermes",
+                "-O",
+                "-verify-ir=true",
+                "-emit-llvm",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/arrays_callbacks.js",
+                "-o",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/arrays_callbacks-O-verify-on.ll"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.014633
+            },
+            {
+              "command": [
+                "/tmp/llvm-direct-toolchain/bin/llvm-as",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/arrays_callbacks-O-verify-on.ll",
+                "-o",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/arrays_callbacks-O-verify-on.bc"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.02621
+            },
+            {
+              "command": [
+                "/tmp/llvm-direct-toolchain/bin/opt",
+                "-passes=verify",
+                "-disable-output",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/arrays_callbacks-O-verify-on.bc"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.016139
+            }
+          ],
+          "llvm_ir": {
+            "path": "build-llvm/post-review-verifier/arrays_callbacks-O-verify-on.ll",
+            "bytes": 23209,
+            "sha256": "bf3cf309695cfeb8a332f4991dc96629cdd2c76dd470ff2ddc23bcd90115dcaa"
+          },
+          "passed": true
+        }
+      ],
+      "byte_identical": true,
+      "passed": true
+    },
+    {
+      "fixture": "test/LLVMNative/arrows_this.js",
+      "source": {
+        "path": "test/LLVMNative/arrows_this.js",
+        "bytes": 298,
+        "sha256": "4b300e3b4092ed7f29a338849b037ac8391a50459c08050920dca0ded1cf6a72"
+      },
+      "hermes_optimization": "O0",
+      "variants": [
+        {
+          "verify_ir": false,
+          "commands": [
+            {
+              "command": [
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/bin/shermes",
+                "-O0",
+                "-verify-ir=false",
+                "-emit-llvm",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/arrows_this.js",
+                "-o",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/arrows_this-O0-verify-off.ll"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.013802
+            },
+            {
+              "command": [
+                "/tmp/llvm-direct-toolchain/bin/llvm-as",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/arrows_this-O0-verify-off.ll",
+                "-o",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/arrows_this-O0-verify-off.bc"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.01791
+            },
+            {
+              "command": [
+                "/tmp/llvm-direct-toolchain/bin/opt",
+                "-passes=verify",
+                "-disable-output",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/arrows_this-O0-verify-off.bc"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.016474
+            }
+          ],
+          "llvm_ir": {
+            "path": "build-llvm/post-review-verifier/arrows_this-O0-verify-off.ll",
+            "bytes": 29158,
+            "sha256": "529493cbe48fb77f40e30eb0855470f2d30c1052a7d950ba0e72c9729fb03ab6"
+          },
+          "passed": true
+        },
+        {
+          "verify_ir": true,
+          "commands": [
+            {
+              "command": [
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/bin/shermes",
+                "-O0",
+                "-verify-ir=true",
+                "-emit-llvm",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/arrows_this.js",
+                "-o",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/arrows_this-O0-verify-on.ll"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.017794
+            },
+            {
+              "command": [
+                "/tmp/llvm-direct-toolchain/bin/llvm-as",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/arrows_this-O0-verify-on.ll",
+                "-o",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/arrows_this-O0-verify-on.bc"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.017539
+            },
+            {
+              "command": [
+                "/tmp/llvm-direct-toolchain/bin/opt",
+                "-passes=verify",
+                "-disable-output",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/arrows_this-O0-verify-on.bc"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.023692
+            }
+          ],
+          "llvm_ir": {
+            "path": "build-llvm/post-review-verifier/arrows_this-O0-verify-on.ll",
+            "bytes": 29158,
+            "sha256": "529493cbe48fb77f40e30eb0855470f2d30c1052a7d950ba0e72c9729fb03ab6"
+          },
+          "passed": true
+        }
+      ],
+      "byte_identical": true,
+      "passed": true
+    },
+    {
+      "fixture": "test/LLVMNative/arrows_this.js",
+      "source": {
+        "path": "test/LLVMNative/arrows_this.js",
+        "bytes": 298,
+        "sha256": "4b300e3b4092ed7f29a338849b037ac8391a50459c08050920dca0ded1cf6a72"
+      },
+      "hermes_optimization": "O",
+      "variants": [
+        {
+          "verify_ir": false,
+          "commands": [
+            {
+              "command": [
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/bin/shermes",
+                "-O",
+                "-verify-ir=false",
+                "-emit-llvm",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/arrows_this.js",
+                "-o",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/arrows_this-O-verify-off.ll"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.030325
+            },
+            {
+              "command": [
+                "/tmp/llvm-direct-toolchain/bin/llvm-as",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/arrows_this-O-verify-off.ll",
+                "-o",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/arrows_this-O-verify-off.bc"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.03148
+            },
+            {
+              "command": [
+                "/tmp/llvm-direct-toolchain/bin/opt",
+                "-passes=verify",
+                "-disable-output",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/arrows_this-O-verify-off.bc"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.018556
+            }
+          ],
+          "llvm_ir": {
+            "path": "build-llvm/post-review-verifier/arrows_this-O-verify-off.ll",
+            "bytes": 22730,
+            "sha256": "3e96363befe6319cfc77a306aa6437c2f7c867f0336a8260e0be2b6fd484a5bd"
+          },
+          "passed": true
+        },
+        {
+          "verify_ir": true,
+          "commands": [
+            {
+              "command": [
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/bin/shermes",
+                "-O",
+                "-verify-ir=true",
+                "-emit-llvm",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/arrows_this.js",
+                "-o",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/arrows_this-O-verify-on.ll"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.012744
+            },
+            {
+              "command": [
+                "/tmp/llvm-direct-toolchain/bin/llvm-as",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/arrows_this-O-verify-on.ll",
+                "-o",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/arrows_this-O-verify-on.bc"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.017394
+            },
+            {
+              "command": [
+                "/tmp/llvm-direct-toolchain/bin/opt",
+                "-passes=verify",
+                "-disable-output",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/arrows_this-O-verify-on.bc"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.015445
+            }
+          ],
+          "llvm_ir": {
+            "path": "build-llvm/post-review-verifier/arrows_this-O-verify-on.ll",
+            "bytes": 22730,
+            "sha256": "3e96363befe6319cfc77a306aa6437c2f7c867f0336a8260e0be2b6fd484a5bd"
+          },
+          "passed": true
+        }
+      ],
+      "byte_identical": true,
+      "passed": true
+    },
+    {
+      "fixture": "test/LLVMNative/catch_basic.js",
+      "source": {
+        "path": "test/LLVMNative/catch_basic.js",
+        "bytes": 41,
+        "sha256": "feafe1e7368a0fc6b3eeffa67c78c771766d91a4d817438e69f770d0dfd547dd"
+      },
+      "hermes_optimization": "O0",
+      "variants": [
+        {
+          "verify_ir": false,
+          "commands": [
+            {
+              "command": [
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/bin/shermes",
+                "-O0",
+                "-verify-ir=false",
+                "-emit-llvm",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/catch_basic.js",
+                "-o",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/catch_basic-O0-verify-off.ll"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.010284
+            },
+            {
+              "command": [
+                "/tmp/llvm-direct-toolchain/bin/llvm-as",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/catch_basic-O0-verify-off.ll",
+                "-o",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/catch_basic-O0-verify-off.bc"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.014547
+            },
+            {
+              "command": [
+                "/tmp/llvm-direct-toolchain/bin/opt",
+                "-passes=verify",
+                "-disable-output",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/catch_basic-O0-verify-off.bc"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.014117
+            }
+          ],
+          "llvm_ir": {
+            "path": "build-llvm/post-review-verifier/catch_basic-O0-verify-off.ll",
+            "bytes": 7007,
+            "sha256": "4e458133c43db04aaa3277fbcba15f29a783b9d5c76036d12b8637a9f8e12c52"
+          },
+          "passed": true
+        },
+        {
+          "verify_ir": true,
+          "commands": [
+            {
+              "command": [
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/bin/shermes",
+                "-O0",
+                "-verify-ir=true",
+                "-emit-llvm",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/catch_basic.js",
+                "-o",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/catch_basic-O0-verify-on.ll"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.011186
+            },
+            {
+              "command": [
+                "/tmp/llvm-direct-toolchain/bin/llvm-as",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/catch_basic-O0-verify-on.ll",
+                "-o",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/catch_basic-O0-verify-on.bc"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.01585
+            },
+            {
+              "command": [
+                "/tmp/llvm-direct-toolchain/bin/opt",
+                "-passes=verify",
+                "-disable-output",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/catch_basic-O0-verify-on.bc"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.015335
+            }
+          ],
+          "llvm_ir": {
+            "path": "build-llvm/post-review-verifier/catch_basic-O0-verify-on.ll",
+            "bytes": 7007,
+            "sha256": "4e458133c43db04aaa3277fbcba15f29a783b9d5c76036d12b8637a9f8e12c52"
+          },
+          "passed": true
+        }
+      ],
+      "byte_identical": true,
+      "passed": true
+    },
+    {
+      "fixture": "test/LLVMNative/catch_basic.js",
+      "source": {
+        "path": "test/LLVMNative/catch_basic.js",
+        "bytes": 41,
+        "sha256": "feafe1e7368a0fc6b3eeffa67c78c771766d91a4d817438e69f770d0dfd547dd"
+      },
+      "hermes_optimization": "O",
+      "variants": [
+        {
+          "verify_ir": false,
+          "commands": [
+            {
+              "command": [
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/bin/shermes",
+                "-O",
+                "-verify-ir=false",
+                "-emit-llvm",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/catch_basic.js",
+                "-o",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/catch_basic-O-verify-off.ll"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.012897
+            },
+            {
+              "command": [
+                "/tmp/llvm-direct-toolchain/bin/llvm-as",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/catch_basic-O-verify-off.ll",
+                "-o",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/catch_basic-O-verify-off.bc"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.013316
+            },
+            {
+              "command": [
+                "/tmp/llvm-direct-toolchain/bin/opt",
+                "-passes=verify",
+                "-disable-output",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/catch_basic-O-verify-off.bc"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.014466
+            }
+          ],
+          "llvm_ir": {
+            "path": "build-llvm/post-review-verifier/catch_basic-O-verify-off.ll",
+            "bytes": 5467,
+            "sha256": "cafa6374fab94fe376590f8f4b025e942189a1a1037bf521fe2b60b39c0e648b"
+          },
+          "passed": true
+        },
+        {
+          "verify_ir": true,
+          "commands": [
+            {
+              "command": [
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/bin/shermes",
+                "-O",
+                "-verify-ir=true",
+                "-emit-llvm",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/catch_basic.js",
+                "-o",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/catch_basic-O-verify-on.ll"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.01176
+            },
+            {
+              "command": [
+                "/tmp/llvm-direct-toolchain/bin/llvm-as",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/catch_basic-O-verify-on.ll",
+                "-o",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/catch_basic-O-verify-on.bc"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.01629
+            },
+            {
+              "command": [
+                "/tmp/llvm-direct-toolchain/bin/opt",
+                "-passes=verify",
+                "-disable-output",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/catch_basic-O-verify-on.bc"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.015443
+            }
+          ],
+          "llvm_ir": {
+            "path": "build-llvm/post-review-verifier/catch_basic-O-verify-on.ll",
+            "bytes": 5467,
+            "sha256": "cafa6374fab94fe376590f8f4b025e942189a1a1037bf521fe2b60b39c0e648b"
+          },
+          "passed": true
+        }
+      ],
+      "byte_identical": true,
+      "passed": true
+    },
+    {
+      "fixture": "test/LLVMNative/classes.js",
+      "source": {
+        "path": "test/LLVMNative/classes.js",
+        "bytes": 512,
+        "sha256": "7a20389b833dbad5fa7dc9590236a201da92be56b279c9d80e57a110ec441b03"
+      },
+      "hermes_optimization": "O0",
+      "variants": [
+        {
+          "verify_ir": false,
+          "commands": [
+            {
+              "command": [
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/bin/shermes",
+                "-O0",
+                "-verify-ir=false",
+                "-emit-llvm",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/classes.js",
+                "-o",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/classes-O0-verify-off.ll"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.0141
+            },
+            {
+              "command": [
+                "/tmp/llvm-direct-toolchain/bin/llvm-as",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/classes-O0-verify-off.ll",
+                "-o",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/classes-O0-verify-off.bc"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.016724
+            },
+            {
+              "command": [
+                "/tmp/llvm-direct-toolchain/bin/opt",
+                "-passes=verify",
+                "-disable-output",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/classes-O0-verify-off.bc"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.016214
+            }
+          ],
+          "llvm_ir": {
+            "path": "build-llvm/post-review-verifier/classes-O0-verify-off.ll",
+            "bytes": 45237,
+            "sha256": "64dab1df85c98ee82aeab2a8e62aa59a6483fc6104efb424dce1b5193a3809f9"
+          },
+          "passed": true
+        },
+        {
+          "verify_ir": true,
+          "commands": [
+            {
+              "command": [
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/bin/shermes",
+                "-O0",
+                "-verify-ir=true",
+                "-emit-llvm",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/classes.js",
+                "-o",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/classes-O0-verify-on.ll"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.014434
+            },
+            {
+              "command": [
+                "/tmp/llvm-direct-toolchain/bin/llvm-as",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/classes-O0-verify-on.ll",
+                "-o",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/classes-O0-verify-on.bc"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.016306
+            },
+            {
+              "command": [
+                "/tmp/llvm-direct-toolchain/bin/opt",
+                "-passes=verify",
+                "-disable-output",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/classes-O0-verify-on.bc"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.015894
+            }
+          ],
+          "llvm_ir": {
+            "path": "build-llvm/post-review-verifier/classes-O0-verify-on.ll",
+            "bytes": 45237,
+            "sha256": "64dab1df85c98ee82aeab2a8e62aa59a6483fc6104efb424dce1b5193a3809f9"
+          },
+          "passed": true
+        }
+      ],
+      "byte_identical": true,
+      "passed": true
+    },
+    {
+      "fixture": "test/LLVMNative/classes.js",
+      "source": {
+        "path": "test/LLVMNative/classes.js",
+        "bytes": 512,
+        "sha256": "7a20389b833dbad5fa7dc9590236a201da92be56b279c9d80e57a110ec441b03"
+      },
+      "hermes_optimization": "O",
+      "variants": [
+        {
+          "verify_ir": false,
+          "commands": [
+            {
+              "command": [
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/bin/shermes",
+                "-O",
+                "-verify-ir=false",
+                "-emit-llvm",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/classes.js",
+                "-o",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/classes-O-verify-off.ll"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.015682
+            },
+            {
+              "command": [
+                "/tmp/llvm-direct-toolchain/bin/llvm-as",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/classes-O-verify-off.ll",
+                "-o",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/classes-O-verify-off.bc"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.01666
+            },
+            {
+              "command": [
+                "/tmp/llvm-direct-toolchain/bin/opt",
+                "-passes=verify",
+                "-disable-output",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/classes-O-verify-off.bc"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.014812
+            }
+          ],
+          "llvm_ir": {
+            "path": "build-llvm/post-review-verifier/classes-O-verify-off.ll",
+            "bytes": 31755,
+            "sha256": "3ecdc397f177b934637e78a504972848916c337559a4e501fb992d2874ba78a2"
+          },
+          "passed": true
+        },
+        {
+          "verify_ir": true,
+          "commands": [
+            {
+              "command": [
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/bin/shermes",
+                "-O",
+                "-verify-ir=true",
+                "-emit-llvm",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/classes.js",
+                "-o",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/classes-O-verify-on.ll"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.015323
+            },
+            {
+              "command": [
+                "/tmp/llvm-direct-toolchain/bin/llvm-as",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/classes-O-verify-on.ll",
+                "-o",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/classes-O-verify-on.bc"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.018863
+            },
+            {
+              "command": [
+                "/tmp/llvm-direct-toolchain/bin/opt",
+                "-passes=verify",
+                "-disable-output",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/classes-O-verify-on.bc"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.017549
+            }
+          ],
+          "llvm_ir": {
+            "path": "build-llvm/post-review-verifier/classes-O-verify-on.ll",
+            "bytes": 31755,
+            "sha256": "3ecdc397f177b934637e78a504972848916c337559a4e501fb992d2874ba78a2"
+          },
+          "passed": true
+        }
+      ],
+      "byte_identical": true,
+      "passed": true
+    },
+    {
+      "fixture": "test/LLVMNative/closures.js",
+      "source": {
+        "path": "test/LLVMNative/closures.js",
+        "bytes": 442,
+        "sha256": "3126dfc6d63f9e39d70316b9d99ae46b730ac4cb3526a69d82df3022c81cc7c7"
+      },
+      "hermes_optimization": "O0",
+      "variants": [
+        {
+          "verify_ir": false,
+          "commands": [
+            {
+              "command": [
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/bin/shermes",
+                "-O0",
+                "-verify-ir=false",
+                "-emit-llvm",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/closures.js",
+                "-o",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/closures-O0-verify-off.ll"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.01413
+            },
+            {
+              "command": [
+                "/tmp/llvm-direct-toolchain/bin/llvm-as",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/closures-O0-verify-off.ll",
+                "-o",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/closures-O0-verify-off.bc"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.016034
+            },
+            {
+              "command": [
+                "/tmp/llvm-direct-toolchain/bin/opt",
+                "-passes=verify",
+                "-disable-output",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/closures-O0-verify-off.bc"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.01478
+            }
+          ],
+          "llvm_ir": {
+            "path": "build-llvm/post-review-verifier/closures-O0-verify-off.ll",
+            "bytes": 48685,
+            "sha256": "ce66152f9b818ac9d21bc20e6b30c854e4998d5b39574f17ba347de0b9e825b8"
+          },
+          "passed": true
+        },
+        {
+          "verify_ir": true,
+          "commands": [
+            {
+              "command": [
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/bin/shermes",
+                "-O0",
+                "-verify-ir=true",
+                "-emit-llvm",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/closures.js",
+                "-o",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/closures-O0-verify-on.ll"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.012103
+            },
+            {
+              "command": [
+                "/tmp/llvm-direct-toolchain/bin/llvm-as",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/closures-O0-verify-on.ll",
+                "-o",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/closures-O0-verify-on.bc"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.014739
+            },
+            {
+              "command": [
+                "/tmp/llvm-direct-toolchain/bin/opt",
+                "-passes=verify",
+                "-disable-output",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/closures-O0-verify-on.bc"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.016962
+            }
+          ],
+          "llvm_ir": {
+            "path": "build-llvm/post-review-verifier/closures-O0-verify-on.ll",
+            "bytes": 48685,
+            "sha256": "ce66152f9b818ac9d21bc20e6b30c854e4998d5b39574f17ba347de0b9e825b8"
+          },
+          "passed": true
+        }
+      ],
+      "byte_identical": true,
+      "passed": true
+    },
+    {
+      "fixture": "test/LLVMNative/closures.js",
+      "source": {
+        "path": "test/LLVMNative/closures.js",
+        "bytes": 442,
+        "sha256": "3126dfc6d63f9e39d70316b9d99ae46b730ac4cb3526a69d82df3022c81cc7c7"
+      },
+      "hermes_optimization": "O",
+      "variants": [
+        {
+          "verify_ir": false,
+          "commands": [
+            {
+              "command": [
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/bin/shermes",
+                "-O",
+                "-verify-ir=false",
+                "-emit-llvm",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/closures.js",
+                "-o",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/closures-O-verify-off.ll"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.015758
+            },
+            {
+              "command": [
+                "/tmp/llvm-direct-toolchain/bin/llvm-as",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/closures-O-verify-off.ll",
+                "-o",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/closures-O-verify-off.bc"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.030716
+            },
+            {
+              "command": [
+                "/tmp/llvm-direct-toolchain/bin/opt",
+                "-passes=verify",
+                "-disable-output",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/closures-O-verify-off.bc"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.014412
+            }
+          ],
+          "llvm_ir": {
+            "path": "build-llvm/post-review-verifier/closures-O-verify-off.ll",
+            "bytes": 32182,
+            "sha256": "2b23da0235098e0381ace2cabaed9925b40a94077030d8fe33d62eea0a222927"
+          },
+          "passed": true
+        },
+        {
+          "verify_ir": true,
+          "commands": [
+            {
+              "command": [
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/bin/shermes",
+                "-O",
+                "-verify-ir=true",
+                "-emit-llvm",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/closures.js",
+                "-o",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/closures-O-verify-on.ll"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.014893
+            },
+            {
+              "command": [
+                "/tmp/llvm-direct-toolchain/bin/llvm-as",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/closures-O-verify-on.ll",
+                "-o",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/closures-O-verify-on.bc"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.015706
+            },
+            {
+              "command": [
+                "/tmp/llvm-direct-toolchain/bin/opt",
+                "-passes=verify",
+                "-disable-output",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/closures-O-verify-on.bc"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.016606
+            }
+          ],
+          "llvm_ir": {
+            "path": "build-llvm/post-review-verifier/closures-O-verify-on.ll",
+            "bytes": 32182,
+            "sha256": "2b23da0235098e0381ace2cabaed9925b40a94077030d8fe33d62eea0a222927"
+          },
+          "passed": true
+        }
+      ],
+      "byte_identical": true,
+      "passed": true
+    },
+    {
+      "fixture": "test/LLVMNative/coercion.js",
+      "source": {
+        "path": "test/LLVMNative/coercion.js",
+        "bytes": 356,
+        "sha256": "920a30759cff382450bf40c2264aed91f31fb76c9ab71139806ab3542f153bc3"
+      },
+      "hermes_optimization": "O0",
+      "variants": [
+        {
+          "verify_ir": false,
+          "commands": [
+            {
+              "command": [
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/bin/shermes",
+                "-O0",
+                "-verify-ir=false",
+                "-emit-llvm",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/coercion.js",
+                "-o",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/coercion-O0-verify-off.ll"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.012118
+            },
+            {
+              "command": [
+                "/tmp/llvm-direct-toolchain/bin/llvm-as",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/coercion-O0-verify-off.ll",
+                "-o",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/coercion-O0-verify-off.bc"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.01459
+            },
+            {
+              "command": [
+                "/tmp/llvm-direct-toolchain/bin/opt",
+                "-passes=verify",
+                "-disable-output",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/coercion-O0-verify-off.bc"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.018227
+            }
+          ],
+          "llvm_ir": {
+            "path": "build-llvm/post-review-verifier/coercion-O0-verify-off.ll",
+            "bytes": 27166,
+            "sha256": "87d1f27db233f2cc655a6f0fa6a831193d105aa76eaa78c76a5eda6633b0884c"
+          },
+          "passed": true
+        },
+        {
+          "verify_ir": true,
+          "commands": [
+            {
+              "command": [
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/bin/shermes",
+                "-O0",
+                "-verify-ir=true",
+                "-emit-llvm",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/coercion.js",
+                "-o",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/coercion-O0-verify-on.ll"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.012407
+            },
+            {
+              "command": [
+                "/tmp/llvm-direct-toolchain/bin/llvm-as",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/coercion-O0-verify-on.ll",
+                "-o",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/coercion-O0-verify-on.bc"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.016381
+            },
+            {
+              "command": [
+                "/tmp/llvm-direct-toolchain/bin/opt",
+                "-passes=verify",
+                "-disable-output",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/coercion-O0-verify-on.bc"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.016355
+            }
+          ],
+          "llvm_ir": {
+            "path": "build-llvm/post-review-verifier/coercion-O0-verify-on.ll",
+            "bytes": 27166,
+            "sha256": "87d1f27db233f2cc655a6f0fa6a831193d105aa76eaa78c76a5eda6633b0884c"
+          },
+          "passed": true
+        }
+      ],
+      "byte_identical": true,
+      "passed": true
+    },
+    {
+      "fixture": "test/LLVMNative/coercion.js",
+      "source": {
+        "path": "test/LLVMNative/coercion.js",
+        "bytes": 356,
+        "sha256": "920a30759cff382450bf40c2264aed91f31fb76c9ab71139806ab3542f153bc3"
+      },
+      "hermes_optimization": "O",
+      "variants": [
+        {
+          "verify_ir": false,
+          "commands": [
+            {
+              "command": [
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/bin/shermes",
+                "-O",
+                "-verify-ir=false",
+                "-emit-llvm",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/coercion.js",
+                "-o",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/coercion-O-verify-off.ll"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.011105
+            },
+            {
+              "command": [
+                "/tmp/llvm-direct-toolchain/bin/llvm-as",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/coercion-O-verify-off.ll",
+                "-o",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/coercion-O-verify-off.bc"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.015799
+            },
+            {
+              "command": [
+                "/tmp/llvm-direct-toolchain/bin/opt",
+                "-passes=verify",
+                "-disable-output",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/coercion-O-verify-off.bc"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.013096
+            }
+          ],
+          "llvm_ir": {
+            "path": "build-llvm/post-review-verifier/coercion-O-verify-off.ll",
+            "bytes": 17029,
+            "sha256": "c2e2fb60ab317a593e4714c5476ee40b5e3253092d2c0e2658109e85e2e5c845"
+          },
+          "passed": true
+        },
+        {
+          "verify_ir": true,
+          "commands": [
+            {
+              "command": [
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/bin/shermes",
+                "-O",
+                "-verify-ir=true",
+                "-emit-llvm",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/coercion.js",
+                "-o",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/coercion-O-verify-on.ll"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.013797
+            },
+            {
+              "command": [
+                "/tmp/llvm-direct-toolchain/bin/llvm-as",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/coercion-O-verify-on.ll",
+                "-o",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/coercion-O-verify-on.bc"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.013229
+            },
+            {
+              "command": [
+                "/tmp/llvm-direct-toolchain/bin/opt",
+                "-passes=verify",
+                "-disable-output",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/coercion-O-verify-on.bc"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.016562
+            }
+          ],
+          "llvm_ir": {
+            "path": "build-llvm/post-review-verifier/coercion-O-verify-on.ll",
+            "bytes": 17029,
+            "sha256": "c2e2fb60ab317a593e4714c5476ee40b5e3253092d2c0e2658109e85e2e5c845"
+          },
+          "passed": true
+        }
+      ],
+      "byte_identical": true,
+      "passed": true
+    },
+    {
+      "fixture": "test/LLVMNative/constructors.js",
+      "source": {
+        "path": "test/LLVMNative/constructors.js",
+        "bytes": 480,
+        "sha256": "6577b9221628cce1cbd6e6a907c6027bc50d946edb64967c363006767d735598"
+      },
+      "hermes_optimization": "O0",
+      "variants": [
+        {
+          "verify_ir": false,
+          "commands": [
+            {
+              "command": [
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/bin/shermes",
+                "-O0",
+                "-verify-ir=false",
+                "-emit-llvm",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/constructors.js",
+                "-o",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/constructors-O0-verify-off.ll"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.01609
+            },
+            {
+              "command": [
+                "/tmp/llvm-direct-toolchain/bin/llvm-as",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/constructors-O0-verify-off.ll",
+                "-o",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/constructors-O0-verify-off.bc"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.01361
+            },
+            {
+              "command": [
+                "/tmp/llvm-direct-toolchain/bin/opt",
+                "-passes=verify",
+                "-disable-output",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/constructors-O0-verify-off.bc"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.014129
+            }
+          ],
+          "llvm_ir": {
+            "path": "build-llvm/post-review-verifier/constructors-O0-verify-off.ll",
+            "bytes": 32894,
+            "sha256": "64efa249bd11f22ad9dfedffb0d5730ca1034c63ea847d76fd20b48b65ca5fa8"
+          },
+          "passed": true
+        },
+        {
+          "verify_ir": true,
+          "commands": [
+            {
+              "command": [
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/bin/shermes",
+                "-O0",
+                "-verify-ir=true",
+                "-emit-llvm",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/constructors.js",
+                "-o",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/constructors-O0-verify-on.ll"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.012999
+            },
+            {
+              "command": [
+                "/tmp/llvm-direct-toolchain/bin/llvm-as",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/constructors-O0-verify-on.ll",
+                "-o",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/constructors-O0-verify-on.bc"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.013637
+            },
+            {
+              "command": [
+                "/tmp/llvm-direct-toolchain/bin/opt",
+                "-passes=verify",
+                "-disable-output",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/constructors-O0-verify-on.bc"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.016564
+            }
+          ],
+          "llvm_ir": {
+            "path": "build-llvm/post-review-verifier/constructors-O0-verify-on.ll",
+            "bytes": 32894,
+            "sha256": "64efa249bd11f22ad9dfedffb0d5730ca1034c63ea847d76fd20b48b65ca5fa8"
+          },
+          "passed": true
+        }
+      ],
+      "byte_identical": true,
+      "passed": true
+    },
+    {
+      "fixture": "test/LLVMNative/constructors.js",
+      "source": {
+        "path": "test/LLVMNative/constructors.js",
+        "bytes": 480,
+        "sha256": "6577b9221628cce1cbd6e6a907c6027bc50d946edb64967c363006767d735598"
+      },
+      "hermes_optimization": "O",
+      "variants": [
+        {
+          "verify_ir": false,
+          "commands": [
+            {
+              "command": [
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/bin/shermes",
+                "-O",
+                "-verify-ir=false",
+                "-emit-llvm",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/constructors.js",
+                "-o",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/constructors-O-verify-off.ll"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.01309
+            },
+            {
+              "command": [
+                "/tmp/llvm-direct-toolchain/bin/llvm-as",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/constructors-O-verify-off.ll",
+                "-o",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/constructors-O-verify-off.bc"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.016967
+            },
+            {
+              "command": [
+                "/tmp/llvm-direct-toolchain/bin/opt",
+                "-passes=verify",
+                "-disable-output",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/constructors-O-verify-off.bc"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.017087
+            }
+          ],
+          "llvm_ir": {
+            "path": "build-llvm/post-review-verifier/constructors-O-verify-off.ll",
+            "bytes": 24508,
+            "sha256": "0571e784de7ae852be7727bbb58733be04d990b3db8c08c91b241eeafb6d788f"
+          },
+          "passed": true
+        },
+        {
+          "verify_ir": true,
+          "commands": [
+            {
+              "command": [
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/bin/shermes",
+                "-O",
+                "-verify-ir=true",
+                "-emit-llvm",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/constructors.js",
+                "-o",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/constructors-O-verify-on.ll"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.013359
+            },
+            {
+              "command": [
+                "/tmp/llvm-direct-toolchain/bin/llvm-as",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/constructors-O-verify-on.ll",
+                "-o",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/constructors-O-verify-on.bc"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.01544
+            },
+            {
+              "command": [
+                "/tmp/llvm-direct-toolchain/bin/opt",
+                "-passes=verify",
+                "-disable-output",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/constructors-O-verify-on.bc"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.032643
+            }
+          ],
+          "llvm_ir": {
+            "path": "build-llvm/post-review-verifier/constructors-O-verify-on.ll",
+            "bytes": 24508,
+            "sha256": "0571e784de7ae852be7727bbb58733be04d990b3db8c08c91b241eeafb6d788f"
+          },
+          "passed": true
+        }
+      ],
+      "byte_identical": true,
+      "passed": true
+    },
+    {
+      "fixture": "test/LLVMNative/control_phi.js",
+      "source": {
+        "path": "test/LLVMNative/control_phi.js",
+        "bytes": 429,
+        "sha256": "853085848d87f76f749b664142fb4d89b7ed775f5b54bc70acf92de9e8125e29"
+      },
+      "hermes_optimization": "O0",
+      "variants": [
+        {
+          "verify_ir": false,
+          "commands": [
+            {
+              "command": [
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/bin/shermes",
+                "-O0",
+                "-verify-ir=false",
+                "-emit-llvm",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/control_phi.js",
+                "-o",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/control_phi-O0-verify-off.ll"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.014236
+            },
+            {
+              "command": [
+                "/tmp/llvm-direct-toolchain/bin/llvm-as",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/control_phi-O0-verify-off.ll",
+                "-o",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/control_phi-O0-verify-off.bc"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.014705
+            },
+            {
+              "command": [
+                "/tmp/llvm-direct-toolchain/bin/opt",
+                "-passes=verify",
+                "-disable-output",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/control_phi-O0-verify-off.bc"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.012359
+            }
+          ],
+          "llvm_ir": {
+            "path": "build-llvm/post-review-verifier/control_phi-O0-verify-off.ll",
+            "bytes": 37204,
+            "sha256": "5e98694df3cb7d4ccfab8fc0aaaac86d472c66a082a42521c606bf00c0c3a9fa"
+          },
+          "passed": true
+        },
+        {
+          "verify_ir": true,
+          "commands": [
+            {
+              "command": [
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/bin/shermes",
+                "-O0",
+                "-verify-ir=true",
+                "-emit-llvm",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/control_phi.js",
+                "-o",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/control_phi-O0-verify-on.ll"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.011775
+            },
+            {
+              "command": [
+                "/tmp/llvm-direct-toolchain/bin/llvm-as",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/control_phi-O0-verify-on.ll",
+                "-o",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/control_phi-O0-verify-on.bc"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.014596
+            },
+            {
+              "command": [
+                "/tmp/llvm-direct-toolchain/bin/opt",
+                "-passes=verify",
+                "-disable-output",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/control_phi-O0-verify-on.bc"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.015225
+            }
+          ],
+          "llvm_ir": {
+            "path": "build-llvm/post-review-verifier/control_phi-O0-verify-on.ll",
+            "bytes": 37204,
+            "sha256": "5e98694df3cb7d4ccfab8fc0aaaac86d472c66a082a42521c606bf00c0c3a9fa"
+          },
+          "passed": true
+        }
+      ],
+      "byte_identical": true,
+      "passed": true
+    },
+    {
+      "fixture": "test/LLVMNative/control_phi.js",
+      "source": {
+        "path": "test/LLVMNative/control_phi.js",
+        "bytes": 429,
+        "sha256": "853085848d87f76f749b664142fb4d89b7ed775f5b54bc70acf92de9e8125e29"
+      },
+      "hermes_optimization": "O",
+      "variants": [
+        {
+          "verify_ir": false,
+          "commands": [
+            {
+              "command": [
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/bin/shermes",
+                "-O",
+                "-verify-ir=false",
+                "-emit-llvm",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/control_phi.js",
+                "-o",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/control_phi-O-verify-off.ll"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.011753
+            },
+            {
+              "command": [
+                "/tmp/llvm-direct-toolchain/bin/llvm-as",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/control_phi-O-verify-off.ll",
+                "-o",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/control_phi-O-verify-off.bc"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.011443
+            },
+            {
+              "command": [
+                "/tmp/llvm-direct-toolchain/bin/opt",
+                "-passes=verify",
+                "-disable-output",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/control_phi-O-verify-off.bc"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.014347
+            }
+          ],
+          "llvm_ir": {
+            "path": "build-llvm/post-review-verifier/control_phi-O-verify-off.ll",
+            "bytes": 21844,
+            "sha256": "968962e771b98afa08a28e632143531f7b855abd7dc741d3014da6b50eeeaae0"
+          },
+          "passed": true
+        },
+        {
+          "verify_ir": true,
+          "commands": [
+            {
+              "command": [
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/bin/shermes",
+                "-O",
+                "-verify-ir=true",
+                "-emit-llvm",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/control_phi.js",
+                "-o",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/control_phi-O-verify-on.ll"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.014328
+            },
+            {
+              "command": [
+                "/tmp/llvm-direct-toolchain/bin/llvm-as",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/control_phi-O-verify-on.ll",
+                "-o",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/control_phi-O-verify-on.bc"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.013242
+            },
+            {
+              "command": [
+                "/tmp/llvm-direct-toolchain/bin/opt",
+                "-passes=verify",
+                "-disable-output",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/control_phi-O-verify-on.bc"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.019617
+            }
+          ],
+          "llvm_ir": {
+            "path": "build-llvm/post-review-verifier/control_phi-O-verify-on.ll",
+            "bytes": 21844,
+            "sha256": "968962e771b98afa08a28e632143531f7b855abd7dc741d3014da6b50eeeaae0"
+          },
+          "passed": true
+        }
+      ],
+      "byte_identical": true,
+      "passed": true
+    },
+    {
+      "fixture": "test/LLVMNative/exceptions.js",
+      "source": {
+        "path": "test/LLVMNative/exceptions.js",
+        "bytes": 629,
+        "sha256": "86ef5d86a2e5c3e8dc01d769271dfaae72ce6650469076b1b6e15dc60d6b12a0"
+      },
+      "hermes_optimization": "O0",
+      "variants": [
+        {
+          "verify_ir": false,
+          "commands": [
+            {
+              "command": [
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/bin/shermes",
+                "-O0",
+                "-verify-ir=false",
+                "-emit-llvm",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/exceptions.js",
+                "-o",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/exceptions-O0-verify-off.ll"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.016707
+            },
+            {
+              "command": [
+                "/tmp/llvm-direct-toolchain/bin/llvm-as",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/exceptions-O0-verify-off.ll",
+                "-o",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/exceptions-O0-verify-off.bc"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.017825
+            },
+            {
+              "command": [
+                "/tmp/llvm-direct-toolchain/bin/opt",
+                "-passes=verify",
+                "-disable-output",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/exceptions-O0-verify-off.bc"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.019782
+            }
+          ],
+          "llvm_ir": {
+            "path": "build-llvm/post-review-verifier/exceptions-O0-verify-off.ll",
+            "bytes": 54922,
+            "sha256": "69a7f9200a895d223446ae9227635afb97ff01238c86a859aa75a701d469855b"
+          },
+          "passed": true
+        },
+        {
+          "verify_ir": true,
+          "commands": [
+            {
+              "command": [
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/bin/shermes",
+                "-O0",
+                "-verify-ir=true",
+                "-emit-llvm",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/exceptions.js",
+                "-o",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/exceptions-O0-verify-on.ll"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.012838
+            },
+            {
+              "command": [
+                "/tmp/llvm-direct-toolchain/bin/llvm-as",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/exceptions-O0-verify-on.ll",
+                "-o",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/exceptions-O0-verify-on.bc"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.01743
+            },
+            {
+              "command": [
+                "/tmp/llvm-direct-toolchain/bin/opt",
+                "-passes=verify",
+                "-disable-output",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/exceptions-O0-verify-on.bc"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.023552
+            }
+          ],
+          "llvm_ir": {
+            "path": "build-llvm/post-review-verifier/exceptions-O0-verify-on.ll",
+            "bytes": 54922,
+            "sha256": "69a7f9200a895d223446ae9227635afb97ff01238c86a859aa75a701d469855b"
+          },
+          "passed": true
+        }
+      ],
+      "byte_identical": true,
+      "passed": true
+    },
+    {
+      "fixture": "test/LLVMNative/exceptions.js",
+      "source": {
+        "path": "test/LLVMNative/exceptions.js",
+        "bytes": 629,
+        "sha256": "86ef5d86a2e5c3e8dc01d769271dfaae72ce6650469076b1b6e15dc60d6b12a0"
+      },
+      "hermes_optimization": "O",
+      "variants": [
+        {
+          "verify_ir": false,
+          "commands": [
+            {
+              "command": [
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/bin/shermes",
+                "-O",
+                "-verify-ir=false",
+                "-emit-llvm",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/exceptions.js",
+                "-o",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/exceptions-O-verify-off.ll"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.018837
+            },
+            {
+              "command": [
+                "/tmp/llvm-direct-toolchain/bin/llvm-as",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/exceptions-O-verify-off.ll",
+                "-o",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/exceptions-O-verify-off.bc"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.016168
+            },
+            {
+              "command": [
+                "/tmp/llvm-direct-toolchain/bin/opt",
+                "-passes=verify",
+                "-disable-output",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/exceptions-O-verify-off.bc"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.016303
+            }
+          ],
+          "llvm_ir": {
+            "path": "build-llvm/post-review-verifier/exceptions-O-verify-off.ll",
+            "bytes": 41538,
+            "sha256": "a33c25ba76516e375e4396a06aba98aceb7ad3ec9d3aabf13d63c68fda766c68"
+          },
+          "passed": true
+        },
+        {
+          "verify_ir": true,
+          "commands": [
+            {
+              "command": [
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/bin/shermes",
+                "-O",
+                "-verify-ir=true",
+                "-emit-llvm",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/exceptions.js",
+                "-o",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/exceptions-O-verify-on.ll"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.02048
+            },
+            {
+              "command": [
+                "/tmp/llvm-direct-toolchain/bin/llvm-as",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/exceptions-O-verify-on.ll",
+                "-o",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/exceptions-O-verify-on.bc"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.019166
+            },
+            {
+              "command": [
+                "/tmp/llvm-direct-toolchain/bin/opt",
+                "-passes=verify",
+                "-disable-output",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/exceptions-O-verify-on.bc"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.015355
+            }
+          ],
+          "llvm_ir": {
+            "path": "build-llvm/post-review-verifier/exceptions-O-verify-on.ll",
+            "bytes": 41538,
+            "sha256": "a33c25ba76516e375e4396a06aba98aceb7ad3ec9d3aabf13d63c68fda766c68"
+          },
+          "passed": true
+        }
+      ],
+      "byte_identical": true,
+      "passed": true
+    },
+    {
+      "fixture": "test/LLVMNative/functions.js",
+      "source": {
+        "path": "test/LLVMNative/functions.js",
+        "bytes": 382,
+        "sha256": "5344c3e6cb57e25eaa167944eef6059573c185bd35e5a4b9493053312a0da97f"
+      },
+      "hermes_optimization": "O0",
+      "variants": [
+        {
+          "verify_ir": false,
+          "commands": [
+            {
+              "command": [
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/bin/shermes",
+                "-O0",
+                "-verify-ir=false",
+                "-emit-llvm",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/functions.js",
+                "-o",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/functions-O0-verify-off.ll"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.018098
+            },
+            {
+              "command": [
+                "/tmp/llvm-direct-toolchain/bin/llvm-as",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/functions-O0-verify-off.ll",
+                "-o",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/functions-O0-verify-off.bc"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.013883
+            },
+            {
+              "command": [
+                "/tmp/llvm-direct-toolchain/bin/opt",
+                "-passes=verify",
+                "-disable-output",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/functions-O0-verify-off.bc"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.016847
+            }
+          ],
+          "llvm_ir": {
+            "path": "build-llvm/post-review-verifier/functions-O0-verify-off.ll",
+            "bytes": 39424,
+            "sha256": "d805933b15cfa51e064d5d00baa18dec8fb375c076a51fefdd6bde3984102b7c"
+          },
+          "passed": true
+        },
+        {
+          "verify_ir": true,
+          "commands": [
+            {
+              "command": [
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/bin/shermes",
+                "-O0",
+                "-verify-ir=true",
+                "-emit-llvm",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/functions.js",
+                "-o",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/functions-O0-verify-on.ll"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.018765
+            },
+            {
+              "command": [
+                "/tmp/llvm-direct-toolchain/bin/llvm-as",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/functions-O0-verify-on.ll",
+                "-o",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/functions-O0-verify-on.bc"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.020083
+            },
+            {
+              "command": [
+                "/tmp/llvm-direct-toolchain/bin/opt",
+                "-passes=verify",
+                "-disable-output",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/functions-O0-verify-on.bc"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.014749
+            }
+          ],
+          "llvm_ir": {
+            "path": "build-llvm/post-review-verifier/functions-O0-verify-on.ll",
+            "bytes": 39424,
+            "sha256": "d805933b15cfa51e064d5d00baa18dec8fb375c076a51fefdd6bde3984102b7c"
+          },
+          "passed": true
+        }
+      ],
+      "byte_identical": true,
+      "passed": true
+    },
+    {
+      "fixture": "test/LLVMNative/functions.js",
+      "source": {
+        "path": "test/LLVMNative/functions.js",
+        "bytes": 382,
+        "sha256": "5344c3e6cb57e25eaa167944eef6059573c185bd35e5a4b9493053312a0da97f"
+      },
+      "hermes_optimization": "O",
+      "variants": [
+        {
+          "verify_ir": false,
+          "commands": [
+            {
+              "command": [
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/bin/shermes",
+                "-O",
+                "-verify-ir=false",
+                "-emit-llvm",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/functions.js",
+                "-o",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/functions-O-verify-off.ll"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.012507
+            },
+            {
+              "command": [
+                "/tmp/llvm-direct-toolchain/bin/llvm-as",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/functions-O-verify-off.ll",
+                "-o",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/functions-O-verify-off.bc"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.01243
+            },
+            {
+              "command": [
+                "/tmp/llvm-direct-toolchain/bin/opt",
+                "-passes=verify",
+                "-disable-output",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/functions-O-verify-off.bc"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.026567
+            }
+          ],
+          "llvm_ir": {
+            "path": "build-llvm/post-review-verifier/functions-O-verify-off.ll",
+            "bytes": 28493,
+            "sha256": "23626342802acce8323b835065449229269ba26bce5e3c217705bdcc2784ac48"
+          },
+          "passed": true
+        },
+        {
+          "verify_ir": true,
+          "commands": [
+            {
+              "command": [
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/bin/shermes",
+                "-O",
+                "-verify-ir=true",
+                "-emit-llvm",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/functions.js",
+                "-o",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/functions-O-verify-on.ll"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.013217
+            },
+            {
+              "command": [
+                "/tmp/llvm-direct-toolchain/bin/llvm-as",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/functions-O-verify-on.ll",
+                "-o",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/functions-O-verify-on.bc"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.013994
+            },
+            {
+              "command": [
+                "/tmp/llvm-direct-toolchain/bin/opt",
+                "-passes=verify",
+                "-disable-output",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/functions-O-verify-on.bc"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.016645
+            }
+          ],
+          "llvm_ir": {
+            "path": "build-llvm/post-review-verifier/functions-O-verify-on.ll",
+            "bytes": 28493,
+            "sha256": "23626342802acce8323b835065449229269ba26bce5e3c217705bdcc2784ac48"
+          },
+          "passed": true
+        }
+      ],
+      "byte_identical": true,
+      "passed": true
+    },
+    {
+      "fixture": "test/LLVMNative/gc_closures.js",
+      "source": {
+        "path": "test/LLVMNative/gc_closures.js",
+        "bytes": 436,
+        "sha256": "e2cc29627ab8b921aff3e70f1d8ef95d7314f9be040c56bfa87769b68b732dfd"
+      },
+      "hermes_optimization": "O0",
+      "variants": [
+        {
+          "verify_ir": false,
+          "commands": [
+            {
+              "command": [
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/bin/shermes",
+                "-O0",
+                "-verify-ir=false",
+                "-emit-llvm",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/gc_closures.js",
+                "-o",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/gc_closures-O0-verify-off.ll"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.014286
+            },
+            {
+              "command": [
+                "/tmp/llvm-direct-toolchain/bin/llvm-as",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/gc_closures-O0-verify-off.ll",
+                "-o",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/gc_closures-O0-verify-off.bc"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.015411
+            },
+            {
+              "command": [
+                "/tmp/llvm-direct-toolchain/bin/opt",
+                "-passes=verify",
+                "-disable-output",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/gc_closures-O0-verify-off.bc"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.012908
+            }
+          ],
+          "llvm_ir": {
+            "path": "build-llvm/post-review-verifier/gc_closures-O0-verify-off.ll",
+            "bytes": 41590,
+            "sha256": "332a386149b466739925dcf7c506d90037ff33a3ce22413d7b6d245466b42285"
+          },
+          "passed": true
+        },
+        {
+          "verify_ir": true,
+          "commands": [
+            {
+              "command": [
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/bin/shermes",
+                "-O0",
+                "-verify-ir=true",
+                "-emit-llvm",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/gc_closures.js",
+                "-o",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/gc_closures-O0-verify-on.ll"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.012998
+            },
+            {
+              "command": [
+                "/tmp/llvm-direct-toolchain/bin/llvm-as",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/gc_closures-O0-verify-on.ll",
+                "-o",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/gc_closures-O0-verify-on.bc"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.012842
+            },
+            {
+              "command": [
+                "/tmp/llvm-direct-toolchain/bin/opt",
+                "-passes=verify",
+                "-disable-output",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/gc_closures-O0-verify-on.bc"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.013919
+            }
+          ],
+          "llvm_ir": {
+            "path": "build-llvm/post-review-verifier/gc_closures-O0-verify-on.ll",
+            "bytes": 41590,
+            "sha256": "332a386149b466739925dcf7c506d90037ff33a3ce22413d7b6d245466b42285"
+          },
+          "passed": true
+        }
+      ],
+      "byte_identical": true,
+      "passed": true
+    },
+    {
+      "fixture": "test/LLVMNative/gc_closures.js",
+      "source": {
+        "path": "test/LLVMNative/gc_closures.js",
+        "bytes": 436,
+        "sha256": "e2cc29627ab8b921aff3e70f1d8ef95d7314f9be040c56bfa87769b68b732dfd"
+      },
+      "hermes_optimization": "O",
+      "variants": [
+        {
+          "verify_ir": false,
+          "commands": [
+            {
+              "command": [
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/bin/shermes",
+                "-O",
+                "-verify-ir=false",
+                "-emit-llvm",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/gc_closures.js",
+                "-o",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/gc_closures-O-verify-off.ll"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.01506
+            },
+            {
+              "command": [
+                "/tmp/llvm-direct-toolchain/bin/llvm-as",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/gc_closures-O-verify-off.ll",
+                "-o",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/gc_closures-O-verify-off.bc"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.014053
+            },
+            {
+              "command": [
+                "/tmp/llvm-direct-toolchain/bin/opt",
+                "-passes=verify",
+                "-disable-output",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/gc_closures-O-verify-off.bc"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.014869
+            }
+          ],
+          "llvm_ir": {
+            "path": "build-llvm/post-review-verifier/gc_closures-O-verify-off.ll",
+            "bytes": 26882,
+            "sha256": "195670961a0cbb02d944befe9c79564fda58067ec4c3012a10bfd75639f67970"
+          },
+          "passed": true
+        },
+        {
+          "verify_ir": true,
+          "commands": [
+            {
+              "command": [
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/bin/shermes",
+                "-O",
+                "-verify-ir=true",
+                "-emit-llvm",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/gc_closures.js",
+                "-o",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/gc_closures-O-verify-on.ll"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.012165
+            },
+            {
+              "command": [
+                "/tmp/llvm-direct-toolchain/bin/llvm-as",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/gc_closures-O-verify-on.ll",
+                "-o",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/gc_closures-O-verify-on.bc"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.012738
+            },
+            {
+              "command": [
+                "/tmp/llvm-direct-toolchain/bin/opt",
+                "-passes=verify",
+                "-disable-output",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/gc_closures-O-verify-on.bc"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.01869
+            }
+          ],
+          "llvm_ir": {
+            "path": "build-llvm/post-review-verifier/gc_closures-O-verify-on.ll",
+            "bytes": 26882,
+            "sha256": "195670961a0cbb02d944befe9c79564fda58067ec4c3012a10bfd75639f67970"
+          },
+          "passed": true
+        }
+      ],
+      "byte_identical": true,
+      "passed": true
+    },
+    {
+      "fixture": "test/LLVMNative/lexical_tdz.js",
+      "source": {
+        "path": "test/LLVMNative/lexical_tdz.js",
+        "bytes": 267,
+        "sha256": "17649e0fd19e538d264e5b7f28b8b10a602a12f704e52a5d30a5b379a3b37efd"
+      },
+      "hermes_optimization": "O0",
+      "variants": [
+        {
+          "verify_ir": false,
+          "commands": [
+            {
+              "command": [
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/bin/shermes",
+                "-O0",
+                "-verify-ir=false",
+                "-emit-llvm",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/lexical_tdz.js",
+                "-o",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/lexical_tdz-O0-verify-off.ll"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.013946
+            },
+            {
+              "command": [
+                "/tmp/llvm-direct-toolchain/bin/llvm-as",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/lexical_tdz-O0-verify-off.ll",
+                "-o",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/lexical_tdz-O0-verify-off.bc"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.011962
+            },
+            {
+              "command": [
+                "/tmp/llvm-direct-toolchain/bin/opt",
+                "-passes=verify",
+                "-disable-output",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/lexical_tdz-O0-verify-off.bc"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.013169
+            }
+          ],
+          "llvm_ir": {
+            "path": "build-llvm/post-review-verifier/lexical_tdz-O0-verify-off.ll",
+            "bytes": 25074,
+            "sha256": "ad79b4fc5732994e1f1f2f1af6dcfec1dea6dd5bbadc19017025da3737b86df8"
+          },
+          "passed": true
+        },
+        {
+          "verify_ir": true,
+          "commands": [
+            {
+              "command": [
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/bin/shermes",
+                "-O0",
+                "-verify-ir=true",
+                "-emit-llvm",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/lexical_tdz.js",
+                "-o",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/lexical_tdz-O0-verify-on.ll"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.012908
+            },
+            {
+              "command": [
+                "/tmp/llvm-direct-toolchain/bin/llvm-as",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/lexical_tdz-O0-verify-on.ll",
+                "-o",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/lexical_tdz-O0-verify-on.bc"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.014462
+            },
+            {
+              "command": [
+                "/tmp/llvm-direct-toolchain/bin/opt",
+                "-passes=verify",
+                "-disable-output",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/lexical_tdz-O0-verify-on.bc"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.013451
+            }
+          ],
+          "llvm_ir": {
+            "path": "build-llvm/post-review-verifier/lexical_tdz-O0-verify-on.ll",
+            "bytes": 25074,
+            "sha256": "ad79b4fc5732994e1f1f2f1af6dcfec1dea6dd5bbadc19017025da3737b86df8"
+          },
+          "passed": true
+        }
+      ],
+      "byte_identical": true,
+      "passed": true
+    },
+    {
+      "fixture": "test/LLVMNative/lexical_tdz.js",
+      "source": {
+        "path": "test/LLVMNative/lexical_tdz.js",
+        "bytes": 267,
+        "sha256": "17649e0fd19e538d264e5b7f28b8b10a602a12f704e52a5d30a5b379a3b37efd"
+      },
+      "hermes_optimization": "O",
+      "variants": [
+        {
+          "verify_ir": false,
+          "commands": [
+            {
+              "command": [
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/bin/shermes",
+                "-O",
+                "-verify-ir=false",
+                "-emit-llvm",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/lexical_tdz.js",
+                "-o",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/lexical_tdz-O-verify-off.ll"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.013506
+            },
+            {
+              "command": [
+                "/tmp/llvm-direct-toolchain/bin/llvm-as",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/lexical_tdz-O-verify-off.ll",
+                "-o",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/lexical_tdz-O-verify-off.bc"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.016261
+            },
+            {
+              "command": [
+                "/tmp/llvm-direct-toolchain/bin/opt",
+                "-passes=verify",
+                "-disable-output",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/lexical_tdz-O-verify-off.bc"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.028157
+            }
+          ],
+          "llvm_ir": {
+            "path": "build-llvm/post-review-verifier/lexical_tdz-O-verify-off.ll",
+            "bytes": 13891,
+            "sha256": "5b98c8ce5624121b31ca3b0f0ea2f41e71b264439270e7130e72d9c15b6e5b3a"
+          },
+          "passed": true
+        },
+        {
+          "verify_ir": true,
+          "commands": [
+            {
+              "command": [
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/bin/shermes",
+                "-O",
+                "-verify-ir=true",
+                "-emit-llvm",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/lexical_tdz.js",
+                "-o",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/lexical_tdz-O-verify-on.ll"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.012971
+            },
+            {
+              "command": [
+                "/tmp/llvm-direct-toolchain/bin/llvm-as",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/lexical_tdz-O-verify-on.ll",
+                "-o",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/lexical_tdz-O-verify-on.bc"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.016491
+            },
+            {
+              "command": [
+                "/tmp/llvm-direct-toolchain/bin/opt",
+                "-passes=verify",
+                "-disable-output",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/lexical_tdz-O-verify-on.bc"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.014223
+            }
+          ],
+          "llvm_ir": {
+            "path": "build-llvm/post-review-verifier/lexical_tdz-O-verify-on.ll",
+            "bytes": 13891,
+            "sha256": "5b98c8ce5624121b31ca3b0f0ea2f41e71b264439270e7130e72d9c15b6e5b3a"
+          },
+          "passed": true
+        }
+      ],
+      "byte_identical": true,
+      "passed": true
+    },
+    {
+      "fixture": "test/LLVMNative/objects.js",
+      "source": {
+        "path": "test/LLVMNative/objects.js",
+        "bytes": 385,
+        "sha256": "b5921cd8bcc10666245ca233b553f44fb50bae0130848090b48aec0172b22301"
+      },
+      "hermes_optimization": "O0",
+      "variants": [
+        {
+          "verify_ir": false,
+          "commands": [
+            {
+              "command": [
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/bin/shermes",
+                "-O0",
+                "-verify-ir=false",
+                "-emit-llvm",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/objects.js",
+                "-o",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/objects-O0-verify-off.ll"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.011442
+            },
+            {
+              "command": [
+                "/tmp/llvm-direct-toolchain/bin/llvm-as",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/objects-O0-verify-off.ll",
+                "-o",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/objects-O0-verify-off.bc"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.015906
+            },
+            {
+              "command": [
+                "/tmp/llvm-direct-toolchain/bin/opt",
+                "-passes=verify",
+                "-disable-output",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/objects-O0-verify-off.bc"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.012837
+            }
+          ],
+          "llvm_ir": {
+            "path": "build-llvm/post-review-verifier/objects-O0-verify-off.ll",
+            "bytes": 25146,
+            "sha256": "049ad04f63eec1e85b0e0fd23fe20246d4681e83f916c341cebf67c9d113262f"
+          },
+          "passed": true
+        },
+        {
+          "verify_ir": true,
+          "commands": [
+            {
+              "command": [
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/bin/shermes",
+                "-O0",
+                "-verify-ir=true",
+                "-emit-llvm",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/objects.js",
+                "-o",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/objects-O0-verify-on.ll"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.011277
+            },
+            {
+              "command": [
+                "/tmp/llvm-direct-toolchain/bin/llvm-as",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/objects-O0-verify-on.ll",
+                "-o",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/objects-O0-verify-on.bc"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.012404
+            },
+            {
+              "command": [
+                "/tmp/llvm-direct-toolchain/bin/opt",
+                "-passes=verify",
+                "-disable-output",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/objects-O0-verify-on.bc"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.015286
+            }
+          ],
+          "llvm_ir": {
+            "path": "build-llvm/post-review-verifier/objects-O0-verify-on.ll",
+            "bytes": 25146,
+            "sha256": "049ad04f63eec1e85b0e0fd23fe20246d4681e83f916c341cebf67c9d113262f"
+          },
+          "passed": true
+        }
+      ],
+      "byte_identical": true,
+      "passed": true
+    },
+    {
+      "fixture": "test/LLVMNative/objects.js",
+      "source": {
+        "path": "test/LLVMNative/objects.js",
+        "bytes": 385,
+        "sha256": "b5921cd8bcc10666245ca233b553f44fb50bae0130848090b48aec0172b22301"
+      },
+      "hermes_optimization": "O",
+      "variants": [
+        {
+          "verify_ir": false,
+          "commands": [
+            {
+              "command": [
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/bin/shermes",
+                "-O",
+                "-verify-ir=false",
+                "-emit-llvm",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/objects.js",
+                "-o",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/objects-O-verify-off.ll"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.011583
+            },
+            {
+              "command": [
+                "/tmp/llvm-direct-toolchain/bin/llvm-as",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/objects-O-verify-off.ll",
+                "-o",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/objects-O-verify-off.bc"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.012557
+            },
+            {
+              "command": [
+                "/tmp/llvm-direct-toolchain/bin/opt",
+                "-passes=verify",
+                "-disable-output",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/objects-O-verify-off.bc"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.015822
+            }
+          ],
+          "llvm_ir": {
+            "path": "build-llvm/post-review-verifier/objects-O-verify-off.ll",
+            "bytes": 13094,
+            "sha256": "d94e0e6b93fd9155d8e29fc784e8039eef02cf8344669f7cf4a4d553195c8b36"
+          },
+          "passed": true
+        },
+        {
+          "verify_ir": true,
+          "commands": [
+            {
+              "command": [
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/bin/shermes",
+                "-O",
+                "-verify-ir=true",
+                "-emit-llvm",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/objects.js",
+                "-o",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/objects-O-verify-on.ll"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.012259
+            },
+            {
+              "command": [
+                "/tmp/llvm-direct-toolchain/bin/llvm-as",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/objects-O-verify-on.ll",
+                "-o",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/objects-O-verify-on.bc"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.014429
+            },
+            {
+              "command": [
+                "/tmp/llvm-direct-toolchain/bin/opt",
+                "-passes=verify",
+                "-disable-output",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/objects-O-verify-on.bc"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.017728
+            }
+          ],
+          "llvm_ir": {
+            "path": "build-llvm/post-review-verifier/objects-O-verify-on.ll",
+            "bytes": 13094,
+            "sha256": "d94e0e6b93fd9155d8e29fc784e8039eef02cf8344669f7cf4a4d553195c8b36"
+          },
+          "passed": true
+        }
+      ],
+      "byte_identical": true,
+      "passed": true
+    },
+    {
+      "fixture": "test/LLVMNative/strings.js",
+      "source": {
+        "path": "test/LLVMNative/strings.js",
+        "bytes": 254,
+        "sha256": "585c59480c253588eb55326e2c1d3d318a96284a8e81a392a522ee2b79c481f1"
+      },
+      "hermes_optimization": "O0",
+      "variants": [
+        {
+          "verify_ir": false,
+          "commands": [
+            {
+              "command": [
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/bin/shermes",
+                "-O0",
+                "-verify-ir=false",
+                "-emit-llvm",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/strings.js",
+                "-o",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/strings-O0-verify-off.ll"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.011828
+            },
+            {
+              "command": [
+                "/tmp/llvm-direct-toolchain/bin/llvm-as",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/strings-O0-verify-off.ll",
+                "-o",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/strings-O0-verify-off.bc"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.012307
+            },
+            {
+              "command": [
+                "/tmp/llvm-direct-toolchain/bin/opt",
+                "-passes=verify",
+                "-disable-output",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/strings-O0-verify-off.bc"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.014343
+            }
+          ],
+          "llvm_ir": {
+            "path": "build-llvm/post-review-verifier/strings-O0-verify-off.ll",
+            "bytes": 20004,
+            "sha256": "cff3f8372ce3c32b56948c9f8f0259aa55a7ef413396f79aacaa51cb4b43e616"
+          },
+          "passed": true
+        },
+        {
+          "verify_ir": true,
+          "commands": [
+            {
+              "command": [
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/bin/shermes",
+                "-O0",
+                "-verify-ir=true",
+                "-emit-llvm",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/strings.js",
+                "-o",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/strings-O0-verify-on.ll"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.010836
+            },
+            {
+              "command": [
+                "/tmp/llvm-direct-toolchain/bin/llvm-as",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/strings-O0-verify-on.ll",
+                "-o",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/strings-O0-verify-on.bc"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.016006
+            },
+            {
+              "command": [
+                "/tmp/llvm-direct-toolchain/bin/opt",
+                "-passes=verify",
+                "-disable-output",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/strings-O0-verify-on.bc"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.017354
+            }
+          ],
+          "llvm_ir": {
+            "path": "build-llvm/post-review-verifier/strings-O0-verify-on.ll",
+            "bytes": 20004,
+            "sha256": "cff3f8372ce3c32b56948c9f8f0259aa55a7ef413396f79aacaa51cb4b43e616"
+          },
+          "passed": true
+        }
+      ],
+      "byte_identical": true,
+      "passed": true
+    },
+    {
+      "fixture": "test/LLVMNative/strings.js",
+      "source": {
+        "path": "test/LLVMNative/strings.js",
+        "bytes": 254,
+        "sha256": "585c59480c253588eb55326e2c1d3d318a96284a8e81a392a522ee2b79c481f1"
+      },
+      "hermes_optimization": "O",
+      "variants": [
+        {
+          "verify_ir": false,
+          "commands": [
+            {
+              "command": [
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/bin/shermes",
+                "-O",
+                "-verify-ir=false",
+                "-emit-llvm",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/strings.js",
+                "-o",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/strings-O-verify-off.ll"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.010647
+            },
+            {
+              "command": [
+                "/tmp/llvm-direct-toolchain/bin/llvm-as",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/strings-O-verify-off.ll",
+                "-o",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/strings-O-verify-off.bc"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.015319
+            },
+            {
+              "command": [
+                "/tmp/llvm-direct-toolchain/bin/opt",
+                "-passes=verify",
+                "-disable-output",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/strings-O-verify-off.bc"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.014358
+            }
+          ],
+          "llvm_ir": {
+            "path": "build-llvm/post-review-verifier/strings-O-verify-off.ll",
+            "bytes": 14105,
+            "sha256": "57adaa20c580917737ac5ca285d9ca7d8b2fffc3e602d108cde42bf1aa1b4709"
+          },
+          "passed": true
+        },
+        {
+          "verify_ir": true,
+          "commands": [
+            {
+              "command": [
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/bin/shermes",
+                "-O",
+                "-verify-ir=true",
+                "-emit-llvm",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/strings.js",
+                "-o",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/strings-O-verify-on.ll"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.013223
+            },
+            {
+              "command": [
+                "/tmp/llvm-direct-toolchain/bin/llvm-as",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/strings-O-verify-on.ll",
+                "-o",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/strings-O-verify-on.bc"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.014321
+            },
+            {
+              "command": [
+                "/tmp/llvm-direct-toolchain/bin/opt",
+                "-passes=verify",
+                "-disable-output",
+                "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/strings-O-verify-on.bc"
+              ],
+              "exit_code": 0,
+              "stdout": "",
+              "stderr": "",
+              "seconds": 0.015751
+            }
+          ],
+          "llvm_ir": {
+            "path": "build-llvm/post-review-verifier/strings-O-verify-on.ll",
+            "bytes": 14105,
+            "sha256": "57adaa20c580917737ac5ca285d9ca7d8b2fffc3e602d108cde42bf1aa1b4709"
+          },
+          "passed": true
+        }
+      ],
+      "byte_identical": true,
+      "passed": true
+    }
+  ],
+  "counter_execution": [
+    {
+      "command": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+        "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/utils/shllvm.py",
+        "run",
+        "--build-dir",
+        "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm",
+        "--llvm-bin",
+        "/tmp/llvm-direct-toolchain/bin",
+        "--no-runtime-build",
+        "--hermes-opt",
+        "O",
+        "--llvm-opt",
+        "2",
+        "-o",
+        "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/counter-native",
+        "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/examples/llvm/counter.js"
+      ],
+      "exit_code": 0,
+      "stdout": "41 42 42 105\n{\"value\":42,\"description\":\"captured state\"}\n7,14,21\n50\nexample 52\n",
+      "stderr": "",
+      "seconds": 0.346549,
+      "mode": "native",
+      "expected_stdout": "41 42 42 105\n{\"value\":42,\"description\":\"captured state\"}\n7,14,21\n50\nexample 52\n",
+      "passed": true
+    },
+    {
+      "command": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+        "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/utils/shllvm.py",
+        "jit",
+        "--build-dir",
+        "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm",
+        "--llvm-bin",
+        "/tmp/llvm-direct-toolchain/bin",
+        "--no-runtime-build",
+        "--hermes-opt",
+        "O",
+        "--llvm-opt",
+        "2",
+        "-o",
+        "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/post-review-verifier/counter-jit",
+        "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/examples/llvm/counter.js"
+      ],
+      "exit_code": 0,
+      "stdout": "41 42 42 105\n{\"value\":42,\"description\":\"captured state\"}\n7,14,21\n50\nexample 52\n",
+      "stderr": "",
+      "seconds": 0.255984,
+      "mode": "jit",
+      "expected_stdout": "41 42 42 105\n{\"value\":42,\"description\":\"captured state\"}\n7,14,21\n50\nexample 52\n",
+      "passed": true
+    }
+  ],
+  "positive_fixtures": 16,
+  "emission_pairs": 32,
+  "passed_emission_pairs": 32,
+  "llvm_modules_assembled_and_verified": 64,
+  "passed_counter_modes": 2,
+  "expected_change_set": true,
+  "all_passed": true
+}

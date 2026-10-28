@@ -1,0 +1,54 @@
+test_backend_failure_preserves_previous_elf (test_direct_llvm.DirectLLVMTests.test_backend_failure_preserves_previous_elf) ... /workspace/scratch/ea758b58c6af/picocalc-llvm-direct/picocalc-llvm-poc/compiler/js2llvm.js:25
+  throw new Error(`${infile}:${at.line + 1}:${at.character + 1}: ${message}`);
+  ^
+
+Error: /tmp/picojit-4axpfhjp/module.js:1:57: unsupported expression ArrowFunction
+    at die (/workspace/scratch/ea758b58c6af/picocalc-llvm-direct/picocalc-llvm-poc/compiler/js2llvm.js:25:9)
+    at FunctionEmitter.expression (/workspace/scratch/ea758b58c6af/picocalc-llvm-direct/picocalc-llvm-poc/compiler/js2llvm.js:142:5)
+    at FunctionEmitter.statement (/workspace/scratch/ea758b58c6af/picocalc-llvm-direct/picocalc-llvm-poc/compiler/js2llvm.js:156:40)
+    at FunctionEmitter.body (/workspace/scratch/ea758b58c6af/picocalc-llvm-direct/picocalc-llvm-poc/compiler/js2llvm.js:146:71)
+    at FunctionEmitter.generate (/workspace/scratch/ea758b58c6af/picocalc-llvm-direct/picocalc-llvm-poc/compiler/js2llvm.js:192:10)
+    at Object.<anonymous> (/workspace/scratch/ea758b58c6af/picocalc-llvm-direct/picocalc-llvm-poc/compiler/js2llvm.js:213:54)
+    at Module._compile (node:internal/modules/cjs/loader:1929:14)
+    at Object..js (node:internal/modules/cjs/loader:2060:10)
+    at Module.load (node:internal/modules/cjs/loader:1651:32)
+    at Module._load (node:internal/modules/cjs/loader:1443:12)
+
+Node.js v24.22.1
+ok
+test_default_emits_verifiable_llvm_and_no_generated_c (test_direct_llvm.DirectLLVMTests.test_default_emits_verifiable_llvm_and_no_generated_c) ... ok
+test_direct_lane_explicit_scope_boundary (test_direct_llvm.DirectLLVMTests.test_direct_lane_explicit_scope_boundary) ... ok
+test_integer_boundaries_unsigned_and_wrap (test_direct_llvm.DirectLLVMTests.test_integer_boundaries_unsigned_and_wrap) ... ok
+test_loop_locals_control_flow_and_assignments (test_direct_llvm.DirectLLVMTests.test_loop_locals_control_flow_and_assignments) ... ok
+test_seeded_c_oracle_state_and_effects (test_direct_llvm.DirectLLVMTests.test_seeded_c_oracle_state_and_effects) ... ok
+test_short_circuit_nested_phi_and_side_effects (test_direct_llvm.DirectLLVMTests.test_short_circuit_nested_phi_and_side_effects) ... ok
+test_unsupported_or_invalid_source_rejected_before_ir_output (test_direct_llvm.DirectLLVMTests.test_unsupported_or_invalid_source_rejected_before_ir_output) ... ok
+test_capability_is_enforced_at_ecall_boundary (test_end_to_end.PicoHostTests.test_capability_is_enforced_at_ecall_boundary) ... ok
+test_compiled_code_executes_with_effects (test_end_to_end.PicoHostTests.test_compiled_code_executes_with_effects) ... ok
+test_differential_against_node_for_supported_js_subset (test_end_to_end.PicoHostTests.test_differential_against_node_for_supported_js_subset) ... ok
+test_display_capability_denied (test_end_to_end.PicoHostTests.test_display_capability_denied) ... ok
+test_failed_migration_keeps_old_code_and_epoch (test_end_to_end.PicoHostTests.test_failed_migration_keeps_old_code_and_epoch) ... ok
+test_freestanding_c_guest_with_native_calls_and_stack (test_end_to_end.PicoHostTests.test_freestanding_c_guest_with_native_calls_and_stack) ... ok
+test_freestanding_elf_code_slots_and_no_libc (test_end_to_end.PicoHostTests.test_freestanding_elf_code_slots_and_no_libc) ... ok
+test_guest_fault_rolls_back_state_and_effects (test_end_to_end.PicoHostTests.test_guest_fault_rolls_back_state_and_effects) ... ok
+test_instruction_fuel_preempts_infinite_loop (test_end_to_end.PicoHostTests.test_instruction_fuel_preempts_infinite_loop) ... ok
+test_llvm_o0_o2_oz_equivalence (test_end_to_end.PicoHostTests.test_llvm_o0_o2_oz_equivalence) ... ok
+test_malformed_elf_rejected (test_end_to_end.PicoHostTests.test_malformed_elf_rejected) ... ok
+test_pixel_effects_commit_only_after_success (test_end_to_end.PicoHostTests.test_pixel_effects_commit_only_after_success) ... ok
+test_reload_schema_migration_and_stale_messages (test_end_to_end.PicoHostTests.test_reload_schema_migration_and_stale_messages) ... ok
+test_schema_mismatch_rolls_back_reload (test_end_to_end.PicoHostTests.test_schema_mismatch_rolls_back_reload) ... ok
+test_transpiler_rejects_dynamic_javascript (test_end_to_end.PicoHostTests.test_transpiler_rejects_dynamic_javascript) ... ok
+test_unix_socket_service_and_output_guard (test_jitd.CompilerServiceTests.test_unix_socket_service_and_output_guard) ... FAIL
+
+======================================================================
+FAIL: test_unix_socket_service_and_output_guard (test_jitd.CompilerServiceTests.test_unix_socket_service_and_output_guard)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/scratch/ea758b58c6af/picocalc-llvm-direct/picocalc-llvm-poc/tests/test_jitd.py", line 21, in test_unix_socket_service_and_output_guard
+    self.assertTrue(sock.exists(),'no jitd socket')
+AssertionError: False is not true : no jitd socket
+
+----------------------------------------------------------------------
+Ran 24 tests in 17.030s
+
+FAILED (failures=1)

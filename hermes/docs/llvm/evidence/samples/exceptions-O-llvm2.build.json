@@ -1,0 +1,96 @@
+{
+  "source": "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/exceptions.js",
+  "source_sha256": "86ef5d86a2e5c3e8dc01d769271dfaae72ce6650469076b1b6e15dc60d6b12a0",
+  "llvm_ir": "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/exceptions-O-llvm2.ll",
+  "llvm_ir_sha256": "a33c25ba76516e375e4396a06aba98aceb7ad3ec9d3aabf13d63c68fda766c68",
+  "hermes_optimization": "O",
+  "llvm_optimization": "2",
+  "pipeline": "JavaScript -> Hermes SSA -> LLVM IR -> LLVM",
+  "program_c_generation": false,
+  "runtime_bridge": "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/lib/libshllvm_runtime.a",
+  "runtime_bridge_sha256": "b65ecc0f2f667f673a6f569ae9a090acb8891233fdfe344bd57c213c43ee82e3",
+  "runtime_address_sanitizer": true,
+  "runtime_undefined_behavior_sanitizer": false,
+  "commands": [
+    {
+      "command": [
+        "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/bin/shermes",
+        "-O",
+        "-Xes6-block-scoping",
+        "-Xenable-tdz",
+        "-emit-llvm",
+        "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/exceptions.js",
+        "-o",
+        "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/shllvm-83arud4k/program.ll"
+      ],
+      "exit_code": 0,
+      "seconds": 0.020523,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/tmp/llvm-direct-toolchain/root/usr/lib/llvm-18/bin/llvm-as",
+        "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/shllvm-83arud4k/program.ll",
+        "-o",
+        "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/shllvm-83arud4k/program.bc"
+      ],
+      "exit_code": 0,
+      "seconds": 0.01831,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/tmp/llvm-direct-toolchain/root/usr/lib/llvm-18/bin/opt",
+        "-passes=verify",
+        "-disable-output",
+        "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/shllvm-83arud4k/program.bc"
+      ],
+      "exit_code": 0,
+      "seconds": 0.016448,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/tmp/llvm-direct-toolchain/root/usr/lib/llvm-18/bin/opt",
+        "-passes=verify,default<O2>,verify",
+        "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/shllvm-83arud4k/program.bc",
+        "-o",
+        "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/shllvm-83arud4k/optimized.bc"
+      ],
+      "exit_code": 0,
+      "seconds": 0.035328,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/tmp/llvm-direct-toolchain/root/usr/lib/llvm-18/bin/clang",
+        "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/exceptions-O-llvm2.bc",
+        "-O2",
+        "-Wno-override-module",
+        "-fsanitize=address",
+        "-L/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/lib",
+        "-Wl,-rpath,/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/lib",
+        "-L/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/tools/shermes",
+        "-Wl,-rpath,/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/tools/shermes",
+        "-L/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/jsi",
+        "-Wl,-rpath,/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/jsi",
+        "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/lib/libshllvm_runtime.a",
+        "-lshermes_console",
+        "-lhermesvm",
+        "-lm",
+        "-o",
+        "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/shllvm-link-4o2p45i3/program"
+      ],
+      "exit_code": 0,
+      "seconds": 0.273523,
+      "stdout": "",
+      "stderr": ""
+    }
+  ],
+  "native_executable": "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/exceptions-O-llvm2",
+  "native_executable_sha256": "06abb96da1fa6393737811a0af9a598932ba93722a513f8f3f7df6c548ba558c"
+}

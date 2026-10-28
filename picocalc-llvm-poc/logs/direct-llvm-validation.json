@@ -1,0 +1,16 @@
+{
+  "timestamp_utc": "2026-10-28T13:30:57.107750+00:00",
+  "tests": 24,
+  "passed": 24,
+  "failed": 0,
+  "skipped": 0,
+  "test_log": "logs/direct-llvm-tests-with-sockets-final.txt",
+  "test_log_sha256": "ec6e431e463de50e914c76184575eff6f55e897bcf95aa4860e9fedd45d2fd76",
+  "note": "Local Unix sockets enabled for compiler daemon test. Initial restricted-sandbox run retained separately; earlier socket-enabled run produced incomplete log and is not counted.",
+  "source_hashes": {
+    "compiler/js2llvm.js": "6e70c9a545f024ac3638cebf54fa4852c92133f9eae58b8ea5f7cb71f9ae2e2f",
+    "compiler/compile.py": "9ade461ca358b8a61e0d855117eb55067d3891be8e9be8460fb245840fad2c2c",
+    "compiler/jitd.py": "0980a74f6baa1b9f21ff5c97d450e2462d9284b4d3a350c56c6f1bcf92e84dfd",
+    "tests/test_direct_llvm.py": "a8835c6e5109abb59548ab5fa145f010d4bd848adf2c29104a995562c40d0d8b"
+  }
+}

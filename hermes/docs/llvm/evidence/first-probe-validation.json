@@ -1,0 +1,13 @@
+{
+  "source_sha256": "bf823a6d92c4bac4a6787b11f7bfd205492b180e05bbce7d432a1e78f8c5d015",
+  "llvm_sha256": "5479d196c318610256cea01df808d9bad6b0d9bf77967e8c4a3342b9aec564f6",
+  "expected": "45 720 11 12 12\n",
+  "actual": "45 720 11 12 12\n",
+  "exit": 0,
+  "stderr": "",
+  "reference_c_backend_observed": "45 720 11 12 12\n",
+  "address_sanitizer": "runtime and bridge instrumented; LeakSanitizer disabled because restricted proc access",
+  "llvm_parser": "llvm-as 18 accepted",
+  "native_target": "x86_64-pc-linux-gnu",
+  "llvm_native_optimization": "-O2"
+}

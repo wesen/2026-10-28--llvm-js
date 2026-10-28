@@ -1,0 +1,11 @@
+const key = 'value';
+const obj = {value: 3, nested: {x: 7}, tag: 'ok'};
+const alias = obj;
+obj[key] += 39;
+alias.nested.x *= 2;
+obj.self = obj;
+print(obj.value, obj.nested.x, obj.tag, obj.self === alias);
+obj.extra = 99;
+print('extra' in obj, delete obj.extra, 'extra' in obj, obj.missing === undefined);
+const unicode = {'é': 11, '𝄞': 31};
+print(unicode['é'] + unicode['𝄞']);

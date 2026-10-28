@@ -1,0 +1,9 @@
+{
+  "name": "picocalc-llvm-world-lab-host-frontend",
+  "private": true,
+  "description": "Host-side TypeScript parser for a restricted JavaScript/i32 compiler; no JavaScript runtime runs on the guest",
+  "version": "0.1.0",
+  "dependencies": {
+    "typescript": "5.8.3"
+  }
+}

@@ -1,0 +1,5 @@
+41 42 42 105
+{"value":42,"description":"captured state"}
+7,14,21
+50
+example 52

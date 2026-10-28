@@ -1,0 +1,35 @@
+# Copyright (c) Meta Platforms, Inc. and affiliates.
+#
+# This source code is licensed under the MIT license found in the
+# LICENSE file in the root directory of this source tree.
+
+set(source_files
+   PlatformUnicodeJava.cpp
+   PlatformUnicodeCF.cpp
+   PlatformUnicodeLite.cpp
+   PlatformUnicodeEmscripten.cpp
+   PlatformUnicodeHermes.cpp
+   CharacterProperties.cpp
+)
+
+# The self-contained normalizer, case converter and collator, compiled only
+# for the backends that call them. Android and Apple have platform
+# implementations, so they must not pay for these tables.
+# HERMES_UNICODE_LITE wins over the platform check because the LITE backend
+# calls them on every platform.
+if(HERMES_UNICODE_LITE OR (NOT APPLE AND NOT HERMES_IS_ANDROID))
+  list(APPEND source_files UnicodeNormalization.cpp UnicodeCaseConversion.cpp
+       UnicodeCollation.cpp PlatformDateFormat.cpp)
+endif()
+
+add_hermes_library(hermesPlatformUnicode ${source_files})
+
+if(HERMES_UNICODE_LITE)
+  # nothing
+elseif(HERMES_IS_ANDROID)
+  target_link_libraries(hermesPlatformUnicode_obj fbjni::fbjni)
+  set_source_files_properties(PlatformUnicodeJava.cpp PROPERTIES
+    COMPILE_FLAGS "-frtti -fexceptions")
+elseif(APPLE)
+  target_link_libraries(hermesPlatformUnicode_obj ${CORE_FOUNDATION})
+endif()

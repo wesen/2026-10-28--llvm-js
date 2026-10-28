@@ -1,0 +1,67 @@
+/**
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+
+// RUN: %shermes -typed -dump-ir %s | %FileCheckOrRegen %s --match-full-lines
+
+// Check optimization of chained casts.
+
+class Cls {
+    next: ?Cls;
+}
+
+function next (ptr: ?Cls): Cls {
+    return ((((ptr: any): Cls).next : any): Cls);
+}
+
+exports.next = next
+
+// Auto-generated content below. Please do not modify manually.
+
+// CHECK:function global(): undefined
+// CHECK-NEXT:%BB0:
+// CHECK-NEXT:  %0 = CreateFunctionInst (:object) empty: any, empty: any, %Symbol(): functionCode
+// CHECK-NEXT:  %1 = AllocTypedNonEnumObjectInst (:object) null: null
+// CHECK-NEXT:       StorePropertyStrictInst %1: object, %0: object, "prototype": string
+// CHECK-NEXT:  %3 = CreateFunctionInst (:object) empty: any, empty: any, %Object(): functionCode
+// CHECK-NEXT:  %4 = AllocTypedNonEnumObjectInst (:object) null: null
+// CHECK-NEXT:       StorePropertyStrictInst %4: object, %3: object, "prototype": string
+// CHECK-NEXT:  %6 = AllocObjectLiteralInst (:object) empty: any
+// CHECK-NEXT:  %7 = CreateFunctionInst (:object) empty: any, empty: any, %next(): functionCode
+// CHECK-NEXT:  %8 = CreateFunctionInst (:object) empty: any, empty: any, %Cls(): functionCode
+// CHECK-NEXT:  %9 = AllocTypedNonEnumObjectInst (:object) null: null
+// CHECK-NEXT:        StorePropertyStrictInst %9: object, %8: object, "prototype": string
+// CHECK-NEXT:        StorePropertyStrictInst %7: object, %6: object, "next": string
+// CHECK-NEXT:        ReturnInst undefined: undefined
+// CHECK-NEXT:function_end
+
+// CHECK:base constructor Symbol(): any [typed,noReturn]
+// CHECK-NEXT:%BB0:
+// CHECK-NEXT:  %0 = TryLoadGlobalPropertyInst (:any) globalObject: object, "TypeError": string
+// CHECK-NEXT:  %1 = CreateThisInst (:undefined|object) %0: any, %0: any, empty: any
+// CHECK-NEXT:  %2 = CallInst (:any) %0: any, empty: any, false: boolean, empty: any, %0: any, %1: undefined|object, "Symbol is not a constructor": string
+// CHECK-NEXT:  %3 = GetConstructedObjectInst (:object) %1: undefined|object, %2: any
+// CHECK-NEXT:       ThrowInst %3: object
+// CHECK-NEXT:function_end
+
+// CHECK:function Object(): undefined
+// CHECK-NEXT:%BB0:
+// CHECK-NEXT:       ReturnInst undefined: undefined
+// CHECK-NEXT:function_end
+
+// CHECK:function next(ptr: undefined|null|object): object [typed]
+// CHECK-NEXT:%BB0:
+// CHECK-NEXT:  %0 = LoadParamInst (:undefined|null|object) %ptr: undefined|null|object
+// CHECK-NEXT:  %1 = CheckedTypeCastInst (:object) %0: undefined|null|object, type(object)
+// CHECK-NEXT:  %2 = PrLoadInst (:undefined|null|object) %1: object, 0: number, "next": string
+// CHECK-NEXT:  %3 = CheckedTypeCastInst (:object) %2: undefined|null|object, type(object)
+// CHECK-NEXT:       ReturnInst %3: object
+// CHECK-NEXT:function_end
+
+// CHECK:function Cls(): undefined
+// CHECK-NEXT:%BB0:
+// CHECK-NEXT:       ReturnInst undefined: undefined
+// CHECK-NEXT:function_end

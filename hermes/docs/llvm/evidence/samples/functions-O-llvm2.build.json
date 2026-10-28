@@ -1,0 +1,96 @@
+{
+  "source": "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/functions.js",
+  "source_sha256": "5344c3e6cb57e25eaa167944eef6059573c185bd35e5a4b9493053312a0da97f",
+  "llvm_ir": "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/functions-O-llvm2.ll",
+  "llvm_ir_sha256": "23626342802acce8323b835065449229269ba26bce5e3c217705bdcc2784ac48",
+  "hermes_optimization": "O",
+  "llvm_optimization": "2",
+  "pipeline": "JavaScript -> Hermes SSA -> LLVM IR -> LLVM",
+  "program_c_generation": false,
+  "runtime_bridge": "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/lib/libshllvm_runtime.a",
+  "runtime_bridge_sha256": "b65ecc0f2f667f673a6f569ae9a090acb8891233fdfe344bd57c213c43ee82e3",
+  "runtime_address_sanitizer": true,
+  "runtime_undefined_behavior_sanitizer": false,
+  "commands": [
+    {
+      "command": [
+        "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/bin/shermes",
+        "-O",
+        "-Xes6-block-scoping",
+        "-Xenable-tdz",
+        "-emit-llvm",
+        "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/functions.js",
+        "-o",
+        "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/shllvm-bxua3pd3/program.ll"
+      ],
+      "exit_code": 0,
+      "seconds": 0.027243,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/tmp/llvm-direct-toolchain/root/usr/lib/llvm-18/bin/llvm-as",
+        "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/shllvm-bxua3pd3/program.ll",
+        "-o",
+        "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/shllvm-bxua3pd3/program.bc"
+      ],
+      "exit_code": 0,
+      "seconds": 0.018239,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/tmp/llvm-direct-toolchain/root/usr/lib/llvm-18/bin/opt",
+        "-passes=verify",
+        "-disable-output",
+        "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/shllvm-bxua3pd3/program.bc"
+      ],
+      "exit_code": 0,
+      "seconds": 0.01857,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/tmp/llvm-direct-toolchain/root/usr/lib/llvm-18/bin/opt",
+        "-passes=verify,default<O2>,verify",
+        "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/shllvm-bxua3pd3/program.bc",
+        "-o",
+        "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/shllvm-bxua3pd3/optimized.bc"
+      ],
+      "exit_code": 0,
+      "seconds": 0.02796,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/tmp/llvm-direct-toolchain/root/usr/lib/llvm-18/bin/clang",
+        "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/functions-O-llvm2.bc",
+        "-O2",
+        "-Wno-override-module",
+        "-fsanitize=address",
+        "-L/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/lib",
+        "-Wl,-rpath,/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/lib",
+        "-L/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/tools/shermes",
+        "-Wl,-rpath,/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/tools/shermes",
+        "-L/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/jsi",
+        "-Wl,-rpath,/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/jsi",
+        "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/lib/libshllvm_runtime.a",
+        "-lshermes_console",
+        "-lhermesvm",
+        "-lm",
+        "-o",
+        "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/shllvm-link-a872w7m5/program"
+      ],
+      "exit_code": 0,
+      "seconds": 0.215805,
+      "stdout": "",
+      "stderr": ""
+    }
+  ],
+  "native_executable": "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/functions-O-llvm2",
+  "native_executable_sha256": "d2bfd68cd4b79c6677f5786a21ecde7fdba2f5d2390212542dd63b2f1c4d1770"
+}

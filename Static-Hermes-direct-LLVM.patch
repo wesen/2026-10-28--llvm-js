@@ -1,0 +1,3422 @@
+diff --git a/docs/llvm/ARCHITECTURE.md b/docs/llvm/ARCHITECTURE.md
+new file mode 100644
+index 0000000000000000000000000000000000000000..b8ae2a83543fcc17800179b57ab732a546ff1da1
+--- /dev/null
++++ b/docs/llvm/ARCHITECTURE.md
+@@ -0,0 +1,329 @@
++# Direct LLVM compilation for Static Hermes
++
++## 1. What this implementation builds
++
++This chapter follows a JavaScript program from Hermes's intermediate representation to LLVM IR and then to native execution. Its central question is practical: **how can a compiler emit native code for functions, objects, and closures while preserving the language's runtime behavior?** Arithmetic instructions alone are insufficient. A function can return another function, a property access can call a getter, and an allocation can move objects that an earlier expression still needs.
++
++The implementation answers that question by combining a new LLVM emitter with the existing Static Hermes runtime. The emitter generates each program's functions, branches, and calls directly as textual LLVM IR. A small, separately compiled C bridge adapts those calls to Hermes's value representation, object model, environments, call frames, and garbage collector. The bridge is built once for a runtime configuration; a guest program does not become a generated C program on this path. [1] [2] [3]
++
++The source base is the `static_h` development line of Hermes, pinned here to commit `f837b9dd8396ebf5c4e8115412417d273565f0fe`. This chapter describes the accompanying local changes, which are not present in that upstream commit. It explains implemented mechanisms and their constraints; examples are teaching examples, not a claim that every JavaScript feature or every optimization combination has passed validation. Consult the delivered validation records for measured results.
++
++The current dynamic runtime bridge deliberately requires a 64-bit host pointer ABI. The separate PicoCalc prototype compiles its restricted integer worlds directly to RV32 LLVM IR. These are two distinct execution targets. Objects and closures in the host backend do not establish that the dynamic Hermes runtime runs on a physical PicoCalc or ESP32 device. Section 13 explains the remaining integration work.
++
++## 2. Where the compiler changes direction
++
++An **intermediate representation**, or IR, records program operations in a form designed for analysis and transformation. Hermes already parses JavaScript, resolves bindings, constructs functions and basic blocks, and lowers many language constructs. The new backend reuses that work. It does not parse JavaScript again.
++
++```mermaid
++flowchart TD
++    JS[JavaScript source] --> H[Hermes frontend and IR]
++    H --> L[Shared module lowering]
++    L --> E[Direct LLVM emitter]
++    L --> C[Existing Static Hermes C backend]
++    E --> V[LLVM verification and code generation]
++    V --> N[Native program]
++    B[Prebuilt runtime bridge] --> N
++    R[Hermes runtime] --> B
++```
++
++The compiler driver's `-emit-llvm` path calls `sh::generateLLVM`. That function invokes `lowerForLLVM`, assigns indices to environment variables, and creates a `ModuleEmitter`. The shared lowering includes argument handling, object literal lowering, scope lowering, switch lowering, constant loading, and selected optimizations. [1] [4]
++
++The boundary matters. The existing C backend subsequently performs its own register allocation and transformations such as call lowering that encode its register choices. The direct backend stops before those stages. LLVM receives a representation from which it can perform its own optimization and machine register allocation. Reusing the C backend's final register-oriented form would unnecessarily couple the new emitter to a different code generator's storage decisions.
++
++| Component | Responsibility |
++|---|---|
++| `tools/shermes/compile.cpp` | Select direct emission and publish a complete module only after backend success |
++| `lib/BCGen/SH/SH.cpp` | Provide the shared module-lowering boundary |
++| `LLVMNative/LLVMBackend.cpp` | Translate supported Hermes instructions, functions, control flow, and module data into LLVM text |
++| `LLVMNative/runtime.h` | Declare the narrow interface between generated code and runtime adaptation |
++| `LLVMNative/runtime.c` | Implement that interface using the actual Static Hermes runtime |
++| `utils/shllvm.py` | Assemble, verify, optimize, link or JIT, and record the build inputs |
++
++`ModuleEmitter` assigns function IDs, interns strings, gathers helper declarations, and writes module data. `FunctionEmitter` handles an individual function's blocks, storage, instructions, and exception regions. Imported helper signatures are recorded consistently: a helper cannot silently acquire different LLVM argument types at different call sites. [1]
++
++Text emission keeps the compiler independent of LLVM's C++ library ABI. The tools `llvm-as` and `opt` subsequently check the emitted module. Unsupported Hermes instructions produce diagnostics, and `compileToLLVM` buffers the module before publishing it. This prevents an incomplete translation from looking like successful output. Verification remains a structural check: valid LLVM can still implement the wrong JavaScript behavior.
++
++## 3. Values and the runtime boundary
++
++Generated native JavaScript functions currently have this shape:
++
++```llvm
++define internal i64 @shllvm_f7(ptr %shr) {
++  ; Generated function body.
++}
++```
++
++The parameter is a runtime pointer. The returned `i64` holds the bits of a Hermes `SHLegacyValue`. It does **not** mean that every JavaScript value is an integer. Numbers, booleans, undefined, null, and heap references use the runtime's tagged representation. JavaScript arguments arrive through Hermes's register stack, described in Section 6. [1] [2] [5]
++
++Most helpers receive pointers to rooted value slots and place their result into another slot. For example, a dynamic addition passes a result address, runtime pointer, operation code, and two operand addresses to `shllvm_binary`. The bridge then calls Hermes's existing addition implementation. This preserves behaviors such as string concatenation and object-to-primitive conversion without duplicating them in the emitter.
++
++The LLVM-visible interface uses a small vocabulary:
++
++| LLVM type | Meaning in this interface |
++|---|---|
++| `ptr` | An opaque runtime, frame, unit, native function, or rooted-slot address, according to the helper signature |
++| `i64` | Tagged value bits, or an explicitly declared size/bit-pattern field |
++| `i32` | Counts, indices, operation selectors, and bridge boolean results |
++| `double` | A Number already known to be suitable for floating-point arithmetic |
++
++Opaque pointers do not remove type discipline. Passing a frame address where a rooted value address is expected is still a compiler bug. The discipline resides in the helper prototypes and emitter logic rather than LLVM pointee types.
++
++The bridge computes native structure sizes and accesses C fields. Compile-time assertions require eight-byte values, eight-byte host pointers, and a sixteen-byte function descriptor. These assertions document the present ABI contract; they are not a proof of portability to every 64-bit platform.
++
++Constants also cross this boundary deliberately. Numeric bit patterns become values through `_sh_ljs_untrusted_double`; booleans use the boolean constructor. The internal Empty sentinel has its own representation. Uninit follows the existing SH convention of using undefined bits, while compiler type information retains its distinct role. Consequently, a temporal-dead-zone check carries an explicit invalid-type mask: it must not reject every ordinary JavaScript `undefined`. [1] [2] [5]
++
++## 4. Keeping values alive across allocation
++
++A **garbage-collector root** is a location from which the collector begins tracing live objects. A native machine register containing an object address is not automatically such a location. Moreover, a moving collector can relocate an object and update its registered references. Generated code must subsequently use the updated value.
++
++This backend adopts a conservative storage policy: every Hermes instruction receives a root slot, and encountered constants receive slots too. Side-effect-only instructions also receive unused slots to keep numbering simple. A scratch slot supports temporary helper operations. All slots are initialized to undefined before they are exposed to collection. [1] [2]
++
++At entry, generated code asks `shllvm_frame_size` for the required native storage size, allocates aligned stack storage, and calls `shllvm_enter`. The bridge initializes the `SHLocals` header, links this root frame through `_sh_enter`, and reserves the outgoing Hermes argument/frame area. The emitter obtains the root-array address through `shllvm_roots`; it never guesses the offset of that array inside `SHLocals`.
++
++The resulting invariant is:
++
++> Every guest value that must survive a potentially allocating operation has an authoritative copy in a location traced by Hermes.
++
++A property read can invoke a getter; a conversion can invoke user code; either can allocate. Therefore the emitter treats ordinary runtime helpers as possible safepoints unless their implementation establishes otherwise. After a helper returns, later uses reload their values from root slots. The emitter does not cache a movable heap address in a long-lived LLVM temporary. It also avoids false purity attributes that would tell LLVM these calls cannot modify rooted storage.
++
++Short-lived raw values are permissible between safepoints. A phi-edge transfer, for example, performs only loads and stores. Similarly, argument copying first loads rooted values into an outgoing array, then the bridge copies them without allocation into Hermes's traced register stack before invoking the callee. The temporary array is not a separate collector root table; the copying protocol makes that safe. [1] [2] [6]
++
++Normal return reads the result, removes any function-level exception handler, leaves the runtime frame, and returns its bits. Those cleanup operations do not allocate managed objects. Exceptional unwinding needs a different restoration path, explained in Section 10.
++
++This design favors inspectable correctness over compact frames. Values can remain rooted after their last semantic use, delaying collection until return. Precise liveness, slot reuse, or LLVM stack maps would be later optimizations requiring new proofs. The current admission limit is 1,024 combined root and argument slots, including scratch/minimum argument storage: at most 8 KiB of explicit tagged payload. Headers, exception buffers, machine spills, runtime frames, and recursion consume additional stack. The limit and native stack checks are not a total memory budget.
++
++## 5. Branches and simultaneous phi assignments
++
++A **basic block** contains instructions executed in sequence until its final branch, return, or throw. A conditional Hermes branch becomes a truthiness helper call followed by an LLVM conditional branch. JavaScript truthiness is preserved before LLVM receives its one-bit condition. [1]
++
++Hermes IR also uses phi nodes. A phi selects a value according to the incoming control-flow edge. In this implementation its result lives in a root slot. The emitter inserts an edge block whenever the destination requires phi transfers.
++
++Consider a loop whose next iteration exchanges two values:
++
++```text
++next_a = old_b
++next_b = old_a
++```
++
++Writing `a = b` and then `b = a` into the same storage loses `old_a`. Both phi assignments logically occur together. `emitEdges` therefore loads **all incoming values first**, then stores all destination slots:
++
++```llvm
++edge_example:
++  %old_a = load i64, ptr %a, align 8
++  %old_b = load i64, ptr %b, align 8
++  store i64 %old_b, ptr %a, align 8
++  store i64 %old_a, ptr %b, align 8
++  br label %loop
++```
++
++This is schematic explanatory IR, not an extracted module. There are no allocating calls between these transfers. Thus the raw temporaries remain valid, and cycles among phi assignments cannot overwrite their own inputs. The same edge mechanism handles phi transfers into exception destinations. LLVM's phi definition supplies the general control-flow semantics; the rooted-slot strategy is this backend's implementation choice. [1] [9]
++
++## 6. Calling functions, passing `this`, and constructing objects
++
++Although a generated function takes one LLVM parameter, a JavaScript call has a callee, arguments, `this`, and sometimes `new.target`. `emitCall` gathers explicit arguments into a contiguous array. `shllvm_call` places the callee, receiver, construction target, and arguments into the outgoing Hermes frame, then invokes `_sh_ljs_call`. Hermes owns the remaining call metadata and dispatch. [1] [2] [6]
++
++`shllvm_param` reads incoming parameters using the runtime's established numbering: index zero is `this`, and explicit parameters begin at one. Missing parameters produce undefined. Recursion creates new native/root frames, while each invoked closure still identifies its own captured environment.
++
++This distinction explains method calls. In `object.method(3)`, the function value and receiver are different pieces of call information. Extracting the same method into a variable can change the receiver on a later call. The frontend represents this distinction, and the bridge preserves it. Non-strict receiver coercion has its own helper; an arrow's lexical `this` comes from the frontend's capture representation, rather than a special rule invented by the call bridge.
++
++Construction also uses the existing protocol. Helpers implement `CreateThis`, `GetNewTarget`, and selection between the allocated receiver and an explicit object returned by the constructor. Function metadata distinguishes permitted invocation forms: an arrow cannot be constructed, and a class constructor cannot be called as an ordinary function. The generated prologue checks these restrictions.
++
++Class creation delegates to `_sh_ljs_create_class`, passing the native function, its environment and metadata, the home-object output, and an optional superclass. Receiver-sensitive property helpers support operations whose lookup object differs from their receiver. These mechanisms describe the implemented path; they do not imply that every class extension, such as private-field lowering, is accepted. Argument objects likewise retain Hermes's lazy/reified and strict/loose helper paths. [1] [2] [5]
++
++## 7. Closures are code plus shared bindings
++
++A **closure** packages executable code with the lexical environment needed by that code. A captured binding is a mutable cell in an environment, not necessarily a copy of the value present when the function was created.
++
++Consider this excerpt from `test/LLVMNative/closures.js`:
++
++```javascript
++function counter(start) {
++  let n = start;
++  return {
++    inc: () => ++n,
++    dec: function () { return --n; },
++    read: () => n
++  };
++}
++const a = counter(40), b = counter(100);
++print(a.inc(), a.inc(), a.dec(), a.read(), b.inc(), a.read());
++```
++
++The expected output, derived from the source, is `41 42 41 41 101 41`. `a.inc`, `a.dec`, and `a.read` share the same binding for `n`. The second invocation creates a separate binding for `b`. Incrementing `b` cannot change `a`.
++
++```mermaid
++flowchart TD
++    A[Object a] --> AI[inc closure]
++    A --> AD[dec closure]
++    A --> AR[read closure]
++    AI --> EA[Environment A: n]
++    AD --> EA
++    AR --> EA
++    B[Object b] --> BI[inc closure]
++    BI --> EB[Environment B: n]
++```
++
++The implementation maps each part to existing Hermes operations. `CreateScopeInst` calls `shllvm_env_create`. Variable indices assigned after lowering identify the environment slots. `StoreFrameInst` writes a slot through `shllvm_env_store`; `LoadFrameInst` reads it through `shllvm_env_load`. The store uses Hermes's write barrier, allowing the collector to track newly stored heap references. [1] [2] [5]
++
++`CreateFunctionInst` calls `shllvm_closure`, which creates a real Hermes function object containing the generated native function pointer, metadata, compilation unit, and environment. At invocation, the callee recovers its environment from the current closure. Scope-resolution helpers walk parent environments for captures from more distant lexical scopes.
++
++The creator's native frame can disappear while the environment survives. In the example, the returned object retains the closures, and those closures retain Environment A. That reachability, not the stack frame of `counter`, keeps `n` alive. The absent-environment case is handled explicitly as undefined/null helper input; the bridge must not fabricate an object-tagged null address and present it to the collector.
++
++Nested arrows such as `a => b => c => a + b + c` extend this chain. Each invocation can introduce a new environment, and the innermost closure reaches the required outer bindings. Recursive closures add another useful case:
++
++```javascript
++function recursiveClosure() {
++  let f = n => n === 0 ? 0 : n + f(n - 1);
++  return f;
++}
++print(recursiveClosure()(20)); // Expected mathematically: 210.
++```
++
++Here the captured `f` slot refers to a closure that itself refers to the environment containing `f`. A tracing collector can handle this cycle. The compiler must preserve shared-cell access rather than substitute an incomplete snapshot during closure creation.
++
++There are two lifetimes to distinguish. Heap reachability controls closure/environment lifetime. The native code mapping and `SHUnit` metadata must also remain available whenever a closure can execute. Upstream specifies that a unit, once associated with a runtime, persists until that runtime is destroyed. Unloading code while a surviving closure points to it violates a different contract that garbage collection alone cannot repair. [5]
++
++## 8. Objects, properties, arrays, and observable order
++
++Objects are allocated by Hermes. The emitter uses helpers for named or computed reads, assignment, defining own properties, accessors, and deletion. Named operations use interned symbol IDs and per-string property caches; computed operations pass a rooted key value. A cache accelerates the runtime's lookup protocol without replacing its semantic checks. [1] [2]
++
++Assignment and definition are distinct. Assigning a property may invoke an inherited setter; defining an own property creates or changes a property on the object itself. Strict and non-strict writes also differ in failure behavior. The emitter chooses corresponding helper variants, including operations with an explicit receiver. The `try_flag` on global-property helpers concerns errors for missing global bindings, not JavaScript `try` syntax.
++
++Object literals lowered into buffers are expanded into ordinary allocation and property definitions in this first backend. Where the lowered IR contains named fixed-property operations, the emitter preserves the property name instead of assuming the optimized C backend's storage offsets. Explicit prototypes use the runtime's parent-aware allocation helper and a registered empty-shape cache. Typed object allocation and private fixed-slot properties are rejected rather than silently translated with ordinary object semantics.
++
++Arrays require a subtle distinction:
++
++```javascript
++const hole = [,];
++const present = [undefined];
++print(0 in hole, 0 in present); // Expected: false true.
++```
++
++Both arrays have length one, but only the second owns an element at index zero. The emitter allocates the logical array length and skips `LiteralEmpty` entries. It still defines an element whose value is undefined. Nonliteral element stores already introduced by frontend lowering remain in their IR order. This preserves the frontend's evaluation sequence rather than recomputing expressions during allocation. [1] [2] [7]
++
++These are also memory-management concerns. A getter, setter, conversion, or array callback can reenter generated JavaScript. Root frames, environments, outgoing arguments, and code mappings must remain valid across that nested execution.
++
++## 9. Dynamic arithmetic and direct floating-point operations
++
++The backend has two arithmetic paths. General JavaScript operations call Hermes helpers, which preserve coercion and exception behavior. An addition with an unknown operand type cannot simply become LLVM `fadd`: it might concatenate strings or run user code during conversion. [1] [2]
++
++When Hermes IR already contains a floating operation, the emitter loads its known numeric operands, bitcasts their value bits to `double`, and emits `fadd`, `fsub`, `fmul`, `fdiv`, `frem`, or `fneg`. Results pass through `shllvm_number`, which uses the runtime's untrusted-double constructor before they become tagged values again.
++
++The emitter attaches **no fast-math flags**. JavaScript exposes signed zero, infinities, and NaN-related behavior, so transformations requiring assumptions about their absence would need a stronger justification. Floating comparisons use ordered predicates for equality and ordering, and unordered-or-not-equal for inequality: `oeq`, `olt`, `ole`, `ogt`, `oge`, and `une`. This gives the intended NaN behavior for the typed comparison operations. [1] [9]
++
++For example, a compiler must preserve the distinction between `1 / 0` and `1 / -0`, and must not turn `NaN !== NaN` into false. The root-slot representation does not itself enforce these rules; correct operation selection and the runtime's numeric constructor do. Likewise, bitwise JavaScript operations retain their runtime conversion rules rather than applying integer instructions directly to arbitrary tagged values.
++
++## 10. Exceptions and a function-local nonlocal return
++
++The current implementation reuses Hermes's setjmp/longjmp exception convention. It does not introduce a separate LLVM `invoke`/landing-pad exception model. A function containing lexical try regions installs one native `SHJmpBuf` and uses a small state variable to identify the active region. [1] [2] [5]
++
++The setup is deliberate:
++
++1. Ask the bridge for the target's `sizeof(SHJmpBuf)` and allocate aligned storage.
++2. Initialize a volatile `try_state` to zero, meaning no active lexical handler.
++3. Call `shllvm_try_begin` to link the buffer and obtain its native jump-buffer address.
++4. Call `_setjmp` **inside the generated function**, with `returns_twice` on its LLVM declaration and call.
++5. Continue normally for zero; dispatch a caught exception for a nonzero result.
++
++Placing setjmp in a helper that returns would be incorrect: a later longjmp would attempt to resume an activation that has already ended. The bridge prepares the buffer, but the generated function owns the continuation point. LLVM's `returns_twice` attribute informs optimization about this unusual return behavior. [9]
++
++`TryStartInst` writes its nonzero region ID. `TryEndInst` restores the enclosing region or zero. A `CatchInst` similarly establishes the enclosing handler and retrieves/clears the pending exception. Source-level finally behavior has already been expressed by the frontend's control flow; the emitter follows that graph, including paths through return, break, and continue.
++
++On exceptional return, the dispatcher reads `try_state` and calls `shllvm_catch_prepare` with the function's **root-frame storage**, incoming frame, and outgoing argument capacity. This delegates to `_sh_catch_no_pop`, restoring runtime root/register-stack state after intervening calls have unwound. A switch then chooses the matching catch edge, including any required phi transfers. State zero follows a pop-and-rethrow path to an enclosing function's handler. [1] [2]
++
++The emitter makes its ordinary raw value loads and stores volatile in functions containing try regions, including phi stores. Together with memory-resident state and `returns_twice`, this conservatively preserves mutations needed after a nonlocal return. Volatile is not a collector, a synchronization mechanism, or an independent proof of exception correctness.
++
++Exception tests should examine more than a thrown integer. An exception object can retain a lambda; a finally block can replace a pending return; a nested handler can rethrow after updating a captured variable. The `exceptions.js` fixture illustrates these interactions. They exercise the relationship between language control flow, native continuation state, and heap reachability rather than just one branch instruction.
++
++## 11. Compilation units and stable descriptors
++
++Generated code needs data as well as function bodies. `ModuleEmitter` produces ASCII and UTF-16 pools, string records containing offset/length/hash, a unit-index global, and function descriptors. UTF-16 conversion preserves surrogate code units, and the high offset bit distinguishes the non-ASCII pool. [1] [5]
++
++Function descriptors use an intentionally simple boundary format:
++
++```llvm
++%SHLLVMFunctionInfo = type { i32, i32, i32, i32 }
++```
++
++The fields hold the name index, expected explicit argument count, function kind, and invocation prohibition. Native `SHNativeFuncInfo` contains C bitfields. The bridge copies descriptor fields into that structure using compiled C assignments; the LLVM emitter never guesses the target compiler's bitfield layout. [2] [3]
++
++`sh_export_<unitName>` constructs the unit, which owns runtime symbol/cache arrays and native function metadata. Generated string pools and code pointers remain referenced by that unit. When requested, a generated `main` calls `shllvm_run`, which checks the runtime model, initializes Hermes and console bindings, initializes the unit, runs the event loop, and performs cleanup. This provides a host executable lifecycle, not a device scheduler or hot-reload manager.
++
++## 12. Reading and running the generated program
++
++The following commands assume a configured `build-llvm` directory with `shermes` built, matching LLVM tools available, and execution from the repository root. Set `LLVM_BIN` to your LLVM installation's `bin` directory if those tools are not otherwise discoverable. The commands are reproducible exercises; their inclusion is not a report of a particular validation run. [8]
++
++```sh
++# Preserve easily inspected IR: minimize both optimization stages.
++python3 utils/shllvm.py emit --build-dir build-llvm \
++  --hermes-opt O0 --llvm-opt 0 \
++  -o build-llvm/lesson/closures.ll test/LLVMNative/closures.js
++
++# Compile, link, and execute a native program.
++python3 utils/shllvm.py run --build-dir build-llvm \
++  -o build-llvm/lesson/closures test/LLVMNative/closures.js
++
++# Execute the verified bitcode through host LLVM lli.
++python3 utils/shllvm.py jit --build-dir build-llvm \
++  -o build-llvm/lesson/closures-jit test/LLVMNative/closures.js
++```
++
++The driver enables ES6 block scoping and temporal-dead-zone checks, emits `.ll`, assembles it, verifies it, and applies the selected LLVM optimization pipeline with verification. It publishes the readable IR and optimized `.bc` after successful processing. Native builds link the static bridge archive plus Hermes libraries; JIT execution loads the shared bridge into `lli`. Neither path regenerates C for the guest program. The native executable still depends on its runtime libraries and build configuration.
++
++Direct `shermes -emit-llvm` invocation also enables block scoping and TDZ checks by default, while respecting explicit `-Xes6-block-scoping=false` and `-Xenable-tdz=false` overrides. The existing C-emission oracle needs the corresponding enabled flags for comparison. These checks retain the pinned upstream frontend's language restrictions: the supplied reassignment-to-`const` example is rejected during compilation, and a statically provable read before lexical initialization can also be rejected even inside `try`. Standard JavaScript can instead expose catchable runtime errors in those examples. Closure-mediated runtime TDZ checks are exercised separately; enabling TDZ does not establish complete ECMAScript acceptance. The distinction is recorded in [the lexical-default checks](evidence/lexical-defaults-validation.json) and [the differential results](evidence/validation.json).
++
++The adjacent `.build.json` records source/IR hashes, the bridge hash where available, commands, optimization choices, sanitizer configuration, and `program_c_generation: false`. This helps connect a result to its actual inputs. The external `lli` path is host execution, not an embedded ORC integration or an RV32 emulator. A subprocess timeout limits a run from outside; it is not an instruction-fuel mechanism within generated code. [8] [10] [11]
++
++## 13. Connecting the host backend to PicoCalc
++
++The PicoCalc integer-world lane has a fixed state structure, a capability-call ABI, and an RV32 instruction interpreter. Its direct emitter can preserve that contract without introducing a dynamic heap. The Hermes lane introduces managed objects, closure environments, runtime services, and native code lifetimes. The integration chapter documents these separate contracts in detail. [12]
++
++A defensible initial dynamic-world design gives each generation its own runtime. The host prepares a candidate, serializes explicitly supported application state into it, checks migration, and switches event delivery only after success. Old code remains mapped until no invocation or retained callback can reach it. Raw Hermes values, environment addresses, and native function pointers are unsuitable as a cross-runtime state format.
++
++Several device tasks remain substantive engineering work: establish the RV32 value/callback ABI, port required allocation and exception services, provide double-precision support appropriate to the target, validate collector roots and barriers, manage executable memory/cache synchronization, and connect capability effects to the world's transaction protocol. Removing the bridge's 64-bit assertion accomplishes none of those tasks.
++
++Heap rollback and scheduling also need explicit policies. Canceling display effects does not undo mutations already made to a Hermes object. A GC safepoint is not automatically a fuel check. LLVM's ability to emit RISC-V instructions therefore supplies one compilation component, while runtime portability and world supervision remain separate obligations. [12] [13]
++
++## 14. Laboratory exercises and evidence
++
++Use the exercises below to connect the implementation to observable behavior. Record tool versions, command lines, hashes, expected output, actual output, and any failure before drawing conclusions.
++
++1. **Shared and independent captures.** Extend `counter` with a reset method. Predict results for two counters and several retained methods. Inspect emitted calls to environment load/store helpers, then compare native and JIT behavior.
++2. **Parallel phi transfers.** Write a loop that rotates three values. Find its edge blocks in minimally optimized IR. Explain which inputs would be lost by interleaving loads and stores. Compare multiple optimization levels.
++3. **Property effects and holes.** Combine a getter that logs access with an array containing a hole and an explicit undefined. Predict both output order and `in` results before running it.
++4. **Exceptions and captures.** Throw an object containing a closure; update its captured variable in finally; call it in an outer catch. Trace handler-state changes and explain which roots retain the environment.
++5. **An unsupported construct.** Compile an existing negative fixture and verify that it fails with a diagnostic. Preserve an old output file and check that failed emission does not replace it with partial IR.
++
++Each technique answers a different question. LLVM verification checks IR structure. Differential execution against an independent JavaScript implementation checks selected observable semantics. Collector stress checks root/lifetime assumptions. Sanitizers can expose native memory mistakes. None alone proves complete language conformance, and passing a host test does not demonstrate device execution. Future optimizations should preserve these distinctions while reducing root traffic, metadata overhead, or redundant runtime calls.
++
++## References and source-reading guide
++
++Local links identify the implementation accompanying this chapter. Upstream links are pinned to the base commit so that the reused contracts remain reviewable. LLVM links use the LLVM 18 documentation family; consult the installed tool's version when reproducing a build.
++
++1. [Direct emitter: `LLVMBackend.cpp`][1]. Read `FunctionEmitter::generate`, `emitInstruction`, `emitEdges`, and `ModuleEmitter::emitData` together.
++2. [Runtime adaptation: `runtime.c`][2]. Follow `shllvm_enter`, `shllvm_call`, environment helpers, exception helpers, and `shllvm_create_unit`.
++3. [Bridge interface: `runtime.h`][3]. Defines the fixed descriptors and helper signatures.
++4. [Upstream Static Hermes lowering and C emission][4]. Compare `lowerModuleIR` with later register-specific transformations; the local file adds `lowerForLLVM`.
++5. [Upstream Static Hermes public runtime contract][5]. Contains `SHUnit`, `SHLocals`, function metadata, value helpers, and exception entry points.
++6. [Upstream Hermes stack-frame layout][6]. Explains the call-frame indices preserved by the bridge.
++7. [Upstream lowering implementation][7]. Provides context for object/array and other instruction transformations.
++8. [Build and execution driver: `utils/shllvm.py`][8]. Its commands and manifests define the reproducible workflow.
++9. [LLVM 18 Language Reference][9]. Consult phi nodes, floating comparisons, fast-math flags, volatile accesses, and `returns_twice`.
++10. [LLVM 18 `lli` guide][10]. Describes host bitcode execution.
++11. [LLVM 18 `opt` guide][11]. Describes optimization and verification tooling.
++12. [PicoCalc integration and remaining port work][12]. Separates integer-world evidence from dynamic host-runtime execution.
++13. [LLVM RISC-V target documentation][13]. Describes backend target considerations rather than a JavaScript runtime port.
++
++[1]: ../../lib/BCGen/SH/LLVMNative/LLVMBackend.cpp
++[2]: ../../lib/BCGen/SH/LLVMNative/runtime.c
++[3]: ../../lib/BCGen/SH/LLVMNative/runtime.h
++[4]: https://github.com/facebook/hermes/blob/f837b9dd8396ebf5c4e8115412417d273565f0fe/lib/BCGen/SH/SH.cpp
++[5]: https://github.com/facebook/hermes/blob/f837b9dd8396ebf5c4e8115412417d273565f0fe/include/hermes/VM/static_h.h
++[6]: https://github.com/facebook/hermes/blob/f837b9dd8396ebf5c4e8115412417d273565f0fe/include/hermes/VMLayouts/sh_stack_frame_layout.h
++[7]: https://github.com/facebook/hermes/blob/f837b9dd8396ebf5c4e8115412417d273565f0fe/lib/BCGen/Lowering.cpp
++[8]: ../../utils/shllvm.py
++[9]: https://releases.llvm.org/18.1.8/docs/LangRef.html
++[10]: https://releases.llvm.org/18.1.8/docs/CommandGuide/lli.html
++[11]: https://releases.llvm.org/18.1.8/docs/CommandGuide/opt.html
++[12]: PICOCALC_INTEGRATION.md
++[13]: https://llvm.org/docs/RISCVUsage.html
+diff --git a/docs/llvm/DRIVER.md b/docs/llvm/DRIVER.md
+new file mode 100644
+index 0000000000000000000000000000000000000000..0268b9771228d0898d5d81609607214166c29038
+--- /dev/null
++++ b/docs/llvm/DRIVER.md
+@@ -0,0 +1,142 @@
++# Running the direct LLVM backend
++
++The driver in `utils/shllvm.py` accepts JavaScript, invokes Static Hermes' new
++`-emit-llvm` mode, assembles and verifies the resulting LLVM IR, and uses LLVM to
++produce an executable or run the module through `lli`. The shared/static bridge
++is built once through CMake dependency tracking. Individual JavaScript programs
++do not produce C source and do not invoke a C frontend.
++
++## Build prerequisites
++
++Use a native Linux x86-64 host, a C++ build toolchain, CMake, Ninja, Python 3, and
++LLVM 18 tools (`clang`, `llvm-as`, `opt`, `lli`). The recorded toolchain was LLVM
++18.1.3. The runtime bridge currently checks for eight-byte host pointers; the
++presence of other targets in LLVM does not establish a working device runtime.
++
++A representative configuration is:
++
++```sh
++cmake -S . -B build-llvm -G Ninja \
++  -DCMAKE_BUILD_TYPE=Release \
++  -DCMAKE_C_COMPILER=clang \
++  -DCMAKE_CXX_COMPILER=clang++ \
++  -DHERMES_ENABLE_ADDRESS_SANITIZER=ON
++cmake --build build-llvm --target shermes shllvm_runtime shllvm_runtime_shared --parallel 3
++```
++
++The recorded build used `-O1 -DNDEBUG` for its C++ release flags to reduce build
++cost; this is distinct from the frontend and LLVM optimization choices for each
++JavaScript program. Set `LLVM_BIN` if the LLVM executables are not on PATH, and
++`HERMES_BUILD_DIR` for a different configured build directory. Both also have
++corresponding command-line options.
++
++## Commands
++
++```sh
++# Keep human-readable LLVM IR and optimized bitcode.
++python3 utils/shllvm.py emit test/LLVMNative/closures.js -o out/closures.ll
++
++# Produce a native executable, along with .ll, .bc and .build.json artifacts.
++python3 utils/shllvm.py build test/LLVMNative/closures.js -o out/closures
++./out/closures
++
++# Compile and execute with a subprocess timeout.
++python3 utils/shllvm.py run test/LLVMNative/classes.js
++
++# Real LLVM JIT execution in the lli host process.
++python3 utils/shllvm.py jit test/LLVMNative/gc_closures.js
++
++# Select frontend and LLVM optimization independently.
++python3 utils/shllvm.py run --hermes-opt O0 --llvm-opt 0 \
++  test/LLVMNative/exceptions.js
++```
++
++The driver enables ES6 block scoping and temporal-dead-zone checks explicitly.
++These options matter for a closure created inside a `let` loop and for a closure
++that reads a lexical binding before its declaration executes. The original C
++backend requires the same options when used as a semantic comparison.
++
++Arguments after `--` are forwarded to the generated program/`lli` program.
++Static Hermes itself uses `--` to distinguish runtime flags from script
++arguments, so an invocation that needs script arguments can contain a second
++separator. `--no-runtime-build` uses an already-built matching bridge and is
++intended for validation batches. Normal invocations ask CMake to ensure the
++bridge and dependent libraries are current.
++
++A failed frontend emission or LLVM verification leaves an existing LLVM output
++untouched. Executable publication also uses a temporary file followed by a
++rename. Build metadata contains source, IR, compiler, runtime and executable
++hashes and the commands that were run.
++
++## Native execution and JIT are separate paths
++
++`build` and `run` link compiled LLVM code with a once-built static bridge and the
++Hermes runtime/console shared libraries. `jit` asks LLVM's `lli` executable to
++JIT the bitcode and load the shared bridge. The latter is real native execution
++through LLVM, but it is not an in-process embedding API or a hot-reload manager.
++Every invocation currently creates its own process/runtime lifetime.
++
++For an AddressSanitizer runtime build, the driver preloads the matching Clang
++ASan shared library into `lli`. The runtime and bridge are instrumented. The
++emitted LLVM bodies do not carry ASan instrumentation attributes, so this must
++not be described as complete instrumentation of all generated code.
++
++In the execution sandbox used for this report, LeakSanitizer could not inspect
++`/proc`. Validation therefore set `ASAN_OPTIONS=detect_leaks=0`; address checks
++remained enabled. Ordinary users should only apply that setting if their
++environment has the same restriction. The driver does not disable leak
++checking automatically.
++
++## Differential validation
++
++```sh
++python3 utils/test_shllvm.py --jobs 2
++```
++
++Node must be on PATH. The runner executes Node with `--expose-gc`, defines
++`print` as `console.log`, and compares each successful program with the original
++C-emission backend and the direct LLVM backend. Both Hermes optimization levels
++(`O0`, `O`) and both LLVM levels (`0`, `2`) are exercised. The suite also executes
++three programs through `lli`, verifies runtime error classes, and checks that
++rejected constructs preserve an existing output file.
++
++The final release run passed **22 source cases**: **16 positive programs**, **3 runtime
++error programs**, and **3 explicit compile rejections**. There were **64 native
++LLVM comparisons** with Node and the C backend, **3 successful `lli` JIT
++comparisons**, and **6 checked runtime-error executions**. The allocation test
++creates 50,000 temporary object/array structures, retains closures, confirms
++that `gc` exists, invokes it unconditionally, and reads the captured state
++successfully afterward. These are integration tests, not a full ECMAScript
++conformance certificate.
++
++Final release results are in `evidence/final-validation.json` and
++`evidence/final-validation.log`; `evidence/final-validated-files.json` identifies
++the exact tested implementation, compiler, runtime and bridge. The complete
++suite was rerun after the final verifier guard, automatic static/shared bridge
++build correction and dependent VM rebuild. The original run remains unchanged
++in `evidence/validation.json`, `evidence/validation.log` and
++`evidence/validated-files.json`.
++
++`evidence/post-review-verifier.json` records the focused verifier-flag and LLVM
++output checks. `evidence/post-review-driver.json` records a missing-static-archive
++first-run check and native/JIT executions with automatic builds enabled.
++`evidence/samples/` contains emitted LLVM, selected application disassembly, and
++build metadata for representative programs. The diary records failures found
++and corrected during implementation.
++
++## Explicit boundaries
++
++Generators and dynamic `eval` are rejected by this backend. The pinned upstream
++frontend also rejects an assignment to a `const` binding during compilation,
++even inside a `try` block; standard JavaScript can instead raise a catchable
++runtime TypeError. That limitation is retained and tested as an explicit
++compile rejection. The implementation is an experimental backend over the
++pinned Static Hermes language/runtime pipeline, not a claim that every
++ECMAScript program is accepted.
++
++The current bridge uses the existing Static Hermes unit lifecycle: a unit and
++its code/string storage must remain alive until its runtime is destroyed.
++Unloading an old code generation while closures still refer to it is not
++supported. Device integration, an RV32 runtime ABI, capability confinement,
++transactional OS state updates and generation-based hot reload need their own
++implementation and validation.
+diff --git a/docs/llvm/PICOCALC_INTEGRATION.md b/docs/llvm/PICOCALC_INTEGRATION.md
+new file mode 100644
+index 0000000000000000000000000000000000000000..e4a1644b7ad988d46cdb1dd6797f47128509c37a
+--- /dev/null
++++ b/docs/llvm/PICOCALC_INTEGRATION.md
+@@ -0,0 +1,182 @@
++# PicoCalc integration: the two execution targets
++
++This change provides a direct LLVM backend at two different layers. Keeping
++their evidence separate is essential to understanding what now works and
++what a physical-device port still requires.
++
++| Property | PicoCalc integer world lane | Static Hermes dynamic language lane |
++|---|---|---|
++| Frontend | Existing restricted TypeScript-parsed JS/i32 grammar | Actual Static Hermes parser and IR pipeline |
++| New backend | `compiler/js2llvm.js` | `lib/BCGen/SH/LLVMNative/LLVMBackend.cpp` |
++| Per-program output | Textual LLVM IR, then a prelinked ELF32 module | Textual LLVM IR calling the Static Hermes runtime bridge |
++| Runtime values | Fixed `PicoState` and i32 temporaries | Hermes values, objects, closure environments, native function objects |
++| Target evidence | RV32IM instructions executed in the existing simulator | Linux x86-64 native execution and host `lli`; see the final host validation records |
++| Managed heap and collector | None | Actual host Static Hermes runtime owns the heap and collector |
++| Reload behavior exercised | State-preserving generation replacement, migration rollback, stale-event rejection | Code/runtime lifetime must be retained as a generation; device integration is not implemented |
++| Physical ESP32-P4 execution | Not tested | Not tested |
++
++The integer lane's **24-test complete regression run** is recorded in
++`picocalc-llvm-poc/logs/direct-llvm-tests-with-sockets-final.txt`. Its source
++hashes and counts are in `logs/direct-llvm-validation.json`. The collector
++`scripts/collect_direct_llvm.py` assembled and verified six directly emitted
++modules, linked RV32IM ELF images, and ran an eleven-record reload scenario.
++That scenario retained score 3 across a successful migration, reached score
++43 under the new implementation, rejected a failing replacement, and then
++reached score 129 using the still-active generation. The final epoch was 2.
++
++These results support preservation of the original world protocol for the
++exercised cases after removing the per-module C stage. They do not establish
++that objects or closures run in the RV32 interpreter or on physical PicoCalc
++hardware.
++
++The host backend reuses the full dynamic Hermes runtime, including its heap,
++collector, objects, and closure machinery, through a selected set of emitted
++instructions. This does not mean complete ECMAScript acceptance. Generators,
++direct `eval`, and regular-expression literals are rejected; typed-object
++and private fixed-slot operations are outside this backend. The pinned frontend
++also rejects the supplied `const` reassignment and some statically provable TDZ
++violations during compilation, even inside `try`. Runtime TDZ behavior through
++captured bindings is tested separately. See `evidence/validation.json`,
++`evidence/driver-validation.json`, and `evidence/lexical-defaults-validation.json`.
++
++## The shared architectural idea
++
++Both lanes place the compiler on the host. A module's source becomes LLVM IR,
++then native machine code. The integer lane's world supervisor owns execution
++policy and capability access. Connecting the dynamic host runtime to that
++supervisor remains integration work. LLVM is not the operating system,
++JavaScript runtime, garbage collector, or state migration mechanism.
++
++In the integer lane, the LLVM IR has no external runtime calls. Capability
++requests use a RISC-V `ecall`, and the simulator enforces memory access and
++instruction fuel. The ABI is a 16-byte `PicoState`, an 8 KiB stack, and one of
++two prelinked code slots, `0x100000` and `0x200000`.
++
++In the dynamic lane, generated IR calls the bridge in `runtime.c`, which in
++turn uses Static Hermes's existing value operations, object model, closure
++creation, environment stores, function call machinery, and garbage-collector
++roots. The bridge is compiled once for its runtime configuration. Guest
++program bodies do not pass through generated C.
++
++## Why a closure changes the reload problem
++
++A closure combines executable code with an environment containing captured
++bindings. An object can retain a closure, and that closure can retain further
++objects. Replacing a code pointer does not transfer this graph to another
++runtime or make the old graph safe to collect.
++
++The upstream `SHUnit` contract says that a unit, once associated with an
++`SHRuntime`, persists until that runtime is destroyed. The generated native
++function objects and their metadata refer to that unit. Unmapping an old
++generation's machine code while a surviving closure can call it would violate
++the lifetime contract.
++
++For PicoCalc, the defensible first integration is therefore **one runtime per
++world generation**:
++
++1. Compile and validate a candidate module on the host.
++2. Create the candidate runtime and instantiate the module without exposing
++   live external effects.
++3. Migrate a deliberately serialized state representation. Do not copy native
++   pointers, Hermes values, object addresses, or closure environments between
++   runtimes.
++4. Check schema and resource policy; activate the candidate only after success.
++5. Direct new events to the candidate generation and reject stale events using
++   the existing epoch rule.
++6. Release the old runtime, all old handles, and finally its code mapping after
++   no invocation or externally held callback can reach it.
++
++This sequence describes the required dynamic-world integration. The current
++integer simulator already exercises its simpler fixed-state version. It does
++not yet instantiate a Hermes runtime inside a world.
++
++Plain JSON state may be sufficient for a first application, but it has its own
++boundary: functions, object identity, cycles, undefined-valued properties,
++BigInts, and non-finite numbers need an explicit policy. A closure is behavior
++to recreate in the new generation, not a raw address to migrate.
++
++## Transactional effects require host bindings
++
++The existing simulator copies fixed state and stages panel/log effects until
++the native turn completes. A dynamic runtime needs corresponding bindings
++that append effect proposals to a generation-owned transaction. Direct access
++to host file descriptors, panel drivers, or shared mutable objects would
++bypass that protocol.
++
++The host also needs to decide whether heap mutation itself rolls back. A
++Hermes object modified during a failed call does not automatically return to
++its prior value merely because effect delivery was canceled. Practical first
++choices include application-level pure reducers over serialized state, a
++fresh runtime for each speculative turn, or a separate snapshot/transaction
++design. The present compiler change does not implement any of these dynamic
++heap rollback strategies.
++
++Likewise, the integer interpreter's instruction counter cannot simply be
++reused for arbitrary native Hermes code. A device port needs a defined
++interruption mechanism: explicit compiler-inserted polling, protected
++execution with a timer and reliable unwind policy, or another independently
++validated scheduling design. Garbage-collector safepoints and world fuel
++checks are different mechanisms with different guarantees.
++
++## What an RV32 Hermes port entails
++
++The bridge currently contains a deliberate `sizeof(void *) == 8` assertion.
++It prevents the tested host callback ABI from being advertised as an RV32
++runtime ABI. Deleting that assertion is not a port.
++
++The host emitter also admits at most 1,024 combined root/argument slots,
++including scratch/minimum argument storage. That caps explicit tagged payload
++at 8 KiB; it does not cap total native stack consumption. Root headers,
++exception buffers, compiler spills, runtime frames, and recursion add storage.
++This admission rule is distinct from the integer simulator's actual 8 KiB
++guest-stack region.
++
++The port has to establish at least these contracts:
++
++- **Value and pointer model.** Check the selected Hermes VM model, tagged
++  value representation, compressed pointers if enabled, heap address limits,
++  and collector support for the intended target.
++- **Calling convention.** Prove that the generated `i64` native function
++  return and all bridge prototypes agree with the target C ABI. Aggregate
++  returns, register allocation, alignment, and pointer widths require target
++  validation, not host extrapolation.
++- **Runtime services.** Supply allocation, stack bounds, platform atomics,
++  exception machinery, standard-library dependencies, and any threading or
++  timer services required by the selected runtime configuration.
++- **Floating-point support.** JavaScript uses binary64 Numbers. RV32IM code
++  requires suitable software helpers; a single-precision F extension alone
++  does not provide double-precision execution. The actual hardware/toolchain
++  configuration and runtime libraries must be tested together.
++- **Collector and root correctness.** Rebuild the bridge against the exact
++  target runtime. Verify root-frame alignment, write barriers, moved-object
++  updates, allocation failure, and exception unwinding under collection
++  stress on that target.
++- **Executable code management.** Define executable memory placement,
++  instruction-cache synchronization, loading/relocation, and generation
++  lifetime. The prototype's two fixed synthetic slots are a test convention,
++  not a physical-device memory map.
++- **OS policy.** Connect capabilities, turn scheduling, input queues, display
++  effects, memory budgets, state migration, and failure reporting to the
++  actual PicoCalc nucleus. The current simulator does not implement the
++  physical panel, FreeRTOS, USB, or hardware privilege boundaries.
++
++Generating an RV32 object file can be a useful intermediate check, but it
++does not demonstrate that its imports link, its collector works, or the
++result fits the device. Conversely, host execution of object/closure tests
++does demonstrate the new direct backend's behavior against the actual
++Hermes runtime, within the recorded feature and test scope.
++
++## Source references
++
++- `include/hermes/VM/static_h.h`: `SHUnit` lifetime, `SHLocals`, object,
++  environment, and call interfaces.
++- `include/hermes/VMLayouts/sh_stack_frame_layout.h`: native Hermes register
++  stack frame layout and call metadata.
++- `lib/BCGen/SH/LLVMNative/runtime.c`: bridge representation assertions,
++  runtime entry/exit, value helpers, and compilation-unit allocation.
++- `lib/BCGen/SH/LLVMNative/LLVMBackend.cpp`: rooted values, control flow,
++  closure creation, calls, and module descriptors.
++- `picocalc-llvm-poc/include/pico_abi.h` and `kernel/pico_sim.cpp`: the separate
++  fixed-state RV32 world contract and transactional supervisor.
++- [LLVM RISC-V backend](https://llvm.org/docs/RISCVUsage.html): target support
++  and ABI considerations; consult the version matching the deployed toolchain.
+diff --git a/examples/llvm/counter.js b/examples/llvm/counter.js
+new file mode 100644
+index 0000000000000000000000000000000000000000..ca00e574eaeecaf3bb579e58a4731623fbcb1cc5
+--- /dev/null
++++ b/examples/llvm/counter.js
+@@ -0,0 +1,38 @@
++// A native-compiled closure shares a mutable environment with its siblings.
++function makeCounter(initial) {
++  let value = initial;
++  return {
++    add: delta => { value += delta; return value; },
++    read: () => value,
++    snapshot: () => ({ value, description: "captured state" })
++  };
++}
++
++const first = makeCounter(40);
++const second = makeCounter(100);
++print(first.add(1), first.add(1), first.read(), second.add(5));
++print(JSON.stringify(first.snapshot()));
++
++// A function can return a function, and ordinary array methods call it back.
++function multiplyBy(scale) {
++  return value => value * scale;
++}
++print([1, 2, 3].map(multiplyBy(7)).join(","));
++
++// Constructors, inheritance, methods and lexical arrow this use the same
++// runtime calling convention as plain source functions.
++class CounterView {
++  constructor(counter) { this.counter = counter; }
++  reader() { return () => this.counter.read(); }
++}
++const readLater = new CounterView(first).reader();
++first.add(8);
++print(readLater());
++
++// Exception edges preserve committed captured state.
++try {
++  first.add(2);
++  throw { reason: "example", read: first.read };
++} catch (error) {
++  print(error.reason, error.read());
++}
+diff --git a/include/hermes/BCGen/SH/LLVM.h b/include/hermes/BCGen/SH/LLVM.h
+new file mode 100644
+index 0000000000000000000000000000000000000000..5b6cf5c721435922c46beed72c9ecc3cd07c06bb
+--- /dev/null
++++ b/include/hermes/BCGen/SH/LLVM.h
+@@ -0,0 +1,14 @@
++/*
++ * Direct LLVM backend for Static Hermes.
++ * Licensed under the MIT license in the repository root.
++ */
++#ifndef HERMES_BCGEN_SH_LLVM_H
++#define HERMES_BCGEN_SH_LLVM_H
++#include "hermes/BCGen/SH/SH.h"
++namespace hermes { namespace sh {
++/// Lower Hermes IR and emit textual opaque-pointer LLVM IR. Unsupported IR
++/// produces a source diagnostic and false; the caller must discard the output.
++bool generateLLVM(Module *M, llvh::raw_ostream &OS,
++                  const BytecodeGenerationOptions &options);
++} }
++#endif
+diff --git a/include/hermes/BCGen/SH/SH.h b/include/hermes/BCGen/SH/SH.h
+index 7fe3aab4ce2b946e99d17686d2a8b4c1f832cdd4..a26c60f7453b9121e2c45ec80c320d6d80768720 100644
+--- a/include/hermes/BCGen/SH/SH.h
++++ b/include/hermes/BCGen/SH/SH.h
+@@ -21,6 +21,11 @@ void generateSH(
+     llvh::raw_ostream &OS,
+     const BytecodeGenerationOptions &options);
+ 
++/// Apply the shared Static Hermes lowering while retaining SSA values.
++/// The LLVM backend must call this before emission, and must not apply the
++/// subsequent SH register allocation or allocated-function call lowering.
++bool lowerForLLVM(Module *M, bool optimize);
++
+ } // namespace sh
+ } // namespace hermes
+ 
+diff --git a/lib/BCGen/SH/CMakeLists.txt b/lib/BCGen/SH/CMakeLists.txt
+index 08f09cb1ff6b09cf62add4d4be8a743865d530c7..27753e23e75f00c0639cac0a62300e549c03173f 100644
+--- a/lib/BCGen/SH/CMakeLists.txt
++++ b/lib/BCGen/SH/CMakeLists.txt
+@@ -11,6 +11,7 @@ add_hermes_library(hermesSHBackend
+   LowerNanBoxedUnionNarrowT.cpp
+   PeepholeLowering.cpp
+   SH.cpp
++  LLVMNative/LLVMBackend.cpp
+   SHRegAlloc.cpp SHRegAlloc.h
+   LineDirectiveEmitter.cpp LineDirectiveEmitter.h
+   LINK_OBJLIBS
+@@ -19,3 +20,27 @@ add_hermes_library(hermesSHBackend
+   hermesSourceMap
+   hermesAST
+ )
++
++# The bridge is compiled once for a runtime configuration. JavaScript modules
++# emitted by the LLVM backend link against it without generating or parsing C.
++add_library(shllvm_runtime_obj OBJECT LLVMNative/runtime.c)
++set_target_properties(shllvm_runtime_obj PROPERTIES
++  POSITION_INDEPENDENT_CODE ON)
++if(NOT MSVC)
++  # Hermes hides implementation symbols globally, but these functions form the
++  # public ABI resolved by separately compiled LLVM modules and lli.
++  target_compile_options(shllvm_runtime_obj PRIVATE -fvisibility=default)
++endif()
++
++add_library(shllvm_runtime STATIC $<TARGET_OBJECTS:shllvm_runtime_obj>)
++set_target_properties(shllvm_runtime PROPERTIES
++  ARCHIVE_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/lib")
++
++add_library(shllvm_runtime_shared SHARED
++  $<TARGET_OBJECTS:shllvm_runtime_obj>)
++set_target_properties(shllvm_runtime_shared PROPERTIES
++  OUTPUT_NAME shllvm_runtime
++  WINDOWS_EXPORT_ALL_SYMBOLS ON
++  LIBRARY_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/lib")
++target_link_libraries(shllvm_runtime_shared PRIVATE
++  hermesvm shermes_console)
+diff --git a/lib/BCGen/SH/LLVMNative/LLVMBackend.cpp b/lib/BCGen/SH/LLVMNative/LLVMBackend.cpp
+new file mode 100644
+index 0000000000000000000000000000000000000000..e0c1752d87e7238a92445d7965874bde22d02c5f
+--- /dev/null
++++ b/lib/BCGen/SH/LLVMNative/LLVMBackend.cpp
+@@ -0,0 +1,986 @@
++/*
++ * Direct textual LLVM IR backend for Static Hermes.
++ * Licensed under the MIT license in the repository root.
++ */
++
++#include "hermes/BCGen/SH/LLVM.h"
++#include "hermes/BCGen/FunctionInfo.h"
++#include "hermes/IR/Analysis.h"
++#include "hermes/IR/IR.h"
++#include "hermes/IR/IRVerifier.h"
++#include "hermes/IR/Instrs.h"
++#include "hermes/Support/HashString.h"
++#include "hermes/Support/UTF8.h"
++#include "runtime.h"
++#include "llvh/Support/raw_ostream.h"
++
++#include <algorithm>
++#include <cmath>
++#include <cstring>
++#include <map>
++#include <sstream>
++#include <string>
++#include <utility>
++#include <vector>
++
++using namespace hermes;
++
++namespace {
++
++/// An explicitly typed operand of a bridge call.
++struct Arg {
++  std::string type;
++  std::string value;
++};
++Arg ptr(std::string value) { return {"ptr", std::move(value)}; }
++Arg u32(uint32_t value) { return {"i32", std::to_string(value)}; }
++Arg u64(uint64_t value) { return {"i64", std::to_string(value)}; }
++
++class ModuleEmitter;
++
++/// Each guest value lives in a GC root slot. LLVM SSA temporaries are used only
++/// between safepoints; no movable heap pointer is cached in an LLVM register.
++class FunctionEmitter {
++  ModuleEmitter &module_;
++  Function &function_;
++  std::string text_;
++  llvh::raw_string_ostream os_;
++  std::map<const Value *, unsigned> slots_;
++  std::vector<Value *> constants_;
++  std::map<BasicBlock *, unsigned> blocks_;
++  struct Edge {
++    BasicBlock *from;
++    BasicBlock *to;
++    std::string name;
++  };
++  std::vector<Edge> edges_;
++  std::map<TryStartInst *, uint32_t> tries_;
++  llvh::DenseMap<BasicBlock *, TryStartInst *> enclosingTries_;
++  unsigned temporary_ = 0;
++  unsigned maxArgs_ = 0;
++  unsigned scratch_ = 0;
++  bool ok_ = true;
++
++  std::string temporary() { return "%t" + std::to_string(temporary_++); }
++  std::string slot(Value *value);
++  std::string block(BasicBlock *bb) {
++    return "b" + std::to_string(blocks_.at(bb));
++  }
++  std::string edge(BasicBlock *from, BasicBlock *to);
++  std::string call(
++      const std::string &name,
++      std::initializer_list<Arg> args,
++      const std::string &result = "void");
++  std::string raw(Value *value);
++  void copy(Value *destination, Value *source);
++  void copyTo(const std::string &destination, Value *source);
++  void emitConstant(Value *value);
++  void emitInstruction(Instruction &instruction);
++  void emitEdges();
++  void emitCatchDispatch();
++  void emitCall(BaseCallInst &instruction, bool builtin);
++  void unary(Instruction &instruction, Value *value, unsigned op);
++  void binary(Instruction &instruction, Value *lhs, Value *rhs, unsigned op);
++  void floating(
++      Instruction &instruction,
++      Value *lhs,
++      Value *rhs,
++      const std::string &operation);
++  void compare(
++      Instruction &instruction,
++      Value *lhs,
++      Value *rhs,
++      const std::string &predicate);
++  void getProperty(Instruction &instruction, Value *object, Value *key, bool tryFlag);
++  void setProperty(
++      Value *object, Value *key, Value *value, bool strict, bool tryFlag);
++  void fail(Instruction *instruction, const std::string &message);
++
++ public:
++  FunctionEmitter(ModuleEmitter &module, Function &function);
++  bool generate();
++  const std::string &text() { os_.flush(); return text_; }
++};
++
++/// LLVM types for generated data intentionally describe only our bridge ABI.
++/// The native SHUnit and SHNativeFuncInfo layouts stay in runtime.c.
++class ModuleEmitter {
++ public:
++  Module *module;
++  const BytecodeGenerationOptions &options;
++  std::map<Function *, unsigned> functionIDs;
++  std::vector<Function *> functions;
++  std::map<std::string, unsigned> stringIDs;
++  std::vector<std::string> strings;
++  std::map<std::string, std::pair<std::string, std::vector<std::string>>> imports;
++
++  ModuleEmitter(Module *m, const BytecodeGenerationOptions &o)
++      : module(m), options(o) {
++    functions.push_back(m->getTopLevelFunction());
++    for (auto &f : *m)
++      if (&f != functions[0])
++        functions.push_back(&f);
++    for (unsigned i = 0; i != functions.size(); ++i) {
++      functionIDs[functions[i]] = i;
++      string(functions[i]->getOriginalOrInferredName().str());
++    }
++  }
++  unsigned string(llvh::StringRef value) {
++    auto key = value.str();
++    auto entry = stringIDs.emplace(key, strings.size());
++    if (entry.second)
++      strings.push_back(std::move(key));
++    return entry.first->second;
++  }
++  std::string functionName(Function *f) {
++    return "@shllvm_f" + std::to_string(functionIDs.at(f));
++  }
++  void import(
++      const std::string &name,
++      const std::string &result,
++      std::initializer_list<Arg> args) {
++    std::vector<std::string> types;
++    for (const auto &arg : args)
++      types.push_back(arg.type);
++    auto signature = std::make_pair(result, types);
++    auto entry = imports.emplace(name, signature);
++    assert(entry.second || entry.first->second == signature);
++    (void)entry;
++  }
++  void emitData(llvh::raw_ostream &os);
++  bool generate(llvh::raw_ostream &os);
++};
++
++bool isConstant(Value *value) {
++  return llvh::isa<LiteralNumber>(value) ||
++      llvh::isa<LiteralString>(value) ||
++      llvh::isa<LiteralBool>(value) ||
++      llvh::isa<LiteralUndefined>(value) ||
++      llvh::isa<LiteralNull>(value) ||
++      llvh::isa<LiteralEmpty>(value) ||
++      llvh::isa<LiteralUninit>(value) ||
++      llvh::isa<GlobalObject>(value);
++}
++
++FunctionEmitter::FunctionEmitter(ModuleEmitter &module, Function &function)
++    : module_(module), function_(function), os_(text_) {
++  for (auto &bb : function_) {
++    blocks_[&bb] = blocks_.size();
++    for (auto &instruction : bb) {
++      // Including side-effect-only instructions keeps numbering simple and
++      // deterministic. Unused slots hold undefined and are safe for the GC.
++      slots_.emplace(&instruction, slots_.size());
++      if (auto *call = llvh::dyn_cast<BaseCallInst>(&instruction))
++        maxArgs_ = std::max(maxArgs_, call->getNumArguments() - 1);
++      if (auto *start = llvh::dyn_cast<TryStartInst>(&instruction))
++        tries_[start] = tries_.size() + 1;
++    }
++  }
++  for (auto &bb : function_)
++    for (auto &instruction : bb)
++      for (unsigned i = 0; i != instruction.getNumOperands(); ++i) {
++        Value *value = instruction.getOperand(i);
++        if (isConstant(value) &&
++            slots_.emplace(value, slots_.size()).second)
++          constants_.push_back(value);
++      }
++  scratch_ = slots_.size();
++  if (!tries_.empty()) {
++    auto analysis = findEnclosingTrysPerBlock(&function_);
++    if (analysis)
++      enclosingTries_ = *analysis;
++    else
++      fail(nullptr, "cannot analyze exception regions");
++  }
++}
++
++void FunctionEmitter::fail(
++    Instruction *instruction, const std::string &message) {
++  if (ok_) {
++    auto location = instruction ? instruction->getLocation()
++                                : function_.getSourceRange().Start;
++    module_.module->getContext().getSourceErrorManager().error(
++        location, "direct LLVM backend: " + message);
++  }
++  ok_ = false;
++}
++
++std::string FunctionEmitter::slot(Value *value) {
++  auto it = slots_.find(value);
++  if (it == slots_.end()) {
++    fail(nullptr, "unrepresentable value operand");
++    return "%scratch";
++  }
++  return "%s" + std::to_string(it->second);
++}
++
++std::string FunctionEmitter::call(
++    const std::string &name,
++    std::initializer_list<Arg> args,
++    const std::string &result) {
++  module_.import(name, result, args);
++  auto output = result == "void" ? "" : temporary();
++  os_ << "  ";
++  if (!output.empty())
++    os_ << output << " = ";
++  os_ << "call " << result << " @" << name << "(";
++  bool first = true;
++  for (const auto &arg : args) {
++    if (!first)
++      os_ << ", ";
++    first = false;
++    os_ << arg.type << " " << arg.value;
++  }
++  os_ << ")\n";
++  return output;
++}
++
++std::string FunctionEmitter::raw(Value *value) {
++  auto result = temporary();
++  os_ << "  " << result << " = load " << (tries_.empty() ? "" : "volatile ")
++      << "i64, ptr " << slot(value)
++      << ", align 8\n";
++  return result;
++}
++void FunctionEmitter::copyTo(const std::string &destination, Value *source) {
++  auto value = raw(source);
++  os_ << "  store " << (tries_.empty() ? "" : "volatile ")
++      << "i64 " << value << ", ptr " << destination << ", align 8\n";
++}
++void FunctionEmitter::copy(Value *destination, Value *source) {
++  copyTo(slot(destination), source);
++}
++
++void FunctionEmitter::emitConstant(Value *value) {
++  if (auto *s = llvh::dyn_cast<LiteralString>(value)) {
++    call("shllvm_symbol", {
++        ptr(slot(value)), ptr("%shr"), ptr("%unit"),
++        u32(module_.string(s->getValue().str()))});
++  } else if (llvh::isa<GlobalObject>(value)) {
++    call("shllvm_global", {ptr(slot(value)), ptr("%shr")});
++  } else {
++    unsigned kind = SHLLVM_UNDEFINED;
++    uint64_t bits = 0;
++    if (auto *n = llvh::dyn_cast<LiteralNumber>(value)) {
++      kind = SHLLVM_NUMBER;
++      double number = n->getValue();
++      std::memcpy(&bits, &number, sizeof(bits));
++    } else if (auto *b = llvh::dyn_cast<LiteralBool>(value)) {
++      kind = SHLLVM_BOOLEAN;
++      bits = b->getValue();
++    } else if (llvh::isa<LiteralNull>(value)) {
++      kind = SHLLVM_NULL;
++    } else if (llvh::isa<LiteralEmpty>(value)) {
++      kind = SHLLVM_EMPTY;
++    } else if (llvh::isa<LiteralUninit>(value)) {
++      kind = SHLLVM_UNINIT;
++    }
++    call("shllvm_constant", {ptr(slot(value)), u32(kind), u64(bits)});
++  }
++}
++
++std::string FunctionEmitter::edge(BasicBlock *from, BasicBlock *to) {
++  bool phi = false;
++  for (auto &instruction : *to)
++    if (llvh::isa<PhiInst>(&instruction))
++      phi = true;
++  if (!phi)
++    return block(to);
++  std::string name = "edge" + std::to_string(edges_.size());
++  edges_.push_back({from, to, name});
++  return name;
++}
++
++void FunctionEmitter::emitEdges() {
++  for (const auto &edge : edges_) {
++    os_ << edge.name << ":\n";
++    std::vector<std::pair<Value *, std::string>> assignments;
++    for (auto &instruction : *edge.to) {
++      auto *phi = llvh::dyn_cast<PhiInst>(&instruction);
++      if (!phi)
++        continue;
++      Value *incoming = nullptr;
++      for (unsigned i = 0; i != phi->getNumEntries(); ++i)
++        if (phi->getEntry(i).second == edge.from)
++          incoming = phi->getEntry(i).first;
++      if (!incoming) {
++        fail(phi, "phi has no value for an incoming CFG edge");
++        continue;
++      }
++      // Load every input before any destination is overwritten: loop-carried
++      // swaps and mutually dependent phi nodes require parallel-copy semantics.
++      assignments.emplace_back(phi, raw(incoming));
++    }
++    for (const auto &assignment : assignments)
++      os_ << "  store " << (tries_.empty() ? "" : "volatile ")
++          << "i64 " << assignment.second << ", ptr "
++          << slot(assignment.first) << ", align 8\n";
++    os_ << "  br label %" << block(edge.to) << "\n";
++  }
++}
++
++void FunctionEmitter::emitCatchDispatch() {
++  if (tries_.empty())
++    return;
++  os_ << "catch.dispatch:\n";
++  auto state = temporary();
++  os_ << "  " << state << " = load volatile i32, ptr %try_state, align 4\n";
++  call("shllvm_catch_prepare", {
++      ptr("%shr"), ptr("%storage"), ptr("%frame"), u32(maxArgs_)});
++  std::vector<std::pair<uint32_t, std::string>> destinations;
++  for (const auto &item : tries_)
++    destinations.emplace_back(
++        item.second, edge(item.first->getParent(), item.first->getCatchTarget()));
++  os_ << "  switch i32 " << state << ", label %catch.rethrow [\n";
++  for (const auto &destination : destinations)
++    os_ << "    i32 " << destination.first << ", label %" << destination.second << "\n";
++  os_ << "  ]\ncatch.rethrow:\n";
++  call("shllvm_try_end", {ptr("%shr"), ptr("%try_storage")});
++  call("shllvm_rethrow", {ptr("%shr")});
++  os_ << "  unreachable\n";
++}
++
++void FunctionEmitter::unary(
++    Instruction &instruction, Value *value, unsigned op) {
++  call("shllvm_unary", {
++      ptr(slot(&instruction)), ptr("%shr"), u32(op), ptr(slot(value))});
++}
++void FunctionEmitter::binary(
++    Instruction &instruction, Value *lhs, Value *rhs, unsigned op) {
++  call("shllvm_binary", {
++      ptr(slot(&instruction)), ptr("%shr"), u32(op),
++      ptr(slot(lhs)), ptr(slot(rhs))});
++}
++
++void FunctionEmitter::floating(
++    Instruction &instruction,
++    Value *lhs,
++    Value *rhs,
++    const std::string &operation) {
++  auto left = raw(lhs);
++  auto l = temporary();
++  os_ << "  " << l << " = bitcast i64 " << left << " to double\n";
++  std::string r;
++  if (rhs) {
++    auto right = raw(rhs);
++    r = temporary();
++    os_ << "  " << r << " = bitcast i64 " << right << " to double\n";
++  }
++  auto result = temporary();
++  os_ << "  " << result << " = " << operation << " double " << l;
++  if (rhs)
++    os_ << ", " << r;
++  os_ << "\n";
++  // No fast-math flags: signed zero, infinities and NaNs stay observable.
++  call("shllvm_number", {ptr(slot(&instruction)), {"double", result}});
++}
++
++void FunctionEmitter::compare(
++    Instruction &instruction,
++    Value *lhs,
++    Value *rhs,
++    const std::string &predicate) {
++  auto left = raw(lhs);
++  auto right = raw(rhs);
++  auto l = temporary(), r = temporary(), result = temporary(), extended = temporary();
++  os_ << "  " << l << " = bitcast i64 " << left << " to double\n"
++      << "  " << r << " = bitcast i64 " << right << " to double\n"
++      << "  " << result << " = fcmp " << predicate << " double " << l
++      << ", " << r << "\n"
++      << "  " << extended << " = zext i1 " << result << " to i32\n";
++  call("shllvm_boolean", {ptr(slot(&instruction)), {"i32", extended}});
++}
++
++void FunctionEmitter::getProperty(
++    Instruction &instruction, Value *object, Value *key, bool tryFlag) {
++  if (auto *name = llvh::dyn_cast<LiteralString>(key)) {
++    call("shllvm_get_id", {
++        ptr(slot(&instruction)), ptr("%shr"), ptr("%unit"), ptr(slot(object)),
++        u32(module_.string(name->getValue().str())), u32(tryFlag)});
++  } else {
++    call("shllvm_get", {
++        ptr(slot(&instruction)), ptr("%shr"), ptr(slot(object)), ptr(slot(key))});
++  }
++}
++
++void FunctionEmitter::setProperty(
++    Value *object, Value *key, Value *value, bool strict, bool tryFlag) {
++  if (auto *name = llvh::dyn_cast<LiteralString>(key)) {
++    call("shllvm_set_id", {
++        ptr("%shr"), ptr("%unit"), ptr(slot(object)),
++        u32(module_.string(name->getValue().str())), ptr(slot(value)),
++        u32(strict), u32(tryFlag)});
++  } else {
++    call("shllvm_set", {
++        ptr("%shr"), ptr(slot(object)), ptr(slot(key)), ptr(slot(value)),
++        u32(strict)});
++  }
++}
++
++void FunctionEmitter::emitCall(BaseCallInst &instruction, bool builtin) {
++  auto count = instruction.getNumArguments() - 1;
++  for (unsigned i = 0; i != count; ++i) {
++    auto address = temporary();
++    os_ << "  " << address << " = getelementptr i64, ptr %argv, i32 " << i << "\n";
++    copyTo(address, instruction.getArgument(i + 1));
++  }
++  if (builtin) {
++    auto &bi = llvh::cast<CallBuiltinInst>(instruction);
++    call("shllvm_builtin", {
++        ptr(slot(&instruction)), ptr("%shr"), ptr("%frame"),
++        u32(static_cast<uint32_t>(bi.getBuiltinIndex())), u32(count), ptr("%argv")});
++  } else {
++    call("shllvm_call", {
++        ptr(slot(&instruction)), ptr("%shr"), ptr("%frame"),
++        ptr(slot(instruction.getCallee())), ptr(slot(instruction.getArgument(0))),
++        ptr(slot(instruction.getNewTarget())), u32(count), ptr("%argv")});
++  }
++}
++
++void FunctionEmitter::emitInstruction(Instruction &i) {
++  os_ << "  ; Hermes " << i.getName() << "\n";
++  if (llvh::isa<PhiInst>(&i) || llvh::isa<AllocStackInst>(&i))
++    return;
++  if (auto *x = llvh::dyn_cast<LIRLoadConstInst>(&i)) {
++    copy(x, x->getConst());
++  } else if (auto *x = llvh::dyn_cast<LoadStackInst>(&i)) {
++    copy(x, x->getPtr());
++  } else if (auto *x = llvh::dyn_cast<StoreStackInst>(&i)) {
++    copy(x->getPtr(), x->getValue());
++  } else if (auto *x = llvh::dyn_cast<MovInst>(&i)) {
++    copy(x, x->getSingleOperand());
++  } else if (auto *x = llvh::dyn_cast<UnionNarrowTrustedInst>(&i)) {
++    copy(x, x->getSingleOperand());
++  } else if (auto *x = llvh::dyn_cast<LoadParamInst>(&i)) {
++    call("shllvm_param", {
++        ptr(slot(x)), ptr("%frame"), u32(x->getParam()->getIndexInParamList())});
++  } else if (auto *x = llvh::dyn_cast<GetParentScopeInst>(&i)) {
++    call("shllvm_env_from_frame", {ptr(slot(x)), ptr("%shr"), ptr("%frame")});
++  } else if (auto *x = llvh::dyn_cast<GetClosureScopeInst>(&i)) {
++    call("shllvm_env_from_closure", {
++        ptr(slot(x)), ptr("%shr"), ptr(slot(x->getClosure()))});
++  } else if (auto *x = llvh::dyn_cast<LIRResolveScopeInst>(&i)) {
++    call("shllvm_env_resolve", {
++        ptr(slot(x)), ptr("%shr"), ptr(slot(x->getStartScope())),
++        u32(x->getNumLevels()->asUInt32())});
++  } else if (auto *x = llvh::dyn_cast<CreateScopeInst>(&i)) {
++    auto parent = llvh::isa<EmptySentinel>(x->getParentScope())
++        ? "null" : slot(x->getParentScope());
++    call("shllvm_env_create", {
++        ptr(slot(x)), ptr("%shr"), ptr(parent),
++        u32(x->getVariableScope()->getVariables().size())});
++  } else if (auto *x = llvh::dyn_cast<LoadFrameInst>(&i)) {
++    call("shllvm_env_load", {
++        ptr(slot(x)), ptr(slot(x->getScope())),
++        u32(x->getLoadVariable()->getIndexInVariableList())});
++  } else if (auto *x = llvh::dyn_cast<StoreFrameInst>(&i)) {
++    call("shllvm_env_store", {
++        ptr("%shr"), ptr(slot(x->getScope())), ptr(slot(x->getValue())),
++        u32(x->getVariable()->getIndexInVariableList())});
++  } else if (auto *x = llvh::dyn_cast<CreateFunctionInst>(&i)) {
++    auto environment = llvh::isa<EmptySentinel>(x->getScope())
++        ? "null" : slot(x->getScope());
++    call("shllvm_closure", {
++        ptr(slot(x)), ptr("%shr"), ptr(environment), ptr("%unit"),
++        ptr(module_.functionName(x->getFunctionCode())),
++        u32(module_.functionIDs.at(x->getFunctionCode()))});
++  } else if (auto *x = llvh::dyn_cast<CreateClassInst>(&i)) {
++    auto environment = llvh::isa<EmptySentinel>(x->getScope())
++        ? "null" : slot(x->getScope());
++    auto super = llvh::isa<EmptySentinel>(x->getSuperClass())
++        ? "null" : slot(x->getSuperClass());
++    call("shllvm_class", {
++        ptr(slot(x)), ptr("%shr"), ptr(environment), ptr("%unit"),
++        ptr(module_.functionName(x->getFunctionCode())),
++        u32(module_.functionIDs.at(x->getFunctionCode())),
++        ptr(slot(x->getHomeObjectOutput())), ptr(super)});
++  } else if (auto *x = llvh::dyn_cast<CallInst>(&i)) {
++    emitCall(*x, false);
++  } else if (auto *x = llvh::dyn_cast<CallBuiltinInst>(&i)) {
++    emitCall(*x, true);
++  } else if (auto *x = llvh::dyn_cast<GetBuiltinClosureInst>(&i)) {
++    call("shllvm_builtin_closure", {
++        ptr(slot(x)), ptr("%shr"), u32(static_cast<unsigned>(x->getBuiltinIndex()))});
++  } else if (auto *x = llvh::dyn_cast<BranchIfBuiltinInst>(&i)) {
++    call("shllvm_builtin_closure", {
++        ptr("%scratch"), ptr("%shr"),
++        u32(static_cast<unsigned>(x->getBuiltinIndex()))});
++    auto expected = temporary();
++    auto actual = raw(x->getArgument());
++    auto matches = temporary();
++    os_ << "  " << expected << " = load i64, ptr %scratch, align 8\n"
++        << "  " << matches << " = icmp eq i64 " << actual << ", " << expected << "\n";
++    auto yes = edge(i.getParent(), x->getTrueBlock());
++    auto no = edge(i.getParent(), x->getFalseBlock());
++    os_ << "  br i1 " << matches << ", label %" << yes << ", label %" << no << "\n";
++  } else if (auto *x = llvh::dyn_cast<BranchInst>(&i)) {
++    auto destination = edge(i.getParent(), x->getBranchDest());
++    os_ << "  br label %" << destination << "\n";
++  } else if (auto *x = llvh::dyn_cast<TryStartInst>(&i)) {
++    os_ << "  store volatile i32 " << tries_.at(x)
++        << ", ptr %try_state, align 4\n";
++    auto destination = edge(i.getParent(), x->getTryBody());
++    os_ << "  br label %" << destination << "\n";
++  } else if (auto *x = llvh::dyn_cast<TryEndInst>(&i)) {
++    auto *outer = enclosingTries_.lookup(x->getBranchDest());
++    os_ << "  store volatile i32 " << (outer ? tries_.at(outer) : 0)
++        << ", ptr %try_state, align 4\n";
++    auto destination = edge(i.getParent(), x->getBranchDest());
++    os_ << "  br label %" << destination << "\n";
++  } else if (auto *x = llvh::dyn_cast<CatchInst>(&i)) {
++    auto *outer = enclosingTries_.lookup(x->getParent());
++    os_ << "  store volatile i32 " << (outer ? tries_.at(outer) : 0)
++        << ", ptr %try_state, align 4\n";
++    call("shllvm_catch_value", {ptr(slot(x)), ptr("%shr")});
++  } else if (auto *x = llvh::dyn_cast<CondBranchInst>(&i)) {
++    auto truth = call("shllvm_truthy", {ptr(slot(x->getCondition()))}, "i32");
++    auto condition = temporary();
++    os_ << "  " << condition << " = icmp ne i32 " << truth << ", 0\n";
++    auto yes = edge(i.getParent(), x->getTrueDest());
++    auto no = edge(i.getParent(), x->getFalseDest());
++    os_ << "  br i1 " << condition << ", label %" << yes
++        << ", label %" << no << "\n";
++  } else if (auto *x = llvh::dyn_cast<ReturnInst>(&i)) {
++    auto value = raw(x->getValue());
++    if (!tries_.empty())
++      call("shllvm_try_end", {ptr("%shr"), ptr("%try_storage")});
++    call("shllvm_leave", {ptr("%shr"), ptr("%storage"), ptr("%frame")});
++    os_ << "  ret i64 " << value << "\n";
++  } else if (auto *x = llvh::dyn_cast<ThrowInst>(&i)) {
++    call("shllvm_throw", {ptr("%shr"), ptr(slot(x->getThrownValue()))});
++    os_ << "  unreachable\n";
++  } else if (auto *x = llvh::dyn_cast<ThrowTypeErrorInst>(&i)) {
++    call("shllvm_throw_type_error", {ptr("%shr"), ptr(slot(x->getMessage()))});
++    os_ << "  unreachable\n";
++  } else if (llvh::isa<UnreachableInst>(&i)) {
++    os_ << "  unreachable\n";
++  } else if (auto *x = llvh::dyn_cast<ThrowIfInst>(&i)) {
++    auto &tc = module_.module->getTypeContext();
++    auto bad = x->getInvalidTypes()->getData();
++    unsigned mask = 0;
++    if (!tc.intersectTy(bad, Type::createEmpty()).isNoType()) mask |= 1;
++    if (!tc.intersectTy(bad, Type::createUninit()).isNoType()) mask |= 2;
++    call("shllvm_check_tdz", {
++        ptr("%shr"), ptr(slot(x->getCheckedValue())), u32(mask)});
++    copy(x, x->getCheckedValue());
++  } else if (auto *x = llvh::dyn_cast<ThrowIfThisInitializedInst>(&i)) {
++    call("shllvm_check_this_initialized", {
++        ptr("%shr"), ptr(slot(x->getDerivedClassCheckedThis()))});
++  } else if (auto *x = llvh::dyn_cast<DeclareGlobalVarInst>(&i)) {
++    call("shllvm_declare_global", {
++        ptr("%shr"), ptr("%unit"), u32(module_.string(x->getName()->getValue().str()))});
++  } else if (auto *x = llvh::dyn_cast<LIRGetGlobalObjectInst>(&i)) {
++    call("shllvm_global", {ptr(slot(x)), ptr("%shr")});
++  } else if (auto *x = llvh::dyn_cast<LoadPropertyInst>(&i)) {
++    getProperty(*x, x->getObject(), x->getProperty(), false);
++  } else if (auto *x = llvh::dyn_cast<PrLoadInst>(&i)) {
++    auto *name = llvh::dyn_cast<LiteralString>(x->getOperand(PrLoadInst::PropNameIdx));
++    if (!name) {
++      fail(x, "private fixed-slot properties are not implemented");
++      return;
++    }
++    // Literal expansion uses ordinary Hermes objects. Preserve the field name
++    // rather than assuming the C emitter's optimized storage-slot layout.
++    getProperty(*x, x->getObject(), name, false);
++  } else if (auto *x = llvh::dyn_cast<LoadPropertyWithReceiverInst>(&i)) {
++    call("shllvm_get_receiver", {
++        ptr(slot(x)), ptr("%shr"), ptr(slot(x->getObject())),
++        ptr(slot(x->getProperty())), ptr(slot(x->getReceiver()))});
++  } else if (auto *x = llvh::dyn_cast<TryLoadGlobalPropertyInst>(&i)) {
++    getProperty(*x, x->getObject(), x->getProperty(), true);
++  } else if (auto *x = llvh::dyn_cast<StorePropertyInst>(&i)) {
++    setProperty(x->getObject(), x->getProperty(), x->getStoredValue(),
++                llvh::isa<StorePropertyStrictInst>(x), false);
++  } else if (auto *x = llvh::dyn_cast<PrStoreInst>(&i)) {
++    auto *name = llvh::dyn_cast<LiteralString>(x->getOperand(PrStoreInst::PropNameIdx));
++    if (!name) {
++      fail(x, "private fixed-slot properties are not implemented");
++      return;
++    }
++    setProperty(x->getObject(), name, x->getStoredValue(), true, false);
++  } else if (auto *x = llvh::dyn_cast<TryStoreGlobalPropertyInst>(&i)) {
++    setProperty(x->getObject(), x->getProperty(), x->getStoredValue(),
++                llvh::isa<TryStoreGlobalPropertyStrictInst>(x), true);
++  } else if (auto *x = llvh::dyn_cast<StorePropertyWithReceiverInst>(&i)) {
++    call("shllvm_set_receiver", {
++        ptr("%shr"), ptr(slot(x->getObject())), ptr(slot(x->getProperty())),
++        ptr(slot(x->getStoredValue())), ptr(slot(x->getReceiver())),
++        u32(x->getIsStrict())});
++  } else if (auto *x = llvh::dyn_cast<DefineOwnPropertyInst>(&i)) {
++    call("shllvm_define", {
++        ptr("%shr"), ptr(slot(x->getObject())), ptr(slot(x->getProperty())),
++        ptr(slot(x->getStoredValue())), u32(x->getIsEnumerable())});
++  } else if (auto *x = llvh::dyn_cast<DefineOwnInDenseArrayInst>(&i)) {
++    call("shllvm_define_index", {
++        ptr("%shr"), ptr(slot(x->getArray())),
++        u32(x->getArrayIndex()->asUInt32()), ptr(slot(x->getStoredValue()))});
++  } else if (auto *x = llvh::dyn_cast<DefineOwnGetterSetterInst>(&i)) {
++    call("shllvm_define_accessor", {
++        ptr("%shr"), ptr(slot(x->getObject())), ptr(slot(x->getProperty())),
++        ptr(slot(x->getStoredGetter())), ptr(slot(x->getStoredSetter())),
++        u32(x->getIsEnumerable())});
++  } else if (auto *x = llvh::dyn_cast<DeletePropertyInst>(&i)) {
++    call("shllvm_delete", {
++        ptr(slot(x)), ptr("%shr"), ptr(slot(x->getObject())),
++        ptr(slot(x->getProperty())), u32(llvh::isa<DeletePropertyStrictInst>(x))});
++  } else if (auto *x = llvh::dyn_cast<BaseAllocObjectLiteralInst>(&i)) {
++    if (!llvh::isa<AllocObjectLiteralInst>(x)) {
++      fail(x, "typed object allocation is outside the dynamic-JS backend");
++      return;
++    }
++    if (!llvh::isa<EmptySentinel>(x->getParentObject())) {
++      call("shllvm_object_parent", {
++          ptr(slot(x)), ptr("%shr"), ptr("%unit"), ptr(slot(x->getParentObject()))});
++    } else {
++      call("shllvm_object", {ptr(slot(x)), ptr("%shr")});
++    }
++    for (unsigned n = 0; n != x->getKeyValuePairCount(); ++n)
++      call("shllvm_define", {
++          ptr("%shr"), ptr(slot(x)), ptr(slot(x->getKey(n))),
++          ptr(slot(x->getValue(n))), u32(1)});
++  } else if (auto *x = llvh::dyn_cast<LIRAllocObjectFromBufferInst>(&i)) {
++    if (!llvh::isa<EmptySentinel>(x->getParentObject())) {
++      call("shllvm_object_parent", {
++          ptr(slot(x)), ptr("%shr"), ptr("%unit"), ptr(slot(x->getParentObject()))});
++    } else {
++      call("shllvm_object", {ptr(slot(x)), ptr("%shr")});
++    }
++    for (unsigned n = 0; n != x->getKeyValuePairCount(); ++n) {
++      auto pair = x->getKeyValuePair(n);
++      call("shllvm_define", {
++          ptr("%shr"), ptr(slot(x)), ptr(slot(pair.first)),
++          ptr(slot(pair.second)), u32(1)});
++    }
++  } else if (auto *x = llvh::dyn_cast<AllocArrayInst>(&i)) {
++    call("shllvm_array", {
++        ptr(slot(x)), ptr("%shr"),
++        u32(std::max(x->getSizeHint()->asUInt32(), x->getElementCount()))});
++    for (unsigned n = 0; n != x->getElementCount(); ++n)
++      if (!llvh::isa<LiteralEmpty>(x->getArrayElement(n)))
++        call("shllvm_define_index", {
++            ptr("%shr"), ptr(slot(x)), u32(n), ptr(slot(x->getArrayElement(n)))});
++  } else if (auto *x = llvh::dyn_cast<CoerceThisNSInst>(&i)) {
++    call("shllvm_coerce_this", {
++        ptr(slot(x)), ptr("%shr"), ptr(slot(x->getSingleOperand()))});
++  } else if (auto *x = llvh::dyn_cast<LIRGetThisNSInst>(&i)) {
++    call("shllvm_param", {ptr("%scratch"), ptr("%frame"), u32(0)});
++    call("shllvm_coerce_this", {ptr(slot(x)), ptr("%shr"), ptr("%scratch")});
++  } else if (auto *x = llvh::dyn_cast<GetNewTargetInst>(&i)) {
++    call("shllvm_new_target", {ptr(slot(x)), ptr("%frame")});
++  } else if (auto *x = llvh::dyn_cast<CreateThisInst>(&i)) {
++    call("shllvm_create_this", {
++        ptr(slot(x)), ptr("%shr"), ptr(slot(x->getClosure())),
++        ptr(slot(x->getNewTarget()))});
++  } else if (auto *x = llvh::dyn_cast<GetConstructedObjectInst>(&i)) {
++    call("shllvm_constructed_object", {
++        ptr(slot(x)), ptr(slot(x->getThisValue())),
++        ptr(slot(x->getConstructorReturnValue()))});
++  } else if (auto *x = llvh::dyn_cast<LoadParentNoTrapsInst>(&i)) {
++    call("shllvm_get_parent", {
++        ptr(slot(x)), ptr("%shr"), ptr(slot(x->getObject()))});
++  } else if (auto *x = llvh::dyn_cast<LIRGetArgumentsLengthInst>(&i)) {
++    call("shllvm_args_length", {
++        ptr(slot(x)), ptr("%shr"), ptr("%frame"), ptr(slot(x->getLazyRegister()))});
++  } else if (auto *x = llvh::dyn_cast<LIRGetArgumentsPropByValLooseInst>(&i)) {
++    call("shllvm_args_get", {
++        ptr(slot(x)), ptr("%shr"), ptr("%frame"), ptr(slot(x->getIndex())),
++        ptr(slot(x->getLazyRegister())), u32(0)});
++  } else if (auto *x = llvh::dyn_cast<LIRGetArgumentsPropByValStrictInst>(&i)) {
++    call("shllvm_args_get", {
++        ptr(slot(x)), ptr("%shr"), ptr("%frame"), ptr(slot(x->getIndex())),
++        ptr(slot(x->getLazyRegister())), u32(1)});
++  } else if (auto *x = llvh::dyn_cast<LIRReifyArgumentsLooseInst>(&i)) {
++    call("shllvm_args_reify", {
++        ptr("%shr"), ptr("%frame"), ptr(slot(x->getLazyRegister())), u32(0)});
++  } else if (auto *x = llvh::dyn_cast<LIRReifyArgumentsStrictInst>(&i)) {
++    call("shllvm_args_reify", {
++        ptr("%shr"), ptr("%frame"), ptr(slot(x->getLazyRegister())), u32(1)});
++  } else if (auto *x = llvh::dyn_cast<TypeOfInst>(&i)) {
++    unary(*x, x->getArgument(), SHLLVM_TYPEOF);
++  } else if (auto *x = llvh::dyn_cast<TypeOfIsInst>(&i)) {
++    call("shllvm_typeof_is", {
++        ptr(slot(x)), ptr(slot(x->getArgument())),
++        u32(x->getTypes()->getData().getRaw())});
++  } else if (auto *x = llvh::dyn_cast<AsNumberInst>(&i)) {
++    unary(*x, x->getSingleOperand(), SHLLVM_POS);
++  } else if (auto *x = llvh::dyn_cast<AsNumericInst>(&i)) {
++    unary(*x, x->getSingleOperand(), SHLLVM_TO_NUMERIC);
++  } else if (auto *x = llvh::dyn_cast<AsInt32Inst>(&i)) {
++    unary(*x, x->getSingleOperand(), SHLLVM_TO_INT32);
++  } else if (auto *x = llvh::dyn_cast<AsUint32Inst>(&i)) {
++    unary(*x, x->getSingleOperand(), SHLLVM_TO_UINT32);
++  } else if (auto *x = llvh::dyn_cast<AddEmptyStringInst>(&i)) {
++    unary(*x, x->getSingleOperand(), SHLLVM_TO_STRING);
++  } else if (auto *x = llvh::dyn_cast<ToPropertyKeyInst>(&i)) {
++    unary(*x, x->getSingleOperand(), SHLLVM_TO_PROPERTY_KEY);
++  } else if (auto *x = llvh::dyn_cast<StringConcatInst>(&i)) {
++    if (!x->getNumOperands()) {
++      fail(x, "empty StringConcatInst");
++      return;
++    }
++    copy(x, x->getOperand(0));
++    for (unsigned n = 1; n != x->getNumOperands(); ++n)
++      binary(*x, x, x->getOperand(n), SHLLVM_ADD);
++  } else if (auto *x = llvh::dyn_cast<UnaryOperatorInst>(&i)) {
++    unsigned op;
++    switch (x->getKind()) {
++      case ValueKind::UnaryIncInstKind: op = SHLLVM_INC; break;
++      case ValueKind::UnaryDecInstKind: op = SHLLVM_DEC; break;
++      case ValueKind::UnaryTildeInstKind: op = SHLLVM_BIT_NOT; break;
++      case ValueKind::UnaryMinusInstKind: op = SHLLVM_NEG; break;
++      case ValueKind::UnaryBangInstKind: op = SHLLVM_NOT; break;
++      case ValueKind::UnaryVoidInstKind:
++        call("shllvm_constant", {ptr(slot(x)), u32(SHLLVM_UNDEFINED), u64(0)});
++        return;
++      default: fail(x, "unsupported unary operation"); return;
++    }
++    unary(*x, x->getSingleOperand(), op);
++  } else if (auto *x = llvh::dyn_cast<BinaryOperatorInst>(&i)) {
++    unsigned op;
++    switch (x->getKind()) {
++      case ValueKind::BinaryAddInstKind: op = SHLLVM_ADD; break;
++      case ValueKind::BinarySubtractInstKind: op = SHLLVM_SUB; break;
++      case ValueKind::BinaryMultiplyInstKind: op = SHLLVM_MUL; break;
++      case ValueKind::BinaryDivideInstKind: op = SHLLVM_DIV; break;
++      case ValueKind::BinaryModuloInstKind: op = SHLLVM_MOD; break;
++      case ValueKind::BinaryEqualInstKind: op = SHLLVM_EQ; break;
++      case ValueKind::BinaryNotEqualInstKind: op = SHLLVM_NE; break;
++      case ValueKind::BinaryStrictlyEqualInstKind: op = SHLLVM_STRICT_EQ; break;
++      case ValueKind::BinaryStrictlyNotEqualInstKind: op = SHLLVM_STRICT_NE; break;
++      case ValueKind::BinaryLessThanInstKind: op = SHLLVM_LT; break;
++      case ValueKind::BinaryLessThanOrEqualInstKind: op = SHLLVM_LE; break;
++      case ValueKind::BinaryGreaterThanInstKind: op = SHLLVM_GT; break;
++      case ValueKind::BinaryGreaterThanOrEqualInstKind: op = SHLLVM_GE; break;
++      case ValueKind::BinaryOrInstKind: op = SHLLVM_BIT_OR; break;
++      case ValueKind::BinaryAndInstKind: op = SHLLVM_BIT_AND; break;
++      case ValueKind::BinaryXorInstKind: op = SHLLVM_BIT_XOR; break;
++      case ValueKind::BinaryLeftShiftInstKind: op = SHLLVM_SHL; break;
++      case ValueKind::BinaryRightShiftInstKind: op = SHLLVM_SHR; break;
++      case ValueKind::BinaryUnsignedRightShiftInstKind: op = SHLLVM_USHR; break;
++      case ValueKind::BinaryInInstKind: op = SHLLVM_IN; break;
++      case ValueKind::BinaryInstanceOfInstKind: op = SHLLVM_INSTANCEOF; break;
++      default: fail(x, "unsupported binary operation"); return;
++    }
++    binary(*x, x->getLeftHandSide(), x->getRightHandSide(), op);
++  } else if (auto *x = llvh::dyn_cast<FBinaryMathInst>(&i)) {
++    const char *op = nullptr;
++    switch (x->getKind()) {
++      case ValueKind::FAddInstKind: op = "fadd"; break;
++      case ValueKind::FSubtractInstKind: op = "fsub"; break;
++      case ValueKind::FMultiplyInstKind: op = "fmul"; break;
++      case ValueKind::FDivideInstKind: op = "fdiv"; break;
++      case ValueKind::FModuloInstKind: op = "frem"; break;
++      default: fail(x, "unsupported floating operation"); return;
++    }
++    floating(*x, x->getLeft(), x->getRight(), op);
++  } else if (auto *x = llvh::dyn_cast<FUnaryMathInst>(&i)) {
++    floating(*x, x->getArg(), nullptr, "fneg");
++  } else if (auto *x = llvh::dyn_cast<FCompareInst>(&i)) {
++    const char *predicate = nullptr;
++    switch (x->getKind()) {
++      case ValueKind::FEqualInstKind: predicate = "oeq"; break;
++      case ValueKind::FNotEqualInstKind: predicate = "une"; break;
++      case ValueKind::FLessThanInstKind: predicate = "olt"; break;
++      case ValueKind::FLessThanOrEqualInstKind: predicate = "ole"; break;
++      case ValueKind::FGreaterThanInstKind: predicate = "ogt"; break;
++      case ValueKind::FGreaterThanOrEqualInstKind: predicate = "oge"; break;
++      default: fail(x, "unsupported floating comparison"); return;
++    }
++    compare(*x, x->getLeft(), x->getRight(), predicate);
++  } else {
++    fail(&i, std::string("unsupported instruction ") + i.getName().str());
++  }
++}
++
++bool FunctionEmitter::generate() {
++  // Keep explicit root/argument storage below 8 KiB. The upstream stack check
++  // has a fixed safety gap; admitting a half-megabyte dynamic alloca could jump
++  // over that gap before the next check. This is an admission limit, not a total
++  // memory bound (LLVM spills and runtime/recursive frames also consume stack).
++  if (slots_.size() + 1 + std::max(1u, maxArgs_) > 1024) {
++    fail(nullptr, "function exceeds 1024 combined root/argument-slot admission limit");
++    return false;
++  }
++  os_ << "define internal i64 " << module_.functionName(&function_)
++      << "(ptr %shr) {\nentry:\n";
++  call("_sh_check_native_stack_overflow", {ptr("%shr")});
++  auto size = call("shllvm_frame_size", {u32(slots_.size() + 1)}, "i64");
++  os_ << "  %storage = alloca i8, i64 " << size << ", align 16\n"
++      << "  %argv = alloca [" << std::max(1u, maxArgs_) << " x i64], align 8\n"
++      << "  %unit_index = load i32, ptr @shllvm_unit_index, align 4\n";
++  module_.import("shllvm_enter", "ptr", {
++      ptr(""), ptr(""), u32(0), u32(0), {"i32", ""}});
++  os_ << "  %frame = call ptr @shllvm_enter(ptr %shr, ptr %storage, i32 "
++      << slots_.size() + 1 << ", i32 " << maxArgs_ << ", i32 %unit_index)\n";
++  module_.import("shllvm_roots", "ptr", {ptr("")});
++  os_ << "  %roots = call ptr @shllvm_roots(ptr %storage)\n";
++  module_.import("shllvm_get_unit", "ptr", {ptr(""), u32(0)});
++  os_ << "  %unit = call ptr @shllvm_get_unit(ptr %shr, i32 %unit_index)\n";
++  for (unsigned n = 0; n != slots_.size(); ++n)
++    os_ << "  %s" << n << " = getelementptr i64, ptr %roots, i32 " << n << "\n";
++  os_ << "  %scratch = getelementptr i64, ptr %roots, i32 " << scratch_ << "\n";
++  call("shllvm_check_invocation", {
++      ptr("%shr"), ptr("%frame"),
++      u32(static_cast<uint32_t>(function_.getProhibitInvoke()))});
++  for (auto *constant : constants_)
++    emitConstant(constant);
++  if (function_.begin() == function_.end()) {
++    fail(nullptr, "function has no entry block");
++    return false;
++  }
++  if (!tries_.empty()) {
++    auto size = call("shllvm_try_size", {}, "i64");
++    os_ << "  %try_storage = alloca i8, i64 " << size << ", align 16\n"
++        << "  %try_state = alloca i32, align 4\n"
++        << "  store volatile i32 0, ptr %try_state, align 4\n";
++    auto buffer = call("shllvm_try_begin", {ptr("%shr"), ptr("%try_storage")}, "ptr");
++    module_.import("_setjmp", "i32", {ptr("")});
++    auto status = temporary(), exceptional = temporary();
++    os_ << "  " << status << " = call i32 @_setjmp(ptr " << buffer << ") returns_twice\n"
++        << "  " << exceptional << " = icmp ne i32 " << status << ", 0\n"
++        << "  br i1 " << exceptional << ", label %catch.dispatch, label %"
++        << block(&function_.front()) << "\n";
++  } else {
++    os_ << "  br label %" << block(&function_.front()) << "\n";
++  }
++  for (auto &bb : function_) {
++    os_ << block(&bb) << ":\n";
++    for (auto &instruction : bb)
++      emitInstruction(instruction);
++  }
++  emitCatchDispatch();
++  emitEdges();
++  os_ << "}\n\n";
++  os_.flush();
++  return ok_;
++}
++
++void ModuleEmitter::emitData(llvh::raw_ostream &os) {
++  std::vector<uint8_t> ascii;
++  std::vector<char16_t> utf16;
++  std::vector<uint32_t> triples;
++  for (const auto &str : strings) {
++    if (isAllASCII(str)) {
++      triples.push_back(ascii.size());
++      triples.push_back(str.size());
++      triples.push_back(hashString(llvh::ArrayRef<char>(str.data(), str.size())));
++      ascii.insert(ascii.end(), str.begin(), str.end());
++      ascii.push_back(0);
++    } else {
++      std::u16string converted;
++      convertUTF8WithSurrogatesToUTF16(
++          std::back_inserter(converted), str.data(), str.data() + str.size());
++      triples.push_back(utf16.size() | (1u << 31));
++      triples.push_back(converted.size());
++      triples.push_back(hashString(
++          llvh::ArrayRef<char16_t>(converted.data(), converted.size())));
++      utf16.insert(utf16.end(), converted.begin(), converted.end());
++      utf16.push_back(0);
++    }
++  }
++  if (ascii.empty()) ascii.push_back(0);
++  if (utf16.empty()) utf16.push_back(0);
++  auto array = [&os](const char *name, const char *type, const auto &values) {
++    os << "@" << name << " = private constant [" << values.size()
++       << " x " << type << "] [";
++    for (size_t i = 0; i != values.size(); ++i) {
++      if (i) os << ", ";
++      os << type << " " << static_cast<uint64_t>(values[i]);
++    }
++    os << "]\n";
++  };
++  array("shllvm_ascii", "i8", ascii);
++  array("shllvm_utf16", "i16", utf16);
++  array("shllvm_strings", "i32", triples);
++  os << "@shllvm_unit_index = internal global i32 0, align 4\n"
++     << "@shllvm_unit_name = private constant [12 x i8] c\"llvm_module\\00\"\n"
++     << "%SHLLVMFunctionInfo = type { i32, i32, i32, i32 }\n"
++     << "@shllvm_functions = private constant [" << functions.size()
++     << " x %SHLLVMFunctionInfo] [\n";
++  for (unsigned i = 0; i != functions.size(); ++i) {
++    auto *f = functions[i];
++    if (i) os << ",\n";
++    os << "  %SHLLVMFunctionInfo { i32 "
++       << string(f->getOriginalOrInferredName().str()) << ", i32 "
++       << f->getExpectedParamCountIncludingThis() - 1 << ", i32 "
++       << computeFuncKind(f->getKind()) << ", i32 "
++       << computeProhibitInvoke(f->getProhibitInvoke()) << " }";
++  }
++  os << "\n]\n\n";
++}
++
++bool ModuleEmitter::generate(llvh::raw_ostream &os) {
++  std::vector<std::string> bodies;
++  for (auto *function : functions) {
++    FunctionEmitter emitter(*this, *function);
++    if (!emitter.generate())
++      return false;
++    bodies.push_back(emitter.text());
++  }
++  os << "; Direct Static Hermes IR -> LLVM IR. No generated C frontend stage.\n"
++     << "; Runtime bridge ABI v1; opaque pointers; host native callback ABI.\n"
++     << "source_filename = \"hermes-direct-llvm\"\n\n";
++  emitData(os);
++  import("shllvm_create_unit", "ptr", {
++      ptr(""), u32(0), ptr(""), ptr(""), ptr(""), u32(0), ptr(""), ptr(""), ptr("")});
++  if (options.emitMain)
++    import("shllvm_run", "i32", {{"i32", ""}, ptr(""), ptr("")});
++  for (const auto &entry : imports) {
++    os << "declare " << entry.second.first << " @" << entry.first << "(";
++    for (size_t i = 0; i != entry.second.second.size(); ++i) {
++      if (i) os << ", ";
++      os << entry.second.second[i];
++    }
++    os << ")";
++    if (entry.first == "_setjmp")
++      os << " returns_twice";
++    os << "\n";
++  }
++  os << "\n";
++  for (const auto &body : bodies)
++    os << body;
++  std::string unitName = options.unitName;
++  if (unitName.empty())
++    unitName = "main";
++  // Unit names have already been validated by the shermes driver.
++  os << "define ptr @sh_export_" << unitName << "() {\nentry:\n"
++     << "  %unit = call ptr @shllvm_create_unit(ptr @shllvm_unit_index, i32 "
++     << strings.size() << ", ptr @shllvm_ascii, ptr @shllvm_utf16, ptr "
++     << "@shllvm_strings, i32 " << functions.size()
++     << ", ptr @shllvm_functions, ptr @shllvm_f0, ptr @shllvm_unit_name)\n"
++     << "  ret ptr %unit\n}\n";
++  if (options.emitMain)
++    os << "\ndefine i32 @main(i32 %argc, ptr %argv) {\nentry:\n"
++       << "  %status = call i32 @shllvm_run(i32 %argc, ptr %argv, ptr @sh_export_"
++       << unitName << ")\n  ret i32 %status\n}\n";
++  return true;
++}
++
++} // namespace
++
++bool sh::generateLLVM(
++    Module *module,
++    llvh::raw_ostream &os,
++    const BytecodeGenerationOptions &options) {
++  for (char c : options.unitName) {
++    if (!((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') ||
++          (c >= '0' && c <= '9') || c == '_')) {
++      module->getContext().getSourceErrorManager().error(
++          module->getTopLevelFunction()->getSourceRange().Start,
++          "direct LLVM backend: exported unit name must contain only ASCII letters, digits or underscores");
++      return false;
++    }
++  }
++  if (!sh::lowerForLLVM(module, options.optimizationEnabled))
++    return false;
++  if (options.verifyIR) {
++    if (!verifyModule(*module, &llvh::errs(), VerificationMode::IR_LOWERED)) {
++      module->getContext().getSourceErrorManager().error(
++          llvh::SMLoc{}, "Lowered IR verification failed");
++      return false;
++    }
++  }
++  module->assignIndexToVariables();
++  ModuleEmitter emitter(module, options);
++  return emitter.generate(os);
++}
+diff --git a/lib/BCGen/SH/LLVMNative/runtime.c b/lib/BCGen/SH/LLVMNative/runtime.c
+new file mode 100644
+index 0000000000000000000000000000000000000000..89fc3d083aabad1fc424d46b3fb24ef8eee99f3c
+--- /dev/null
++++ b/lib/BCGen/SH/LLVMNative/runtime.c
+@@ -0,0 +1,413 @@
++/*
++ * Direct LLVM IR backend: target-built adaptation of the existing Static Hermes
++ * runtime. This file is compiled once per runtime/toolchain configuration.
++ * Program functions and control flow are emitted directly as LLVM IR.
++ */
++#include "runtime.h"
++#include "hermes/VM/static_h.h"
++#include <stddef.h>
++#include <stdio.h>
++#include <stdlib.h>
++#include <string.h>
++
++_Static_assert(sizeof(SHLegacyValue) == 8, "LLVM slot ABI requires 8-byte values");
++_Static_assert(sizeof(void *) == 8, "initial LLVM executable ABI is host64");
++_Static_assert(sizeof(SHLLVMFunctionInfo) == 16, "descriptor ABI");
++_Static_assert(offsetof(SHLLVMFunctionInfo, prohibit_invoke) == 12, "descriptor ABI");
++
++typedef struct SHLLVMUnit {
++  SHUnit unit;
++  uint32_t function_count;
++  SHNativeFuncInfo *functions;
++  SHCompressedPointer empty_class;
++  SHShapeTableEntry empty_shape;
++} SHLLVMUnit;
++
++#define V(p) (*(SHLegacyValue *)(p))
++#define R(p) ((SHRuntime *)(p))
++#define U(p) ((SHUnit *)(p))
++
++static void bad(const char *what) {
++  fprintf(stderr, "Static Hermes LLVM bridge: %s\n", what);
++  abort();
++}
++
++void shllvm_constant(void *out, uint32_t kind, uint64_t bits) {
++  switch (kind) {
++    case SHLLVM_UNDEFINED: V(out) = _sh_ljs_undefined(); return;
++    case SHLLVM_NULL: V(out) = _sh_ljs_null(); return;
++    case SHLLVM_BOOLEAN: V(out) = _sh_ljs_bool(bits != 0); return;
++    case SHLLVM_NUMBER: {
++      double d;
++      memcpy(&d, &bits, sizeof(d));
++      V(out) = _sh_ljs_untrusted_double(d);
++      return;
++    }
++    case SHLLVM_EMPTY: V(out) = _sh_ljs_empty(); return;
++    case SHLLVM_UNINIT: V(out) = _sh_ljs_undefined(); return;
++    default: bad("unknown constant kind");
++  }
++}
++void shllvm_number(void *out, double number) {
++  V(out) = _sh_ljs_untrusted_double(number);
++}
++void shllvm_boolean(void *out, uint32_t value) {
++  V(out) = _sh_ljs_bool(value != 0);
++}
++uint64_t shllvm_frame_size(uint32_t count) {
++  return offsetof(SHLocals, locals) + (uint64_t)count * sizeof(SHLegacyValue);
++}
++void *shllvm_get_unit(void *shr, uint32_t index) {
++  if (!index || index >= sizeof(R(shr)->units)/sizeof(R(shr)->units[0]) ||
++      !R(shr)->units[index]) bad("unregistered unit");
++  return R(shr)->units[index];
++}
++void *shllvm_enter(void *shr, void *storage, uint32_t count,
++                   uint32_t max_args, uint32_t index) {
++  SHLocals *locals = storage;
++  if (max_args > UINT32_MAX - 9) bad("argument frame too large");
++  _sh_check_native_stack_overflow(R(shr));
++  locals->count = count;
++  locals->unit = shllvm_get_unit(shr, index);
++  locals->src_location_idx = 0; /* SHSrcLocationTable::kInvalidLocIdx */
++  for (uint32_t i = 0; i < count; ++i)
++    locals->locals[i] = _sh_ljs_undefined();
++  /* One debug slot, max_args values, this, and seven outgoing frame slots. */
++  SHLegacyValue *frame = _sh_enter(R(shr), locals, max_args + 9);
++  for (uint32_t i = 0; i < max_args + 9; ++i)
++    frame[i] = _sh_ljs_undefined();
++  frame[SHStackFrame_SHLocals] = _sh_ljs_native_pointer(locals);
++  return frame;
++}
++void *shllvm_roots(void *storage) { return ((SHLocals *)storage)->locals; }
++void shllvm_leave(void *shr, void *storage, void *frame) {
++  _sh_leave(R(shr), storage, frame);
++}
++void shllvm_param(void *out, void *frame, uint32_t index) {
++  V(out) = _sh_ljs_param(frame, index);
++}
++void shllvm_global(void *out, void *shr) {
++  V(out) = _sh_ljs_get_global_object(R(shr));
++}
++void shllvm_symbol(void *out, void *shr, void *unit, uint32_t index) {
++  if (index >= U(unit)->num_symbols) bad("string index out of range");
++  V(out) = _sh_ljs_get_string(R(shr), U(unit)->symbols[index]);
++}
++void shllvm_declare_global(void *shr, void *unit, uint32_t index) {
++  if (index >= U(unit)->num_symbols) bad("global string index out of range");
++  _sh_ljs_declare_global_var(R(shr), U(unit)->symbols[index]);
++}
++void shllvm_env_create(void *out, void *shr, void *parent, uint32_t size) {
++  /* An absent native environment cannot be an object(null) GC root. */
++  if (parent && _sh_ljs_is_undefined(V(parent))) parent = NULL;
++  V(out) = _sh_ljs_create_environment(R(shr), parent, size);
++}
++void shllvm_env_from_closure(void *out, void *shr, void *closure) {
++  SHLegacyValue env = _sh_ljs_get_env_from_closure(R(shr), V(closure));
++  V(out) = _sh_ljs_get_pointer(env) ? env : _sh_ljs_undefined();
++}
++void shllvm_env_from_frame(void *out, void *shr, void *frame) {
++  shllvm_env_from_closure(out, shr,
++      &((SHLegacyValue *)frame)[SHStackFrame_CalleeClosureOrCB]);
++}
++void shllvm_env_resolve(void *out, void *shr, void *env, uint32_t levels) {
++  V(out) = _sh_ljs_get_env(R(shr), V(env), levels);
++}
++void shllvm_env_load(void *out, void *env, uint32_t index) {
++  V(out) = _sh_ljs_load_from_env(V(env), index);
++}
++void shllvm_env_store(void *shr, void *env, void *value, uint32_t index) {
++  _sh_ljs_store_to_env(R(shr), V(env), V(value), index);
++}
++void shllvm_closure(void *out, void *shr, void *env, void *unit,
++                    void *function, uint32_t function_index) {
++  SHLLVMUnit *llvm_unit = unit;
++  if (function_index >= llvm_unit->function_count) bad("function index out of range");
++  if (env && _sh_ljs_is_undefined(V(env))) env = NULL;
++  V(out) = _sh_ljs_create_closure(R(shr), env,
++      (SHLegacyValue (*)(SHRuntime *))function,
++      &llvm_unit->functions[function_index], U(unit));
++}
++static void copy_args(SHRuntime *shr, uint32_t argc, void *argv) {
++  /* This loop does not allocate. During the following call the register frame
++   * is traced by Hermes. Inputs must already have been evaluated and rooted. */
++  for (uint32_t i = 0; i < argc; ++i)
++    shr->stackPointer[SHStackFrame_FirstArg - (int32_t)i] = ((SHLegacyValue *)argv)[i];
++}
++void shllvm_call(void *out, void *shr, void *frame, void *callee, void *this_value,
++                 void *new_target, uint32_t argc, void *argv) {
++  SHLegacyValue *next = R(shr)->stackPointer;
++  next[SHStackFrame_CalleeClosureOrCB] = V(callee);
++  next[SHStackFrame_ThisArg] = V(this_value);
++  next[SHStackFrame_NewTarget] = new_target ? V(new_target) : _sh_ljs_undefined();
++  copy_args(R(shr), argc, argv);
++  V(out) = _sh_ljs_call(R(shr), frame, argc);
++}
++void shllvm_builtin(void *out, void *shr, void *frame,
++                    uint32_t builtin_index, uint32_t argc, void *argv) {
++  copy_args(R(shr), argc, argv);
++  V(out) = _sh_ljs_call_builtin(R(shr), frame, argc, builtin_index);
++}
++void shllvm_builtin_closure(void *out, void *shr, uint32_t index) {
++  V(out) = _sh_ljs_get_builtin_closure(R(shr), index);
++}
++void shllvm_binary(void *out, void *shr, uint32_t op, void *a, void *b) {
++  SHRuntime *s = R(shr);
++  switch (op) {
++    case SHLLVM_ADD: V(out) = _sh_ljs_add_rjs(s,a,b); return;
++    case SHLLVM_SUB: V(out) = _sh_ljs_sub_rjs(s,a,b); return;
++    case SHLLVM_MUL: V(out) = _sh_ljs_mul_rjs(s,a,b); return;
++    case SHLLVM_DIV: V(out) = _sh_ljs_div_rjs(s,a,b); return;
++    case SHLLVM_MOD: V(out) = _sh_ljs_mod_rjs(s,a,b); return;
++    case SHLLVM_EQ: V(out) = _sh_ljs_bool(_sh_ljs_equal_rjs(s,a,b)); return;
++    case SHLLVM_NE: V(out) = _sh_ljs_bool(!_sh_ljs_equal_rjs(s,a,b)); return;
++    case SHLLVM_STRICT_EQ: V(out) = _sh_ljs_bool(_sh_ljs_strict_equal(V(a),V(b))); return;
++    case SHLLVM_STRICT_NE: V(out) = _sh_ljs_bool(!_sh_ljs_strict_equal(V(a),V(b))); return;
++    case SHLLVM_LT: V(out) = _sh_ljs_bool(_sh_ljs_less_rjs(s,a,b)); return;
++    case SHLLVM_LE: V(out) = _sh_ljs_bool(_sh_ljs_less_equal_rjs(s,a,b)); return;
++    case SHLLVM_GT: V(out) = _sh_ljs_bool(_sh_ljs_greater_rjs(s,a,b)); return;
++    case SHLLVM_GE: V(out) = _sh_ljs_bool(_sh_ljs_greater_equal_rjs(s,a,b)); return;
++    case SHLLVM_BIT_OR: V(out) = _sh_ljs_bit_or_rjs(s,a,b); return;
++    case SHLLVM_BIT_AND: V(out) = _sh_ljs_bit_and_rjs(s,a,b); return;
++    case SHLLVM_BIT_XOR: V(out) = _sh_ljs_bit_xor_rjs(s,a,b); return;
++    case SHLLVM_SHL: V(out) = _sh_ljs_left_shift_rjs(s,a,b); return;
++    case SHLLVM_SHR: V(out) = _sh_ljs_right_shift_rjs(s,a,b); return;
++    case SHLLVM_USHR: V(out) = _sh_ljs_unsigned_right_shift_rjs(s,a,b); return;
++    case SHLLVM_IN: V(out) = _sh_ljs_is_in_rjs(s,a,b); return;
++    case SHLLVM_INSTANCEOF: V(out) = _sh_ljs_instance_of_rjs(s,a,b); return;
++    default: bad("unknown binary opcode");
++  }
++}
++void shllvm_unary(void *out, void *shr, uint32_t op, void *a) {
++  SHRuntime *s = R(shr);
++  switch (op) {
++    case SHLLVM_NEG: V(out) = _sh_ljs_minus_rjs(s,a); return;
++    case SHLLVM_POS: V(out) = _sh_ljs_untrusted_double(_sh_ljs_to_double_rjs(s,a)); return;
++    case SHLLVM_NOT: V(out) = _sh_ljs_bool(!_sh_ljs_to_boolean(V(a))); return;
++    case SHLLVM_BIT_NOT: V(out) = _sh_ljs_bit_not_rjs(s,a); return;
++    case SHLLVM_TYPEOF: V(out) = _sh_ljs_typeof(s,a); return;
++    case SHLLVM_INC: V(out) = _sh_ljs_inc_rjs(s,a); return;
++    case SHLLVM_DEC: V(out) = _sh_ljs_dec_rjs(s,a); return;
++    case SHLLVM_TO_NUMERIC: V(out) = _sh_ljs_to_numeric_rjs(s,a); return;
++    case SHLLVM_TO_STRING: V(out) = _sh_ljs_add_empty_string_rjs(s,a); return;
++    case SHLLVM_TO_INT32: V(out) = _sh_ljs_double(_sh_ljs_to_int32_rjs(s,a)); return;
++    case SHLLVM_TO_UINT32: V(out) = _sh_ljs_double(_sh_ljs_to_uint32_rjs(s,a)); return;
++    case SHLLVM_TO_PROPERTY_KEY: V(out) = _sh_ljs_to_property_key(s,a); return;
++    default: bad("unknown unary opcode");
++  }
++}
++uint32_t shllvm_truthy(void *value) { return _sh_ljs_to_boolean(V(value)); }
++uint32_t shllvm_is_object(void *value) { return _sh_ljs_is_object(V(value)); }
++void shllvm_object(void *out, void *shr) { V(out) = _sh_ljs_new_object(R(shr)); }
++void shllvm_object_parent(void *out, void *shr, void *unit, void *parent) {
++  V(out) = _sh_ljs_new_object_with_parent(R(shr),U(unit),parent,0);
++}
++void shllvm_array(void *out, void *shr, uint32_t length) {
++  V(out) = _sh_ljs_new_array(R(shr),length);
++}
++void shllvm_get(void *out, void *shr, void *object, void *key) {
++  V(out) = _sh_ljs_get_by_val_rjs(R(shr),object,key);
++}
++void shllvm_get_id(void *out, void *shr, void *unit, void *object,
++                   uint32_t key_index, uint32_t try_flag) {
++  if (key_index >= U(unit)->num_symbols) bad("property string index out of range");
++  SHReadPropertyCacheEntry *cache = &U(unit)->read_prop_cache[key_index];
++  V(out) = try_flag ? _sh_ljs_try_get_by_id_rjs(R(shr),object,U(unit)->symbols[key_index],cache)
++                    : _sh_ljs_get_by_id_rjs(R(shr),object,U(unit)->symbols[key_index],cache);
++}
++void shllvm_set(void *shr, void *object, void *key, void *value, uint32_t strict) {
++  if (strict) _sh_ljs_put_by_val_strict_rjs(R(shr),object,key,value);
++  else _sh_ljs_put_by_val_loose_rjs(R(shr),object,key,value);
++}
++void shllvm_set_id(void *shr, void *unit, void *object, uint32_t key_index,
++                   void *value, uint32_t strict, uint32_t try_flag) {
++  if (key_index >= U(unit)->num_symbols) bad("property string index out of range");
++  SHWritePropertyCacheEntry *cache = &U(unit)->write_prop_cache[key_index];
++  SHSymbolID symbol = U(unit)->symbols[key_index];
++  if (try_flag) {
++    if (strict) _sh_ljs_try_put_by_id_strict_rjs(R(shr),U(unit),object,symbol,value,cache);
++    else _sh_ljs_try_put_by_id_loose_rjs(R(shr),U(unit),object,symbol,value,cache);
++  } else {
++    if (strict) _sh_ljs_put_by_id_strict_rjs(R(shr),U(unit),object,symbol,value,cache);
++    else _sh_ljs_put_by_id_loose_rjs(R(shr),U(unit),object,symbol,value,cache);
++  }
++}
++void shllvm_define(void *shr, void *object, void *key, void *value, uint32_t enumerable) {
++  if (enumerable) _sh_ljs_define_own_by_val(R(shr),object,key,value);
++  else _sh_ljs_define_own_ne_by_val(R(shr),object,key,value);
++}
++void shllvm_define_index(void *shr, void *object, uint32_t index, void *value) {
++  _sh_ljs_define_own_by_index(R(shr),object,index,value);
++}
++void shllvm_define_accessor(void *shr, void *object, void *key,
++                            void *getter, void *setter, uint32_t enumerable) {
++  _sh_ljs_define_own_getter_setter_by_val(R(shr),object,key,getter,setter,enumerable != 0);
++}
++void shllvm_delete(void *out, void *shr, void *object, void *key, uint32_t strict) {
++  V(out) = strict ? _sh_ljs_del_by_val_strict(R(shr),object,key)
++                  : _sh_ljs_del_by_val_loose(R(shr),object,key);
++}
++void shllvm_coerce_this(void *out, void *shr, void *value) {
++  V(out) = _sh_ljs_coerce_this_ns(R(shr),V(value));
++}
++void shllvm_create_this(void *out, void *shr, void *callee, void *new_target) {
++  V(out) = _sh_ljs_create_this(R(shr),callee,new_target,NULL,NULL);
++}
++void shllvm_constructed_object(void *out, void *this_value, void *returned) {
++  V(out) = _sh_ljs_is_object(V(returned)) ? V(returned) : V(this_value);
++}
++void shllvm_get_parent(void *out, void *shr, void *object) {
++  V(out) = _sh_ljs_load_parent_no_traps(R(shr),V(object));
++}
++void shllvm_new_target(void *out, void *frame) {
++  V(out) = ((SHLegacyValue *)frame)[SHStackFrame_NewTarget];
++}
++void shllvm_throw(void *shr, void *value) { _sh_throw(R(shr),V(value)); }
++void shllvm_throw_type_error(void *shr, void *message) { _sh_throw_type_error(R(shr),message); }
++void shllvm_check_empty(void *shr, void *value) {
++  if (_sh_ljs_is_empty(V(value))) _sh_throw_empty(R(shr));
++}
++
++/* The ABI descriptor uses fixed-width integers. Native struct layout, bitfields,
++ * symbols and GC-visible caches stay exclusively on this side of the bridge. */
++void *shllvm_create_unit(void *index, uint32_t num_strings,
++                         const void *ascii_pool, const void *u16_pool,
++                         const void *string_triples, uint32_t num_functions,
++                         const void *function_info, void *main_function,
++                         const char *unit_name) {
++  if (!num_functions) bad("unit has no main function");
++  size_t size = sizeof(SHLLVMUnit) +
++      (size_t)num_strings * (sizeof(SHSymbolID) +
++        sizeof(SHWritePropertyCacheEntry) + sizeof(SHReadPropertyCacheEntry)) +
++      (size_t)num_functions * sizeof(SHNativeFuncInfo) + 32;
++  SHLLVMUnit *u = calloc(1,size);
++  if (!u) bad("cannot allocate compilation unit");
++  unsigned char *p = (unsigned char *)(u + 1);
++#define ALIGN_FOR(type) p = (unsigned char *)(((uintptr_t)p + _Alignof(type)-1) & ~(uintptr_t)(_Alignof(type)-1))
++  ALIGN_FOR(SHSymbolID);
++  u->unit.symbols = (SHSymbolID *)p; p += num_strings * sizeof(SHSymbolID);
++  ALIGN_FOR(SHWritePropertyCacheEntry);
++  u->unit.write_prop_cache = (SHWritePropertyCacheEntry *)p;
++  p += num_strings * sizeof(SHWritePropertyCacheEntry);
++  ALIGN_FOR(SHReadPropertyCacheEntry);
++  u->unit.read_prop_cache = (SHReadPropertyCacheEntry *)p;
++  p += num_strings * sizeof(SHReadPropertyCacheEntry);
++  ALIGN_FOR(SHNativeFuncInfo);
++  u->functions = (SHNativeFuncInfo *)p;
++#undef ALIGN_FOR
++  u->function_count = num_functions;
++  const SHLLVMFunctionInfo *info = function_info;
++  for (uint32_t i = 0; i < num_functions; ++i) {
++    if (info[i].name_index >= num_strings || info[i].kind > 3 || info[i].prohibit_invoke > 3)
++      bad("invalid function descriptor");
++    u->functions[i].name_index = info[i].name_index;
++    u->functions[i].arg_count = info[i].arg_count;
++    u->functions[i].kind = info[i].kind;
++    u->functions[i].prohibit_invoke = info[i].prohibit_invoke;
++  }
++  u->unit.index = index;
++  u->unit.num_symbols = num_strings;
++  u->unit.num_read_prop_cache_entries = num_strings;
++  u->unit.num_write_prop_cache_entries = num_strings;
++  u->unit.ascii_pool = ascii_pool;
++  u->unit.u16_pool = u16_pool;
++  u->unit.strings = string_triples;
++  u->unit.unit_main = (SHLegacyValue (*)(SHRuntime *))main_function;
++  u->unit.unit_main_info = &u->functions[0];
++  u->unit.unit_name = unit_name;
++  /* A registered weak cache for empty objects with explicit prototypes. The
++   * bridge never assumes that a generic object's property slots match typed
++   * allocation layouts. Properties are subsequently defined by name. */
++  u->unit.object_literal_class_cache = &u->empty_class;
++  u->unit.obj_shape_table = &u->empty_shape;
++  u->unit.obj_shape_table_count = 1;
++  return u;
++}
++
++typedef struct SHConsoleContext SHConsoleContext;
++extern SHConsoleContext *init_console_bindings(SHRuntime *,int,const char *const *);
++extern void release_console_bindings(SHConsoleContext *);
++extern void free_console_context(SHConsoleContext *);
++extern bool run_event_loop(SHRuntime *,SHConsoleContext *);
++int32_t shllvm_run(int32_t argc, void *argv_raw, void *creator) {
++  _SH_MODEL();
++  char **argv = argv_raw;
++  int script_argc = 0, cl_argc = argc;
++  char **script_argv = NULL;
++  for (int i = 1; i < argc; ++i) {
++    if (strcmp(argv[i],"--") == 0) {
++      script_argc = argc - i - 1;
++      script_argv = argv + i + 1;
++      cl_argc = i;
++      break;
++    }
++  }
++  SHRuntime *shr = _sh_init(cl_argc,argv);
++  SHConsoleContext *console = init_console_bindings(shr,script_argc,(const char *const *)script_argv);
++  bool success = _sh_initialize_units(shr,1,(SHUnitCreator)creator) && run_event_loop(shr,console);
++  release_console_bindings(console);
++  _sh_done(shr);
++  free_console_context(console);
++  return success ? 0 : 1;
++}
++
++void shllvm_check_invocation(void *shr, void *frame, uint32_t prohibit) {
++  SHLegacyValue new_target = ((SHLegacyValue *)frame)[SHStackFrame_NewTarget];
++  if (prohibit == 2 && _sh_ljs_is_undefined(new_target))
++    _sh_throw_type_error_ascii(R(shr), "Class constructor invoked without new");
++  if (prohibit == 1 && !_sh_ljs_is_undefined(new_target))
++    _sh_throw_type_error_ascii(R(shr), "Function is not a constructor");
++}
++void shllvm_typeof_is(void *out, void *value, uint32_t bits) {
++  V(out) = _sh_ljs_bool(_sh_ljs_typeof_is(V(value), (uint16_t)bits));
++}
++void shllvm_get_receiver(void *out, void *shr, void *object, void *key, void *receiver) {
++  V(out) = _sh_ljs_get_by_val_with_receiver_rjs(R(shr),object,key,receiver);
++}
++void shllvm_set_receiver(void *shr, void *object, void *key, void *value,
++                         void *receiver, uint32_t strict) {
++  _sh_ljs_put_by_val_with_receiver_rjs(R(shr),object,key,value,receiver,strict != 0);
++}
++void shllvm_args_length(void *out, void *shr, void *frame, void *lazy) {
++  V(out) = _sh_ljs_get_arguments_length(R(shr),frame,lazy);
++}
++void shllvm_args_get(void *out, void *shr, void *frame, void *key, void *lazy, uint32_t strict) {
++  V(out) = strict ? _sh_ljs_get_arguments_prop_by_val_strict(R(shr),frame,key,lazy)
++                  : _sh_ljs_get_arguments_prop_by_val_loose(R(shr),frame,key,lazy);
++}
++void shllvm_args_reify(void *shr, void *frame, void *lazy, uint32_t strict) {
++  if (strict) _sh_ljs_reify_arguments_strict(R(shr),frame,lazy);
++  else _sh_ljs_reify_arguments_loose(R(shr),frame,lazy);
++}
++
++void shllvm_class(void *out, void *shr, void *env, void *unit,
++                  void *function, uint32_t function_index, void *home_out, void *super_class) {
++  SHLLVMUnit *u = unit;
++  if (function_index >= u->function_count) bad("class function index out of range");
++  if (env && _sh_ljs_is_undefined(V(env))) env = NULL;
++  V(out) = _sh_ljs_create_class(R(shr),env,
++      (SHLegacyValue (*)(SHRuntime *))function, &u->functions[function_index],
++      U(unit),home_out,super_class);
++}
++void shllvm_check_tdz(void *shr, void *value, uint32_t mask) {
++  if (((mask & 1) && _sh_ljs_is_empty(V(value))) ||
++      ((mask & 2) && _sh_ljs_is_undefined(V(value))))
++    _sh_throw_empty(R(shr));
++}
++void shllvm_check_this_initialized(void *shr, void *value) {
++  _sh_ljs_throw_if_this_initialized(R(shr),V(value));
++}
++uint64_t shllvm_try_size(void) { return sizeof(SHJmpBuf); }
++void *shllvm_try_begin(void *shr, void *storage) {
++  SHJmpBuf *buf = storage;
++  _sh_push_try(R(shr),buf);
++  return buf->buf;
++}
++void shllvm_try_end(void *shr, void *storage) { _sh_end_try(R(shr),storage); }
++void shllvm_catch_prepare(void *shr, void *locals, void *frame, uint32_t max_args) {
++  _sh_catch_no_pop(R(shr),locals,frame,max_args+9);
++}
++void shllvm_catch_value(void *out, void *shr) {
++  V(out) = _sh_get_clear_thrown_value(R(shr));
++}
++void shllvm_rethrow(void *shr) { _sh_throw_current(R(shr)); }
+diff --git a/lib/BCGen/SH/LLVMNative/runtime.h b/lib/BCGen/SH/LLVMNative/runtime.h
+new file mode 100644
+index 0000000000000000000000000000000000000000..7654799c9b3323ac8f7f5e30e25192f461abdad7
+--- /dev/null
++++ b/lib/BCGen/SH/LLVMNative/runtime.h
+@@ -0,0 +1,118 @@
++/* Direct LLVM emission runtime bridge. Built once, never generated per program. */
++#ifndef SH_LLVM_RUNTIME_H
++#define SH_LLVM_RUNTIME_H
++#include <stdint.h>
++#ifdef __cplusplus
++extern "C" {
++#endif
++/* All value pointers address rooted eight-byte SHLegacyValue slots. No helper
++ * has an aggregate argument/result. Native JS callbacks retain the established
++ * host64 Hermes ABI: an eight-byte SHLegacyValue returned in an integer register.
++ */
++enum SHLLVMBinary {
++  SHLLVM_ADD=0, SHLLVM_SUB=1, SHLLVM_MUL=2, SHLLVM_DIV=3, SHLLVM_MOD=4,
++  SHLLVM_EQ=5, SHLLVM_NE=6, SHLLVM_STRICT_EQ=7, SHLLVM_STRICT_NE=8,
++  SHLLVM_LT=9, SHLLVM_LE=10, SHLLVM_GT=11, SHLLVM_GE=12,
++  SHLLVM_BIT_OR=13, SHLLVM_BIT_AND=14, SHLLVM_BIT_XOR=15,
++  SHLLVM_SHL=16, SHLLVM_SHR=17, SHLLVM_USHR=18,
++  SHLLVM_IN=19, SHLLVM_INSTANCEOF=20
++};
++enum SHLLVMUnary {
++  SHLLVM_NEG=0, SHLLVM_POS=1, SHLLVM_NOT=2, SHLLVM_BIT_NOT=3,
++  SHLLVM_TYPEOF=4, SHLLVM_INC=5, SHLLVM_DEC=6, SHLLVM_TO_NUMERIC=7,
++  SHLLVM_TO_STRING=8, SHLLVM_TO_INT32=9, SHLLVM_TO_UINT32=10,
++  SHLLVM_TO_PROPERTY_KEY=11
++};
++enum SHLLVMConstant {
++  SHLLVM_UNDEFINED=0, SHLLVM_NULL=1, SHLLVM_BOOLEAN=2, SHLLVM_NUMBER=3,
++  SHLLVM_EMPTY=4, SHLLVM_UNINIT=5
++};
++void shllvm_constant(void *out, uint32_t kind, uint64_t bits);
++void shllvm_number(void *out, double value);
++void shllvm_boolean(void *out, uint32_t value);
++uint64_t shllvm_frame_size(uint32_t root_count);
++void *shllvm_enter(void *shr, void *storage, uint32_t root_count,
++                   uint32_t max_args, uint32_t unit_index);
++void *shllvm_roots(void *storage);
++void shllvm_leave(void *shr, void *storage, void *frame);
++void *shllvm_get_unit(void *shr, uint32_t unit_index);
++void shllvm_param(void *out, void *frame, uint32_t index);
++void shllvm_global(void *out, void *shr);
++void shllvm_symbol(void *out, void *shr, void *unit, uint32_t index);
++void shllvm_declare_global(void *shr, void *unit, uint32_t index);
++void shllvm_env_create(void *out, void *shr, void *parent, uint32_t size);
++void shllvm_env_from_closure(void *out, void *shr, void *closure);
++void shllvm_env_from_frame(void *out, void *shr, void *frame);
++void shllvm_env_resolve(void *out, void *shr, void *env, uint32_t levels);
++void shllvm_env_load(void *out, void *env, uint32_t index);
++void shllvm_env_store(void *shr, void *env, void *value, uint32_t index);
++void shllvm_closure(void *out, void *shr, void *env, void *unit,
++                    void *function, uint32_t function_index);
++/* argc excludes this; argv is contiguous SHLegacyValue data. */
++void shllvm_class(void *out, void *shr, void *env, void *unit,
++                  void *function, uint32_t function_index, void *home_out, void *super_class);
++void shllvm_call(void *out, void *shr, void *frame, void *callee, void *this_value,
++                 void *new_target, uint32_t argc, void *argv);
++void shllvm_builtin(void *out, void *shr, void *frame,
++                    uint32_t builtin_index, uint32_t argc, void *argv);
++void shllvm_builtin_closure(void *out, void *shr, uint32_t builtin_index);
++void shllvm_binary(void *out, void *shr, uint32_t op, void *lhs, void *rhs);
++void shllvm_unary(void *out, void *shr, uint32_t op, void *value);
++uint32_t shllvm_truthy(void *value);
++uint32_t shllvm_is_object(void *value);
++void shllvm_object(void *out, void *shr);
++void shllvm_object_parent(void *out, void *shr, void *unit, void *parent);
++void shllvm_array(void *out, void *shr, uint32_t length);
++void shllvm_get(void *out, void *shr, void *object, void *key);
++/* get-id try flag produces ReferenceError on missing global binding. */
++void shllvm_get_id(void *out, void *shr, void *unit, void *object,
++                   uint32_t key_index, uint32_t try_flag);
++void shllvm_set(void *shr, void *object, void *key, void *value, uint32_t strict);
++void shllvm_set_id(void *shr, void *unit, void *object, uint32_t key_index,
++                   void *value, uint32_t strict, uint32_t try_flag);
++void shllvm_define(void *shr, void *object, void *key, void *value,
++                   uint32_t enumerable);
++void shllvm_define_index(void *shr, void *object, uint32_t index, void *value);
++void shllvm_define_accessor(void *shr, void *object, void *key,
++                            void *getter, void *setter, uint32_t enumerable);
++void shllvm_delete(void *out, void *shr, void *object, void *key, uint32_t strict);
++void shllvm_coerce_this(void *out, void *shr, void *value);
++void shllvm_create_this(void *out, void *shr, void *callee, void *new_target);
++void shllvm_constructed_object(void *out, void *this_value, void *returned);
++void shllvm_get_parent(void *out, void *shr, void *object);
++/* Matches Function::ProhibitInvoke: 0 none, 1 construct, 2 call. */
++void shllvm_check_invocation(void *shr, void *frame, uint32_t prohibit);
++void shllvm_typeof_is(void *out, void *value, uint32_t bits);
++void shllvm_get_receiver(void *out, void *shr, void *object, void *key, void *receiver);
++void shllvm_set_receiver(void *shr, void *object, void *key, void *value,
++                         void *receiver, uint32_t strict);
++void shllvm_args_length(void *out, void *shr, void *frame, void *lazy);
++void shllvm_args_get(void *out, void *shr, void *frame, void *key, void *lazy, uint32_t strict);
++void shllvm_args_reify(void *shr, void *frame, void *lazy, uint32_t strict);
++void shllvm_new_target(void *out, void *frame);
++void shllvm_throw(void *shr, void *value);
++void shllvm_throw_type_error(void *shr, void *message);
++void shllvm_check_empty(void *shr, void *value);
++void shllvm_check_tdz(void *shr, void *value, uint32_t mask);
++void shllvm_check_this_initialized(void *shr, void *value);
++uint64_t shllvm_try_size(void);
++void *shllvm_try_begin(void *shr, void *storage);
++void shllvm_try_end(void *shr, void *storage);
++void shllvm_catch_prepare(void *shr, void *locals, void *frame, uint32_t max_args);
++void shllvm_catch_value(void *out, void *shr);
++void shllvm_rethrow(void *shr);
++/* LLVM emits an array of {i32,i32,i32,i32}; C copies the descriptors
++ * into native SHNativeFuncInfo, so bitfield layouts never cross this ABI. */
++typedef struct SHLLVMFunctionInfo {
++  uint32_t name_index, arg_count, kind, prohibit_invoke;
++} SHLLVMFunctionInfo;
++void *shllvm_create_unit(void *index, uint32_t num_strings,
++                         const void *ascii_pool, const void *u16_pool,
++                         const void *string_triples, uint32_t num_functions,
++                         const void *function_info, void *main_function,
++                         const char *unit_name);
++int32_t shllvm_run(int32_t argc, void *argv, void *creator);
++#ifdef __cplusplus
++}
++#endif
++#endif
+diff --git a/lib/BCGen/SH/SH.cpp b/lib/BCGen/SH/SH.cpp
+index f7b652cbd4c21132d6d272ee0f5a6ac22cc1c8d4..ae73fb2ae242412ea0f60b151c3fd84e52bb703f 100644
+--- a/lib/BCGen/SH/SH.cpp
++++ b/lib/BCGen/SH/SH.cpp
+@@ -3269,3 +3269,7 @@ void sh::generateSH(
+   LineDirectiveEmitter emitter{OS};
+   generateModule(M, emitter, options);
+ }
++
++bool sh::lowerForLLVM(Module *M, bool optimize) {
++  return lowerModuleIR(M, optimize);
++}
+diff --git a/test/LLVMNative/accessors.js b/test/LLVMNative/accessors.js
+new file mode 100644
+index 0000000000000000000000000000000000000000..3ba5be0a1061ad079702ad6e0f67fe41a4042df9
+--- /dev/null
++++ b/test/LLVMNative/accessors.js
+@@ -0,0 +1,10 @@
++let trace = '';
++const o = {
++  _x: 10,
++  get x() { trace += 'g'; return this._x; },
++  set x(v) { trace += 's'; this._x = v; },
++  add(v) { this.x = this.x + v; return this.x; }
++};
++print(o.add(32), trace, o._x);
++Object.defineProperty(o, 'hidden', {value: 8, enumerable: false});
++print(o.hidden, Object.keys(o).join(','));
+diff --git a/test/LLVMNative/arguments.js b/test/LLVMNative/arguments.js
+new file mode 100644
+index 0000000000000000000000000000000000000000..7dc4cd114c1d6ee2e685071b9fb25fa64b51f77f
+--- /dev/null
++++ b/test/LLVMNative/arguments.js
+@@ -0,0 +1,4 @@
++function inspect(a, b) { return arguments.length + ':' + arguments[0] + ':' + arguments[2]; }
++function total() { let n = 0; for (let i = 0; i < arguments.length; ++i) n += arguments[i]; return n; }
++function capture() { return () => arguments[0] + arguments[1]; }
++print(inspect(7, 8, 9), total(1, 2, 3, 4, 32), capture(19, 23)());
+diff --git a/test/LLVMNative/arrays_callbacks.js b/test/LLVMNative/arrays_callbacks.js
+new file mode 100644
+index 0000000000000000000000000000000000000000..45520e61ec9ce3256ada8b3e3a479af06522bbaa
+--- /dev/null
++++ b/test/LLVMNative/arrays_callbacks.js
+@@ -0,0 +1,11 @@
++const a = [1, 2, 3, 4];
++const doubled = a.map(x => x * 2);
++const selected = doubled.filter(x => x > 3);
++print(doubled.join(','), selected.reduce((sum,x) => sum + x, 0));
++a.push(5);
++print(a.pop(), a.length, a[2]);
++const sparse = [7,,9];
++print(sparse.length, 1 in sparse, sparse[1] === undefined);
++const fs = [];
++for (let i = 0; i < 4; ++i) { fs.push(() => i); }
++print(fs[0](), fs[1](), fs[2](), fs[3]());
+diff --git a/test/LLVMNative/arrows_this.js b/test/LLVMNative/arrows_this.js
+new file mode 100644
+index 0000000000000000000000000000000000000000..18e745e952ef32eeeeb0e8d6d365dd175d9fc05b
+--- /dev/null
++++ b/test/LLVMNative/arrows_this.js
+@@ -0,0 +1,10 @@
++const owner = {
++  value: 30,
++  make(delta) { return x => this.value + delta + x; }
++};
++const f = owner.make(5);
++print(f(7), f.call({value: 1000}, 8));
++owner.value = 40;
++print(f(2));
++function sum(a,b) { return this.base + a + b; }
++print(sum.call({base: 10}, 11, 21), sum.apply({base: 20}, [7, 15]));
+diff --git a/test/LLVMNative/catch_basic.js b/test/LLVMNative/catch_basic.js
+new file mode 100644
+index 0000000000000000000000000000000000000000..f1025836585bf954921bfad7d283ffb609e8f127
+--- /dev/null
++++ b/test/LLVMNative/catch_basic.js
+@@ -0,0 +1 @@
++try { throw 1; } catch (e) { print(e); }
+diff --git a/test/LLVMNative/classes.js b/test/LLVMNative/classes.js
+new file mode 100644
+index 0000000000000000000000000000000000000000..3156dbdf59abe3f5e6287d02c75ea5f519999698
+--- /dev/null
++++ b/test/LLVMNative/classes.js
+@@ -0,0 +1,14 @@
++class Base {
++  constructor(x) { this.x = x; }
++  answer() { return this.x; }
++  get value() { return this.x; }
++  static label() { return 'base'; }
++}
++class Derived extends Base {
++  constructor(x, delta) { super(x); this.delta = delta; }
++  answer() { return super.answer() + this.delta; }
++  capture() { return n => this.answer() + n; }
++}
++const d = new Derived(30, 5);
++print(d.answer(), d.value, d.capture()(7), d instanceof Derived, d instanceof Base, Derived.label());
++try { Base(1); } catch (e) { print(e.name); }
+diff --git a/test/LLVMNative/closures.js b/test/LLVMNative/closures.js
+new file mode 100644
+index 0000000000000000000000000000000000000000..a00ddbb39d987f7ffedfa5879254c56844c5d45d
+--- /dev/null
++++ b/test/LLVMNative/closures.js
+@@ -0,0 +1,14 @@
++function counter(start) {
++  let n = start;
++  return { inc: () => ++n, dec: function () { return --n; }, read: () => n };
++}
++const a = counter(40), b = counter(100);
++print(a.inc(), a.inc(), a.dec(), a.read(), b.inc(), a.read());
++function nested(a) { return b => c => a + b + c; }
++const f = nested(7)(11);
++print(f(24), f(25));
++function recursiveClosure() {
++  let f = n => n === 0 ? 0 : n + f(n - 1);
++  return f;
++}
++print(recursiveClosure()(20));
+diff --git a/test/LLVMNative/coercion.js b/test/LLVMNative/coercion.js
+new file mode 100644
+index 0000000000000000000000000000000000000000..989fb8dcb342a54a56d29877f5248d9a110af34d
+--- /dev/null
++++ b/test/LLVMNative/coercion.js
+@@ -0,0 +1,7 @@
++let trace = '';
++const a = {valueOf() { trace += 'a'; return 10; }};
++const b = {valueOf() { trace += 'b'; return 32; }};
++print(a + b, trace, 'value=' + a, +b);
++print(null == undefined, null === undefined, '42' == 42, '42' === 42);
++print(1 / -0, 0 / 0 === 0 / 0, 4294967295 >>> 0, -1 >>> 1);
++print(typeof a, typeof (() => 1), typeof undefined, typeof null);
+diff --git a/test/LLVMNative/constructors.js b/test/LLVMNative/constructors.js
+new file mode 100644
+index 0000000000000000000000000000000000000000..aca069772fd3a37d2072be0ec400e5609771a389
+--- /dev/null
++++ b/test/LLVMNative/constructors.js
+@@ -0,0 +1,9 @@
++function Point(x, y) { this.x = x; this.y = y; }
++Point.prototype.sum = function () { return this.x + this.y; };
++const p = new Point(19, 23);
++print(p.sum(), p instanceof Point, p.constructor === Point);
++function Factory() { this.ignored = true; return {answer: 42}; }
++function Primitive() { this.answer = 41; return 99; }
++print(new Factory().answer, new Primitive().answer);
++function inspect() { return new.target === inspect; }
++print(inspect(), new inspect() instanceof inspect);
+diff --git a/test/LLVMNative/control_phi.js b/test/LLVMNative/control_phi.js
+new file mode 100644
+index 0000000000000000000000000000000000000000..3f9e10ab7875f3cd2c0ffdc5f3e3350bae52070e
+--- /dev/null
++++ b/test/LLVMNative/control_phi.js
+@@ -0,0 +1,19 @@
++function fib(n) {
++  let a = 0, b = 1;
++  for (let i = 0; i < n; ++i) { const old = a; a = b; b = old + b; }
++  return a;
++}
++function loop() {
++  let n = 0, sum = 0;
++  while (true) {
++    ++n;
++    if (n % 2 === 0) continue;
++    if (n > 12) break;
++    sum += n;
++  }
++  return sum;
++}
++print(fib(20), loop());
++let calls = 0;
++function touch(x) { ++calls; return x; }
++print(false && touch(1), true || touch(2), touch(0) || touch(42), calls);
+diff --git a/test/LLVMNative/error_arrow_constructor.js b/test/LLVMNative/error_arrow_constructor.js
+new file mode 100644
+index 0000000000000000000000000000000000000000..c8dc066cf1accb30f9d9cd411405bf331a848c33
+--- /dev/null
++++ b/test/LLVMNative/error_arrow_constructor.js
+@@ -0,0 +1,2 @@
++const f = () => 1;
++new f();
+diff --git a/test/LLVMNative/error_missing_global.js b/test/LLVMNative/error_missing_global.js
+new file mode 100644
+index 0000000000000000000000000000000000000000..0749d1b456d65ac5f2cd33663183ee9f21bf6c03
+--- /dev/null
++++ b/test/LLVMNative/error_missing_global.js
+@@ -0,0 +1 @@
++print(noSuchBindingForLLVMTest);
+diff --git a/test/LLVMNative/error_noncallable.js b/test/LLVMNative/error_noncallable.js
+new file mode 100644
+index 0000000000000000000000000000000000000000..906e244e8009ffb30967463c616b687090a0836d
+--- /dev/null
++++ b/test/LLVMNative/error_noncallable.js
+@@ -0,0 +1,2 @@
++const obj = {value: 3};
++obj.value();
+diff --git a/test/LLVMNative/exceptions.js b/test/LLVMNative/exceptions.js
+new file mode 100644
+index 0000000000000000000000000000000000000000..31fbd9551ff987848a5cc50ccf48375e7ce075f8
+--- /dev/null
++++ b/test/LLVMNative/exceptions.js
+@@ -0,0 +1,22 @@
++function nested(n) {
++  let total = 1;
++  try {
++    try { total += 2; if (n) throw {n: n, run: () => 40}; }
++    finally { total += 4; }
++    total += 8;
++  } catch (e) {
++    total += e.n + e.run();
++  } finally { total += 16; }
++  return total;
++}
++print(nested(0), nested(3));
++function returns() { try { return 10; } finally { return 42; } }
++print(returns());
++let log = '';
++for (let i = 0; i < 4; ++i) {
++  try { if (i === 1) continue; if (i === 3) break; log += i; }
++  finally { log += 'f'; }
++}
++print(log);
++try { const f = () => 1; new f(); } catch (e) { print(e.name); }
++try { print(notDefinedHereLLVM); } catch (e) { print(e.name); }
+diff --git a/test/LLVMNative/functions.js b/test/LLVMNative/functions.js
+new file mode 100644
+index 0000000000000000000000000000000000000000..7e70f89ac088e077d481946cd4696e1fe37db946
+--- /dev/null
++++ b/test/LLVMNative/functions.js
+@@ -0,0 +1,7 @@
++function fact(n) { if (n <= 1) return 1; return n * fact(n - 1); }
++function even(n) { return n === 0 ? true : odd(n - 1); }
++function odd(n) { return n === 0 ? false : even(n - 1); }
++function apply(fn, x) { return fn(x); }
++const twice = x => x * 2;
++function outer(x) { return function inner(y) { return x + y; }; }
++print(fact(8), even(12), odd(13), apply(twice, 21), outer(19)(23));
+diff --git a/test/LLVMNative/gc_closures.js b/test/LLVMNative/gc_closures.js
+new file mode 100644
+index 0000000000000000000000000000000000000000..951088bb1243aa32913e1a06d6f15201ac968fa5
+--- /dev/null
++++ b/test/LLVMNative/gc_closures.js
+@@ -0,0 +1,14 @@
++function make() {
++  let state = {n: 1, words: ['alive', 'after', 'collection']};
++  return () => { state.n += 1; return state; };
++}
++const kept = make();
++const roots = [];
++for (let i = 0; i < 50000; ++i) {
++  const o = {i, text: 'garbage-' + i, list: [i, i + 1, i + 2]};
++  o.self = o;
++  if (i % 5000 === 0) roots.push(() => o.i);
++}
++print('gc-hook', typeof gc);
++gc();
++print(kept().n, kept().words.join(' '), roots.map(f => f()).join(','));
+diff --git a/test/LLVMNative/lexical_tdz.js b/test/LLVMNative/lexical_tdz.js
+new file mode 100644
+index 0000000000000000000000000000000000000000..f25c6554512c722170867348003af81ecad33fa3
+--- /dev/null
++++ b/test/LLVMNative/lexical_tdz.js
+@@ -0,0 +1,14 @@
++function test() {
++  const read = () => value;
++  try { read(); } catch (e) { print(e.name); }
++  let value = 42;
++  return read;
++}
++const f = test();
++print(f());
++let outer = 7;
++{ let outer = 11; print(outer); }
++print(outer);
++const obj = {n: 1};
++obj.n = 42;
++print(obj.n);
+diff --git a/test/LLVMNative/objects.js b/test/LLVMNative/objects.js
+new file mode 100644
+index 0000000000000000000000000000000000000000..f6371c7abd23b66f4c9caad97b09ede8f7bfb674
+--- /dev/null
++++ b/test/LLVMNative/objects.js
+@@ -0,0 +1,11 @@
++const key = 'value';
++const obj = {value: 3, nested: {x: 7}, tag: 'ok'};
++const alias = obj;
++obj[key] += 39;
++alias.nested.x *= 2;
++obj.self = obj;
++print(obj.value, obj.nested.x, obj.tag, obj.self === alias);
++obj.extra = 99;
++print('extra' in obj, delete obj.extra, 'extra' in obj, obj.missing === undefined);
++const unicode = {'é': 11, '𝄞': 31};
++print(unicode['é'] + unicode['𝄞']);
+diff --git a/test/LLVMNative/strings.js b/test/LLVMNative/strings.js
+new file mode 100644
+index 0000000000000000000000000000000000000000..991cae3c9621ffb249d9f57ce9aceecbcafd9a96
+--- /dev/null
++++ b/test/LLVMNative/strings.js
+@@ -0,0 +1,4 @@
++function greet(who) { return 'hello ' + who + '!'; }
++print(greet('world'), '𝄞'.length, 'é'.charCodeAt(0), '𝄞'.charCodeAt(1));
++print('abc'.slice(1), 'a\u0000b'.length, '\uD83D\uDE00'.length);
++const o = {}; o['a\u0000b'] = 42; print(o['a\u0000b']);
+diff --git a/test/LLVMNative/unsupported_const_assignment.js b/test/LLVMNative/unsupported_const_assignment.js
+new file mode 100644
+index 0000000000000000000000000000000000000000..432ecf0e568abe49f18d76c6ba2658717efbc32d
+--- /dev/null
++++ b/test/LLVMNative/unsupported_const_assignment.js
+@@ -0,0 +1,2 @@
++const value = 1;
++try { value = 2; } catch (e) { print(e.name); }
+diff --git a/test/LLVMNative/unsupported_eval.js b/test/LLVMNative/unsupported_eval.js
+new file mode 100644
+index 0000000000000000000000000000000000000000..ee4da769e91e729199f185ef0ad9736071ee3671
+--- /dev/null
++++ b/test/LLVMNative/unsupported_eval.js
+@@ -0,0 +1,2 @@
++const value = eval('1 + 2');
++print(value);
+diff --git a/test/LLVMNative/unsupported_generator.js b/test/LLVMNative/unsupported_generator.js
+new file mode 100644
+index 0000000000000000000000000000000000000000..5971304a5c42866dd53215968f52a63b53a95bcb
+--- /dev/null
++++ b/test/LLVMNative/unsupported_generator.js
+@@ -0,0 +1,2 @@
++function* sequence() { yield 1; yield 2; }
++print(sequence().next().value);
+diff --git a/tools/shermes/compile.cpp b/tools/shermes/compile.cpp
+index fb405cb733dd3c4cebf163a06226624ccd48e1ce..3954adb5721d02d38eeba5e19bb13115f3fb360b 100644
+--- a/tools/shermes/compile.cpp
++++ b/tools/shermes/compile.cpp
+@@ -10,6 +10,7 @@
+ #include "OutputStream.h"
+ #include "config.h"
+ 
++#include "hermes/BCGen/SH/LLVM.h"
+ #include "hermes/BCGen/SH/SH.h"
+ 
+ #include "llvh/ADT/ScopeExit.h"
+@@ -118,6 +119,36 @@ bool compileToC(
+   return fileOS.close();
+ }
+ 
++/// Emit LLVM IR directly from the Hermes IR. Buffer the module until backend
++/// validation succeeds so unsupported instructions cannot produce a partial
++/// stdout module. OutputStream publishes file outputs only after success.
++bool compileToLLVM(
++    hermes::Context *context,
++    hermes::Module &M,
++    const ShermesCompileParams &params,
++    llvh::StringRef inputFilename,
++    llvh::StringRef outputFilename) {
++  std::string moduleIR;
++  llvh::raw_string_ostream irOS(moduleIR);
++  if (!sh::generateLLVM(&M, irOS, params.genOptions))
++    return false;
++  if (auto N = context->getSourceErrorManager().getErrorCount()) {
++    llvh::errs() << "Emitted " << N << " errors. exiting.\n";
++    return false;
++  }
++  irOS.flush();
++
++  llvh::SmallString<32> outputPathBuf{};
++  if (outputFilename.empty())
++    outputFilename = deriveFilename(inputFilename, outputPathBuf, ".ll");
++
++  OutputStream fileOS{};
++  if (!fileOS.open(outputFilename, llvh::sys::fs::F_None))
++    return false;
++  fileOS.os() << moduleIR;
++  return fileOS.close();
++}
++
+ /// Configuration for invoking the C compiler.
+ struct CCCfg {
+   std::string cc;
+@@ -539,6 +570,9 @@ bool shermesCompile(
+   if (outputLevel == OutputLevelKind::C) {
+     return compileToC(context, M, params, inputFilename, outputFilename);
+   }
++  if (outputLevel == OutputLevelKind::LLVM) {
++    return compileToLLVM(context, M, params, inputFilename, outputFilename);
++  }
+   if (outputLevel <= OutputLevelKind::Executable) {
+     return compileFromC(
+         context, M, params, outputLevel, inputFilename, outputFilename);
+diff --git a/tools/shermes/compile.h b/tools/shermes/compile.h
+index 54a4f1dd3ab6d94bad54ce681415c5e5ac0ef800..0e9ddd1c97079fc7932709e8b636e510799b59d2 100644
+--- a/tools/shermes/compile.h
++++ b/tools/shermes/compile.h
+@@ -24,6 +24,7 @@ enum class OutputLevelKind {
+   RA,
+   LRA,
+   C,
++  LLVM,
+   Asm,
+   Obj,
+   SharedObj,
+diff --git a/tools/shermes/shermes.cpp b/tools/shermes/shermes.cpp
+index c6a403df9302e79bfc313690b06cc47c5dd15997..10f7f2e4b0e86a30cc40ab3f310c59e95d115784 100644
+--- a/tools/shermes/shermes.cpp
++++ b/tools/shermes/shermes.cpp
+@@ -60,6 +60,7 @@ OutputFormatKind toOutputFormatKind(OutputLevelKind level) {
+     case OutputLevelKind::LRA:
+       return OutputFormatKind::DumpLRA;
+     case OutputLevelKind::C:
++    case OutputLevelKind::LLVM:
+     case OutputLevelKind::Asm:
+     case OutputLevelKind::Obj:
+     case OutputLevelKind::SharedObj:
+@@ -256,6 +257,10 @@ cl::opt<OutputLevelKind> OutputLevel(
+             "dump-lra",
+             "Register-allocated Lowered IR as text"),
+         clEnumValN(OutputLevelKind::C, "emit-c", "Generated C"),
++        clEnumValN(
++            OutputLevelKind::LLVM,
++            "emit-llvm",
++            "LLVM IR from Hermes SSA (experimental native backend)"),
+         clEnumValN(OutputLevelKind::Asm, "S", "Assembly output"),
+         clEnumValN(OutputLevelKind::Obj, "c", "Object file"),
+         clEnumValN(
+@@ -598,10 +603,12 @@ void setWarningsAreErrorsFromFlags(SourceErrorManager &sm) {
+ std::shared_ptr<Context> createContext() {
+   CodeGenerationSettings codeGenOpts;
+   codeGenOpts.test262 = cli::compilerRuntimeFlags.Test262;
+-  // Test262 enables TDZ checking by default, unless the latter has been
+-  // specified explicitly.
++  // Test262 and direct LLVM emission use modern lexical-binding semantics by
++  // default. Preserve an explicit override, and keep other modes' defaults.
+   codeGenOpts.enableTDZ =
+-      cli::compilerRuntimeFlags.Test262 && !cli::EnableTDZ.getNumOccurrences()
++      (cli::compilerRuntimeFlags.Test262 ||
++       cli::OutputLevel == OutputLevelKind::LLVM) &&
++          !cli::EnableTDZ.getNumOccurrences()
+       ? true
+       : cli::EnableTDZ;
+   codeGenOpts.dumpRegisterInterval = cli::DumpRegisterInterval;
+@@ -661,7 +668,11 @@ std::shared_ptr<Context> createContext() {
+   }
+   context->setStrictMode(cli::Typed || cli::StrictMode);
+   context->setEnableEval(cli::compilerRuntimeFlags.EnableEval);
+-  context->setEnableES6BlockScoping(cli::compilerRuntimeFlags.ES6BlockScoping);
++  const bool llvmBlockScopingDefault =
++      cli::OutputLevel == OutputLevelKind::LLVM &&
++      !cli::compilerRuntimeFlags.ES6BlockScoping.getNumOccurrences();
++  context->setEnableES6BlockScoping(
++      llvmBlockScopingDefault || cli::compilerRuntimeFlags.ES6BlockScoping);
+   context->setEnableAsyncGenerators(
+       cli::compilerRuntimeFlags.EnableAsyncGenerators);
+   context->getSourceErrorManager().setOutputOptions(guessErrorOutputOptions());
+diff --git a/utils/shllvm.py b/utils/shllvm.py
+new file mode 100755
+index 0000000000000000000000000000000000000000..490acb6e8c7f3963f0ed7f3b561230bbf63320ae
+--- /dev/null
++++ b/utils/shllvm.py
+@@ -0,0 +1,248 @@
++#!/usr/bin/env python3
++"""Compile JavaScript directly through Hermes SSA to LLVM IR and native code.
++
++The static runtime bridge is built once through CMake/Ninja dependency tracking.
++No per-program C file is emitted or parsed on this path. Python dependencies:
++standard library only. Configure Hermes first; see docs/llvm/README.md.
++"""
++from __future__ import annotations
++import argparse
++import hashlib
++import json
++import os
++from pathlib import Path
++import shutil
++import subprocess
++import sys
++import tempfile
++import time
++
++ROOT = Path(__file__).resolve().parents[1]
++
++
++class BuildError(RuntimeError):
++    pass
++
++
++def command(argv, *, env=None, capture=False, timeout=180, log=None):
++    argv = [str(x) for x in argv]
++    start = time.monotonic()
++    try:
++        p = subprocess.run(argv, env=env, text=True, capture_output=True,
++                           timeout=timeout)
++    except (OSError, subprocess.TimeoutExpired) as exc:
++        raise BuildError(f"{' '.join(argv)}: {exc}") from exc
++    if log is not None:
++        log.append({"command": argv, "exit_code": p.returncode,
++                    "seconds": round(time.monotonic()-start, 6),
++                    "stdout": p.stdout, "stderr": p.stderr})
++    if not capture or p.returncode:
++        if p.stdout:
++            print(p.stdout, end="", file=sys.stderr)
++        if p.stderr:
++            print(p.stderr, end="", file=sys.stderr)
++    if p.returncode:
++        raise BuildError(f"command failed ({p.returncode}): {' '.join(argv)}")
++    return p
++
++
++def cache_settings(build):
++    result = {}
++    path = build / "CMakeCache.txt"
++    if not path.is_file():
++        raise BuildError(f"No configured Hermes build at {build}; configure it with CMake first")
++    for line in path.read_text().splitlines():
++        if line.startswith(("#", "//")) or ":" not in line or "=" not in line:
++            continue
++        key, rest = line.split(":", 1)
++        _, value = rest.split("=", 1)
++        result[key] = value
++    return result
++
++
++def find_tool(name, llvm_bin=None, settings=None):
++    if llvm_bin:
++        p = Path(llvm_bin) / name
++        if p.is_file():
++            return p.resolve()
++    found = shutil.which(name)
++    if found:
++        return Path(found).resolve()
++    if settings:
++        if name == "cmake" and settings.get("CMAKE_COMMAND"):
++            p = Path(settings["CMAKE_COMMAND"])
++            if p.is_file():
++                return p
++        compiler = settings.get("CMAKE_C_COMPILER")
++        if compiler:
++            p = Path(compiler).resolve().parent / name
++            if p.is_file():
++                return p
++    raise BuildError(f"Required tool {name!r} was not found; set LLVM_BIN or --llvm-bin")
++
++
++def sha256(path):
++    h = hashlib.sha256()
++    with Path(path).open("rb") as f:
++        for chunk in iter(lambda: f.read(1024*1024), b""):
++            h.update(chunk)
++    return h.hexdigest()
++
++
++def prepare(args, *, need_runtime=True, log=None):
++    build = Path(args.build_dir).expanduser().resolve()
++    settings = cache_settings(build)
++    llvm_bin = args.llvm_bin or os.environ.get("LLVM_BIN")
++    tool_names = ["clang", "llvm-as", "opt", "lli"]
++    tools = {n: find_tool(n, llvm_bin, settings) for n in tool_names}
++    compiler = Path(args.compiler).resolve() if args.compiler else build / "bin/shermes"
++    if not compiler.is_file():
++        raise BuildError(f"Build the compiler first: cmake --build {build} --target shermes")
++    runtime = build / ("lib/libshllvm_runtime.so" if args.action == "jit" else "lib/libshllvm_runtime.a")
++    if need_runtime and not args.no_runtime_build:
++        cmake = find_tool("cmake", llvm_bin, settings)
++        command([cmake, "--build", build, "--target", "shllvm_runtime", "shllvm_runtime_shared", "--parallel", "3"],
++                timeout=900, capture=True, log=log)
++    if need_runtime and not runtime.is_file():
++        raise BuildError(f"Missing runtime bridge {runtime}; build targets shllvm_runtime shllvm_runtime_shared")
++    asan = settings.get("HERMES_ENABLE_ADDRESS_SANITIZER") == "ON"
++    ubsan = settings.get("HERMES_ENABLE_UNDEFINED_BEHAVIOR_SANITIZER") == "ON"
++    return build, settings, tools, compiler, runtime, asan, ubsan
++
++
++def emit_and_verify(args, ll_path, context, log):
++    build, settings, tools, compiler, runtime, asan, ubsan = context
++    source = Path(args.source).resolve()
++    if not source.is_file():
++        raise BuildError(f"JavaScript source not found: {source}")
++    ll_path.parent.mkdir(parents=True, exist_ok=True)
++    # Publish only verified complete outputs. An unsupported opcode or LLVM
++    # verifier error leaves an existing user output untouched.
++    with tempfile.TemporaryDirectory(prefix="shllvm-", dir=ll_path.parent) as td:
++        temp = Path(td)
++        raw = temp / "program.ll"
++        bc = temp / "program.bc"
++        optimized = temp / "optimized.bc"
++        command([compiler, f"-{args.hermes_opt}", "-Xes6-block-scoping", "-Xenable-tdz", "-emit-llvm", source, "-o", raw],
++                capture=True, log=log)
++        command([tools["llvm-as"], raw, "-o", bc], capture=True, log=log)
++        command([tools["opt"], "-passes=verify", "-disable-output", bc], capture=True, log=log)
++        pipeline = "verify" if args.llvm_opt == "0" else f"verify,default<O{args.llvm_opt}>,verify"
++        command([tools["opt"], f"-passes={pipeline}", bc, "-o", optimized], capture=True, log=log)
++        # Rename within one filesystem to keep each output replacement atomic.
++        os.replace(raw, ll_path)
++        os.replace(optimized, ll_path.with_suffix(".bc"))
++    return source
++
++
++def execute(args):
++    log = []
++    context = prepare(args, need_runtime=args.action != "emit", log=log)
++    build, settings, tools, compiler, runtime, asan, ubsan = context
++    source = Path(args.source).resolve()
++    default = build / "shllvm-artifacts" / source.stem
++    output = Path(args.output).resolve() if args.output else default
++    if output == source:
++        raise BuildError("Output must not overwrite the JavaScript source")
++    ll_path = output if args.action == "emit" else output.with_name(output.name + ".ll")
++    if args.action == "emit" and ll_path.suffix != ".ll":
++        ll_path = ll_path.with_suffix(".ll")
++    emit_and_verify(args, ll_path, context, log)
++    manifest = {"source": str(source), "source_sha256": sha256(source),
++                "llvm_ir": str(ll_path), "llvm_ir_sha256": sha256(ll_path),
++                "hermes_optimization": args.hermes_opt,
++                "llvm_optimization": args.llvm_opt,
++                "pipeline": "JavaScript -> Hermes SSA -> LLVM IR -> LLVM",
++                "program_c_generation": False,
++                "compiler_sha256": sha256(compiler),
++                "runtime_bridge": str(runtime),
++                "runtime_source_sha256": sha256(ROOT / "lib/BCGen/SH/LLVMNative/runtime.c"),
++                "runtime_header_sha256": sha256(ROOT / "lib/BCGen/SH/LLVMNative/runtime.h"),
++                "runtime_config_sha256": sha256(build / "lib/config/libhermesvm-config.h"),
++                "es6_block_scoping": True, "temporal_dead_zone_checks": True,
++                "runtime_bridge_sha256": sha256(runtime) if runtime.is_file() else None,
++                "runtime_address_sanitizer": asan,
++                "runtime_undefined_behavior_sanitizer": ubsan,
++                "commands": log}
++    sanitizer_flags = []
++    if asan:
++        sanitizer_flags += ["-fsanitize=address"]
++    if ubsan:
++        sanitizer_flags += ["-fsanitize=undefined"]
++    if args.action in ("build", "run"):
++        output.parent.mkdir(parents=True, exist_ok=True)
++        with tempfile.TemporaryDirectory(prefix="shllvm-link-", dir=output.parent) as td:
++            temporary_exe = Path(td) / "program"
++            library_dirs = [build / "lib", build / "tools/shermes", build / "jsi"]
++            flags = [x for p in library_dirs for x in (f"-L{p}", f"-Wl,-rpath,{p}")]
++            command([tools["clang"], ll_path.with_suffix(".bc"), f"-O{args.llvm_opt}",
++                     "-Wno-override-module", *sanitizer_flags, *flags,
++                     runtime, "-lshermes_console", "-lhermesvm", "-lm",
++                     "-o", temporary_exe], capture=True, log=log)
++            os.replace(temporary_exe, output)
++        manifest["native_executable"] = str(output)
++        manifest["native_executable_sha256"] = sha256(output)
++    manifest_path = ll_path.with_suffix(".build.json")
++    manifest_path.write_text(json.dumps(manifest, indent=2) + "\n")
++    if args.action == "emit":
++        print(ll_path)
++        return 0
++    if args.action == "build":
++        print(output)
++        return 0
++    forwarded = args.arguments
++    if forwarded and forwarded[0] == "--":
++        forwarded = forwarded[1:]
++    if args.action == "run":
++        return subprocess.run([str(output), *forwarded], timeout=args.timeout).returncode
++    env = os.environ.copy()
++    if asan:
++        arch = "aarch64" if os.uname().machine == "aarch64" else "x86_64"
++        library_name = f"libclang_rt.asan-{arch}.so"
++        asan_path = command([tools["clang"], f"-print-file-name={library_name}"],
++                            capture=True).stdout.strip()
++        if not Path(asan_path).is_file():
++            raise BuildError(f"ASan runtime required for lli: {library_name}")
++        env["LD_PRELOAD"] = asan_path + (":" + env["LD_PRELOAD"] if env.get("LD_PRELOAD") else "")
++    jit_command = [str(tools["lli"]), f"--dlopen={runtime}",
++                   str(ll_path.with_suffix(".bc")), *forwarded]
++    manifest["jit_command"] = jit_command
++    manifest_path.write_text(json.dumps(manifest, indent=2) + "\n")
++    return subprocess.run(jit_command, env=env, timeout=args.timeout).returncode
++
++
++def parser():
++    p = argparse.ArgumentParser(description=__doc__)
++    sub = p.add_subparsers(dest="action", required=True)
++    for name in ("emit", "build", "run", "jit"):
++        q = sub.add_parser(name)
++        q.add_argument("--build-dir", default=os.environ.get("HERMES_BUILD_DIR", str(ROOT / "build-llvm")))
++        q.add_argument("--llvm-bin", default=os.environ.get("LLVM_BIN"))
++        q.add_argument("--compiler")
++        q.add_argument("--hermes-opt", choices=("O0", "O"), default="O")
++        q.add_argument("--llvm-opt", choices=("0", "1", "2", "3", "s"), default="2")
++        q.add_argument("--no-runtime-build", action="store_true", help="use an already built matching bridge")
++        q.add_argument("-o", "--output", help="output .ll (emit) or executable (build/run/jit artifact stem)")
++        q.add_argument("--timeout", type=float, default=60, help="execution timeout in seconds")
++        q.add_argument("source")
++    return p
++
++
++def main():
++    argv = sys.argv[1:]
++    if "--" in argv:
++        split = argv.index("--")
++        compiler_args, forwarded = argv[:split], argv[split+1:]
++    else:
++        compiler_args, forwarded = argv, []
++    args = parser().parse_args(compiler_args)
++    args.arguments = forwarded
++    try:
++        return execute(args)
++    except (BuildError, subprocess.TimeoutExpired) as exc:
++        print(f"shllvm: {exc}", file=sys.stderr)
++        return 2
++
++
++if __name__ == "__main__":
++    raise SystemExit(main())
+diff --git a/utils/test_shllvm.py b/utils/test_shllvm.py
+new file mode 100755
+index 0000000000000000000000000000000000000000..22360efcba2a95ef70ea14a1363c2bfa14fad6e3
+--- /dev/null
++++ b/utils/test_shllvm.py
+@@ -0,0 +1,174 @@
++#!/usr/bin/env python3
++"""Differential integration tests for the direct LLVM backend.
++
++Each successful source case is compared with Node and the unchanged Static
++Hermes C backend, then run through direct LLVM at both frontend and LLVM
++optimization levels. Failing/unsupported programs are separate contracts.
++"""
++from __future__ import annotations
++import argparse
++import concurrent.futures
++import json
++import os
++from pathlib import Path
++import shutil
++import subprocess
++import sys
++import time
++
++ROOT = Path(__file__).resolve().parents[1]
++SOURCE = ROOT / "test/LLVMNative"
++
++
++def run(argv, *, timeout=120, env=None):
++    start = time.monotonic()
++    try:
++        p = subprocess.run([str(a) for a in argv], capture_output=True,
++                           text=True, timeout=timeout, env=env)
++        return {"command": [str(a) for a in argv], "exit_code": p.returncode,
++                "stdout": p.stdout, "stderr": p.stderr,
++                "seconds": round(time.monotonic()-start, 6)}
++    except (subprocess.TimeoutExpired, OSError) as e:
++        return {"command": [str(a) for a in argv], "exit_code": None,
++                "stdout": "", "stderr": str(e),
++                "seconds": round(time.monotonic()-start, 6)}
++
++
++def main():
++    p = argparse.ArgumentParser(description=__doc__)
++    p.add_argument("--build-dir", default=os.environ.get("HERMES_BUILD_DIR", str(ROOT / "build-llvm")))
++    p.add_argument("--llvm-bin", default=os.environ.get("LLVM_BIN"))
++    p.add_argument("--output", default=str(ROOT / "docs/llvm/evidence/validation.json"))
++    p.add_argument("--case", help="test filename substring")
++    p.add_argument("--jobs", type=int, default=2)
++    p.add_argument("--skip-jit", action="store_true")
++    p.add_argument("--quick", action="store_true", help="LLVM O2 only, still both Hermes levels")
++    args = p.parse_args()
++    build = Path(args.build_dir).resolve()
++    work = build / "shllvm-tests"
++    work.mkdir(exist_ok=True)
++    compiler = build / "bin/shermes"
++    node = shutil.which("node")
++    if not node:
++        p.error("Node is required for the independent semantic oracle")
++    env = os.environ.copy()
++    llvm_args = ["--llvm-bin", args.llvm_bin] if args.llvm_bin else []
++    options = ["--build-dir", str(build), *llvm_args, "--no-runtime-build"]
++    levels = ["2"] if args.quick else ["0", "2"]
++    positive = [f for f in sorted(SOURCE.glob("*.js"))
++                if not f.name.startswith(("error_", "unsupported_"))]
++    if args.case:
++        positive = [f for f in positive if args.case in f.name]
++    results = []
++
++    def positive_test(src):
++        records = []
++        oracle = run([node, "--expose-gc", "-e",
++                      "globalThis.print = (...a) => console.log(...a); require(process.argv[1]);", src], env=env)
++        records.append({"stage": "node", **oracle})
++        success = oracle["exit_code"] == 0
++        comparisons = 0
++        for hopt in ["O0", "O"]:
++            c_exe = work / (src.stem + "-" + hopt + "-c")
++            compiled = run([compiler, "-" + hopt, "-Xes6-block-scoping", "-Xenable-tdz", src, "-o", c_exe], env=env)
++            records.append({"stage": "c-build", "hermes_opt": hopt, **compiled})
++            c_run = None
++            if compiled["exit_code"] == 0:
++                c_run = run([c_exe], env=env)
++                good = c_run["exit_code"] == 0 and c_run["stdout"] == oracle["stdout"]
++                success = success and good
++                records.append({"stage": "c-run", "hermes_opt": hopt, "matches_node": good, **c_run})
++            else:
++                success = False
++            for lopt in levels:
++                exe = work / (src.stem + "-" + hopt + "-llvm" + lopt)
++                llvm_build = run([sys.executable, ROOT / "utils/shllvm.py", "build",
++                                  *options, "--hermes-opt", hopt, "--llvm-opt", lopt,
++                                  "-o", exe, src], env=env)
++                records.append({"stage": "llvm-build", "hermes_opt": hopt,
++                                "llvm_opt": lopt, **llvm_build})
++                if llvm_build["exit_code"] != 0:
++                    success = False
++                    continue
++                llvm_run = run([exe], env=env)
++                good = (llvm_run["exit_code"] == 0 and llvm_run["stdout"] == oracle["stdout"]
++                        and c_run is not None and llvm_run["stdout"] == c_run["stdout"])
++                records.append({"stage": "llvm-run", "hermes_opt": hopt,
++                                "llvm_opt": lopt, "matches_node_and_c": good, **llvm_run})
++                comparisons += 1
++                success = success and good
++        if not args.skip_jit and src.stem in ["functions", "closures", "gc_closures"]:
++            jit = run([sys.executable, ROOT / "utils/shllvm.py", "jit", *options,
++                       "--hermes-opt", "O", "--llvm-opt", "2", "-o",
++                       work / (src.stem + "-jit"), src], env=env)
++            good = jit["exit_code"] == 0 and jit["stdout"] == oracle["stdout"]
++            records.append({"stage": "lli-jit", "matches_node": good, **jit})
++            success = success and good
++        return {"name": src.name, "kind": "positive", "passed": success,
++                "llvm_native_comparisons": comparisons, "records": records}
++
++    with concurrent.futures.ThreadPoolExecutor(max_workers=max(1, args.jobs)) as pool:
++        for result in pool.map(positive_test, positive):
++            results.append(result)
++            print(("PASS" if result["passed"] else "FAIL") + " " + result["name"], flush=True)
++            if not result["passed"]:
++                for r in result["records"]:
++                    if r["exit_code"] or r.get("matches_node_and_c") is False or r.get("matches_node") is False:
++                        print(" ", r["stage"], r.get("hermes_opt", ""), r.get("llvm_opt", ""),
++                              r["stderr"][:600].strip() or repr(r["stdout"][:350]), flush=True)
++
++    for src in sorted(SOURCE.glob("error_*.js")):
++        if args.case and args.case not in src.name:
++            continue
++        records = []
++        expected = "ReferenceError" if "missing_global" in src.stem else "TypeError"
++        passed = True
++        for hopt in ["O0", "O"]:
++            exe = work / (src.stem + "-" + hopt)
++            compilation = run([sys.executable, ROOT / "utils/shllvm.py", "build", *options,
++                               "--hermes-opt", hopt, "-o", exe, src], env=env)
++            records.append({"stage": "error-build", "hermes_opt": hopt, **compilation})
++            if compilation["exit_code"] != 0:
++                passed = False
++                continue
++            execution = run([exe], env=env)
++            good = execution["exit_code"] == 1 and expected in execution["stderr"]
++            records.append({"stage": "runtime-error", "hermes_opt": hopt,
++                            "expected_error": expected, "matches_expected": good, **execution})
++            passed = passed and good
++        result = {"name": src.name, "kind": "runtime-error", "passed": passed, "records": records}
++        results.append(result)
++        print(("PASS" if passed else "FAIL") + " " + src.name, flush=True)
++
++    for src in sorted(SOURCE.glob("unsupported_*.js")):
++        if args.case and args.case not in src.name:
++            continue
++        output = work / (src.stem + ".ll")
++        sentinel = b"unchanged existing LLVM output\n"
++        output.write_bytes(sentinel)
++        compilation = run([compiler, "-O0", "-emit-llvm", src, "-o", output], env=env)
++        preserved = output.read_bytes() == sentinel
++        expected_diagnostic = "invalid assignment left-hand side" if "const_assignment" in src.name else "unsupported"
++        passed = compilation["exit_code"] != 0 and expected_diagnostic in compilation["stderr"].lower() and preserved
++        results.append({"name": src.name, "kind": "compile-rejection", "passed": passed,
++                        "existing_output_preserved": preserved, "records": [compilation]})
++        print(("PASS" if passed else "FAIL") + " " + src.name, flush=True)
++
++    summary = {"generated_at_unix": time.time(), "source_cases": len(results),
++               "passed_cases": sum(bool(r["passed"]) for r in results),
++               "failed_cases": sum(not r["passed"] for r in results),
++               "native_llvm_vs_node_and_c_comparisons": sum(r.get("llvm_native_comparisons", 0) for r in results),
++               "hermes_optimization_levels": ["O0", "O"], "llvm_optimization_levels": levels,
++               "asan_options": env.get("ASAN_OPTIONS", ""),
++               "lsan_options": env.get("LSAN_OPTIONS", ""),
++               "scope": "host native and optional lli execution; not device execution or full ECMAScript conformance",
++               "results": results}
++    path = Path(args.output).resolve()
++    path.parent.mkdir(parents=True, exist_ok=True)
++    path.write_text(json.dumps(summary, indent=2) + "\n")
++    print(json.dumps({k:v for k,v in summary.items() if k != "results"}, indent=2))
++    return 1 if summary["failed_cases"] else 0
++
++
++if __name__ == "__main__":
++    raise SystemExit(main())
+diff --git a/utils/test_shllvm_defaults.py b/utils/test_shllvm_defaults.py
+new file mode 100644
+index 0000000000000000000000000000000000000000..3ad8a6226f1fc00c70c70263ff6b852d78eed002
+--- /dev/null
++++ b/utils/test_shllvm_defaults.py
+@@ -0,0 +1,90 @@
++#!/usr/bin/env python3
++"""Execute raw --emit-llvm lexical defaults and explicit-override checks.
++
++Build shermes, shllvm_runtime, and shllvm_runtime_shared first. This test calls
++the compiler directly, so a wrapper cannot hide an incorrect CLI default.
++"""
++
++import argparse
++import json
++import os
++from pathlib import Path
++import subprocess
++import tempfile
++
++
++def main():
++    root = Path(__file__).resolve().parent.parent
++    parser = argparse.ArgumentParser(description=__doc__)
++    parser.add_argument("--build-dir", type=Path, default=root / "build-llvm")
++    parser.add_argument("--clang", default=os.environ.get("CLANG", "clang"))
++    parser.add_argument("--evidence", type=Path)
++    args = parser.parse_args()
++    build = args.build_dir.resolve()
++    cache = (build / "CMakeCache.txt").read_text()
++    sanitizer = ["-fsanitize=address"] if "HERMES_ENABLE_ADDRESS_SANITIZER:BOOL=ON" in cache else []
++    loop = "let f=[]; for(let i=0;i<3;i++){f.push(() => i);} print(f[0](),f[1](),f[2]());\n"
++    tdz = ("function call(fn){return fn();} function f(){let read=()=>x; "
++           "try {print(call(read));}catch(e){print(e.name);} let x=7;return read();}print(f());\n")
++    cases = [
++        ("loop-default", loop, [], "0 1 2\n"),
++        ("loop-explicit-off", loop, ["-Xes6-block-scoping=false"], "3 3 3\n"),
++        ("tdz-default", tdz, [], "ReferenceError\n7\n"),
++        ("tdz-explicit-off", tdz, ["-Xenable-tdz=false"], "undefined\n7\n"),
++    ]
++    results = []
++    with tempfile.TemporaryDirectory(prefix="shllvm-defaults-") as temporary:
++        directory = Path(temporary)
++        for name, source, flags, expected in cases:
++            source_path = directory / (name + ".js")
++            ir_path = directory / (name + ".ll")
++            executable = directory / name
++            source_path.write_text(source)
++            compile_command = [str(build / "bin/shermes"), "-O0", "--emit-llvm",
++                               *flags, str(source_path), "-o", str(ir_path)]
++            compiled = subprocess.run(compile_command, capture_output=True, text=True, timeout=30)
++            record = {"case": name, "source": source, "flags": flags,
++                      "compile_exit": compiled.returncode, "compile_stderr": compiled.stderr,
++                      "expected": expected, "passed": False}
++            if compiled.returncode == 0:
++                link_command = [args.clang, "-Wno-override-module", "-O2", *sanitizer,
++                                str(ir_path), str(build / "lib/libshllvm_runtime.a"),
++                                "-L" + str(build / "lib"),
++                                "-L" + str(build / "tools/shermes"),
++                                "-Wl,-rpath," + str(build / "lib"),
++                                "-Wl,-rpath," + str(build / "tools/shermes"),
++                                "-lshermes_console", "-lhermesvm", "-lm", "-o", str(executable)]
++                linked = subprocess.run(link_command, capture_output=True, text=True, timeout=30)
++                record.update(link_exit=linked.returncode, link_stderr=linked.stderr)
++                if linked.returncode == 0:
++                    run = subprocess.run([str(executable)], capture_output=True, text=True, timeout=30)
++                    record.update(exit=run.returncode, actual=run.stdout, stderr=run.stderr,
++                                  passed=run.returncode == 0 and run.stdout == expected)
++            results.append(record)
++
++        # Preserve the frontend's documented limit: an obvious TDZ violation
++        # is an early diagnostic, including when source surrounds it with try.
++        source = "function f(){try {print(x);}catch(e){print(e.name);} let x=7;} f();\n"
++        source_path = directory / "static-tdz.js"
++        source_path.write_text(source)
++        compiled = subprocess.run(
++            [str(build / "bin/shermes"), "-O0", "--emit-llvm", str(source_path), "-o", "-"],
++            capture_output=True, text=True, timeout=30,
++        )
++        results.append({"case": "static-tdz-diagnostic", "source": source,
++                        "exit": compiled.returncode, "stderr": compiled.stderr,
++                        "passed": compiled.returncode != 0 and compiled.stdout == ""
++                        and "TDZ violation" in compiled.stderr})
++
++    report = {"passed": sum(item["passed"] for item in results),
++              "total": len(results), "results": results}
++    rendered = json.dumps(report, indent=2) + "\n"
++    if args.evidence:
++        args.evidence.parent.mkdir(parents=True, exist_ok=True)
++        args.evidence.write_text(rendered)
++    print(rendered, end="")
++    return 0 if report["passed"] == report["total"] else 1
++
++
++if __name__ == "__main__":
++    raise SystemExit(main())
+diff --git a/utils/test_shllvm_driver.py b/utils/test_shllvm_driver.py
+new file mode 100644
+index 0000000000000000000000000000000000000000..f4d0c8876a0fb5450252fdb5915f4afb179d67c0
+--- /dev/null
++++ b/utils/test_shllvm_driver.py
+@@ -0,0 +1,111 @@
++#!/usr/bin/env python3
++"""Focused tests for direct LLVM driver publication and output selection.
++
++Run after building shermes. The process inherits ASAN_OPTIONS; restricted
++environments that prohibit LeakSanitizer process inspection can use
++ASAN_OPTIONS=detect_leaks=0 while retaining AddressSanitizer checks.
++"""
++
++import argparse
++import json
++import os
++from pathlib import Path
++import subprocess
++import tempfile
++
++
++def main():
++    root = Path(__file__).resolve().parent.parent
++    parser = argparse.ArgumentParser(description=__doc__)
++    parser.add_argument("--compiler", type=Path, default=root / "build-llvm/bin/shermes")
++    parser.add_argument("--evidence", type=Path)
++    args = parser.parse_args()
++    compiler = args.compiler.resolve()
++    environment = os.environ.copy()
++    environment["CC"] = "/nonexistent/direct-llvm-emission-must-not-invoke-cc"
++    results = []
++
++    with tempfile.TemporaryDirectory(prefix="shllvm-driver-") as temporary:
++        directory = Path(temporary)
++        valid = directory / "valid.js"
++        valid.write_text("print(6 * 7);\n")
++        invalid = directory / "invalid.js"
++        invalid.write_text("function {")
++        unsupported = directory / "unsupported.js"
++        unsupported.write_text('print(/abc/.test("abc"));\n')
++        output = directory / "existing.ll"
++        sentinel = b"existing LLVM module must survive failed compilation\n"
++        output.write_bytes(sentinel)
++
++        def invoke(source, *options):
++            return subprocess.run(
++                [str(compiler), "-O0", "--emit-llvm", str(source), *options],
++                cwd=directory,
++                env=environment,
++                capture_output=True,
++                text=True,
++                timeout=30,
++            )
++
++        def record(name, process, checks):
++            results.append({
++                "case": name,
++                "exit": process.returncode,
++                "checks": checks,
++                "pass": all(checks.values()),
++                "stderr": process.stderr,
++            })
++
++        for name, source in [("syntax failure preserves output", invalid),
++                             ("unsupported opcode preserves output", unsupported)]:
++            process = invoke(source, "-o", str(output))
++            record(name, process, {
++                "rejected": process.returncode != 0,
++                "previous_output_preserved": output.read_bytes() == sentinel,
++                "stdout_empty": process.stdout == "",
++                "diagnostic": "error:" in process.stderr,
++            })
++
++        process = invoke(unsupported, "-o", "-")
++        record("unsupported opcode produces no partial stdout module", process, {
++            "rejected": process.returncode != 0,
++            "stdout_empty": process.stdout == "",
++            "opcode_diagnostic": "CreateRegExpInst" in process.stderr,
++        })
++
++        process = invoke(valid)
++        record("default output bypasses C generation and compiler", process, {
++            "success": process.returncode == 0,
++            "llvm_output_created": (directory / "valid.ll").is_file(),
++            "no_generated_c": not (directory / "valid.c").exists(),
++        })
++
++        process = invoke(valid, "-o", "-")
++        record("stdout module has default main", process, {
++            "success": process.returncode == 0,
++            "main_present": "define i32 @main" in process.stdout,
++        })
++
++        process = invoke(valid, "-exported-unit=driver_test", "-o", "-")
++        record("exported unit suppresses main", process, {
++            "success": process.returncode == 0,
++            "main_absent": "define i32 @main" not in process.stdout,
++            "unit_symbol_present": "sh_export_driver_test" in process.stdout,
++        })
++
++    report = {
++        "compiler": str(compiler),
++        "passed": sum(item["pass"] for item in results),
++        "total": len(results),
++        "results": results,
++    }
++    rendered = json.dumps(report, indent=2) + "\n"
++    if args.evidence:
++        args.evidence.parent.mkdir(parents=True, exist_ok=True)
++        args.evidence.write_text(rendered)
++    print(rendered, end="")
++    return 0 if report["passed"] == report["total"] else 1
++
++
++if __name__ == "__main__":
++    raise SystemExit(main())

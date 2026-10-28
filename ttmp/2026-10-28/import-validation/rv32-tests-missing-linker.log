@@ -1,0 +1,351 @@
+python3 -m unittest discover -s tests -v
+test_backend_failure_preserves_previous_elf (test_direct_llvm.DirectLLVMTests.test_backend_failure_preserves_previous_elf) ... ERROR
+test_default_emits_verifiable_llvm_and_no_generated_c (test_direct_llvm.DirectLLVMTests.test_default_emits_verifiable_llvm_and_no_generated_c) ... ERROR
+test_direct_lane_explicit_scope_boundary (test_direct_llvm.DirectLLVMTests.test_direct_lane_explicit_scope_boundary) ... ok
+test_integer_boundaries_unsigned_and_wrap (test_direct_llvm.DirectLLVMTests.test_integer_boundaries_unsigned_and_wrap) ... ERROR
+test_loop_locals_control_flow_and_assignments (test_direct_llvm.DirectLLVMTests.test_loop_locals_control_flow_and_assignments) ... 
+  test_loop_locals_control_flow_and_assignments (test_direct_llvm.DirectLLVMTests.test_loop_locals_control_flow_and_assignments) (opt='0') ... ERROR
+  test_loop_locals_control_flow_and_assignments (test_direct_llvm.DirectLLVMTests.test_loop_locals_control_flow_and_assignments) (opt='2') ... ERROR
+  test_loop_locals_control_flow_and_assignments (test_direct_llvm.DirectLLVMTests.test_loop_locals_control_flow_and_assignments) (opt='s') ... ERROR
+test_seeded_c_oracle_state_and_effects (test_direct_llvm.DirectLLVMTests.test_seeded_c_oracle_state_and_effects) ... 
+  test_seeded_c_oracle_state_and_effects (test_direct_llvm.DirectLLVMTests.test_seeded_c_oracle_state_and_effects) (world='counter_v1') ... ERROR
+  test_seeded_c_oracle_state_and_effects (test_direct_llvm.DirectLLVMTests.test_seeded_c_oracle_state_and_effects) (world='counter_v2') ... ERROR
+test_short_circuit_nested_phi_and_side_effects (test_direct_llvm.DirectLLVMTests.test_short_circuit_nested_phi_and_side_effects) ... ERROR
+test_unsupported_or_invalid_source_rejected_before_ir_output (test_direct_llvm.DirectLLVMTests.test_unsupported_or_invalid_source_rejected_before_ir_output) ... ok
+setUpClass (test_end_to_end.PicoHostTests) ... ERROR
+test_unix_socket_service_and_output_guard (test_jitd.CompilerServiceTests.test_unix_socket_service_and_output_guard) ... FAIL
+
+======================================================================
+ERROR: test_backend_failure_preserves_previous_elf (test_direct_llvm.DirectLLVMTests.test_backend_failure_preserves_previous_elf)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/manuel/code/wesen/2026-10-28--llvm-js/picocalc-llvm-poc/tests/test_direct_llvm.py", line 112, in test_backend_failure_preserves_previous_elf
+    compile_js((ROOT/'worlds/counter_v1.js').read_text(), out, 0x100000)
+    ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/manuel/code/wesen/2026-10-28--llvm-js/picocalc-llvm-poc/compiler/compile.py", line 108, in compile_js
+    subprocess.run([LINKER,'-m','elf32lriscv','--no-relax','--no-undefined',
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        '--build-id=none','-T',str(ld),str(obj),'-o',str(elf)],check=True,capture_output=True,text=True)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/manuel/.pyenv/versions/3.13.2/lib/python3.13/subprocess.py", line 556, in run
+    with Popen(*popenargs, **kwargs) as process:
+         ~~~~~^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/manuel/.pyenv/versions/3.13.2/lib/python3.13/subprocess.py", line 1038, in __init__
+    self._execute_child(args, executable, preexec_fn, close_fds,
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                        pass_fds, cwd, env,
+                        ^^^^^^^^^^^^^^^^^^^
+    ...<5 lines>...
+                        gid, gids, uid, umask,
+                        ^^^^^^^^^^^^^^^^^^^^^^
+                        start_new_session, process_group)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/manuel/.pyenv/versions/3.13.2/lib/python3.13/subprocess.py", line 1974, in _execute_child
+    raise child_exception_type(errno_num, err_msg, err_filename)
+FileNotFoundError: [Errno 2] No such file or directory: 'ld.lld'
+
+======================================================================
+ERROR: test_default_emits_verifiable_llvm_and_no_generated_c (test_direct_llvm.DirectLLVMTests.test_default_emits_verifiable_llvm_and_no_generated_c)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/manuel/code/wesen/2026-10-28--llvm-js/picocalc-llvm-poc/tests/test_direct_llvm.py", line 44, in test_default_emits_verifiable_llvm_and_no_generated_c
+    meta = compile_js((ROOT/'worlds/counter_v1.js').read_text(), out, 0x100000)
+  File "/home/manuel/code/wesen/2026-10-28--llvm-js/picocalc-llvm-poc/compiler/compile.py", line 108, in compile_js
+    subprocess.run([LINKER,'-m','elf32lriscv','--no-relax','--no-undefined',
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        '--build-id=none','-T',str(ld),str(obj),'-o',str(elf)],check=True,capture_output=True,text=True)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/manuel/.pyenv/versions/3.13.2/lib/python3.13/subprocess.py", line 556, in run
+    with Popen(*popenargs, **kwargs) as process:
+         ~~~~~^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/manuel/.pyenv/versions/3.13.2/lib/python3.13/subprocess.py", line 1038, in __init__
+    self._execute_child(args, executable, preexec_fn, close_fds,
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                        pass_fds, cwd, env,
+                        ^^^^^^^^^^^^^^^^^^^
+    ...<5 lines>...
+                        gid, gids, uid, umask,
+                        ^^^^^^^^^^^^^^^^^^^^^^
+                        start_new_session, process_group)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/manuel/.pyenv/versions/3.13.2/lib/python3.13/subprocess.py", line 1974, in _execute_child
+    raise child_exception_type(errno_num, err_msg, err_filename)
+FileNotFoundError: [Errno 2] No such file or directory: 'ld.lld'
+
+======================================================================
+ERROR: test_integer_boundaries_unsigned_and_wrap (test_direct_llvm.DirectLLVMTests.test_integer_boundaries_unsigned_and_wrap)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/manuel/code/wesen/2026-10-28--llvm-js/picocalc-llvm-poc/tests/test_direct_llvm.py", line 96, in test_integer_boundaries_unsigned_and_wrap
+    self.compare(body, scenarios)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/home/manuel/code/wesen/2026-10-28--llvm-js/picocalc-llvm-poc/tests/test_direct_llvm.py", line 34, in compare
+    llvm, _ = self.build_run(source, scenarios, 'llvm', opt)
+              ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/manuel/code/wesen/2026-10-28--llvm-js/picocalc-llvm-poc/tests/test_direct_llvm.py", line 24, in build_run
+    meta = compile_js(source, out, 0x100000, opt, backend=backend)
+  File "/home/manuel/code/wesen/2026-10-28--llvm-js/picocalc-llvm-poc/compiler/compile.py", line 108, in compile_js
+    subprocess.run([LINKER,'-m','elf32lriscv','--no-relax','--no-undefined',
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        '--build-id=none','-T',str(ld),str(obj),'-o',str(elf)],check=True,capture_output=True,text=True)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/manuel/.pyenv/versions/3.13.2/lib/python3.13/subprocess.py", line 556, in run
+    with Popen(*popenargs, **kwargs) as process:
+         ~~~~~^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/manuel/.pyenv/versions/3.13.2/lib/python3.13/subprocess.py", line 1038, in __init__
+    self._execute_child(args, executable, preexec_fn, close_fds,
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                        pass_fds, cwd, env,
+                        ^^^^^^^^^^^^^^^^^^^
+    ...<5 lines>...
+                        gid, gids, uid, umask,
+                        ^^^^^^^^^^^^^^^^^^^^^^
+                        start_new_session, process_group)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/manuel/.pyenv/versions/3.13.2/lib/python3.13/subprocess.py", line 1974, in _execute_child
+    raise child_exception_type(errno_num, err_msg, err_filename)
+FileNotFoundError: [Errno 2] No such file or directory: 'ld.lld'
+
+======================================================================
+ERROR: test_loop_locals_control_flow_and_assignments (test_direct_llvm.DirectLLVMTests.test_loop_locals_control_flow_and_assignments) (opt='0')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/manuel/code/wesen/2026-10-28--llvm-js/picocalc-llvm-poc/tests/test_direct_llvm.py", line 85, in test_loop_locals_control_flow_and_assignments
+    with self.subTest(opt=opt): self.compare(body, scenarios, opt)
+                                ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/manuel/code/wesen/2026-10-28--llvm-js/picocalc-llvm-poc/tests/test_direct_llvm.py", line 34, in compare
+    llvm, _ = self.build_run(source, scenarios, 'llvm', opt)
+              ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/manuel/code/wesen/2026-10-28--llvm-js/picocalc-llvm-poc/tests/test_direct_llvm.py", line 24, in build_run
+    meta = compile_js(source, out, 0x100000, opt, backend=backend)
+  File "/home/manuel/code/wesen/2026-10-28--llvm-js/picocalc-llvm-poc/compiler/compile.py", line 108, in compile_js
+    subprocess.run([LINKER,'-m','elf32lriscv','--no-relax','--no-undefined',
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        '--build-id=none','-T',str(ld),str(obj),'-o',str(elf)],check=True,capture_output=True,text=True)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/manuel/.pyenv/versions/3.13.2/lib/python3.13/subprocess.py", line 556, in run
+    with Popen(*popenargs, **kwargs) as process:
+         ~~~~~^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/manuel/.pyenv/versions/3.13.2/lib/python3.13/subprocess.py", line 1038, in __init__
+    self._execute_child(args, executable, preexec_fn, close_fds,
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                        pass_fds, cwd, env,
+                        ^^^^^^^^^^^^^^^^^^^
+    ...<5 lines>...
+                        gid, gids, uid, umask,
+                        ^^^^^^^^^^^^^^^^^^^^^^
+                        start_new_session, process_group)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/manuel/.pyenv/versions/3.13.2/lib/python3.13/subprocess.py", line 1974, in _execute_child
+    raise child_exception_type(errno_num, err_msg, err_filename)
+FileNotFoundError: [Errno 2] No such file or directory: 'ld.lld'
+
+======================================================================
+ERROR: test_loop_locals_control_flow_and_assignments (test_direct_llvm.DirectLLVMTests.test_loop_locals_control_flow_and_assignments) (opt='2')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/manuel/code/wesen/2026-10-28--llvm-js/picocalc-llvm-poc/tests/test_direct_llvm.py", line 85, in test_loop_locals_control_flow_and_assignments
+    with self.subTest(opt=opt): self.compare(body, scenarios, opt)
+                                ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/manuel/code/wesen/2026-10-28--llvm-js/picocalc-llvm-poc/tests/test_direct_llvm.py", line 34, in compare
+    llvm, _ = self.build_run(source, scenarios, 'llvm', opt)
+              ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/manuel/code/wesen/2026-10-28--llvm-js/picocalc-llvm-poc/tests/test_direct_llvm.py", line 24, in build_run
+    meta = compile_js(source, out, 0x100000, opt, backend=backend)
+  File "/home/manuel/code/wesen/2026-10-28--llvm-js/picocalc-llvm-poc/compiler/compile.py", line 108, in compile_js
+    subprocess.run([LINKER,'-m','elf32lriscv','--no-relax','--no-undefined',
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        '--build-id=none','-T',str(ld),str(obj),'-o',str(elf)],check=True,capture_output=True,text=True)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/manuel/.pyenv/versions/3.13.2/lib/python3.13/subprocess.py", line 556, in run
+    with Popen(*popenargs, **kwargs) as process:
+         ~~~~~^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/manuel/.pyenv/versions/3.13.2/lib/python3.13/subprocess.py", line 1038, in __init__
+    self._execute_child(args, executable, preexec_fn, close_fds,
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                        pass_fds, cwd, env,
+                        ^^^^^^^^^^^^^^^^^^^
+    ...<5 lines>...
+                        gid, gids, uid, umask,
+                        ^^^^^^^^^^^^^^^^^^^^^^
+                        start_new_session, process_group)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/manuel/.pyenv/versions/3.13.2/lib/python3.13/subprocess.py", line 1974, in _execute_child
+    raise child_exception_type(errno_num, err_msg, err_filename)
+FileNotFoundError: [Errno 2] No such file or directory: 'ld.lld'
+
+======================================================================
+ERROR: test_loop_locals_control_flow_and_assignments (test_direct_llvm.DirectLLVMTests.test_loop_locals_control_flow_and_assignments) (opt='s')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/manuel/code/wesen/2026-10-28--llvm-js/picocalc-llvm-poc/tests/test_direct_llvm.py", line 85, in test_loop_locals_control_flow_and_assignments
+    with self.subTest(opt=opt): self.compare(body, scenarios, opt)
+                                ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/manuel/code/wesen/2026-10-28--llvm-js/picocalc-llvm-poc/tests/test_direct_llvm.py", line 34, in compare
+    llvm, _ = self.build_run(source, scenarios, 'llvm', opt)
+              ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/manuel/code/wesen/2026-10-28--llvm-js/picocalc-llvm-poc/tests/test_direct_llvm.py", line 24, in build_run
+    meta = compile_js(source, out, 0x100000, opt, backend=backend)
+  File "/home/manuel/code/wesen/2026-10-28--llvm-js/picocalc-llvm-poc/compiler/compile.py", line 108, in compile_js
+    subprocess.run([LINKER,'-m','elf32lriscv','--no-relax','--no-undefined',
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        '--build-id=none','-T',str(ld),str(obj),'-o',str(elf)],check=True,capture_output=True,text=True)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/manuel/.pyenv/versions/3.13.2/lib/python3.13/subprocess.py", line 556, in run
+    with Popen(*popenargs, **kwargs) as process:
+         ~~~~~^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/manuel/.pyenv/versions/3.13.2/lib/python3.13/subprocess.py", line 1038, in __init__
+    self._execute_child(args, executable, preexec_fn, close_fds,
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                        pass_fds, cwd, env,
+                        ^^^^^^^^^^^^^^^^^^^
+    ...<5 lines>...
+                        gid, gids, uid, umask,
+                        ^^^^^^^^^^^^^^^^^^^^^^
+                        start_new_session, process_group)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/manuel/.pyenv/versions/3.13.2/lib/python3.13/subprocess.py", line 1974, in _execute_child
+    raise child_exception_type(errno_num, err_msg, err_filename)
+FileNotFoundError: [Errno 2] No such file or directory: 'ld.lld'
+
+======================================================================
+ERROR: test_seeded_c_oracle_state_and_effects (test_direct_llvm.DirectLLVMTests.test_seeded_c_oracle_state_and_effects) (world='counter_v1')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/manuel/code/wesen/2026-10-28--llvm-js/picocalc-llvm-poc/tests/test_direct_llvm.py", line 104, in test_seeded_c_oracle_state_and_effects
+    llvm, _ = self.build_run(source, scenarios, 'llvm')
+              ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/manuel/code/wesen/2026-10-28--llvm-js/picocalc-llvm-poc/tests/test_direct_llvm.py", line 24, in build_run
+    meta = compile_js(source, out, 0x100000, opt, backend=backend)
+  File "/home/manuel/code/wesen/2026-10-28--llvm-js/picocalc-llvm-poc/compiler/compile.py", line 108, in compile_js
+    subprocess.run([LINKER,'-m','elf32lriscv','--no-relax','--no-undefined',
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        '--build-id=none','-T',str(ld),str(obj),'-o',str(elf)],check=True,capture_output=True,text=True)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/manuel/.pyenv/versions/3.13.2/lib/python3.13/subprocess.py", line 556, in run
+    with Popen(*popenargs, **kwargs) as process:
+         ~~~~~^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/manuel/.pyenv/versions/3.13.2/lib/python3.13/subprocess.py", line 1038, in __init__
+    self._execute_child(args, executable, preexec_fn, close_fds,
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                        pass_fds, cwd, env,
+                        ^^^^^^^^^^^^^^^^^^^
+    ...<5 lines>...
+                        gid, gids, uid, umask,
+                        ^^^^^^^^^^^^^^^^^^^^^^
+                        start_new_session, process_group)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/manuel/.pyenv/versions/3.13.2/lib/python3.13/subprocess.py", line 1974, in _execute_child
+    raise child_exception_type(errno_num, err_msg, err_filename)
+FileNotFoundError: [Errno 2] No such file or directory: 'ld.lld'
+
+======================================================================
+ERROR: test_seeded_c_oracle_state_and_effects (test_direct_llvm.DirectLLVMTests.test_seeded_c_oracle_state_and_effects) (world='counter_v2')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/manuel/code/wesen/2026-10-28--llvm-js/picocalc-llvm-poc/tests/test_direct_llvm.py", line 104, in test_seeded_c_oracle_state_and_effects
+    llvm, _ = self.build_run(source, scenarios, 'llvm')
+              ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/manuel/code/wesen/2026-10-28--llvm-js/picocalc-llvm-poc/tests/test_direct_llvm.py", line 24, in build_run
+    meta = compile_js(source, out, 0x100000, opt, backend=backend)
+  File "/home/manuel/code/wesen/2026-10-28--llvm-js/picocalc-llvm-poc/compiler/compile.py", line 108, in compile_js
+    subprocess.run([LINKER,'-m','elf32lriscv','--no-relax','--no-undefined',
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        '--build-id=none','-T',str(ld),str(obj),'-o',str(elf)],check=True,capture_output=True,text=True)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/manuel/.pyenv/versions/3.13.2/lib/python3.13/subprocess.py", line 556, in run
+    with Popen(*popenargs, **kwargs) as process:
+         ~~~~~^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/manuel/.pyenv/versions/3.13.2/lib/python3.13/subprocess.py", line 1038, in __init__
+    self._execute_child(args, executable, preexec_fn, close_fds,
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                        pass_fds, cwd, env,
+                        ^^^^^^^^^^^^^^^^^^^
+    ...<5 lines>...
+                        gid, gids, uid, umask,
+                        ^^^^^^^^^^^^^^^^^^^^^^
+                        start_new_session, process_group)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/manuel/.pyenv/versions/3.13.2/lib/python3.13/subprocess.py", line 1974, in _execute_child
+    raise child_exception_type(errno_num, err_msg, err_filename)
+FileNotFoundError: [Errno 2] No such file or directory: 'ld.lld'
+
+======================================================================
+ERROR: test_short_circuit_nested_phi_and_side_effects (test_direct_llvm.DirectLLVMTests.test_short_circuit_nested_phi_and_side_effects)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/manuel/code/wesen/2026-10-28--llvm-js/picocalc-llvm-poc/tests/test_direct_llvm.py", line 61, in test_short_circuit_nested_phi_and_side_effects
+    rows = self.compare('''
+        let x = 0;
+    ...<4 lines>...
+        cap.emit(x);
+        ''', 'dispatch 0 0\ndispatch 0 2\ndispatch 1 2\n', opt='0')
+  File "/home/manuel/code/wesen/2026-10-28--llvm-js/picocalc-llvm-poc/tests/test_direct_llvm.py", line 34, in compare
+    llvm, _ = self.build_run(source, scenarios, 'llvm', opt)
+              ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/manuel/code/wesen/2026-10-28--llvm-js/picocalc-llvm-poc/tests/test_direct_llvm.py", line 24, in build_run
+    meta = compile_js(source, out, 0x100000, opt, backend=backend)
+  File "/home/manuel/code/wesen/2026-10-28--llvm-js/picocalc-llvm-poc/compiler/compile.py", line 108, in compile_js
+    subprocess.run([LINKER,'-m','elf32lriscv','--no-relax','--no-undefined',
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        '--build-id=none','-T',str(ld),str(obj),'-o',str(elf)],check=True,capture_output=True,text=True)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/manuel/.pyenv/versions/3.13.2/lib/python3.13/subprocess.py", line 556, in run
+    with Popen(*popenargs, **kwargs) as process:
+         ~~~~~^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/manuel/.pyenv/versions/3.13.2/lib/python3.13/subprocess.py", line 1038, in __init__
+    self._execute_child(args, executable, preexec_fn, close_fds,
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                        pass_fds, cwd, env,
+                        ^^^^^^^^^^^^^^^^^^^
+    ...<5 lines>...
+                        gid, gids, uid, umask,
+                        ^^^^^^^^^^^^^^^^^^^^^^
+                        start_new_session, process_group)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/manuel/.pyenv/versions/3.13.2/lib/python3.13/subprocess.py", line 1974, in _execute_child
+    raise child_exception_type(errno_num, err_msg, err_filename)
+FileNotFoundError: [Errno 2] No such file or directory: 'ld.lld'
+
+======================================================================
+ERROR: setUpClass (test_end_to_end.PicoHostTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/manuel/code/wesen/2026-10-28--llvm-js/picocalc-llvm-poc/tests/test_end_to_end.py", line 23, in setUpClass
+    meta=compile_js((ROOT/'worlds'/f'{name}.{lang}').read_text(),p,base,language=lang)
+  File "/home/manuel/code/wesen/2026-10-28--llvm-js/picocalc-llvm-poc/compiler/compile.py", line 108, in compile_js
+    subprocess.run([LINKER,'-m','elf32lriscv','--no-relax','--no-undefined',
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        '--build-id=none','-T',str(ld),str(obj),'-o',str(elf)],check=True,capture_output=True,text=True)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/manuel/.pyenv/versions/3.13.2/lib/python3.13/subprocess.py", line 556, in run
+    with Popen(*popenargs, **kwargs) as process:
+         ~~~~~^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/manuel/.pyenv/versions/3.13.2/lib/python3.13/subprocess.py", line 1038, in __init__
+    self._execute_child(args, executable, preexec_fn, close_fds,
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                        pass_fds, cwd, env,
+                        ^^^^^^^^^^^^^^^^^^^
+    ...<5 lines>...
+                        gid, gids, uid, umask,
+                        ^^^^^^^^^^^^^^^^^^^^^^
+                        start_new_session, process_group)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/manuel/.pyenv/versions/3.13.2/lib/python3.13/subprocess.py", line 1974, in _execute_child
+    raise child_exception_type(errno_num, err_msg, err_filename)
+FileNotFoundError: [Errno 2] No such file or directory: 'ld.lld'
+
+======================================================================
+FAIL: test_unix_socket_service_and_output_guard (test_jitd.CompilerServiceTests.test_unix_socket_service_and_output_guard)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/manuel/code/wesen/2026-10-28--llvm-js/picocalc-llvm-poc/tests/test_jitd.py", line 30, in test_unix_socket_service_and_output_guard
+    self.assertTrue(accepted['ok']);self.assertEqual(accepted['meta']['target'],'riscv32-unknown-elf')
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+AssertionError: False is not true
+
+----------------------------------------------------------------------
+Ran 9 tests in 6.456s
+
+FAILED (failures=1, errors=10)
+make: *** [Makefile:9: test] Error 1

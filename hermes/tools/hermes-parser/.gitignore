@@ -1,0 +1,8 @@
+# Exclude dependencies
+node_modules
+
+# Exclude builds
+dist
+
+# Exclude prettier build dir
+js/prettier-hermes-v2-backport/

@@ -1,0 +1,17 @@
+{
+  "size": 4948,
+  "sha256": "6d413c34c8412e3a9433524a1b83e264f6f1259353cca846c54520b98c4cd426",
+  "entry": 1048576,
+  "segments": [
+    {
+      "vaddr": 1048576,
+      "filesz": 60,
+      "memsz": 60,
+      "flags": 5
+    }
+  ],
+  "target": "riscv32-unknown-elf",
+  "march": "rv32im",
+  "abi": "ilp32",
+  "no_libc": true
+}

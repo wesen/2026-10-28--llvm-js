@@ -1,0 +1,683 @@
+/*
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+
+#ifdef HERMES_ENABLE_DEBUGGER
+
+#include <gtest/gtest.h>
+#include <hermes/DebuggerAPI.h>
+#include <hermes/hermes.h>
+#include <memory>
+
+#include "hermes/BCGen/HBC/DebugInfo.h"
+#include "hermes/BCGen/HBC/SimpleBytecodeBuilder.h"
+
+#include <llvh/ADT/ScopeExit.h>
+
+using namespace facebook::hermes;
+using namespace facebook::hermes::debugger;
+
+struct TestEventObserver : public debugger::EventObserver {
+  std::vector<PauseReason> pauseReasons;
+  std::vector<StackTrace> stackTraces;
+  std::vector<LexicalInfo> lexicalInfos;
+  std::vector<std::string> thrownValueStrings;
+  bool useCaptureStackTrace = false;
+
+  Command didPause(Debugger &debugger) override {
+    auto &state = debugger.getProgramState();
+    pauseReasons.push_back(state.getPauseReason());
+    if (useCaptureStackTrace) {
+      stackTraces.push_back(debugger.captureStackTrace());
+    } else {
+      stackTraces.push_back(state.getStackTrace());
+    }
+
+    auto &stackTrace = stackTraces.back();
+    uint32_t frameCount = stackTrace.callFrameCount();
+    for (uint32_t i = 0; i < frameCount; i++) {
+      lexicalInfos.push_back(debugger.getProgramState().getLexicalInfo(i));
+    }
+
+    thrownValueStrings.push_back(
+        debugger.getThrownValue().toString(*runtime_).utf8(*runtime_));
+
+    return Command::continueExecution();
+  }
+
+  void setRuntime(std::shared_ptr<HermesRuntime> runtime) {
+    runtime_ = runtime;
+  }
+
+ private:
+  std::shared_ptr<HermesRuntime> runtime_;
+};
+
+struct DebuggerAPITest : public ::testing::Test {
+  void eval(const std::string &code) {
+    rt->global().getPropertyAsFunction(*rt, "eval").call(*rt, code);
+  }
+
+  std::shared_ptr<HermesRuntime> rt;
+  TestEventObserver observer;
+
+  DebuggerAPITest() : rt(makeHermesRuntime()) {
+    rt->getDebugger().setEventObserver(&observer);
+    observer.setRuntime(rt);
+  }
+};
+
+TEST_F(DebuggerAPITest, SetAgentTest) {
+  // A basic test that exercises setting the debugger event observer by virtue
+  // of running the DebuggerAPITest constructor.
+}
+
+TEST_F(DebuggerAPITest, BasicPauseTest) {
+  // Test that a basic Pause scenario works.
+  eval("var x = 5; debugger; x=8; debugger;");
+  EXPECT_EQ(
+      std::vector<PauseReason>(
+          {PauseReason::DebuggerStatement, PauseReason::DebuggerStatement}),
+      observer.pauseReasons);
+}
+
+TEST_F(DebuggerAPITest, SingleFrameStackTraceTest) {
+  using namespace facebook;
+
+  rt->getDebugger().setPauseOnThrowMode(PauseOnThrowMode::All);
+
+  jsi::Function nativeThrower = jsi::Function::createFromHostFunction(
+      *rt,
+      jsi::PropNameID::forAscii(*rt, "nativeThrower"),
+      0,
+      [](jsi::Runtime &rt,
+         const jsi::Value &thisVal,
+         const jsi::Value *args,
+         size_t count) -> jsi::Value {
+        throw jsi::JSINativeException("NativeException");
+      });
+  rt->global().setProperty(*rt, "nativeThrower", nativeThrower);
+
+  jsi::Function caller = jsi::Function::createFromHostFunction(
+      *rt,
+      jsi::PropNameID::forAscii(*rt, "caller"),
+      0,
+      [](jsi::Runtime &rt,
+         const jsi::Value &thisVal,
+         const jsi::Value *args,
+         size_t count) -> jsi::Value {
+        jsi::Function jsThrower =
+            rt.global().getPropertyAsFunction(rt, "jsThrower");
+        return jsThrower.call(rt);
+      });
+  rt->global().setProperty(*rt, "caller", caller);
+
+  eval(
+      "globalThis.jsThrower = function jsThrower() { throw 1; };\n"
+      "globalThis.tester = function tester() {"
+      "  try { throw 2; }"
+      "  catch (e) { caller(); } };"
+      "");
+
+  jsi::Function tester =
+      rt->global().getProperty(*rt, "tester").asObject(*rt).asFunction(*rt);
+  try {
+    tester.call(*rt);
+  } catch (jsi::JSIException &) {
+    try {
+      tester.call(*rt);
+    } catch (jsi::JSError &err) {
+      EXPECT_EQ(1, err.value().getNumber());
+    }
+  }
+
+  ASSERT_EQ(
+      std::vector<PauseReason>(
+          {PauseReason::Exception,
+           PauseReason::Exception,
+           PauseReason::Exception}),
+      observer.pauseReasons);
+
+  ASSERT_EQ(3, observer.stackTraces[2].callFrameCount());
+  ASSERT_EQ(
+      "jsThrower", observer.stackTraces[2].callFrameForIndex(0).functionName);
+  ASSERT_EQ(
+      "(native)", observer.stackTraces[2].callFrameForIndex(1).functionName);
+  ASSERT_EQ(
+      "tester", observer.stackTraces[2].callFrameForIndex(2).functionName);
+}
+
+TEST_F(DebuggerAPITest, ExceptionDetailsFromDidPauseTest) {
+  using namespace facebook;
+
+  rt->getDebugger().setPauseOnThrowMode(PauseOnThrowMode::All);
+
+  try {
+    eval(R"(
+      try {
+        throw new Error('test');
+      } catch (e) {
+        throw 123;
+      }
+    )");
+  } catch (jsi::JSError &err) {
+    EXPECT_EQ(123, err.value().getNumber());
+  }
+
+  ASSERT_EQ(
+      std::vector<PauseReason>(
+          {PauseReason::Exception, PauseReason::Exception}),
+      observer.pauseReasons);
+
+  ASSERT_EQ(
+      std::vector<std::string>({"Error: test", "123"}),
+      observer.thrownValueStrings);
+}
+
+TEST_F(DebuggerAPITest, GetEmptyThownValueTest) {
+  using namespace facebook;
+
+  // Before execution
+  EXPECT_TRUE(rt->getDebugger().getThrownValue().isUndefined());
+
+  eval(R"(
+    debugger;
+
+    try {
+      throw new Error('test');
+    } catch (e) {
+      debugger;
+    }
+
+    debugger;
+  )");
+
+  // During execution: before throwing, while catching, and after try/catch
+  ASSERT_EQ(
+      std::vector<std::string>({"undefined", "undefined", "undefined"}),
+      observer.thrownValueStrings);
+
+  // After execution
+  EXPECT_TRUE(rt->getDebugger().getThrownValue().isUndefined());
+}
+
+TEST_F(DebuggerAPITest, CaptureStackTraceTest) {
+  auto setCaptureStackTraceFlag =
+      llvh::make_scope_exit([this] { observer.useCaptureStackTrace = false; });
+  using namespace facebook;
+
+  // Make sure when we're not in the interpreter loop, captureStackTrace() works
+  // and just return 0 call frames.
+  StackTrace stackTrace = rt->getDebugger().captureStackTrace();
+  ASSERT_EQ(stackTrace.callFrameCount(), 0);
+
+  jsi::Function captureStackTrace = jsi::Function::createFromHostFunction(
+      *rt,
+      jsi::PropNameID::forAscii(*rt, "captureStackTrace"),
+      0,
+      [&stackTrace](
+          jsi::Runtime &runtime, const jsi::Value &, const jsi::Value *, size_t)
+          -> jsi::Value {
+        stackTrace = static_cast<HermesRuntime &>(runtime)
+                         .getDebugger()
+                         .captureStackTrace();
+        return jsi::Value::undefined();
+      });
+  rt->global().setProperty(*rt, "captureStackTrace", captureStackTrace);
+
+  // Test for using captureStackTrace from a HostFunction
+  eval(R"(
+    function level4() {
+      captureStackTrace();      // line 3
+    }
+
+    function level3() {
+      level4(...arguments);     // line 7
+    }
+
+    function level2() {
+      level3.call();            // line 11
+    }
+
+    function level1() {
+      var lvl2 = level2.bind();
+      lvl2();                   // line 16
+    }
+
+    level1();                   // line 19
+  )");
+
+  ASSERT_EQ(stackTrace.callFrameCount(), 9);
+
+  uint32_t frameIndex = 0;
+
+  // Even though the JavaScript looks like it should have the top frame being
+  // the level3() function, the top call frame is actually a
+  // FinalizedNativeFunction corresponding to the HostFunction. It'll be
+  // displayed as "(native)".
+  CallFrameInfo frame = stackTrace.callFrameForIndex(frameIndex++);
+  ASSERT_EQ(frame.functionName, "(native)");
+  ASSERT_EQ(frame.location.fileName, "");
+  ASSERT_EQ(frame.location.fileId, kInvalidLocation);
+  ASSERT_EQ(frame.location.line, kInvalidLocation);
+
+  // Next 2 frames are for the `level4(...arguments)` call. This causes the
+  // JSFunction to be called through hermesBuiltinApply, which creates an
+  // additional native call frame.
+  frame = stackTrace.callFrameForIndex(frameIndex++);
+  ASSERT_EQ(frame.functionName, "level4");
+  ASSERT_EQ(frame.location.fileName, "");
+  // Capture the fileId from the first JS frame - don't hardcode it since
+  // internal modules may be added/removed.
+  uint32_t firstEvalFileId = frame.location.fileId;
+  ASSERT_NE(firstEvalFileId, kInvalidLocation);
+  ASSERT_EQ(frame.location.line, 3);
+  frame = stackTrace.callFrameForIndex(frameIndex++);
+  ASSERT_EQ(frame.functionName, "(native)");
+  ASSERT_EQ(frame.location.fileName, "");
+  ASSERT_EQ(frame.location.fileId, kInvalidLocation);
+  ASSERT_EQ(frame.location.line, kInvalidLocation);
+
+  // Next 2 frames are for the `level3.call()` call. This causes the JSFunction
+  // to be called through functionPrototypeCall, which creates an additional
+  // native call frame.
+  frame = stackTrace.callFrameForIndex(frameIndex++);
+  ASSERT_EQ(frame.functionName, "level3");
+  ASSERT_EQ(frame.location.fileName, "");
+  ASSERT_EQ(frame.location.fileId, firstEvalFileId);
+  ASSERT_EQ(frame.location.line, 7);
+  frame = stackTrace.callFrameForIndex(frameIndex++);
+  ASSERT_EQ(frame.functionName, "(native)");
+  ASSERT_EQ(frame.location.fileName, "");
+  ASSERT_EQ(frame.location.fileId, kInvalidLocation);
+  ASSERT_EQ(frame.location.line, kInvalidLocation);
+
+  // This is for the `lvl2()` BoundFuntion call after creating the bound
+  // function via function.prototype.bind. This doesn't create additional native
+  // call frame, but it does have the characteristic that it has a null
+  // savedCodeBlock. This is handled in getStackTrace() when getting savedIP and
+  // savedCodeBlock to properly transition to the correct CodeBlock for the
+  // "level1" frame.
+  frame = stackTrace.callFrameForIndex(frameIndex++);
+  ASSERT_EQ(frame.functionName, "level2");
+  ASSERT_EQ(frame.location.fileName, "");
+  ASSERT_EQ(frame.location.fileId, firstEvalFileId);
+  ASSERT_EQ(frame.location.line, 11);
+
+  frame = stackTrace.callFrameForIndex(frameIndex++);
+  ASSERT_EQ(frame.functionName, "level1");
+  ASSERT_EQ(frame.location.fileName, "");
+  ASSERT_EQ(frame.location.fileId, firstEvalFileId);
+  ASSERT_EQ(frame.location.line, 16);
+
+  frame = stackTrace.callFrameForIndex(frameIndex++);
+  ASSERT_EQ(frame.functionName, "eval");
+  ASSERT_EQ(frame.location.fileName, "");
+  ASSERT_EQ(frame.location.fileId, firstEvalFileId);
+  ASSERT_EQ(frame.location.line, 19);
+
+  frame = stackTrace.callFrameForIndex(frameIndex++);
+  ASSERT_EQ(frame.functionName, "(native)");
+  ASSERT_EQ(frame.location.fileName, "");
+  ASSERT_EQ(frame.location.fileId, kInvalidLocation);
+  ASSERT_EQ(frame.location.line, kInvalidLocation);
+
+  // Test for using captureStackTrace while in didPause()
+  observer.useCaptureStackTrace = true;
+  eval(R"(
+    function level3() {
+      debugger;            // line 3
+    }
+
+    function level2() {
+      level3();            // line 7
+    }
+
+    function level1() {
+      level2();            // line 11
+    }
+
+    level1();              // line 14
+  )");
+
+  stackTrace = observer.stackTraces[0];
+
+  frameIndex = 0;
+
+  // When called from didPause() due to the debugger; statement, there isn't an
+  // extra indirection like the HostFunction case. The top frame is the level3()
+  // call frame.
+  frame = stackTrace.callFrameForIndex(frameIndex++);
+  ASSERT_EQ(frame.functionName, "level3");
+  ASSERT_EQ(frame.location.fileName, "");
+  // Capture the fileId for this eval - it should be different from
+  // firstEvalFileId since this is a new eval.
+  uint32_t secondEvalFileId = frame.location.fileId;
+  ASSERT_NE(secondEvalFileId, kInvalidLocation);
+  ASSERT_NE(secondEvalFileId, firstEvalFileId);
+  ASSERT_EQ(frame.location.line, 3);
+
+  frame = stackTrace.callFrameForIndex(frameIndex++);
+  ASSERT_EQ(frame.functionName, "level2");
+  ASSERT_EQ(frame.location.fileName, "");
+  ASSERT_EQ(frame.location.fileId, secondEvalFileId);
+  ASSERT_EQ(frame.location.line, 7);
+
+  frame = stackTrace.callFrameForIndex(frameIndex++);
+  ASSERT_EQ(frame.functionName, "level1");
+  ASSERT_EQ(frame.location.fileName, "");
+  ASSERT_EQ(frame.location.fileId, secondEvalFileId);
+  ASSERT_EQ(frame.location.line, 11);
+
+  frame = stackTrace.callFrameForIndex(frameIndex++);
+  ASSERT_EQ(frame.functionName, "eval");
+  ASSERT_EQ(frame.location.fileName, "");
+  ASSERT_EQ(frame.location.fileId, secondEvalFileId);
+  ASSERT_EQ(frame.location.line, 14);
+
+  frame = stackTrace.callFrameForIndex(frameIndex++);
+  ASSERT_EQ(frame.functionName, "(native)");
+  ASSERT_EQ(frame.location.fileName, "");
+  ASSERT_EQ(frame.location.fileId, kInvalidLocation);
+  ASSERT_EQ(frame.location.line, kInvalidLocation);
+}
+
+TEST_F(DebuggerAPITest, GetLoadedScriptsTest) {
+  // Don't use the member runtime, as we don't want to
+  // trigger the observer on script loads.
+  std::unique_ptr<HermesRuntime> runtime = makeHermesRuntime(
+      ((hermes::vm::RuntimeConfig::Builder())
+           .withCompilationMode(
+               hermes::vm::CompilationMode::ForceLazyCompilation)
+           .build()));
+
+  auto scripts = runtime->getDebugger().getLoadedScripts();
+  EXPECT_EQ(scripts.size(), 0);
+
+  runtime->global()
+      .getPropertyAsFunction(*runtime, "eval")
+      .call(*runtime, "var x = 1;");
+  scripts = runtime->getDebugger().getLoadedScripts();
+  EXPECT_EQ(scripts.size(), 1);
+  EXPECT_EQ(scripts[0].line, 1);
+  EXPECT_EQ(scripts[0].column, 1);
+  EXPECT_EQ(scripts[0].fileName, "");
+
+  bool foundJavaScript = false;
+  bool foundTestJs = false;
+  // Use a script containing a function (in combination with forced lazy
+  // compilation in the test setup) to cause multiple runtime modules for this
+  // single script, allowing this test to verify we don't get duplicate
+  // results.
+  runtime->debugJavaScript("(function(){var x = 2;})()", "Test.js", {});
+  scripts = runtime->getDebugger().getLoadedScripts();
+  EXPECT_EQ(scripts.size(), 2);
+  for (auto script : scripts) {
+    if (script.fileName == "") {
+      EXPECT_EQ(script.line, 1);
+      EXPECT_EQ(script.column, 1);
+      foundJavaScript = true;
+    } else if (script.fileName == "Test.js") {
+      EXPECT_EQ(script.line, 1);
+      EXPECT_EQ(script.column, 1);
+      foundTestJs = true;
+    }
+  }
+  EXPECT_TRUE(foundJavaScript);
+  EXPECT_TRUE(foundTestJs);
+
+  bool foundGC = false;
+  bool foundAfterGC = false;
+  runtime->debugJavaScript("gc();", "gc.js", {});
+  runtime->debugJavaScript("var y = 1;", "after-gc.js", {});
+  scripts = runtime->getDebugger().getLoadedScripts();
+  // The 2 scripts prior to gc(); got cleaned up
+  EXPECT_EQ(scripts.size(), 2);
+  for (auto script : scripts) {
+    if (script.fileName == "gc.js") {
+      foundGC = true;
+    } else if (script.fileName == "after-gc.js") {
+      foundAfterGC = true;
+    }
+  }
+  EXPECT_TRUE(foundGC);
+  EXPECT_TRUE(foundAfterGC);
+}
+
+// Regression test: the source passed to Runtime::run must not be borrowed when
+// the compiled module retains its source buffer, which it does under the
+// debugger (full debug info). Here the source string is destroyed right after
+// debugJavaScript returns. A later by-line breakpoint resolution walks every
+// runtime module's source; with eager compilation this used to borrow the
+// source string, so the read hit freed memory (ASan: heap-use-after-free in
+// SourceErrorManager::findForCoordsImpl). The buffer must own its bytes.
+TEST_F(DebuggerAPITest, RunDoesNotBorrowTransientSourceTest) {
+  // Force eager compilation so Runtime::run takes the (previously) borrowing
+  // path; lazy compilation already copied the source.
+  std::unique_ptr<HermesRuntime> runtime = makeHermesRuntime(
+      hermes::vm::RuntimeConfig::Builder()
+          .withCompilationMode(
+              hermes::vm::CompilationMode::ForceEagerCompilation)
+          .build());
+
+  {
+    // Heap-allocated (non-SSO) source that is freed at the end of this scope,
+    // immediately after compilation completes.
+    std::string transientSource =
+        "function foo() {\n  var x = 1;\n  return x;\n}\nfoo();\n";
+    runtime->debugJavaScript(transientSource, "transient.js", {});
+  }
+
+  // Resolving a by-line breakpoint (no column) walks each module's source via
+  // findSMRangeForLine; if the module borrowed the now-freed source, this reads
+  // freed memory. With the fix the buffer is owned, so this is safe.
+  SourceLocation loc;
+  loc.line = 3; // 'return x;'
+  runtime->getDebugger().setBreakpoint(loc);
+
+  // Reaching here without an ASan failure is the assertion; also confirm the
+  // runtime is still usable.
+  EXPECT_EQ(
+      7,
+      runtime->global()
+          .getPropertyAsFunction(*runtime, "eval")
+          .call(*runtime, "3 + 4")
+          .asNumber());
+}
+
+TEST_F(DebuggerAPITest, ImplicitAsyncPauseTest) {
+  rt->getDebugger().triggerAsyncPause(AsyncPauseKind::Implicit);
+  eval("var x = 5;");
+  EXPECT_EQ(
+      std::vector<PauseReason>({PauseReason::AsyncTriggerImplicit}),
+      observer.pauseReasons);
+}
+
+TEST_F(DebuggerAPITest, ExplicitAsyncPauseTest) {
+  rt->getDebugger().triggerAsyncPause(AsyncPauseKind::Explicit);
+  eval("var x = 5;");
+  EXPECT_EQ(
+      std::vector<PauseReason>({PauseReason::AsyncTriggerExplicit}),
+      observer.pauseReasons);
+}
+
+TEST_F(DebuggerAPITest, ImplicitAndExplicitAsyncPauseTest) {
+  rt->getDebugger().triggerAsyncPause(AsyncPauseKind::Explicit);
+  rt->getDebugger().triggerAsyncPause(AsyncPauseKind::Implicit);
+  eval("var x = 5;");
+  // Current implementation uses flags to track if Implicit or Explicit has been
+  // requested, so there is no ordering information. This test just demonstrates
+  // that the order the PauseReason gets process could be in different order.
+  EXPECT_EQ(
+      std::vector<PauseReason>(
+          {PauseReason::AsyncTriggerImplicit,
+           PauseReason::AsyncTriggerExplicit}),
+      observer.pauseReasons);
+}
+
+TEST_F(DebuggerAPITest, GetScopes) {
+  // Pause with 4 variables in scope.
+  eval(R"(
+    (function testFunction(one) {
+      let two = 2;
+      if (one > 0) {
+        let three = 3;
+        try {
+          let four = 4;
+          debugger;
+        } catch (err) {}
+      }
+    })(1);
+  )");
+
+  EXPECT_EQ(
+      std::vector<PauseReason>({PauseReason::DebuggerStatement}),
+      observer.pauseReasons);
+
+  EXPECT_GT(observer.lexicalInfos.size(), 0);
+  auto &lexicalInfo = observer.lexicalInfos[0];
+  EXPECT_GT(lexicalInfo.getScopesCount(), 0);
+  EXPECT_EQ(lexicalInfo.getVariablesCountInScope(0), 1);
+}
+
+namespace {
+// A class which adapts a Hermes buffer to a jsi buffer.
+class BufferAdapter final : public facebook::jsi::Buffer {
+ public:
+  BufferAdapter(std::unique_ptr<hermes::Buffer> buf) : buf_(std::move(buf)) {}
+
+  const uint8_t *data() const override {
+    return buf_->data();
+  }
+
+  size_t size() const override {
+    return buf_->size();
+  }
+
+ private:
+  std::unique_ptr<hermes::Buffer> buf_;
+};
+
+/// \return the bytecode buffer for the async break test.
+static std::unique_ptr<hermes::Buffer> makeAsyncBreakCode() {
+  using Loc = hermes::hbc::DebugSourceLocation;
+  hermes::hbc::SimpleBytecodeBuilder builder;
+  hermes::hbc::BytecodeInstructionGenerator instGen;
+
+  hermes::hbc::DebugInfo debugInfo{};
+  hermes::hbc::DebugInfoGenerator debugGen{debugInfo};
+  debugGen.addFilename("test.js");
+
+  instGen.emitAsyncBreakCheck();
+  uint32_t offset = instGen.getCurrentLocation();
+  instGen.emitAddEmptyString(0, 0);
+  instGen.emitRet(0);
+
+  debugGen.appendSourceLocations(
+      Loc{0, 1, 0, 0, 0}, // Use filename 1 to generate a region.
+      0,
+      {
+          // AsyncBreakCheck, offset 0 has no source location
+          Loc{0, 0, 0, 0, 0},
+          // AddEmptyString, offset 1 has statement 1
+          Loc{offset, 0, 1, 1, 1},
+      });
+  std::move(debugGen).generate();
+  builder.setDebugInfo(&debugInfo);
+
+  EXPECT_FALSE(debugInfo.getLocationForAddress(0, 0).hasValue());
+  EXPECT_TRUE(debugInfo.getLocationForAddress(0, offset).hasValue());
+
+  builder.addFunction(1, 1, instGen.acquireBytecode());
+
+  return builder.generateBytecodeBuffer();
+};
+
+/// \return the bytecode buffer for a module in which no instruction has a
+/// source location, so that servicing an async break has to walk all the way
+/// to the Ret to look for a valid pause location.
+static std::unique_ptr<hermes::Buffer> makeAsyncBreakAtRetCode() {
+  using Loc = hermes::hbc::DebugSourceLocation;
+  hermes::hbc::SimpleBytecodeBuilder builder;
+  hermes::hbc::BytecodeInstructionGenerator instGen;
+
+  hermes::hbc::DebugInfo debugInfo{};
+  hermes::hbc::DebugInfoGenerator debugGen{debugInfo};
+  debugGen.addFilename("ret.js");
+
+  instGen.emitAsyncBreakCheck();
+  uint32_t addOffset = instGen.getCurrentLocation();
+  instGen.emitAddEmptyString(0, 0);
+  uint32_t retOffset = instGen.getCurrentLocation();
+  instGen.emitRet(0);
+
+  debugGen.appendSourceLocations(
+      Loc{0, 1, 0, 0, 0}, // Use filename 1 to generate a region.
+      0,
+      {
+          // AsyncBreakCheck, offset 0 has no source location.
+          Loc{0, 0, 0, 0, 0},
+      });
+  std::move(debugGen).generate();
+  builder.setDebugInfo(&debugInfo);
+
+  EXPECT_FALSE(debugInfo.getLocationForAddress(0, 0).hasValue());
+  EXPECT_FALSE(debugInfo.getLocationForAddress(0, addOffset).hasValue());
+  EXPECT_FALSE(debugInfo.getLocationForAddress(0, retOffset).hasValue());
+
+  builder.addFunction(1, 1, instGen.acquireBytecode());
+
+  return builder.generateBytecodeBuffer();
+};
+
+} // namespace
+
+TEST_F(DebuggerAPITest, ExplicitAsyncBreakLocationTest) {
+  observer.useCaptureStackTrace = true;
+  auto buffer = makeAsyncBreakCode();
+  rt->getDebugger().triggerAsyncPause(AsyncPauseKind::Explicit);
+  rt->evaluateJavaScript(
+      std::make_shared<BufferAdapter>(std::move(buffer)), "test.js");
+  EXPECT_EQ(
+      std::vector<PauseReason>({PauseReason::AsyncTriggerExplicit}),
+      observer.pauseReasons);
+  ASSERT_EQ(observer.stackTraces.size(), 1);
+  EXPECT_EQ(observer.stackTraces.front().callFrameForIndex(0).location.line, 1);
+}
+
+TEST_F(DebuggerAPITest, ImplicitAsyncBreakLocationTest) {
+  observer.useCaptureStackTrace = true;
+  auto buffer = makeAsyncBreakCode();
+  rt->getDebugger().triggerAsyncPause(AsyncPauseKind::Implicit);
+  rt->evaluateJavaScript(
+      std::make_shared<BufferAdapter>(std::move(buffer)), "test.js");
+  EXPECT_EQ(
+      std::vector<PauseReason>({PauseReason::AsyncTriggerImplicit}),
+      observer.pauseReasons);
+  ASSERT_EQ(observer.stackTraces.size(), 1);
+  EXPECT_EQ(observer.stackTraces.front().callFrameForIndex(0).location.line, 1);
+}
+
+TEST_F(DebuggerAPITest, ImplicitAsyncBreakAtRetTest) {
+  // Looking for a valid pause location walks to a Ret, which must not
+  // synthesize a step out: there is no step in progress, so preStepState_
+  // holds no meaningful value and the pending implicit trigger, not
+  // StepFinish, is the reason for the pause that eventually happens.
+  auto buffer = makeAsyncBreakAtRetCode();
+  rt->getDebugger().triggerAsyncPause(AsyncPauseKind::Implicit);
+  rt->evaluateJavaScript(
+      std::make_shared<BufferAdapter>(std::move(buffer)), "ret.js");
+
+  // Walking to the Ret leaves every code block breakpointed, so the next
+  // script pauses on entry. That is where the trigger gets delivered.
+  eval("var x = 5;");
+
+  EXPECT_EQ(
+      std::vector<PauseReason>({PauseReason::AsyncTriggerImplicit}),
+      observer.pauseReasons);
+}
+
+#endif

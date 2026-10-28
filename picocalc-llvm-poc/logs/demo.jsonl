@@ -1,0 +1,17 @@
+{"event": "jitd_ready", "protocol": "unix socket / jsonl", "separate_pid": 4015}
+{"event":"status","ok":true,"epoch":1,"schema":1,"score":0,"ticks":0,"flags":0,"code_slot":"0x100000"}
+{"event":"dispatch","ok":true,"epoch":1,"schema":1,"score":3,"ticks":1,"flags":0,"steps":15,"effects":[3],"pixels":0}
+{"event":"expect","key":"score","value":3,"ok":true}
+{"event":"queue","epoch":1}
+{"event":"reload","ok":true,"epoch":2,"schema":2,"score":3,"ticks":1,"flags":42,"migration_steps":8,"code_slot":"0x200000"}
+{"event":"expect","key":"flags","value":42,"ok":true}
+{"event":"expect","key":"schema","value":2,"ok":true}
+{"event":"stale","queued_epoch":1,"current_epoch":2}
+{"event":"dispatch","ok":true,"epoch":2,"schema":2,"score":43,"ticks":2,"flags":42,"steps":17,"effects":[43],"pixels":0}
+{"event":"expect","key":"score","value":43,"ok":true}
+{"event":"expect","key":"epoch","value":2,"ok":true}
+{"event":"reload","ok":false,"epoch":2,"schema":2,"score":43,"ticks":2,"flags":42,"reason":"world abort 33"}
+{"event":"expect","key":"epoch","value":2,"ok":true}
+{"event":"dispatch","ok":true,"epoch":2,"schema":2,"score":53,"ticks":3,"flags":42,"steps":17,"effects":[53],"pixels":0}
+{"event":"expect","key":"score","value":53,"ok":true}
+{"event":"status","ok":true,"epoch":2,"schema":2,"score":53,"ticks":3,"flags":42,"code_slot":"0x200000"}

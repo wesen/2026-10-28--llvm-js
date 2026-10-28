@@ -1,0 +1,7 @@
+# ASan and UBSan command and result
+c++ -std=c++17 -O1 -g -fsanitize=address,undefined -fno-omit-frame-pointer -Iinclude kernel/pico_sim.cpp -o build/pico-sim-sanitize
+{"event":"dispatch","ok":true,"epoch":1,"schema":1,"score":5,"ticks":1,"flags":0,"steps":15,"effects":[5],"pixels":0}
+{"event":"reload","ok":true,"epoch":2,"schema":2,"score":5,"ticks":1,"flags":42,"migration_steps":8,"code_slot":"0x200000"}
+{"event":"dispatch","ok":true,"epoch":2,"schema":2,"score":15,"ticks":1,"flags":42,"steps":11,"effects":[15],"pixels":0}
+{"event":"expect","key":"score","value":15,"ok":true}
+# No sanitizer diagnostics emitted

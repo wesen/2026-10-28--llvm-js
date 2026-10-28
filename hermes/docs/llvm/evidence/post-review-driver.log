@@ -1,0 +1,19 @@
+python3 utils/shllvm.py run examples/llvm/counter.js -o /workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-driver-review/counter-native
+exit=0
+41 42 42 105
+{"value":42,"description":"captured state"}
+7,14,21
+50
+example 52
+
+CMake: [{"command": ["/tmp/llvm-direct-toolchain/python-tools/cmake/data/bin/cmake", "--build", "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm", "--target", "shllvm_runtime", "shllvm_runtime_shared", "--parallel", "3"], "exit_code": 0, "seconds": 4.832687, "stdout": "[1/13] Linking C static library lib/libshllvm_runtime.a\n[2/13] Linking CXX executable bin/hermesc\n[3/13] Generating ExtensionsBytecode.hbc\n[4/13] Generating ExtensionsBytecode.inc\n[5/13] Generating InternalBytecode.hbc\n[6/13] Generating InternalBytecode.inc\n[7/13] Building CXX object API/hermes/CMakeFiles/hermesapi_obj.dir/extensions/ExtensionsBytecode.cpp.o\n[8/13] Linking CXX static library API/hermes/libhermesapi.a\n[9/13] Building CXX object lib/InternalJavaScript/CMakeFiles/hermesInternalBytecode_obj.dir/InternalBytecode.cpp.o\n[10/13] Linking CXX static library lib/libhermesvm_a.a\n[11/13] Linking CXX shared library lib/libhermesvm.so\n[12/13] Linking CXX shared library tools/shermes/libshermes_console.so\n[13/13] Linking C shared library lib/libshllvm_runtime.so\n", "stderr": ""}]
+
+python3 utils/shllvm.py jit examples/llvm/counter.js -o /workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-driver-review/counter-jit
+exit=0
+41 42 42 105
+{"value":42,"description":"captured state"}
+7,14,21
+50
+example 52
+
+CMake: [{"command": ["/tmp/llvm-direct-toolchain/python-tools/cmake/data/bin/cmake", "--build", "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm", "--target", "shllvm_runtime", "shllvm_runtime_shared", "--parallel", "3"], "exit_code": 0, "seconds": 0.037562, "stdout": "ninja: no work to do.\n", "stderr": ""}]

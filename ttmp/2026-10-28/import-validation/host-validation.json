@@ -1,0 +1,4174 @@
+{
+  "generated_at_unix": 1793223274.906309,
+  "source_cases": 22,
+  "passed_cases": 22,
+  "failed_cases": 0,
+  "native_llvm_vs_node_and_c_comparisons": 64,
+  "hermes_optimization_levels": [
+    "O0",
+    "O"
+  ],
+  "llvm_optimization_levels": [
+    "0",
+    "2"
+  ],
+  "asan_options": "",
+  "lsan_options": "",
+  "scope": "host native and optional lli execution; not device execution or full ECMAScript conformance",
+  "results": [
+    {
+      "name": "accessors.js",
+      "kind": "positive",
+      "passed": true,
+      "llvm_native_comparisons": 4,
+      "records": [
+        {
+          "stage": "node",
+          "command": [
+            "/home/manuel/.nvm/versions/node/v24.18.0/bin/node",
+            "--expose-gc",
+            "-e",
+            "globalThis.print = (...a) => console.log(...a); require(process.argv[1]);",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/test/LLVMNative/accessors.js"
+          ],
+          "exit_code": 0,
+          "stdout": "42 gsg 42\n8 _x,x,add\n",
+          "stderr": "",
+          "seconds": 0.031791
+        },
+        {
+          "stage": "c-build",
+          "hermes_opt": "O0",
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/bin/shermes",
+            "-O0",
+            "-Xes6-block-scoping",
+            "-Xenable-tdz",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/test/LLVMNative/accessors.js",
+            "-o",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/accessors-O0-c"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "",
+          "seconds": 0.123497
+        },
+        {
+          "stage": "c-run",
+          "hermes_opt": "O0",
+          "matches_node": true,
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/accessors-O0-c"
+          ],
+          "exit_code": 0,
+          "stdout": "42 gsg 42\n8 _x,x,add\n",
+          "stderr": "",
+          "seconds": 0.004325
+        },
+        {
+          "stage": "llvm-build",
+          "hermes_opt": "O0",
+          "llvm_opt": "0",
+          "command": [
+            "/home/manuel/.pyenv/versions/3.13.2/bin/python3",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/utils/shllvm.py",
+            "build",
+            "--build-dir",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm",
+            "--llvm-bin",
+            "/usr/lib/llvm-18/bin",
+            "--no-runtime-build",
+            "--hermes-opt",
+            "O0",
+            "--llvm-opt",
+            "0",
+            "-o",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/accessors-O0-llvm0",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/test/LLVMNative/accessors.js"
+          ],
+          "exit_code": 0,
+          "stdout": "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/accessors-O0-llvm0\n",
+          "stderr": "",
+          "seconds": 0.170702
+        },
+        {
+          "stage": "llvm-run",
+          "hermes_opt": "O0",
+          "llvm_opt": "0",
+          "matches_node_and_c": true,
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/accessors-O0-llvm0"
+          ],
+          "exit_code": 0,
+          "stdout": "42 gsg 42\n8 _x,x,add\n",
+          "stderr": "",
+          "seconds": 0.004074
+        },
+        {
+          "stage": "llvm-build",
+          "hermes_opt": "O0",
+          "llvm_opt": "2",
+          "command": [
+            "/home/manuel/.pyenv/versions/3.13.2/bin/python3",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/utils/shllvm.py",
+            "build",
+            "--build-dir",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm",
+            "--llvm-bin",
+            "/usr/lib/llvm-18/bin",
+            "--no-runtime-build",
+            "--hermes-opt",
+            "O0",
+            "--llvm-opt",
+            "2",
+            "-o",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/accessors-O0-llvm2",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/test/LLVMNative/accessors.js"
+          ],
+          "exit_code": 0,
+          "stdout": "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/accessors-O0-llvm2\n",
+          "stderr": "",
+          "seconds": 0.204079
+        },
+        {
+          "stage": "llvm-run",
+          "hermes_opt": "O0",
+          "llvm_opt": "2",
+          "matches_node_and_c": true,
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/accessors-O0-llvm2"
+          ],
+          "exit_code": 0,
+          "stdout": "42 gsg 42\n8 _x,x,add\n",
+          "stderr": "",
+          "seconds": 0.004325
+        },
+        {
+          "stage": "c-build",
+          "hermes_opt": "O",
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/bin/shermes",
+            "-O",
+            "-Xes6-block-scoping",
+            "-Xenable-tdz",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/test/LLVMNative/accessors.js",
+            "-o",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/accessors-O-c"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "",
+          "seconds": 0.211032
+        },
+        {
+          "stage": "c-run",
+          "hermes_opt": "O",
+          "matches_node": true,
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/accessors-O-c"
+          ],
+          "exit_code": 0,
+          "stdout": "42 gsg 42\n8 _x,x,add\n",
+          "stderr": "",
+          "seconds": 0.004608
+        },
+        {
+          "stage": "llvm-build",
+          "hermes_opt": "O",
+          "llvm_opt": "0",
+          "command": [
+            "/home/manuel/.pyenv/versions/3.13.2/bin/python3",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/utils/shllvm.py",
+            "build",
+            "--build-dir",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm",
+            "--llvm-bin",
+            "/usr/lib/llvm-18/bin",
+            "--no-runtime-build",
+            "--hermes-opt",
+            "O",
+            "--llvm-opt",
+            "0",
+            "-o",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/accessors-O-llvm0",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/test/LLVMNative/accessors.js"
+          ],
+          "exit_code": 0,
+          "stdout": "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/accessors-O-llvm0\n",
+          "stderr": "",
+          "seconds": 0.197948
+        },
+        {
+          "stage": "llvm-run",
+          "hermes_opt": "O",
+          "llvm_opt": "0",
+          "matches_node_and_c": true,
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/accessors-O-llvm0"
+          ],
+          "exit_code": 0,
+          "stdout": "42 gsg 42\n8 _x,x,add\n",
+          "stderr": "",
+          "seconds": 0.004548
+        },
+        {
+          "stage": "llvm-build",
+          "hermes_opt": "O",
+          "llvm_opt": "2",
+          "command": [
+            "/home/manuel/.pyenv/versions/3.13.2/bin/python3",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/utils/shllvm.py",
+            "build",
+            "--build-dir",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm",
+            "--llvm-bin",
+            "/usr/lib/llvm-18/bin",
+            "--no-runtime-build",
+            "--hermes-opt",
+            "O",
+            "--llvm-opt",
+            "2",
+            "-o",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/accessors-O-llvm2",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/test/LLVMNative/accessors.js"
+          ],
+          "exit_code": 0,
+          "stdout": "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/accessors-O-llvm2\n",
+          "stderr": "",
+          "seconds": 0.237585
+        },
+        {
+          "stage": "llvm-run",
+          "hermes_opt": "O",
+          "llvm_opt": "2",
+          "matches_node_and_c": true,
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/accessors-O-llvm2"
+          ],
+          "exit_code": 0,
+          "stdout": "42 gsg 42\n8 _x,x,add\n",
+          "stderr": "",
+          "seconds": 0.007413
+        }
+      ]
+    },
+    {
+      "name": "arguments.js",
+      "kind": "positive",
+      "passed": true,
+      "llvm_native_comparisons": 4,
+      "records": [
+        {
+          "stage": "node",
+          "command": [
+            "/home/manuel/.nvm/versions/node/v24.18.0/bin/node",
+            "--expose-gc",
+            "-e",
+            "globalThis.print = (...a) => console.log(...a); require(process.argv[1]);",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/test/LLVMNative/arguments.js"
+          ],
+          "exit_code": 0,
+          "stdout": "3:7:9 42 42\n",
+          "stderr": "",
+          "seconds": 0.032375
+        },
+        {
+          "stage": "c-build",
+          "hermes_opt": "O0",
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/bin/shermes",
+            "-O0",
+            "-Xes6-block-scoping",
+            "-Xenable-tdz",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/test/LLVMNative/arguments.js",
+            "-o",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/arguments-O0-c"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "",
+          "seconds": 0.12287
+        },
+        {
+          "stage": "c-run",
+          "hermes_opt": "O0",
+          "matches_node": true,
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/arguments-O0-c"
+          ],
+          "exit_code": 0,
+          "stdout": "3:7:9 42 42\n",
+          "stderr": "",
+          "seconds": 0.004322
+        },
+        {
+          "stage": "llvm-build",
+          "hermes_opt": "O0",
+          "llvm_opt": "0",
+          "command": [
+            "/home/manuel/.pyenv/versions/3.13.2/bin/python3",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/utils/shllvm.py",
+            "build",
+            "--build-dir",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm",
+            "--llvm-bin",
+            "/usr/lib/llvm-18/bin",
+            "--no-runtime-build",
+            "--hermes-opt",
+            "O0",
+            "--llvm-opt",
+            "0",
+            "-o",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/arguments-O0-llvm0",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/test/LLVMNative/arguments.js"
+          ],
+          "exit_code": 0,
+          "stdout": "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/arguments-O0-llvm0\n",
+          "stderr": "",
+          "seconds": 0.168254
+        },
+        {
+          "stage": "llvm-run",
+          "hermes_opt": "O0",
+          "llvm_opt": "0",
+          "matches_node_and_c": true,
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/arguments-O0-llvm0"
+          ],
+          "exit_code": 0,
+          "stdout": "3:7:9 42 42\n",
+          "stderr": "",
+          "seconds": 0.00443
+        },
+        {
+          "stage": "llvm-build",
+          "hermes_opt": "O0",
+          "llvm_opt": "2",
+          "command": [
+            "/home/manuel/.pyenv/versions/3.13.2/bin/python3",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/utils/shllvm.py",
+            "build",
+            "--build-dir",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm",
+            "--llvm-bin",
+            "/usr/lib/llvm-18/bin",
+            "--no-runtime-build",
+            "--hermes-opt",
+            "O0",
+            "--llvm-opt",
+            "2",
+            "-o",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/arguments-O0-llvm2",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/test/LLVMNative/arguments.js"
+          ],
+          "exit_code": 0,
+          "stdout": "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/arguments-O0-llvm2\n",
+          "stderr": "",
+          "seconds": 0.206984
+        },
+        {
+          "stage": "llvm-run",
+          "hermes_opt": "O0",
+          "llvm_opt": "2",
+          "matches_node_and_c": true,
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/arguments-O0-llvm2"
+          ],
+          "exit_code": 0,
+          "stdout": "3:7:9 42 42\n",
+          "stderr": "",
+          "seconds": 0.004067
+        },
+        {
+          "stage": "c-build",
+          "hermes_opt": "O",
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/bin/shermes",
+            "-O",
+            "-Xes6-block-scoping",
+            "-Xenable-tdz",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/test/LLVMNative/arguments.js",
+            "-o",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/arguments-O-c"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "",
+          "seconds": 0.207749
+        },
+        {
+          "stage": "c-run",
+          "hermes_opt": "O",
+          "matches_node": true,
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/arguments-O-c"
+          ],
+          "exit_code": 0,
+          "stdout": "3:7:9 42 42\n",
+          "stderr": "",
+          "seconds": 0.005007
+        },
+        {
+          "stage": "llvm-build",
+          "hermes_opt": "O",
+          "llvm_opt": "0",
+          "command": [
+            "/home/manuel/.pyenv/versions/3.13.2/bin/python3",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/utils/shllvm.py",
+            "build",
+            "--build-dir",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm",
+            "--llvm-bin",
+            "/usr/lib/llvm-18/bin",
+            "--no-runtime-build",
+            "--hermes-opt",
+            "O",
+            "--llvm-opt",
+            "0",
+            "-o",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/arguments-O-llvm0",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/test/LLVMNative/arguments.js"
+          ],
+          "exit_code": 0,
+          "stdout": "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/arguments-O-llvm0\n",
+          "stderr": "",
+          "seconds": 0.191443
+        },
+        {
+          "stage": "llvm-run",
+          "hermes_opt": "O",
+          "llvm_opt": "0",
+          "matches_node_and_c": true,
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/arguments-O-llvm0"
+          ],
+          "exit_code": 0,
+          "stdout": "3:7:9 42 42\n",
+          "stderr": "",
+          "seconds": 0.004445
+        },
+        {
+          "stage": "llvm-build",
+          "hermes_opt": "O",
+          "llvm_opt": "2",
+          "command": [
+            "/home/manuel/.pyenv/versions/3.13.2/bin/python3",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/utils/shllvm.py",
+            "build",
+            "--build-dir",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm",
+            "--llvm-bin",
+            "/usr/lib/llvm-18/bin",
+            "--no-runtime-build",
+            "--hermes-opt",
+            "O",
+            "--llvm-opt",
+            "2",
+            "-o",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/arguments-O-llvm2",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/test/LLVMNative/arguments.js"
+          ],
+          "exit_code": 0,
+          "stdout": "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/arguments-O-llvm2\n",
+          "stderr": "",
+          "seconds": 0.269832
+        },
+        {
+          "stage": "llvm-run",
+          "hermes_opt": "O",
+          "llvm_opt": "2",
+          "matches_node_and_c": true,
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/arguments-O-llvm2"
+          ],
+          "exit_code": 0,
+          "stdout": "3:7:9 42 42\n",
+          "stderr": "",
+          "seconds": 0.004556
+        }
+      ]
+    },
+    {
+      "name": "arrays_callbacks.js",
+      "kind": "positive",
+      "passed": true,
+      "llvm_native_comparisons": 4,
+      "records": [
+        {
+          "stage": "node",
+          "command": [
+            "/home/manuel/.nvm/versions/node/v24.18.0/bin/node",
+            "--expose-gc",
+            "-e",
+            "globalThis.print = (...a) => console.log(...a); require(process.argv[1]);",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/test/LLVMNative/arrays_callbacks.js"
+          ],
+          "exit_code": 0,
+          "stdout": "2,4,6,8 18\n5 4 3\n3 false true\n0 1 2 3\n",
+          "stderr": "",
+          "seconds": 0.031436
+        },
+        {
+          "stage": "c-build",
+          "hermes_opt": "O0",
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/bin/shermes",
+            "-O0",
+            "-Xes6-block-scoping",
+            "-Xenable-tdz",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/test/LLVMNative/arrays_callbacks.js",
+            "-o",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/arrays_callbacks-O0-c"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "",
+          "seconds": 0.129331
+        },
+        {
+          "stage": "c-run",
+          "hermes_opt": "O0",
+          "matches_node": true,
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/arrays_callbacks-O0-c"
+          ],
+          "exit_code": 0,
+          "stdout": "2,4,6,8 18\n5 4 3\n3 false true\n0 1 2 3\n",
+          "stderr": "",
+          "seconds": 0.003572
+        },
+        {
+          "stage": "llvm-build",
+          "hermes_opt": "O0",
+          "llvm_opt": "0",
+          "command": [
+            "/home/manuel/.pyenv/versions/3.13.2/bin/python3",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/utils/shllvm.py",
+            "build",
+            "--build-dir",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm",
+            "--llvm-bin",
+            "/usr/lib/llvm-18/bin",
+            "--no-runtime-build",
+            "--hermes-opt",
+            "O0",
+            "--llvm-opt",
+            "0",
+            "-o",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/arrays_callbacks-O0-llvm0",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/test/LLVMNative/arrays_callbacks.js"
+          ],
+          "exit_code": 0,
+          "stdout": "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/arrays_callbacks-O0-llvm0\n",
+          "stderr": "",
+          "seconds": 0.177284
+        },
+        {
+          "stage": "llvm-run",
+          "hermes_opt": "O0",
+          "llvm_opt": "0",
+          "matches_node_and_c": true,
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/arrays_callbacks-O0-llvm0"
+          ],
+          "exit_code": 0,
+          "stdout": "2,4,6,8 18\n5 4 3\n3 false true\n0 1 2 3\n",
+          "stderr": "",
+          "seconds": 0.004268
+        },
+        {
+          "stage": "llvm-build",
+          "hermes_opt": "O0",
+          "llvm_opt": "2",
+          "command": [
+            "/home/manuel/.pyenv/versions/3.13.2/bin/python3",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/utils/shllvm.py",
+            "build",
+            "--build-dir",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm",
+            "--llvm-bin",
+            "/usr/lib/llvm-18/bin",
+            "--no-runtime-build",
+            "--hermes-opt",
+            "O0",
+            "--llvm-opt",
+            "2",
+            "-o",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/arrays_callbacks-O0-llvm2",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/test/LLVMNative/arrays_callbacks.js"
+          ],
+          "exit_code": 0,
+          "stdout": "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/arrays_callbacks-O0-llvm2\n",
+          "stderr": "",
+          "seconds": 0.239555
+        },
+        {
+          "stage": "llvm-run",
+          "hermes_opt": "O0",
+          "llvm_opt": "2",
+          "matches_node_and_c": true,
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/arrays_callbacks-O0-llvm2"
+          ],
+          "exit_code": 0,
+          "stdout": "2,4,6,8 18\n5 4 3\n3 false true\n0 1 2 3\n",
+          "stderr": "",
+          "seconds": 0.004477
+        },
+        {
+          "stage": "c-build",
+          "hermes_opt": "O",
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/bin/shermes",
+            "-O",
+            "-Xes6-block-scoping",
+            "-Xenable-tdz",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/test/LLVMNative/arrays_callbacks.js",
+            "-o",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/arrays_callbacks-O-c"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "",
+          "seconds": 0.216926
+        },
+        {
+          "stage": "c-run",
+          "hermes_opt": "O",
+          "matches_node": true,
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/arrays_callbacks-O-c"
+          ],
+          "exit_code": 0,
+          "stdout": "2,4,6,8 18\n5 4 3\n3 false true\n0 1 2 3\n",
+          "stderr": "",
+          "seconds": 0.004317
+        },
+        {
+          "stage": "llvm-build",
+          "hermes_opt": "O",
+          "llvm_opt": "0",
+          "command": [
+            "/home/manuel/.pyenv/versions/3.13.2/bin/python3",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/utils/shllvm.py",
+            "build",
+            "--build-dir",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm",
+            "--llvm-bin",
+            "/usr/lib/llvm-18/bin",
+            "--no-runtime-build",
+            "--hermes-opt",
+            "O",
+            "--llvm-opt",
+            "0",
+            "-o",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/arrays_callbacks-O-llvm0",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/test/LLVMNative/arrays_callbacks.js"
+          ],
+          "exit_code": 0,
+          "stdout": "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/arrays_callbacks-O-llvm0\n",
+          "stderr": "",
+          "seconds": 0.236893
+        },
+        {
+          "stage": "llvm-run",
+          "hermes_opt": "O",
+          "llvm_opt": "0",
+          "matches_node_and_c": true,
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/arrays_callbacks-O-llvm0"
+          ],
+          "exit_code": 0,
+          "stdout": "2,4,6,8 18\n5 4 3\n3 false true\n0 1 2 3\n",
+          "stderr": "",
+          "seconds": 0.006644
+        },
+        {
+          "stage": "llvm-build",
+          "hermes_opt": "O",
+          "llvm_opt": "2",
+          "command": [
+            "/home/manuel/.pyenv/versions/3.13.2/bin/python3",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/utils/shllvm.py",
+            "build",
+            "--build-dir",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm",
+            "--llvm-bin",
+            "/usr/lib/llvm-18/bin",
+            "--no-runtime-build",
+            "--hermes-opt",
+            "O",
+            "--llvm-opt",
+            "2",
+            "-o",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/arrays_callbacks-O-llvm2",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/test/LLVMNative/arrays_callbacks.js"
+          ],
+          "exit_code": 0,
+          "stdout": "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/arrays_callbacks-O-llvm2\n",
+          "stderr": "",
+          "seconds": 0.246019
+        },
+        {
+          "stage": "llvm-run",
+          "hermes_opt": "O",
+          "llvm_opt": "2",
+          "matches_node_and_c": true,
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/arrays_callbacks-O-llvm2"
+          ],
+          "exit_code": 0,
+          "stdout": "2,4,6,8 18\n5 4 3\n3 false true\n0 1 2 3\n",
+          "stderr": "",
+          "seconds": 0.004454
+        }
+      ]
+    },
+    {
+      "name": "arrows_this.js",
+      "kind": "positive",
+      "passed": true,
+      "llvm_native_comparisons": 4,
+      "records": [
+        {
+          "stage": "node",
+          "command": [
+            "/home/manuel/.nvm/versions/node/v24.18.0/bin/node",
+            "--expose-gc",
+            "-e",
+            "globalThis.print = (...a) => console.log(...a); require(process.argv[1]);",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/test/LLVMNative/arrows_this.js"
+          ],
+          "exit_code": 0,
+          "stdout": "42 43\n47\n42 42\n",
+          "stderr": "",
+          "seconds": 0.048932
+        },
+        {
+          "stage": "c-build",
+          "hermes_opt": "O0",
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/bin/shermes",
+            "-O0",
+            "-Xes6-block-scoping",
+            "-Xenable-tdz",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/test/LLVMNative/arrows_this.js",
+            "-o",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/arrows_this-O0-c"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "",
+          "seconds": 0.164974
+        },
+        {
+          "stage": "c-run",
+          "hermes_opt": "O0",
+          "matches_node": true,
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/arrows_this-O0-c"
+          ],
+          "exit_code": 0,
+          "stdout": "42 43\n47\n42 42\n",
+          "stderr": "",
+          "seconds": 0.004511
+        },
+        {
+          "stage": "llvm-build",
+          "hermes_opt": "O0",
+          "llvm_opt": "0",
+          "command": [
+            "/home/manuel/.pyenv/versions/3.13.2/bin/python3",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/utils/shllvm.py",
+            "build",
+            "--build-dir",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm",
+            "--llvm-bin",
+            "/usr/lib/llvm-18/bin",
+            "--no-runtime-build",
+            "--hermes-opt",
+            "O0",
+            "--llvm-opt",
+            "0",
+            "-o",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/arrows_this-O0-llvm0",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/test/LLVMNative/arrows_this.js"
+          ],
+          "exit_code": 0,
+          "stdout": "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/arrows_this-O0-llvm0\n",
+          "stderr": "",
+          "seconds": 0.200093
+        },
+        {
+          "stage": "llvm-run",
+          "hermes_opt": "O0",
+          "llvm_opt": "0",
+          "matches_node_and_c": true,
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/arrows_this-O0-llvm0"
+          ],
+          "exit_code": 0,
+          "stdout": "42 43\n47\n42 42\n",
+          "stderr": "",
+          "seconds": 0.005271
+        },
+        {
+          "stage": "llvm-build",
+          "hermes_opt": "O0",
+          "llvm_opt": "2",
+          "command": [
+            "/home/manuel/.pyenv/versions/3.13.2/bin/python3",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/utils/shllvm.py",
+            "build",
+            "--build-dir",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm",
+            "--llvm-bin",
+            "/usr/lib/llvm-18/bin",
+            "--no-runtime-build",
+            "--hermes-opt",
+            "O0",
+            "--llvm-opt",
+            "2",
+            "-o",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/arrows_this-O0-llvm2",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/test/LLVMNative/arrows_this.js"
+          ],
+          "exit_code": 0,
+          "stdout": "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/arrows_this-O0-llvm2\n",
+          "stderr": "",
+          "seconds": 0.253245
+        },
+        {
+          "stage": "llvm-run",
+          "hermes_opt": "O0",
+          "llvm_opt": "2",
+          "matches_node_and_c": true,
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/arrows_this-O0-llvm2"
+          ],
+          "exit_code": 0,
+          "stdout": "42 43\n47\n42 42\n",
+          "stderr": "",
+          "seconds": 0.005295
+        },
+        {
+          "stage": "c-build",
+          "hermes_opt": "O",
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/bin/shermes",
+            "-O",
+            "-Xes6-block-scoping",
+            "-Xenable-tdz",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/test/LLVMNative/arrows_this.js",
+            "-o",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/arrows_this-O-c"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "",
+          "seconds": 0.265437
+        },
+        {
+          "stage": "c-run",
+          "hermes_opt": "O",
+          "matches_node": true,
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/arrows_this-O-c"
+          ],
+          "exit_code": 0,
+          "stdout": "42 43\n47\n42 42\n",
+          "stderr": "",
+          "seconds": 0.006698
+        },
+        {
+          "stage": "llvm-build",
+          "hermes_opt": "O",
+          "llvm_opt": "0",
+          "command": [
+            "/home/manuel/.pyenv/versions/3.13.2/bin/python3",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/utils/shllvm.py",
+            "build",
+            "--build-dir",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm",
+            "--llvm-bin",
+            "/usr/lib/llvm-18/bin",
+            "--no-runtime-build",
+            "--hermes-opt",
+            "O",
+            "--llvm-opt",
+            "0",
+            "-o",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/arrows_this-O-llvm0",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/test/LLVMNative/arrows_this.js"
+          ],
+          "exit_code": 0,
+          "stdout": "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/arrows_this-O-llvm0\n",
+          "stderr": "",
+          "seconds": 0.236833
+        },
+        {
+          "stage": "llvm-run",
+          "hermes_opt": "O",
+          "llvm_opt": "0",
+          "matches_node_and_c": true,
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/arrows_this-O-llvm0"
+          ],
+          "exit_code": 0,
+          "stdout": "42 43\n47\n42 42\n",
+          "stderr": "",
+          "seconds": 0.005317
+        },
+        {
+          "stage": "llvm-build",
+          "hermes_opt": "O",
+          "llvm_opt": "2",
+          "command": [
+            "/home/manuel/.pyenv/versions/3.13.2/bin/python3",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/utils/shllvm.py",
+            "build",
+            "--build-dir",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm",
+            "--llvm-bin",
+            "/usr/lib/llvm-18/bin",
+            "--no-runtime-build",
+            "--hermes-opt",
+            "O",
+            "--llvm-opt",
+            "2",
+            "-o",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/arrows_this-O-llvm2",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/test/LLVMNative/arrows_this.js"
+          ],
+          "exit_code": 0,
+          "stdout": "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/arrows_this-O-llvm2\n",
+          "stderr": "",
+          "seconds": 0.255597
+        },
+        {
+          "stage": "llvm-run",
+          "hermes_opt": "O",
+          "llvm_opt": "2",
+          "matches_node_and_c": true,
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/arrows_this-O-llvm2"
+          ],
+          "exit_code": 0,
+          "stdout": "42 43\n47\n42 42\n",
+          "stderr": "",
+          "seconds": 0.004717
+        }
+      ]
+    },
+    {
+      "name": "catch_basic.js",
+      "kind": "positive",
+      "passed": true,
+      "llvm_native_comparisons": 4,
+      "records": [
+        {
+          "stage": "node",
+          "command": [
+            "/home/manuel/.nvm/versions/node/v24.18.0/bin/node",
+            "--expose-gc",
+            "-e",
+            "globalThis.print = (...a) => console.log(...a); require(process.argv[1]);",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/test/LLVMNative/catch_basic.js"
+          ],
+          "exit_code": 0,
+          "stdout": "1\n",
+          "stderr": "",
+          "seconds": 0.045085
+        },
+        {
+          "stage": "c-build",
+          "hermes_opt": "O0",
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/bin/shermes",
+            "-O0",
+            "-Xes6-block-scoping",
+            "-Xenable-tdz",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/test/LLVMNative/catch_basic.js",
+            "-o",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/catch_basic-O0-c"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "",
+          "seconds": 0.149722
+        },
+        {
+          "stage": "c-run",
+          "hermes_opt": "O0",
+          "matches_node": true,
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/catch_basic-O0-c"
+          ],
+          "exit_code": 0,
+          "stdout": "1\n",
+          "stderr": "",
+          "seconds": 0.004271
+        },
+        {
+          "stage": "llvm-build",
+          "hermes_opt": "O0",
+          "llvm_opt": "0",
+          "command": [
+            "/home/manuel/.pyenv/versions/3.13.2/bin/python3",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/utils/shllvm.py",
+            "build",
+            "--build-dir",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm",
+            "--llvm-bin",
+            "/usr/lib/llvm-18/bin",
+            "--no-runtime-build",
+            "--hermes-opt",
+            "O0",
+            "--llvm-opt",
+            "0",
+            "-o",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/catch_basic-O0-llvm0",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/test/LLVMNative/catch_basic.js"
+          ],
+          "exit_code": 0,
+          "stdout": "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/catch_basic-O0-llvm0\n",
+          "stderr": "",
+          "seconds": 0.194143
+        },
+        {
+          "stage": "llvm-run",
+          "hermes_opt": "O0",
+          "llvm_opt": "0",
+          "matches_node_and_c": true,
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/catch_basic-O0-llvm0"
+          ],
+          "exit_code": 0,
+          "stdout": "1\n",
+          "stderr": "",
+          "seconds": 0.004782
+        },
+        {
+          "stage": "llvm-build",
+          "hermes_opt": "O0",
+          "llvm_opt": "2",
+          "command": [
+            "/home/manuel/.pyenv/versions/3.13.2/bin/python3",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/utils/shllvm.py",
+            "build",
+            "--build-dir",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm",
+            "--llvm-bin",
+            "/usr/lib/llvm-18/bin",
+            "--no-runtime-build",
+            "--hermes-opt",
+            "O0",
+            "--llvm-opt",
+            "2",
+            "-o",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/catch_basic-O0-llvm2",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/test/LLVMNative/catch_basic.js"
+          ],
+          "exit_code": 0,
+          "stdout": "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/catch_basic-O0-llvm2\n",
+          "stderr": "",
+          "seconds": 0.222962
+        },
+        {
+          "stage": "llvm-run",
+          "hermes_opt": "O0",
+          "llvm_opt": "2",
+          "matches_node_and_c": true,
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/catch_basic-O0-llvm2"
+          ],
+          "exit_code": 0,
+          "stdout": "1\n",
+          "stderr": "",
+          "seconds": 0.005302
+        },
+        {
+          "stage": "c-build",
+          "hermes_opt": "O",
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/bin/shermes",
+            "-O",
+            "-Xes6-block-scoping",
+            "-Xenable-tdz",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/test/LLVMNative/catch_basic.js",
+            "-o",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/catch_basic-O-c"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "",
+          "seconds": 0.206224
+        },
+        {
+          "stage": "c-run",
+          "hermes_opt": "O",
+          "matches_node": true,
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/catch_basic-O-c"
+          ],
+          "exit_code": 0,
+          "stdout": "1\n",
+          "stderr": "",
+          "seconds": 0.004793
+        },
+        {
+          "stage": "llvm-build",
+          "hermes_opt": "O",
+          "llvm_opt": "0",
+          "command": [
+            "/home/manuel/.pyenv/versions/3.13.2/bin/python3",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/utils/shllvm.py",
+            "build",
+            "--build-dir",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm",
+            "--llvm-bin",
+            "/usr/lib/llvm-18/bin",
+            "--no-runtime-build",
+            "--hermes-opt",
+            "O",
+            "--llvm-opt",
+            "0",
+            "-o",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/catch_basic-O-llvm0",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/test/LLVMNative/catch_basic.js"
+          ],
+          "exit_code": 0,
+          "stdout": "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/catch_basic-O-llvm0\n",
+          "stderr": "",
+          "seconds": 0.229657
+        },
+        {
+          "stage": "llvm-run",
+          "hermes_opt": "O",
+          "llvm_opt": "0",
+          "matches_node_and_c": true,
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/catch_basic-O-llvm0"
+          ],
+          "exit_code": 0,
+          "stdout": "1\n",
+          "stderr": "",
+          "seconds": 0.004832
+        },
+        {
+          "stage": "llvm-build",
+          "hermes_opt": "O",
+          "llvm_opt": "2",
+          "command": [
+            "/home/manuel/.pyenv/versions/3.13.2/bin/python3",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/utils/shllvm.py",
+            "build",
+            "--build-dir",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm",
+            "--llvm-bin",
+            "/usr/lib/llvm-18/bin",
+            "--no-runtime-build",
+            "--hermes-opt",
+            "O",
+            "--llvm-opt",
+            "2",
+            "-o",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/catch_basic-O-llvm2",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/test/LLVMNative/catch_basic.js"
+          ],
+          "exit_code": 0,
+          "stdout": "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/catch_basic-O-llvm2\n",
+          "stderr": "",
+          "seconds": 0.235904
+        },
+        {
+          "stage": "llvm-run",
+          "hermes_opt": "O",
+          "llvm_opt": "2",
+          "matches_node_and_c": true,
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/catch_basic-O-llvm2"
+          ],
+          "exit_code": 0,
+          "stdout": "1\n",
+          "stderr": "",
+          "seconds": 0.005638
+        }
+      ]
+    },
+    {
+      "name": "classes.js",
+      "kind": "positive",
+      "passed": true,
+      "llvm_native_comparisons": 4,
+      "records": [
+        {
+          "stage": "node",
+          "command": [
+            "/home/manuel/.nvm/versions/node/v24.18.0/bin/node",
+            "--expose-gc",
+            "-e",
+            "globalThis.print = (...a) => console.log(...a); require(process.argv[1]);",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/test/LLVMNative/classes.js"
+          ],
+          "exit_code": 0,
+          "stdout": "35 30 42 true true base\nTypeError\n",
+          "stderr": "",
+          "seconds": 0.040354
+        },
+        {
+          "stage": "c-build",
+          "hermes_opt": "O0",
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/bin/shermes",
+            "-O0",
+            "-Xes6-block-scoping",
+            "-Xenable-tdz",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/test/LLVMNative/classes.js",
+            "-o",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/classes-O0-c"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "",
+          "seconds": 0.169593
+        },
+        {
+          "stage": "c-run",
+          "hermes_opt": "O0",
+          "matches_node": true,
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/classes-O0-c"
+          ],
+          "exit_code": 0,
+          "stdout": "35 30 42 true true base\nTypeError\n",
+          "stderr": "",
+          "seconds": 0.004697
+        },
+        {
+          "stage": "llvm-build",
+          "hermes_opt": "O0",
+          "llvm_opt": "0",
+          "command": [
+            "/home/manuel/.pyenv/versions/3.13.2/bin/python3",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/utils/shllvm.py",
+            "build",
+            "--build-dir",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm",
+            "--llvm-bin",
+            "/usr/lib/llvm-18/bin",
+            "--no-runtime-build",
+            "--hermes-opt",
+            "O0",
+            "--llvm-opt",
+            "0",
+            "-o",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/classes-O0-llvm0",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/test/LLVMNative/classes.js"
+          ],
+          "exit_code": 0,
+          "stdout": "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/classes-O0-llvm0\n",
+          "stderr": "",
+          "seconds": 0.215673
+        },
+        {
+          "stage": "llvm-run",
+          "hermes_opt": "O0",
+          "llvm_opt": "0",
+          "matches_node_and_c": true,
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/classes-O0-llvm0"
+          ],
+          "exit_code": 0,
+          "stdout": "35 30 42 true true base\nTypeError\n",
+          "stderr": "",
+          "seconds": 0.005514
+        },
+        {
+          "stage": "llvm-build",
+          "hermes_opt": "O0",
+          "llvm_opt": "2",
+          "command": [
+            "/home/manuel/.pyenv/versions/3.13.2/bin/python3",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/utils/shllvm.py",
+            "build",
+            "--build-dir",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm",
+            "--llvm-bin",
+            "/usr/lib/llvm-18/bin",
+            "--no-runtime-build",
+            "--hermes-opt",
+            "O0",
+            "--llvm-opt",
+            "2",
+            "-o",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/classes-O0-llvm2",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/test/LLVMNative/classes.js"
+          ],
+          "exit_code": 0,
+          "stdout": "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/classes-O0-llvm2\n",
+          "stderr": "",
+          "seconds": 0.281929
+        },
+        {
+          "stage": "llvm-run",
+          "hermes_opt": "O0",
+          "llvm_opt": "2",
+          "matches_node_and_c": true,
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/classes-O0-llvm2"
+          ],
+          "exit_code": 0,
+          "stdout": "35 30 42 true true base\nTypeError\n",
+          "stderr": "",
+          "seconds": 0.005027
+        },
+        {
+          "stage": "c-build",
+          "hermes_opt": "O",
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/bin/shermes",
+            "-O",
+            "-Xes6-block-scoping",
+            "-Xenable-tdz",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/test/LLVMNative/classes.js",
+            "-o",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/classes-O-c"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "",
+          "seconds": 0.296363
+        },
+        {
+          "stage": "c-run",
+          "hermes_opt": "O",
+          "matches_node": true,
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/classes-O-c"
+          ],
+          "exit_code": 0,
+          "stdout": "35 30 42 true true base\nTypeError\n",
+          "stderr": "",
+          "seconds": 0.006378
+        },
+        {
+          "stage": "llvm-build",
+          "hermes_opt": "O",
+          "llvm_opt": "0",
+          "command": [
+            "/home/manuel/.pyenv/versions/3.13.2/bin/python3",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/utils/shllvm.py",
+            "build",
+            "--build-dir",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm",
+            "--llvm-bin",
+            "/usr/lib/llvm-18/bin",
+            "--no-runtime-build",
+            "--hermes-opt",
+            "O",
+            "--llvm-opt",
+            "0",
+            "-o",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/classes-O-llvm0",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/test/LLVMNative/classes.js"
+          ],
+          "exit_code": 0,
+          "stdout": "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/classes-O-llvm0\n",
+          "stderr": "",
+          "seconds": 0.256549
+        },
+        {
+          "stage": "llvm-run",
+          "hermes_opt": "O",
+          "llvm_opt": "0",
+          "matches_node_and_c": true,
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/classes-O-llvm0"
+          ],
+          "exit_code": 0,
+          "stdout": "35 30 42 true true base\nTypeError\n",
+          "stderr": "",
+          "seconds": 0.005147
+        },
+        {
+          "stage": "llvm-build",
+          "hermes_opt": "O",
+          "llvm_opt": "2",
+          "command": [
+            "/home/manuel/.pyenv/versions/3.13.2/bin/python3",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/utils/shllvm.py",
+            "build",
+            "--build-dir",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm",
+            "--llvm-bin",
+            "/usr/lib/llvm-18/bin",
+            "--no-runtime-build",
+            "--hermes-opt",
+            "O",
+            "--llvm-opt",
+            "2",
+            "-o",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/classes-O-llvm2",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/test/LLVMNative/classes.js"
+          ],
+          "exit_code": 0,
+          "stdout": "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/classes-O-llvm2\n",
+          "stderr": "",
+          "seconds": 0.248246
+        },
+        {
+          "stage": "llvm-run",
+          "hermes_opt": "O",
+          "llvm_opt": "2",
+          "matches_node_and_c": true,
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/classes-O-llvm2"
+          ],
+          "exit_code": 0,
+          "stdout": "35 30 42 true true base\nTypeError\n",
+          "stderr": "",
+          "seconds": 0.004772
+        }
+      ]
+    },
+    {
+      "name": "closures.js",
+      "kind": "positive",
+      "passed": true,
+      "llvm_native_comparisons": 4,
+      "records": [
+        {
+          "stage": "node",
+          "command": [
+            "/home/manuel/.nvm/versions/node/v24.18.0/bin/node",
+            "--expose-gc",
+            "-e",
+            "globalThis.print = (...a) => console.log(...a); require(process.argv[1]);",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/test/LLVMNative/closures.js"
+          ],
+          "exit_code": 0,
+          "stdout": "41 42 41 41 101 41\n42 43\n210\n",
+          "stderr": "",
+          "seconds": 0.048708
+        },
+        {
+          "stage": "c-build",
+          "hermes_opt": "O0",
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/bin/shermes",
+            "-O0",
+            "-Xes6-block-scoping",
+            "-Xenable-tdz",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/test/LLVMNative/closures.js",
+            "-o",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/closures-O0-c"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "",
+          "seconds": 0.173736
+        },
+        {
+          "stage": "c-run",
+          "hermes_opt": "O0",
+          "matches_node": true,
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/closures-O0-c"
+          ],
+          "exit_code": 0,
+          "stdout": "41 42 41 41 101 41\n42 43\n210\n",
+          "stderr": "",
+          "seconds": 0.004669
+        },
+        {
+          "stage": "llvm-build",
+          "hermes_opt": "O0",
+          "llvm_opt": "0",
+          "command": [
+            "/home/manuel/.pyenv/versions/3.13.2/bin/python3",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/utils/shllvm.py",
+            "build",
+            "--build-dir",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm",
+            "--llvm-bin",
+            "/usr/lib/llvm-18/bin",
+            "--no-runtime-build",
+            "--hermes-opt",
+            "O0",
+            "--llvm-opt",
+            "0",
+            "-o",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/closures-O0-llvm0",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/test/LLVMNative/closures.js"
+          ],
+          "exit_code": 0,
+          "stdout": "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/closures-O0-llvm0\n",
+          "stderr": "",
+          "seconds": 0.215028
+        },
+        {
+          "stage": "llvm-run",
+          "hermes_opt": "O0",
+          "llvm_opt": "0",
+          "matches_node_and_c": true,
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/closures-O0-llvm0"
+          ],
+          "exit_code": 0,
+          "stdout": "41 42 41 41 101 41\n42 43\n210\n",
+          "stderr": "",
+          "seconds": 0.006979
+        },
+        {
+          "stage": "llvm-build",
+          "hermes_opt": "O0",
+          "llvm_opt": "2",
+          "command": [
+            "/home/manuel/.pyenv/versions/3.13.2/bin/python3",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/utils/shllvm.py",
+            "build",
+            "--build-dir",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm",
+            "--llvm-bin",
+            "/usr/lib/llvm-18/bin",
+            "--no-runtime-build",
+            "--hermes-opt",
+            "O0",
+            "--llvm-opt",
+            "2",
+            "-o",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/closures-O0-llvm2",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/test/LLVMNative/closures.js"
+          ],
+          "exit_code": 0,
+          "stdout": "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/closures-O0-llvm2\n",
+          "stderr": "",
+          "seconds": 0.286
+        },
+        {
+          "stage": "llvm-run",
+          "hermes_opt": "O0",
+          "llvm_opt": "2",
+          "matches_node_and_c": true,
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/closures-O0-llvm2"
+          ],
+          "exit_code": 0,
+          "stdout": "41 42 41 41 101 41\n42 43\n210\n",
+          "stderr": "",
+          "seconds": 0.005561
+        },
+        {
+          "stage": "c-build",
+          "hermes_opt": "O",
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/bin/shermes",
+            "-O",
+            "-Xes6-block-scoping",
+            "-Xenable-tdz",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/test/LLVMNative/closures.js",
+            "-o",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/closures-O-c"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "",
+          "seconds": 0.276751
+        },
+        {
+          "stage": "c-run",
+          "hermes_opt": "O",
+          "matches_node": true,
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/closures-O-c"
+          ],
+          "exit_code": 0,
+          "stdout": "41 42 41 41 101 41\n42 43\n210\n",
+          "stderr": "",
+          "seconds": 0.004732
+        },
+        {
+          "stage": "llvm-build",
+          "hermes_opt": "O",
+          "llvm_opt": "0",
+          "command": [
+            "/home/manuel/.pyenv/versions/3.13.2/bin/python3",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/utils/shllvm.py",
+            "build",
+            "--build-dir",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm",
+            "--llvm-bin",
+            "/usr/lib/llvm-18/bin",
+            "--no-runtime-build",
+            "--hermes-opt",
+            "O",
+            "--llvm-opt",
+            "0",
+            "-o",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/closures-O-llvm0",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/test/LLVMNative/closures.js"
+          ],
+          "exit_code": 0,
+          "stdout": "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/closures-O-llvm0\n",
+          "stderr": "",
+          "seconds": 0.214725
+        },
+        {
+          "stage": "llvm-run",
+          "hermes_opt": "O",
+          "llvm_opt": "0",
+          "matches_node_and_c": true,
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/closures-O-llvm0"
+          ],
+          "exit_code": 0,
+          "stdout": "41 42 41 41 101 41\n42 43\n210\n",
+          "stderr": "",
+          "seconds": 0.005112
+        },
+        {
+          "stage": "llvm-build",
+          "hermes_opt": "O",
+          "llvm_opt": "2",
+          "command": [
+            "/home/manuel/.pyenv/versions/3.13.2/bin/python3",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/utils/shllvm.py",
+            "build",
+            "--build-dir",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm",
+            "--llvm-bin",
+            "/usr/lib/llvm-18/bin",
+            "--no-runtime-build",
+            "--hermes-opt",
+            "O",
+            "--llvm-opt",
+            "2",
+            "-o",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/closures-O-llvm2",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/test/LLVMNative/closures.js"
+          ],
+          "exit_code": 0,
+          "stdout": "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/closures-O-llvm2\n",
+          "stderr": "",
+          "seconds": 0.259018
+        },
+        {
+          "stage": "llvm-run",
+          "hermes_opt": "O",
+          "llvm_opt": "2",
+          "matches_node_and_c": true,
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/closures-O-llvm2"
+          ],
+          "exit_code": 0,
+          "stdout": "41 42 41 41 101 41\n42 43\n210\n",
+          "stderr": "",
+          "seconds": 0.005658
+        },
+        {
+          "stage": "lli-jit",
+          "matches_node": true,
+          "command": [
+            "/home/manuel/.pyenv/versions/3.13.2/bin/python3",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/utils/shllvm.py",
+            "jit",
+            "--build-dir",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm",
+            "--llvm-bin",
+            "/usr/lib/llvm-18/bin",
+            "--no-runtime-build",
+            "--hermes-opt",
+            "O",
+            "--llvm-opt",
+            "2",
+            "-o",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/closures-jit",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/test/LLVMNative/closures.js"
+          ],
+          "exit_code": 0,
+          "stdout": "41 42 41 41 101 41\n42 43\n210\n",
+          "stderr": "",
+          "seconds": 0.254034
+        }
+      ]
+    },
+    {
+      "name": "coercion.js",
+      "kind": "positive",
+      "passed": true,
+      "llvm_native_comparisons": 4,
+      "records": [
+        {
+          "stage": "node",
+          "command": [
+            "/home/manuel/.nvm/versions/node/v24.18.0/bin/node",
+            "--expose-gc",
+            "-e",
+            "globalThis.print = (...a) => console.log(...a); require(process.argv[1]);",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/test/LLVMNative/coercion.js"
+          ],
+          "exit_code": 0,
+          "stdout": "42 ab value=10 32\ntrue false true false\n-Infinity false 4294967295 2147483647\nobject function undefined object\n",
+          "stderr": "",
+          "seconds": 0.04158
+        },
+        {
+          "stage": "c-build",
+          "hermes_opt": "O0",
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/bin/shermes",
+            "-O0",
+            "-Xes6-block-scoping",
+            "-Xenable-tdz",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/test/LLVMNative/coercion.js",
+            "-o",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/coercion-O0-c"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "",
+          "seconds": 0.16571
+        },
+        {
+          "stage": "c-run",
+          "hermes_opt": "O0",
+          "matches_node": true,
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/coercion-O0-c"
+          ],
+          "exit_code": 0,
+          "stdout": "42 ab value=10 32\ntrue false true false\n-Infinity false 4294967295 2147483647\nobject function undefined object\n",
+          "stderr": "",
+          "seconds": 0.004632
+        },
+        {
+          "stage": "llvm-build",
+          "hermes_opt": "O0",
+          "llvm_opt": "0",
+          "command": [
+            "/home/manuel/.pyenv/versions/3.13.2/bin/python3",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/utils/shllvm.py",
+            "build",
+            "--build-dir",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm",
+            "--llvm-bin",
+            "/usr/lib/llvm-18/bin",
+            "--no-runtime-build",
+            "--hermes-opt",
+            "O0",
+            "--llvm-opt",
+            "0",
+            "-o",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/coercion-O0-llvm0",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/test/LLVMNative/coercion.js"
+          ],
+          "exit_code": 0,
+          "stdout": "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/coercion-O0-llvm0\n",
+          "stderr": "",
+          "seconds": 0.22726
+        },
+        {
+          "stage": "llvm-run",
+          "hermes_opt": "O0",
+          "llvm_opt": "0",
+          "matches_node_and_c": true,
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/coercion-O0-llvm0"
+          ],
+          "exit_code": 0,
+          "stdout": "42 ab value=10 32\ntrue false true false\n-Infinity false 4294967295 2147483647\nobject function undefined object\n",
+          "stderr": "",
+          "seconds": 0.006772
+        },
+        {
+          "stage": "llvm-build",
+          "hermes_opt": "O0",
+          "llvm_opt": "2",
+          "command": [
+            "/home/manuel/.pyenv/versions/3.13.2/bin/python3",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/utils/shllvm.py",
+            "build",
+            "--build-dir",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm",
+            "--llvm-bin",
+            "/usr/lib/llvm-18/bin",
+            "--no-runtime-build",
+            "--hermes-opt",
+            "O0",
+            "--llvm-opt",
+            "2",
+            "-o",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/coercion-O0-llvm2",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/test/LLVMNative/coercion.js"
+          ],
+          "exit_code": 0,
+          "stdout": "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/coercion-O0-llvm2\n",
+          "stderr": "",
+          "seconds": 0.244136
+        },
+        {
+          "stage": "llvm-run",
+          "hermes_opt": "O0",
+          "llvm_opt": "2",
+          "matches_node_and_c": true,
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/coercion-O0-llvm2"
+          ],
+          "exit_code": 0,
+          "stdout": "42 ab value=10 32\ntrue false true false\n-Infinity false 4294967295 2147483647\nobject function undefined object\n",
+          "stderr": "",
+          "seconds": 0.004839
+        },
+        {
+          "stage": "c-build",
+          "hermes_opt": "O",
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/bin/shermes",
+            "-O",
+            "-Xes6-block-scoping",
+            "-Xenable-tdz",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/test/LLVMNative/coercion.js",
+            "-o",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/coercion-O-c"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "",
+          "seconds": 0.202628
+        },
+        {
+          "stage": "c-run",
+          "hermes_opt": "O",
+          "matches_node": true,
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/coercion-O-c"
+          ],
+          "exit_code": 0,
+          "stdout": "42 ab value=10 32\ntrue false true false\n-Infinity false 4294967295 2147483647\nobject function undefined object\n",
+          "stderr": "",
+          "seconds": 0.005025
+        },
+        {
+          "stage": "llvm-build",
+          "hermes_opt": "O",
+          "llvm_opt": "0",
+          "command": [
+            "/home/manuel/.pyenv/versions/3.13.2/bin/python3",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/utils/shllvm.py",
+            "build",
+            "--build-dir",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm",
+            "--llvm-bin",
+            "/usr/lib/llvm-18/bin",
+            "--no-runtime-build",
+            "--hermes-opt",
+            "O",
+            "--llvm-opt",
+            "0",
+            "-o",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/coercion-O-llvm0",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/test/LLVMNative/coercion.js"
+          ],
+          "exit_code": 0,
+          "stdout": "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/coercion-O-llvm0\n",
+          "stderr": "",
+          "seconds": 0.217233
+        },
+        {
+          "stage": "llvm-run",
+          "hermes_opt": "O",
+          "llvm_opt": "0",
+          "matches_node_and_c": true,
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/coercion-O-llvm0"
+          ],
+          "exit_code": 0,
+          "stdout": "42 ab value=10 32\ntrue false true false\n-Infinity false 4294967295 2147483647\nobject function undefined object\n",
+          "stderr": "",
+          "seconds": 0.004513
+        },
+        {
+          "stage": "llvm-build",
+          "hermes_opt": "O",
+          "llvm_opt": "2",
+          "command": [
+            "/home/manuel/.pyenv/versions/3.13.2/bin/python3",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/utils/shllvm.py",
+            "build",
+            "--build-dir",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm",
+            "--llvm-bin",
+            "/usr/lib/llvm-18/bin",
+            "--no-runtime-build",
+            "--hermes-opt",
+            "O",
+            "--llvm-opt",
+            "2",
+            "-o",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/coercion-O-llvm2",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/test/LLVMNative/coercion.js"
+          ],
+          "exit_code": 0,
+          "stdout": "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/coercion-O-llvm2\n",
+          "stderr": "",
+          "seconds": 0.233267
+        },
+        {
+          "stage": "llvm-run",
+          "hermes_opt": "O",
+          "llvm_opt": "2",
+          "matches_node_and_c": true,
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/coercion-O-llvm2"
+          ],
+          "exit_code": 0,
+          "stdout": "42 ab value=10 32\ntrue false true false\n-Infinity false 4294967295 2147483647\nobject function undefined object\n",
+          "stderr": "",
+          "seconds": 0.004874
+        }
+      ]
+    },
+    {
+      "name": "constructors.js",
+      "kind": "positive",
+      "passed": true,
+      "llvm_native_comparisons": 4,
+      "records": [
+        {
+          "stage": "node",
+          "command": [
+            "/home/manuel/.nvm/versions/node/v24.18.0/bin/node",
+            "--expose-gc",
+            "-e",
+            "globalThis.print = (...a) => console.log(...a); require(process.argv[1]);",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/test/LLVMNative/constructors.js"
+          ],
+          "exit_code": 0,
+          "stdout": "42 true true\n42 41\nfalse true\n",
+          "stderr": "",
+          "seconds": 0.049891
+        },
+        {
+          "stage": "c-build",
+          "hermes_opt": "O0",
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/bin/shermes",
+            "-O0",
+            "-Xes6-block-scoping",
+            "-Xenable-tdz",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/test/LLVMNative/constructors.js",
+            "-o",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/constructors-O0-c"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "",
+          "seconds": 0.189779
+        },
+        {
+          "stage": "c-run",
+          "hermes_opt": "O0",
+          "matches_node": true,
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/constructors-O0-c"
+          ],
+          "exit_code": 0,
+          "stdout": "42 true true\n42 41\nfalse true\n",
+          "stderr": "",
+          "seconds": 0.005228
+        },
+        {
+          "stage": "llvm-build",
+          "hermes_opt": "O0",
+          "llvm_opt": "0",
+          "command": [
+            "/home/manuel/.pyenv/versions/3.13.2/bin/python3",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/utils/shllvm.py",
+            "build",
+            "--build-dir",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm",
+            "--llvm-bin",
+            "/usr/lib/llvm-18/bin",
+            "--no-runtime-build",
+            "--hermes-opt",
+            "O0",
+            "--llvm-opt",
+            "0",
+            "-o",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/constructors-O0-llvm0",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/test/LLVMNative/constructors.js"
+          ],
+          "exit_code": 0,
+          "stdout": "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/constructors-O0-llvm0\n",
+          "stderr": "",
+          "seconds": 0.216155
+        },
+        {
+          "stage": "llvm-run",
+          "hermes_opt": "O0",
+          "llvm_opt": "0",
+          "matches_node_and_c": true,
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/constructors-O0-llvm0"
+          ],
+          "exit_code": 0,
+          "stdout": "42 true true\n42 41\nfalse true\n",
+          "stderr": "",
+          "seconds": 0.004994
+        },
+        {
+          "stage": "llvm-build",
+          "hermes_opt": "O0",
+          "llvm_opt": "2",
+          "command": [
+            "/home/manuel/.pyenv/versions/3.13.2/bin/python3",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/utils/shllvm.py",
+            "build",
+            "--build-dir",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm",
+            "--llvm-bin",
+            "/usr/lib/llvm-18/bin",
+            "--no-runtime-build",
+            "--hermes-opt",
+            "O0",
+            "--llvm-opt",
+            "2",
+            "-o",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/constructors-O0-llvm2",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/test/LLVMNative/constructors.js"
+          ],
+          "exit_code": 0,
+          "stdout": "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/constructors-O0-llvm2\n",
+          "stderr": "",
+          "seconds": 0.251949
+        },
+        {
+          "stage": "llvm-run",
+          "hermes_opt": "O0",
+          "llvm_opt": "2",
+          "matches_node_and_c": true,
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/constructors-O0-llvm2"
+          ],
+          "exit_code": 0,
+          "stdout": "42 true true\n42 41\nfalse true\n",
+          "stderr": "",
+          "seconds": 0.005863
+        },
+        {
+          "stage": "c-build",
+          "hermes_opt": "O",
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/bin/shermes",
+            "-O",
+            "-Xes6-block-scoping",
+            "-Xenable-tdz",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/test/LLVMNative/constructors.js",
+            "-o",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/constructors-O-c"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "",
+          "seconds": 0.269244
+        },
+        {
+          "stage": "c-run",
+          "hermes_opt": "O",
+          "matches_node": true,
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/constructors-O-c"
+          ],
+          "exit_code": 0,
+          "stdout": "42 true true\n42 41\nfalse true\n",
+          "stderr": "",
+          "seconds": 0.004788
+        },
+        {
+          "stage": "llvm-build",
+          "hermes_opt": "O",
+          "llvm_opt": "0",
+          "command": [
+            "/home/manuel/.pyenv/versions/3.13.2/bin/python3",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/utils/shllvm.py",
+            "build",
+            "--build-dir",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm",
+            "--llvm-bin",
+            "/usr/lib/llvm-18/bin",
+            "--no-runtime-build",
+            "--hermes-opt",
+            "O",
+            "--llvm-opt",
+            "0",
+            "-o",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/constructors-O-llvm0",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/test/LLVMNative/constructors.js"
+          ],
+          "exit_code": 0,
+          "stdout": "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/constructors-O-llvm0\n",
+          "stderr": "",
+          "seconds": 0.213387
+        },
+        {
+          "stage": "llvm-run",
+          "hermes_opt": "O",
+          "llvm_opt": "0",
+          "matches_node_and_c": true,
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/constructors-O-llvm0"
+          ],
+          "exit_code": 0,
+          "stdout": "42 true true\n42 41\nfalse true\n",
+          "stderr": "",
+          "seconds": 0.005014
+        },
+        {
+          "stage": "llvm-build",
+          "hermes_opt": "O",
+          "llvm_opt": "2",
+          "command": [
+            "/home/manuel/.pyenv/versions/3.13.2/bin/python3",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/utils/shllvm.py",
+            "build",
+            "--build-dir",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm",
+            "--llvm-bin",
+            "/usr/lib/llvm-18/bin",
+            "--no-runtime-build",
+            "--hermes-opt",
+            "O",
+            "--llvm-opt",
+            "2",
+            "-o",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/constructors-O-llvm2",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/test/LLVMNative/constructors.js"
+          ],
+          "exit_code": 0,
+          "stdout": "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/constructors-O-llvm2\n",
+          "stderr": "",
+          "seconds": 0.250449
+        },
+        {
+          "stage": "llvm-run",
+          "hermes_opt": "O",
+          "llvm_opt": "2",
+          "matches_node_and_c": true,
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/constructors-O-llvm2"
+          ],
+          "exit_code": 0,
+          "stdout": "42 true true\n42 41\nfalse true\n",
+          "stderr": "",
+          "seconds": 0.005706
+        }
+      ]
+    },
+    {
+      "name": "control_phi.js",
+      "kind": "positive",
+      "passed": true,
+      "llvm_native_comparisons": 4,
+      "records": [
+        {
+          "stage": "node",
+          "command": [
+            "/home/manuel/.nvm/versions/node/v24.18.0/bin/node",
+            "--expose-gc",
+            "-e",
+            "globalThis.print = (...a) => console.log(...a); require(process.argv[1]);",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/test/LLVMNative/control_phi.js"
+          ],
+          "exit_code": 0,
+          "stdout": "6765 36\nfalse true 42 2\n",
+          "stderr": "",
+          "seconds": 0.045455
+        },
+        {
+          "stage": "c-build",
+          "hermes_opt": "O0",
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/bin/shermes",
+            "-O0",
+            "-Xes6-block-scoping",
+            "-Xenable-tdz",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/test/LLVMNative/control_phi.js",
+            "-o",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/control_phi-O0-c"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "",
+          "seconds": 0.185124
+        },
+        {
+          "stage": "c-run",
+          "hermes_opt": "O0",
+          "matches_node": true,
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/control_phi-O0-c"
+          ],
+          "exit_code": 0,
+          "stdout": "6765 36\nfalse true 42 2\n",
+          "stderr": "",
+          "seconds": 0.005609
+        },
+        {
+          "stage": "llvm-build",
+          "hermes_opt": "O0",
+          "llvm_opt": "0",
+          "command": [
+            "/home/manuel/.pyenv/versions/3.13.2/bin/python3",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/utils/shllvm.py",
+            "build",
+            "--build-dir",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm",
+            "--llvm-bin",
+            "/usr/lib/llvm-18/bin",
+            "--no-runtime-build",
+            "--hermes-opt",
+            "O0",
+            "--llvm-opt",
+            "0",
+            "-o",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/control_phi-O0-llvm0",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/test/LLVMNative/control_phi.js"
+          ],
+          "exit_code": 0,
+          "stdout": "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/control_phi-O0-llvm0\n",
+          "stderr": "",
+          "seconds": 0.23242
+        },
+        {
+          "stage": "llvm-run",
+          "hermes_opt": "O0",
+          "llvm_opt": "0",
+          "matches_node_and_c": true,
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/control_phi-O0-llvm0"
+          ],
+          "exit_code": 0,
+          "stdout": "6765 36\nfalse true 42 2\n",
+          "stderr": "",
+          "seconds": 0.0053
+        },
+        {
+          "stage": "llvm-build",
+          "hermes_opt": "O0",
+          "llvm_opt": "2",
+          "command": [
+            "/home/manuel/.pyenv/versions/3.13.2/bin/python3",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/utils/shllvm.py",
+            "build",
+            "--build-dir",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm",
+            "--llvm-bin",
+            "/usr/lib/llvm-18/bin",
+            "--no-runtime-build",
+            "--hermes-opt",
+            "O0",
+            "--llvm-opt",
+            "2",
+            "-o",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/control_phi-O0-llvm2",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/test/LLVMNative/control_phi.js"
+          ],
+          "exit_code": 0,
+          "stdout": "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/control_phi-O0-llvm2\n",
+          "stderr": "",
+          "seconds": 0.274997
+        },
+        {
+          "stage": "llvm-run",
+          "hermes_opt": "O0",
+          "llvm_opt": "2",
+          "matches_node_and_c": true,
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/control_phi-O0-llvm2"
+          ],
+          "exit_code": 0,
+          "stdout": "6765 36\nfalse true 42 2\n",
+          "stderr": "",
+          "seconds": 0.006326
+        },
+        {
+          "stage": "c-build",
+          "hermes_opt": "O",
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/bin/shermes",
+            "-O",
+            "-Xes6-block-scoping",
+            "-Xenable-tdz",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/test/LLVMNative/control_phi.js",
+            "-o",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/control_phi-O-c"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "",
+          "seconds": 0.269694
+        },
+        {
+          "stage": "c-run",
+          "hermes_opt": "O",
+          "matches_node": true,
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/control_phi-O-c"
+          ],
+          "exit_code": 0,
+          "stdout": "6765 36\nfalse true 42 2\n",
+          "stderr": "",
+          "seconds": 0.005835
+        },
+        {
+          "stage": "llvm-build",
+          "hermes_opt": "O",
+          "llvm_opt": "0",
+          "command": [
+            "/home/manuel/.pyenv/versions/3.13.2/bin/python3",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/utils/shllvm.py",
+            "build",
+            "--build-dir",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm",
+            "--llvm-bin",
+            "/usr/lib/llvm-18/bin",
+            "--no-runtime-build",
+            "--hermes-opt",
+            "O",
+            "--llvm-opt",
+            "0",
+            "-o",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/control_phi-O-llvm0",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/test/LLVMNative/control_phi.js"
+          ],
+          "exit_code": 0,
+          "stdout": "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/control_phi-O-llvm0\n",
+          "stderr": "",
+          "seconds": 0.270569
+        },
+        {
+          "stage": "llvm-run",
+          "hermes_opt": "O",
+          "llvm_opt": "0",
+          "matches_node_and_c": true,
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/control_phi-O-llvm0"
+          ],
+          "exit_code": 0,
+          "stdout": "6765 36\nfalse true 42 2\n",
+          "stderr": "",
+          "seconds": 0.005031
+        },
+        {
+          "stage": "llvm-build",
+          "hermes_opt": "O",
+          "llvm_opt": "2",
+          "command": [
+            "/home/manuel/.pyenv/versions/3.13.2/bin/python3",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/utils/shllvm.py",
+            "build",
+            "--build-dir",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm",
+            "--llvm-bin",
+            "/usr/lib/llvm-18/bin",
+            "--no-runtime-build",
+            "--hermes-opt",
+            "O",
+            "--llvm-opt",
+            "2",
+            "-o",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/control_phi-O-llvm2",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/test/LLVMNative/control_phi.js"
+          ],
+          "exit_code": 0,
+          "stdout": "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/control_phi-O-llvm2\n",
+          "stderr": "",
+          "seconds": 0.283779
+        },
+        {
+          "stage": "llvm-run",
+          "hermes_opt": "O",
+          "llvm_opt": "2",
+          "matches_node_and_c": true,
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/control_phi-O-llvm2"
+          ],
+          "exit_code": 0,
+          "stdout": "6765 36\nfalse true 42 2\n",
+          "stderr": "",
+          "seconds": 0.006014
+        }
+      ]
+    },
+    {
+      "name": "exceptions.js",
+      "kind": "positive",
+      "passed": true,
+      "llvm_native_comparisons": 4,
+      "records": [
+        {
+          "stage": "node",
+          "command": [
+            "/home/manuel/.nvm/versions/node/v24.18.0/bin/node",
+            "--expose-gc",
+            "-e",
+            "globalThis.print = (...a) => console.log(...a); require(process.argv[1]);",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/test/LLVMNative/exceptions.js"
+          ],
+          "exit_code": 0,
+          "stdout": "31 66\n42\n0ff2ff\nTypeError\nReferenceError\n",
+          "stderr": "",
+          "seconds": 0.044949
+        },
+        {
+          "stage": "c-build",
+          "hermes_opt": "O0",
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/bin/shermes",
+            "-O0",
+            "-Xes6-block-scoping",
+            "-Xenable-tdz",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/test/LLVMNative/exceptions.js",
+            "-o",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/exceptions-O0-c"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "",
+          "seconds": 0.196433
+        },
+        {
+          "stage": "c-run",
+          "hermes_opt": "O0",
+          "matches_node": true,
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/exceptions-O0-c"
+          ],
+          "exit_code": 0,
+          "stdout": "31 66\n42\n0ff2ff\nTypeError\nReferenceError\n",
+          "stderr": "",
+          "seconds": 0.005285
+        },
+        {
+          "stage": "llvm-build",
+          "hermes_opt": "O0",
+          "llvm_opt": "0",
+          "command": [
+            "/home/manuel/.pyenv/versions/3.13.2/bin/python3",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/utils/shllvm.py",
+            "build",
+            "--build-dir",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm",
+            "--llvm-bin",
+            "/usr/lib/llvm-18/bin",
+            "--no-runtime-build",
+            "--hermes-opt",
+            "O0",
+            "--llvm-opt",
+            "0",
+            "-o",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/exceptions-O0-llvm0",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/test/LLVMNative/exceptions.js"
+          ],
+          "exit_code": 0,
+          "stdout": "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/exceptions-O0-llvm0\n",
+          "stderr": "",
+          "seconds": 0.238645
+        },
+        {
+          "stage": "llvm-run",
+          "hermes_opt": "O0",
+          "llvm_opt": "0",
+          "matches_node_and_c": true,
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/exceptions-O0-llvm0"
+          ],
+          "exit_code": 0,
+          "stdout": "31 66\n42\n0ff2ff\nTypeError\nReferenceError\n",
+          "stderr": "",
+          "seconds": 0.00481
+        },
+        {
+          "stage": "llvm-build",
+          "hermes_opt": "O0",
+          "llvm_opt": "2",
+          "command": [
+            "/home/manuel/.pyenv/versions/3.13.2/bin/python3",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/utils/shllvm.py",
+            "build",
+            "--build-dir",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm",
+            "--llvm-bin",
+            "/usr/lib/llvm-18/bin",
+            "--no-runtime-build",
+            "--hermes-opt",
+            "O0",
+            "--llvm-opt",
+            "2",
+            "-o",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/exceptions-O0-llvm2",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/test/LLVMNative/exceptions.js"
+          ],
+          "exit_code": 0,
+          "stdout": "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/exceptions-O0-llvm2\n",
+          "stderr": "",
+          "seconds": 0.332709
+        },
+        {
+          "stage": "llvm-run",
+          "hermes_opt": "O0",
+          "llvm_opt": "2",
+          "matches_node_and_c": true,
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/exceptions-O0-llvm2"
+          ],
+          "exit_code": 0,
+          "stdout": "31 66\n42\n0ff2ff\nTypeError\nReferenceError\n",
+          "stderr": "",
+          "seconds": 0.0067
+        },
+        {
+          "stage": "c-build",
+          "hermes_opt": "O",
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/bin/shermes",
+            "-O",
+            "-Xes6-block-scoping",
+            "-Xenable-tdz",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/test/LLVMNative/exceptions.js",
+            "-o",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/exceptions-O-c"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "",
+          "seconds": 0.291284
+        },
+        {
+          "stage": "c-run",
+          "hermes_opt": "O",
+          "matches_node": true,
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/exceptions-O-c"
+          ],
+          "exit_code": 0,
+          "stdout": "31 66\n42\n0ff2ff\nTypeError\nReferenceError\n",
+          "stderr": "",
+          "seconds": 0.0051
+        },
+        {
+          "stage": "llvm-build",
+          "hermes_opt": "O",
+          "llvm_opt": "0",
+          "command": [
+            "/home/manuel/.pyenv/versions/3.13.2/bin/python3",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/utils/shllvm.py",
+            "build",
+            "--build-dir",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm",
+            "--llvm-bin",
+            "/usr/lib/llvm-18/bin",
+            "--no-runtime-build",
+            "--hermes-opt",
+            "O",
+            "--llvm-opt",
+            "0",
+            "-o",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/exceptions-O-llvm0",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/test/LLVMNative/exceptions.js"
+          ],
+          "exit_code": 0,
+          "stdout": "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/exceptions-O-llvm0\n",
+          "stderr": "",
+          "seconds": 0.253243
+        },
+        {
+          "stage": "llvm-run",
+          "hermes_opt": "O",
+          "llvm_opt": "0",
+          "matches_node_and_c": true,
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/exceptions-O-llvm0"
+          ],
+          "exit_code": 0,
+          "stdout": "31 66\n42\n0ff2ff\nTypeError\nReferenceError\n",
+          "stderr": "",
+          "seconds": 0.004864
+        },
+        {
+          "stage": "llvm-build",
+          "hermes_opt": "O",
+          "llvm_opt": "2",
+          "command": [
+            "/home/manuel/.pyenv/versions/3.13.2/bin/python3",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/utils/shllvm.py",
+            "build",
+            "--build-dir",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm",
+            "--llvm-bin",
+            "/usr/lib/llvm-18/bin",
+            "--no-runtime-build",
+            "--hermes-opt",
+            "O",
+            "--llvm-opt",
+            "2",
+            "-o",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/exceptions-O-llvm2",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/test/LLVMNative/exceptions.js"
+          ],
+          "exit_code": 0,
+          "stdout": "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/exceptions-O-llvm2\n",
+          "stderr": "",
+          "seconds": 0.27485
+        },
+        {
+          "stage": "llvm-run",
+          "hermes_opt": "O",
+          "llvm_opt": "2",
+          "matches_node_and_c": true,
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/exceptions-O-llvm2"
+          ],
+          "exit_code": 0,
+          "stdout": "31 66\n42\n0ff2ff\nTypeError\nReferenceError\n",
+          "stderr": "",
+          "seconds": 0.005575
+        }
+      ]
+    },
+    {
+      "name": "functions.js",
+      "kind": "positive",
+      "passed": true,
+      "llvm_native_comparisons": 4,
+      "records": [
+        {
+          "stage": "node",
+          "command": [
+            "/home/manuel/.nvm/versions/node/v24.18.0/bin/node",
+            "--expose-gc",
+            "-e",
+            "globalThis.print = (...a) => console.log(...a); require(process.argv[1]);",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/test/LLVMNative/functions.js"
+          ],
+          "exit_code": 0,
+          "stdout": "40320 true true 42 42\n",
+          "stderr": "",
+          "seconds": 0.041729
+        },
+        {
+          "stage": "c-build",
+          "hermes_opt": "O0",
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/bin/shermes",
+            "-O0",
+            "-Xes6-block-scoping",
+            "-Xenable-tdz",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/test/LLVMNative/functions.js",
+            "-o",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/functions-O0-c"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "",
+          "seconds": 0.181808
+        },
+        {
+          "stage": "c-run",
+          "hermes_opt": "O0",
+          "matches_node": true,
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/functions-O0-c"
+          ],
+          "exit_code": 0,
+          "stdout": "40320 true true 42 42\n",
+          "stderr": "",
+          "seconds": 0.005121
+        },
+        {
+          "stage": "llvm-build",
+          "hermes_opt": "O0",
+          "llvm_opt": "0",
+          "command": [
+            "/home/manuel/.pyenv/versions/3.13.2/bin/python3",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/utils/shllvm.py",
+            "build",
+            "--build-dir",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm",
+            "--llvm-bin",
+            "/usr/lib/llvm-18/bin",
+            "--no-runtime-build",
+            "--hermes-opt",
+            "O0",
+            "--llvm-opt",
+            "0",
+            "-o",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/functions-O0-llvm0",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/test/LLVMNative/functions.js"
+          ],
+          "exit_code": 0,
+          "stdout": "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/functions-O0-llvm0\n",
+          "stderr": "",
+          "seconds": 0.241458
+        },
+        {
+          "stage": "llvm-run",
+          "hermes_opt": "O0",
+          "llvm_opt": "0",
+          "matches_node_and_c": true,
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/functions-O0-llvm0"
+          ],
+          "exit_code": 0,
+          "stdout": "40320 true true 42 42\n",
+          "stderr": "",
+          "seconds": 0.005811
+        },
+        {
+          "stage": "llvm-build",
+          "hermes_opt": "O0",
+          "llvm_opt": "2",
+          "command": [
+            "/home/manuel/.pyenv/versions/3.13.2/bin/python3",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/utils/shllvm.py",
+            "build",
+            "--build-dir",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm",
+            "--llvm-bin",
+            "/usr/lib/llvm-18/bin",
+            "--no-runtime-build",
+            "--hermes-opt",
+            "O0",
+            "--llvm-opt",
+            "2",
+            "-o",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/functions-O0-llvm2",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/test/LLVMNative/functions.js"
+          ],
+          "exit_code": 0,
+          "stdout": "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/functions-O0-llvm2\n",
+          "stderr": "",
+          "seconds": 0.305896
+        },
+        {
+          "stage": "llvm-run",
+          "hermes_opt": "O0",
+          "llvm_opt": "2",
+          "matches_node_and_c": true,
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/functions-O0-llvm2"
+          ],
+          "exit_code": 0,
+          "stdout": "40320 true true 42 42\n",
+          "stderr": "",
+          "seconds": 0.005405
+        },
+        {
+          "stage": "c-build",
+          "hermes_opt": "O",
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/bin/shermes",
+            "-O",
+            "-Xes6-block-scoping",
+            "-Xenable-tdz",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/test/LLVMNative/functions.js",
+            "-o",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/functions-O-c"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "",
+          "seconds": 0.314946
+        },
+        {
+          "stage": "c-run",
+          "hermes_opt": "O",
+          "matches_node": true,
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/functions-O-c"
+          ],
+          "exit_code": 0,
+          "stdout": "40320 true true 42 42\n",
+          "stderr": "",
+          "seconds": 0.004887
+        },
+        {
+          "stage": "llvm-build",
+          "hermes_opt": "O",
+          "llvm_opt": "0",
+          "command": [
+            "/home/manuel/.pyenv/versions/3.13.2/bin/python3",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/utils/shllvm.py",
+            "build",
+            "--build-dir",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm",
+            "--llvm-bin",
+            "/usr/lib/llvm-18/bin",
+            "--no-runtime-build",
+            "--hermes-opt",
+            "O",
+            "--llvm-opt",
+            "0",
+            "-o",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/functions-O-llvm0",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/test/LLVMNative/functions.js"
+          ],
+          "exit_code": 0,
+          "stdout": "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/functions-O-llvm0\n",
+          "stderr": "",
+          "seconds": 0.242877
+        },
+        {
+          "stage": "llvm-run",
+          "hermes_opt": "O",
+          "llvm_opt": "0",
+          "matches_node_and_c": true,
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/functions-O-llvm0"
+          ],
+          "exit_code": 0,
+          "stdout": "40320 true true 42 42\n",
+          "stderr": "",
+          "seconds": 0.004874
+        },
+        {
+          "stage": "llvm-build",
+          "hermes_opt": "O",
+          "llvm_opt": "2",
+          "command": [
+            "/home/manuel/.pyenv/versions/3.13.2/bin/python3",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/utils/shllvm.py",
+            "build",
+            "--build-dir",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm",
+            "--llvm-bin",
+            "/usr/lib/llvm-18/bin",
+            "--no-runtime-build",
+            "--hermes-opt",
+            "O",
+            "--llvm-opt",
+            "2",
+            "-o",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/functions-O-llvm2",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/test/LLVMNative/functions.js"
+          ],
+          "exit_code": 0,
+          "stdout": "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/functions-O-llvm2\n",
+          "stderr": "",
+          "seconds": 0.261901
+        },
+        {
+          "stage": "llvm-run",
+          "hermes_opt": "O",
+          "llvm_opt": "2",
+          "matches_node_and_c": true,
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/functions-O-llvm2"
+          ],
+          "exit_code": 0,
+          "stdout": "40320 true true 42 42\n",
+          "stderr": "",
+          "seconds": 0.004813
+        },
+        {
+          "stage": "lli-jit",
+          "matches_node": true,
+          "command": [
+            "/home/manuel/.pyenv/versions/3.13.2/bin/python3",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/utils/shllvm.py",
+            "jit",
+            "--build-dir",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm",
+            "--llvm-bin",
+            "/usr/lib/llvm-18/bin",
+            "--no-runtime-build",
+            "--hermes-opt",
+            "O",
+            "--llvm-opt",
+            "2",
+            "-o",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/functions-jit",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/test/LLVMNative/functions.js"
+          ],
+          "exit_code": 0,
+          "stdout": "40320 true true 42 42\n",
+          "stderr": "",
+          "seconds": 0.214493
+        }
+      ]
+    },
+    {
+      "name": "gc_closures.js",
+      "kind": "positive",
+      "passed": true,
+      "llvm_native_comparisons": 4,
+      "records": [
+        {
+          "stage": "node",
+          "command": [
+            "/home/manuel/.nvm/versions/node/v24.18.0/bin/node",
+            "--expose-gc",
+            "-e",
+            "globalThis.print = (...a) => console.log(...a); require(process.argv[1]);",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/test/LLVMNative/gc_closures.js"
+          ],
+          "exit_code": 0,
+          "stdout": "gc-hook function\n2 alive after collection 0,5000,10000,15000,20000,25000,30000,35000,40000,45000\n",
+          "stderr": "",
+          "seconds": 0.062377
+        },
+        {
+          "stage": "c-build",
+          "hermes_opt": "O0",
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/bin/shermes",
+            "-O0",
+            "-Xes6-block-scoping",
+            "-Xenable-tdz",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/test/LLVMNative/gc_closures.js",
+            "-o",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/gc_closures-O0-c"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "",
+          "seconds": 0.183671
+        },
+        {
+          "stage": "c-run",
+          "hermes_opt": "O0",
+          "matches_node": true,
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/gc_closures-O0-c"
+          ],
+          "exit_code": 0,
+          "stdout": "gc-hook function\n2 alive after collection 0,5000,10000,15000,20000,25000,30000,35000,40000,45000\n",
+          "stderr": "",
+          "seconds": 0.057754
+        },
+        {
+          "stage": "llvm-build",
+          "hermes_opt": "O0",
+          "llvm_opt": "0",
+          "command": [
+            "/home/manuel/.pyenv/versions/3.13.2/bin/python3",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/utils/shllvm.py",
+            "build",
+            "--build-dir",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm",
+            "--llvm-bin",
+            "/usr/lib/llvm-18/bin",
+            "--no-runtime-build",
+            "--hermes-opt",
+            "O0",
+            "--llvm-opt",
+            "0",
+            "-o",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/gc_closures-O0-llvm0",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/test/LLVMNative/gc_closures.js"
+          ],
+          "exit_code": 0,
+          "stdout": "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/gc_closures-O0-llvm0\n",
+          "stderr": "",
+          "seconds": 0.234201
+        },
+        {
+          "stage": "llvm-run",
+          "hermes_opt": "O0",
+          "llvm_opt": "0",
+          "matches_node_and_c": true,
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/gc_closures-O0-llvm0"
+          ],
+          "exit_code": 0,
+          "stdout": "gc-hook function\n2 alive after collection 0,5000,10000,15000,20000,25000,30000,35000,40000,45000\n",
+          "stderr": "",
+          "seconds": 0.04202
+        },
+        {
+          "stage": "llvm-build",
+          "hermes_opt": "O0",
+          "llvm_opt": "2",
+          "command": [
+            "/home/manuel/.pyenv/versions/3.13.2/bin/python3",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/utils/shllvm.py",
+            "build",
+            "--build-dir",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm",
+            "--llvm-bin",
+            "/usr/lib/llvm-18/bin",
+            "--no-runtime-build",
+            "--hermes-opt",
+            "O0",
+            "--llvm-opt",
+            "2",
+            "-o",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/gc_closures-O0-llvm2",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/test/LLVMNative/gc_closures.js"
+          ],
+          "exit_code": 0,
+          "stdout": "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/gc_closures-O0-llvm2\n",
+          "stderr": "",
+          "seconds": 0.272176
+        },
+        {
+          "stage": "llvm-run",
+          "hermes_opt": "O0",
+          "llvm_opt": "2",
+          "matches_node_and_c": true,
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/gc_closures-O0-llvm2"
+          ],
+          "exit_code": 0,
+          "stdout": "gc-hook function\n2 alive after collection 0,5000,10000,15000,20000,25000,30000,35000,40000,45000\n",
+          "stderr": "",
+          "seconds": 0.034721
+        },
+        {
+          "stage": "c-build",
+          "hermes_opt": "O",
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/bin/shermes",
+            "-O",
+            "-Xes6-block-scoping",
+            "-Xenable-tdz",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/test/LLVMNative/gc_closures.js",
+            "-o",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/gc_closures-O-c"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "",
+          "seconds": 0.26683
+        },
+        {
+          "stage": "c-run",
+          "hermes_opt": "O",
+          "matches_node": true,
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/gc_closures-O-c"
+          ],
+          "exit_code": 0,
+          "stdout": "gc-hook function\n2 alive after collection 0,5000,10000,15000,20000,25000,30000,35000,40000,45000\n",
+          "stderr": "",
+          "seconds": 0.015214
+        },
+        {
+          "stage": "llvm-build",
+          "hermes_opt": "O",
+          "llvm_opt": "0",
+          "command": [
+            "/home/manuel/.pyenv/versions/3.13.2/bin/python3",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/utils/shllvm.py",
+            "build",
+            "--build-dir",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm",
+            "--llvm-bin",
+            "/usr/lib/llvm-18/bin",
+            "--no-runtime-build",
+            "--hermes-opt",
+            "O",
+            "--llvm-opt",
+            "0",
+            "-o",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/gc_closures-O-llvm0",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/test/LLVMNative/gc_closures.js"
+          ],
+          "exit_code": 0,
+          "stdout": "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/gc_closures-O-llvm0\n",
+          "stderr": "",
+          "seconds": 0.231628
+        },
+        {
+          "stage": "llvm-run",
+          "hermes_opt": "O",
+          "llvm_opt": "0",
+          "matches_node_and_c": true,
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/gc_closures-O-llvm0"
+          ],
+          "exit_code": 0,
+          "stdout": "gc-hook function\n2 alive after collection 0,5000,10000,15000,20000,25000,30000,35000,40000,45000\n",
+          "stderr": "",
+          "seconds": 0.027978
+        },
+        {
+          "stage": "llvm-build",
+          "hermes_opt": "O",
+          "llvm_opt": "2",
+          "command": [
+            "/home/manuel/.pyenv/versions/3.13.2/bin/python3",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/utils/shllvm.py",
+            "build",
+            "--build-dir",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm",
+            "--llvm-bin",
+            "/usr/lib/llvm-18/bin",
+            "--no-runtime-build",
+            "--hermes-opt",
+            "O",
+            "--llvm-opt",
+            "2",
+            "-o",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/gc_closures-O-llvm2",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/test/LLVMNative/gc_closures.js"
+          ],
+          "exit_code": 0,
+          "stdout": "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/gc_closures-O-llvm2\n",
+          "stderr": "",
+          "seconds": 0.248699
+        },
+        {
+          "stage": "llvm-run",
+          "hermes_opt": "O",
+          "llvm_opt": "2",
+          "matches_node_and_c": true,
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/gc_closures-O-llvm2"
+          ],
+          "exit_code": 0,
+          "stdout": "gc-hook function\n2 alive after collection 0,5000,10000,15000,20000,25000,30000,35000,40000,45000\n",
+          "stderr": "",
+          "seconds": 0.032074
+        },
+        {
+          "stage": "lli-jit",
+          "matches_node": true,
+          "command": [
+            "/home/manuel/.pyenv/versions/3.13.2/bin/python3",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/utils/shllvm.py",
+            "jit",
+            "--build-dir",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm",
+            "--llvm-bin",
+            "/usr/lib/llvm-18/bin",
+            "--no-runtime-build",
+            "--hermes-opt",
+            "O",
+            "--llvm-opt",
+            "2",
+            "-o",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/gc_closures-jit",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/test/LLVMNative/gc_closures.js"
+          ],
+          "exit_code": 0,
+          "stdout": "gc-hook function\n2 alive after collection 0,5000,10000,15000,20000,25000,30000,35000,40000,45000\n",
+          "stderr": "",
+          "seconds": 0.266904
+        }
+      ]
+    },
+    {
+      "name": "lexical_tdz.js",
+      "kind": "positive",
+      "passed": true,
+      "llvm_native_comparisons": 4,
+      "records": [
+        {
+          "stage": "node",
+          "command": [
+            "/home/manuel/.nvm/versions/node/v24.18.0/bin/node",
+            "--expose-gc",
+            "-e",
+            "globalThis.print = (...a) => console.log(...a); require(process.argv[1]);",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/test/LLVMNative/lexical_tdz.js"
+          ],
+          "exit_code": 0,
+          "stdout": "ReferenceError\n42\n11\n7\n42\n",
+          "stderr": "",
+          "seconds": 0.044042
+        },
+        {
+          "stage": "c-build",
+          "hermes_opt": "O0",
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/bin/shermes",
+            "-O0",
+            "-Xes6-block-scoping",
+            "-Xenable-tdz",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/test/LLVMNative/lexical_tdz.js",
+            "-o",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/lexical_tdz-O0-c"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "",
+          "seconds": 0.190738
+        },
+        {
+          "stage": "c-run",
+          "hermes_opt": "O0",
+          "matches_node": true,
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/lexical_tdz-O0-c"
+          ],
+          "exit_code": 0,
+          "stdout": "ReferenceError\n42\n11\n7\n42\n",
+          "stderr": "",
+          "seconds": 0.005373
+        },
+        {
+          "stage": "llvm-build",
+          "hermes_opt": "O0",
+          "llvm_opt": "0",
+          "command": [
+            "/home/manuel/.pyenv/versions/3.13.2/bin/python3",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/utils/shllvm.py",
+            "build",
+            "--build-dir",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm",
+            "--llvm-bin",
+            "/usr/lib/llvm-18/bin",
+            "--no-runtime-build",
+            "--hermes-opt",
+            "O0",
+            "--llvm-opt",
+            "0",
+            "-o",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/lexical_tdz-O0-llvm0",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/test/LLVMNative/lexical_tdz.js"
+          ],
+          "exit_code": 0,
+          "stdout": "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/lexical_tdz-O0-llvm0\n",
+          "stderr": "",
+          "seconds": 0.219069
+        },
+        {
+          "stage": "llvm-run",
+          "hermes_opt": "O0",
+          "llvm_opt": "0",
+          "matches_node_and_c": true,
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/lexical_tdz-O0-llvm0"
+          ],
+          "exit_code": 0,
+          "stdout": "ReferenceError\n42\n11\n7\n42\n",
+          "stderr": "",
+          "seconds": 0.00511
+        },
+        {
+          "stage": "llvm-build",
+          "hermes_opt": "O0",
+          "llvm_opt": "2",
+          "command": [
+            "/home/manuel/.pyenv/versions/3.13.2/bin/python3",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/utils/shllvm.py",
+            "build",
+            "--build-dir",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm",
+            "--llvm-bin",
+            "/usr/lib/llvm-18/bin",
+            "--no-runtime-build",
+            "--hermes-opt",
+            "O0",
+            "--llvm-opt",
+            "2",
+            "-o",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/lexical_tdz-O0-llvm2",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/test/LLVMNative/lexical_tdz.js"
+          ],
+          "exit_code": 0,
+          "stdout": "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/lexical_tdz-O0-llvm2\n",
+          "stderr": "",
+          "seconds": 0.24127
+        },
+        {
+          "stage": "llvm-run",
+          "hermes_opt": "O0",
+          "llvm_opt": "2",
+          "matches_node_and_c": true,
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/lexical_tdz-O0-llvm2"
+          ],
+          "exit_code": 0,
+          "stdout": "ReferenceError\n42\n11\n7\n42\n",
+          "stderr": "",
+          "seconds": 0.00506
+        },
+        {
+          "stage": "c-build",
+          "hermes_opt": "O",
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/bin/shermes",
+            "-O",
+            "-Xes6-block-scoping",
+            "-Xenable-tdz",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/test/LLVMNative/lexical_tdz.js",
+            "-o",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/lexical_tdz-O-c"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "",
+          "seconds": 0.233477
+        },
+        {
+          "stage": "c-run",
+          "hermes_opt": "O",
+          "matches_node": true,
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/lexical_tdz-O-c"
+          ],
+          "exit_code": 0,
+          "stdout": "ReferenceError\n42\n11\n7\n42\n",
+          "stderr": "",
+          "seconds": 0.005686
+        },
+        {
+          "stage": "llvm-build",
+          "hermes_opt": "O",
+          "llvm_opt": "0",
+          "command": [
+            "/home/manuel/.pyenv/versions/3.13.2/bin/python3",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/utils/shllvm.py",
+            "build",
+            "--build-dir",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm",
+            "--llvm-bin",
+            "/usr/lib/llvm-18/bin",
+            "--no-runtime-build",
+            "--hermes-opt",
+            "O",
+            "--llvm-opt",
+            "0",
+            "-o",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/lexical_tdz-O-llvm0",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/test/LLVMNative/lexical_tdz.js"
+          ],
+          "exit_code": 0,
+          "stdout": "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/lexical_tdz-O-llvm0\n",
+          "stderr": "",
+          "seconds": 0.204792
+        },
+        {
+          "stage": "llvm-run",
+          "hermes_opt": "O",
+          "llvm_opt": "0",
+          "matches_node_and_c": true,
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/lexical_tdz-O-llvm0"
+          ],
+          "exit_code": 0,
+          "stdout": "ReferenceError\n42\n11\n7\n42\n",
+          "stderr": "",
+          "seconds": 0.004345
+        },
+        {
+          "stage": "llvm-build",
+          "hermes_opt": "O",
+          "llvm_opt": "2",
+          "command": [
+            "/home/manuel/.pyenv/versions/3.13.2/bin/python3",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/utils/shllvm.py",
+            "build",
+            "--build-dir",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm",
+            "--llvm-bin",
+            "/usr/lib/llvm-18/bin",
+            "--no-runtime-build",
+            "--hermes-opt",
+            "O",
+            "--llvm-opt",
+            "2",
+            "-o",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/lexical_tdz-O-llvm2",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/test/LLVMNative/lexical_tdz.js"
+          ],
+          "exit_code": 0,
+          "stdout": "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/lexical_tdz-O-llvm2\n",
+          "stderr": "",
+          "seconds": 0.222207
+        },
+        {
+          "stage": "llvm-run",
+          "hermes_opt": "O",
+          "llvm_opt": "2",
+          "matches_node_and_c": true,
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/lexical_tdz-O-llvm2"
+          ],
+          "exit_code": 0,
+          "stdout": "ReferenceError\n42\n11\n7\n42\n",
+          "stderr": "",
+          "seconds": 0.005182
+        }
+      ]
+    },
+    {
+      "name": "objects.js",
+      "kind": "positive",
+      "passed": true,
+      "llvm_native_comparisons": 4,
+      "records": [
+        {
+          "stage": "node",
+          "command": [
+            "/home/manuel/.nvm/versions/node/v24.18.0/bin/node",
+            "--expose-gc",
+            "-e",
+            "globalThis.print = (...a) => console.log(...a); require(process.argv[1]);",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/test/LLVMNative/objects.js"
+          ],
+          "exit_code": 0,
+          "stdout": "42 14 ok true\ntrue true false true\n42\n",
+          "stderr": "",
+          "seconds": 0.059624
+        },
+        {
+          "stage": "c-build",
+          "hermes_opt": "O0",
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/bin/shermes",
+            "-O0",
+            "-Xes6-block-scoping",
+            "-Xenable-tdz",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/test/LLVMNative/objects.js",
+            "-o",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/objects-O0-c"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "",
+          "seconds": 0.175
+        },
+        {
+          "stage": "c-run",
+          "hermes_opt": "O0",
+          "matches_node": true,
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/objects-O0-c"
+          ],
+          "exit_code": 0,
+          "stdout": "42 14 ok true\ntrue true false true\n42\n",
+          "stderr": "",
+          "seconds": 0.005447
+        },
+        {
+          "stage": "llvm-build",
+          "hermes_opt": "O0",
+          "llvm_opt": "0",
+          "command": [
+            "/home/manuel/.pyenv/versions/3.13.2/bin/python3",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/utils/shllvm.py",
+            "build",
+            "--build-dir",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm",
+            "--llvm-bin",
+            "/usr/lib/llvm-18/bin",
+            "--no-runtime-build",
+            "--hermes-opt",
+            "O0",
+            "--llvm-opt",
+            "0",
+            "-o",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/objects-O0-llvm0",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/test/LLVMNative/objects.js"
+          ],
+          "exit_code": 0,
+          "stdout": "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/objects-O0-llvm0\n",
+          "stderr": "",
+          "seconds": 0.221709
+        },
+        {
+          "stage": "llvm-run",
+          "hermes_opt": "O0",
+          "llvm_opt": "0",
+          "matches_node_and_c": true,
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/objects-O0-llvm0"
+          ],
+          "exit_code": 0,
+          "stdout": "42 14 ok true\ntrue true false true\n42\n",
+          "stderr": "",
+          "seconds": 0.007211
+        },
+        {
+          "stage": "llvm-build",
+          "hermes_opt": "O0",
+          "llvm_opt": "2",
+          "command": [
+            "/home/manuel/.pyenv/versions/3.13.2/bin/python3",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/utils/shllvm.py",
+            "build",
+            "--build-dir",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm",
+            "--llvm-bin",
+            "/usr/lib/llvm-18/bin",
+            "--no-runtime-build",
+            "--hermes-opt",
+            "O0",
+            "--llvm-opt",
+            "2",
+            "-o",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/objects-O0-llvm2",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/test/LLVMNative/objects.js"
+          ],
+          "exit_code": 0,
+          "stdout": "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/objects-O0-llvm2\n",
+          "stderr": "",
+          "seconds": 0.26386
+        },
+        {
+          "stage": "llvm-run",
+          "hermes_opt": "O0",
+          "llvm_opt": "2",
+          "matches_node_and_c": true,
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/objects-O0-llvm2"
+          ],
+          "exit_code": 0,
+          "stdout": "42 14 ok true\ntrue true false true\n42\n",
+          "stderr": "",
+          "seconds": 0.006331
+        },
+        {
+          "stage": "c-build",
+          "hermes_opt": "O",
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/bin/shermes",
+            "-O",
+            "-Xes6-block-scoping",
+            "-Xenable-tdz",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/test/LLVMNative/objects.js",
+            "-o",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/objects-O-c"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "",
+          "seconds": 0.212672
+        },
+        {
+          "stage": "c-run",
+          "hermes_opt": "O",
+          "matches_node": true,
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/objects-O-c"
+          ],
+          "exit_code": 0,
+          "stdout": "42 14 ok true\ntrue true false true\n42\n",
+          "stderr": "",
+          "seconds": 0.005577
+        },
+        {
+          "stage": "llvm-build",
+          "hermes_opt": "O",
+          "llvm_opt": "0",
+          "command": [
+            "/home/manuel/.pyenv/versions/3.13.2/bin/python3",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/utils/shllvm.py",
+            "build",
+            "--build-dir",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm",
+            "--llvm-bin",
+            "/usr/lib/llvm-18/bin",
+            "--no-runtime-build",
+            "--hermes-opt",
+            "O",
+            "--llvm-opt",
+            "0",
+            "-o",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/objects-O-llvm0",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/test/LLVMNative/objects.js"
+          ],
+          "exit_code": 0,
+          "stdout": "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/objects-O-llvm0\n",
+          "stderr": "",
+          "seconds": 0.199138
+        },
+        {
+          "stage": "llvm-run",
+          "hermes_opt": "O",
+          "llvm_opt": "0",
+          "matches_node_and_c": true,
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/objects-O-llvm0"
+          ],
+          "exit_code": 0,
+          "stdout": "42 14 ok true\ntrue true false true\n42\n",
+          "stderr": "",
+          "seconds": 0.004453
+        },
+        {
+          "stage": "llvm-build",
+          "hermes_opt": "O",
+          "llvm_opt": "2",
+          "command": [
+            "/home/manuel/.pyenv/versions/3.13.2/bin/python3",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/utils/shllvm.py",
+            "build",
+            "--build-dir",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm",
+            "--llvm-bin",
+            "/usr/lib/llvm-18/bin",
+            "--no-runtime-build",
+            "--hermes-opt",
+            "O",
+            "--llvm-opt",
+            "2",
+            "-o",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/objects-O-llvm2",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/test/LLVMNative/objects.js"
+          ],
+          "exit_code": 0,
+          "stdout": "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/objects-O-llvm2\n",
+          "stderr": "",
+          "seconds": 0.244493
+        },
+        {
+          "stage": "llvm-run",
+          "hermes_opt": "O",
+          "llvm_opt": "2",
+          "matches_node_and_c": true,
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/objects-O-llvm2"
+          ],
+          "exit_code": 0,
+          "stdout": "42 14 ok true\ntrue true false true\n42\n",
+          "stderr": "",
+          "seconds": 0.005342
+        }
+      ]
+    },
+    {
+      "name": "strings.js",
+      "kind": "positive",
+      "passed": true,
+      "llvm_native_comparisons": 4,
+      "records": [
+        {
+          "stage": "node",
+          "command": [
+            "/home/manuel/.nvm/versions/node/v24.18.0/bin/node",
+            "--expose-gc",
+            "-e",
+            "globalThis.print = (...a) => console.log(...a); require(process.argv[1]);",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/test/LLVMNative/strings.js"
+          ],
+          "exit_code": 0,
+          "stdout": "hello world! 2 233 56606\nbc 3 2\n42\n",
+          "stderr": "",
+          "seconds": 0.045528
+        },
+        {
+          "stage": "c-build",
+          "hermes_opt": "O0",
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/bin/shermes",
+            "-O0",
+            "-Xes6-block-scoping",
+            "-Xenable-tdz",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/test/LLVMNative/strings.js",
+            "-o",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/strings-O0-c"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "",
+          "seconds": 0.175036
+        },
+        {
+          "stage": "c-run",
+          "hermes_opt": "O0",
+          "matches_node": true,
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/strings-O0-c"
+          ],
+          "exit_code": 0,
+          "stdout": "hello world! 2 233 56606\nbc 3 2\n42\n",
+          "stderr": "",
+          "seconds": 0.005101
+        },
+        {
+          "stage": "llvm-build",
+          "hermes_opt": "O0",
+          "llvm_opt": "0",
+          "command": [
+            "/home/manuel/.pyenv/versions/3.13.2/bin/python3",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/utils/shllvm.py",
+            "build",
+            "--build-dir",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm",
+            "--llvm-bin",
+            "/usr/lib/llvm-18/bin",
+            "--no-runtime-build",
+            "--hermes-opt",
+            "O0",
+            "--llvm-opt",
+            "0",
+            "-o",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/strings-O0-llvm0",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/test/LLVMNative/strings.js"
+          ],
+          "exit_code": 0,
+          "stdout": "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/strings-O0-llvm0\n",
+          "stderr": "",
+          "seconds": 0.216861
+        },
+        {
+          "stage": "llvm-run",
+          "hermes_opt": "O0",
+          "llvm_opt": "0",
+          "matches_node_and_c": true,
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/strings-O0-llvm0"
+          ],
+          "exit_code": 0,
+          "stdout": "hello world! 2 233 56606\nbc 3 2\n42\n",
+          "stderr": "",
+          "seconds": 0.005765
+        },
+        {
+          "stage": "llvm-build",
+          "hermes_opt": "O0",
+          "llvm_opt": "2",
+          "command": [
+            "/home/manuel/.pyenv/versions/3.13.2/bin/python3",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/utils/shllvm.py",
+            "build",
+            "--build-dir",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm",
+            "--llvm-bin",
+            "/usr/lib/llvm-18/bin",
+            "--no-runtime-build",
+            "--hermes-opt",
+            "O0",
+            "--llvm-opt",
+            "2",
+            "-o",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/strings-O0-llvm2",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/test/LLVMNative/strings.js"
+          ],
+          "exit_code": 0,
+          "stdout": "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/strings-O0-llvm2\n",
+          "stderr": "",
+          "seconds": 0.251993
+        },
+        {
+          "stage": "llvm-run",
+          "hermes_opt": "O0",
+          "llvm_opt": "2",
+          "matches_node_and_c": true,
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/strings-O0-llvm2"
+          ],
+          "exit_code": 0,
+          "stdout": "hello world! 2 233 56606\nbc 3 2\n42\n",
+          "stderr": "",
+          "seconds": 0.006031
+        },
+        {
+          "stage": "c-build",
+          "hermes_opt": "O",
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/bin/shermes",
+            "-O",
+            "-Xes6-block-scoping",
+            "-Xenable-tdz",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/test/LLVMNative/strings.js",
+            "-o",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/strings-O-c"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "",
+          "seconds": 0.184061
+        },
+        {
+          "stage": "c-run",
+          "hermes_opt": "O",
+          "matches_node": true,
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/strings-O-c"
+          ],
+          "exit_code": 0,
+          "stdout": "hello world! 2 233 56606\nbc 3 2\n42\n",
+          "stderr": "",
+          "seconds": 0.004556
+        },
+        {
+          "stage": "llvm-build",
+          "hermes_opt": "O",
+          "llvm_opt": "0",
+          "command": [
+            "/home/manuel/.pyenv/versions/3.13.2/bin/python3",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/utils/shllvm.py",
+            "build",
+            "--build-dir",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm",
+            "--llvm-bin",
+            "/usr/lib/llvm-18/bin",
+            "--no-runtime-build",
+            "--hermes-opt",
+            "O",
+            "--llvm-opt",
+            "0",
+            "-o",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/strings-O-llvm0",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/test/LLVMNative/strings.js"
+          ],
+          "exit_code": 0,
+          "stdout": "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/strings-O-llvm0\n",
+          "stderr": "",
+          "seconds": 0.197554
+        },
+        {
+          "stage": "llvm-run",
+          "hermes_opt": "O",
+          "llvm_opt": "0",
+          "matches_node_and_c": true,
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/strings-O-llvm0"
+          ],
+          "exit_code": 0,
+          "stdout": "hello world! 2 233 56606\nbc 3 2\n42\n",
+          "stderr": "",
+          "seconds": 0.004377
+        },
+        {
+          "stage": "llvm-build",
+          "hermes_opt": "O",
+          "llvm_opt": "2",
+          "command": [
+            "/home/manuel/.pyenv/versions/3.13.2/bin/python3",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/utils/shllvm.py",
+            "build",
+            "--build-dir",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm",
+            "--llvm-bin",
+            "/usr/lib/llvm-18/bin",
+            "--no-runtime-build",
+            "--hermes-opt",
+            "O",
+            "--llvm-opt",
+            "2",
+            "-o",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/strings-O-llvm2",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/test/LLVMNative/strings.js"
+          ],
+          "exit_code": 0,
+          "stdout": "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/strings-O-llvm2\n",
+          "stderr": "",
+          "seconds": 0.178996
+        },
+        {
+          "stage": "llvm-run",
+          "hermes_opt": "O",
+          "llvm_opt": "2",
+          "matches_node_and_c": true,
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/strings-O-llvm2"
+          ],
+          "exit_code": 0,
+          "stdout": "hello world! 2 233 56606\nbc 3 2\n42\n",
+          "stderr": "",
+          "seconds": 0.003949
+        }
+      ]
+    },
+    {
+      "name": "error_arrow_constructor.js",
+      "kind": "runtime-error",
+      "passed": true,
+      "records": [
+        {
+          "stage": "error-build",
+          "hermes_opt": "O0",
+          "command": [
+            "/home/manuel/.pyenv/versions/3.13.2/bin/python3",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/utils/shllvm.py",
+            "build",
+            "--build-dir",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm",
+            "--llvm-bin",
+            "/usr/lib/llvm-18/bin",
+            "--no-runtime-build",
+            "--hermes-opt",
+            "O0",
+            "-o",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/error_arrow_constructor-O0",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/test/LLVMNative/error_arrow_constructor.js"
+          ],
+          "exit_code": 0,
+          "stdout": "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/error_arrow_constructor-O0\n",
+          "stderr": "",
+          "seconds": 0.167722
+        },
+        {
+          "stage": "runtime-error",
+          "hermes_opt": "O0",
+          "expected_error": "TypeError",
+          "matches_expected": true,
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/error_arrow_constructor-O0"
+          ],
+          "exit_code": 1,
+          "stdout": "",
+          "stderr": "Uncaught TypeError: Function is not a constructor\n    at f (native)\n    at global (native)\n",
+          "seconds": 0.003912
+        },
+        {
+          "stage": "error-build",
+          "hermes_opt": "O",
+          "command": [
+            "/home/manuel/.pyenv/versions/3.13.2/bin/python3",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/utils/shllvm.py",
+            "build",
+            "--build-dir",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm",
+            "--llvm-bin",
+            "/usr/lib/llvm-18/bin",
+            "--no-runtime-build",
+            "--hermes-opt",
+            "O",
+            "-o",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/error_arrow_constructor-O",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/test/LLVMNative/error_arrow_constructor.js"
+          ],
+          "exit_code": 0,
+          "stdout": "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/error_arrow_constructor-O\n",
+          "stderr": "",
+          "seconds": 0.150505
+        },
+        {
+          "stage": "runtime-error",
+          "hermes_opt": "O",
+          "expected_error": "TypeError",
+          "matches_expected": true,
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/error_arrow_constructor-O"
+          ],
+          "exit_code": 1,
+          "stdout": "",
+          "stderr": "Uncaught TypeError: Function is not a constructor\n    at f (native)\n    at global (native)\n",
+          "seconds": 0.00381
+        }
+      ]
+    },
+    {
+      "name": "error_missing_global.js",
+      "kind": "runtime-error",
+      "passed": true,
+      "records": [
+        {
+          "stage": "error-build",
+          "hermes_opt": "O0",
+          "command": [
+            "/home/manuel/.pyenv/versions/3.13.2/bin/python3",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/utils/shllvm.py",
+            "build",
+            "--build-dir",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm",
+            "--llvm-bin",
+            "/usr/lib/llvm-18/bin",
+            "--no-runtime-build",
+            "--hermes-opt",
+            "O0",
+            "-o",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/error_missing_global-O0",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/test/LLVMNative/error_missing_global.js"
+          ],
+          "exit_code": 0,
+          "stdout": "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/error_missing_global-O0\n",
+          "stderr": "",
+          "seconds": 0.145812
+        },
+        {
+          "stage": "runtime-error",
+          "hermes_opt": "O0",
+          "expected_error": "ReferenceError",
+          "matches_expected": true,
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/error_missing_global-O0"
+          ],
+          "exit_code": 1,
+          "stdout": "",
+          "stderr": "Uncaught ReferenceError: Property 'noSuchBindingForLLVMTest' doesn't exist\n    at global (native)\n",
+          "seconds": 0.003471
+        },
+        {
+          "stage": "error-build",
+          "hermes_opt": "O",
+          "command": [
+            "/home/manuel/.pyenv/versions/3.13.2/bin/python3",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/utils/shllvm.py",
+            "build",
+            "--build-dir",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm",
+            "--llvm-bin",
+            "/usr/lib/llvm-18/bin",
+            "--no-runtime-build",
+            "--hermes-opt",
+            "O",
+            "-o",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/error_missing_global-O",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/test/LLVMNative/error_missing_global.js"
+          ],
+          "exit_code": 0,
+          "stdout": "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/error_missing_global-O\n",
+          "stderr": "",
+          "seconds": 0.145974
+        },
+        {
+          "stage": "runtime-error",
+          "hermes_opt": "O",
+          "expected_error": "ReferenceError",
+          "matches_expected": true,
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/error_missing_global-O"
+          ],
+          "exit_code": 1,
+          "stdout": "",
+          "stderr": "Uncaught ReferenceError: Property 'noSuchBindingForLLVMTest' doesn't exist\n    at global (native)\n",
+          "seconds": 0.003436
+        }
+      ]
+    },
+    {
+      "name": "error_noncallable.js",
+      "kind": "runtime-error",
+      "passed": true,
+      "records": [
+        {
+          "stage": "error-build",
+          "hermes_opt": "O0",
+          "command": [
+            "/home/manuel/.pyenv/versions/3.13.2/bin/python3",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/utils/shllvm.py",
+            "build",
+            "--build-dir",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm",
+            "--llvm-bin",
+            "/usr/lib/llvm-18/bin",
+            "--no-runtime-build",
+            "--hermes-opt",
+            "O0",
+            "-o",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/error_noncallable-O0",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/test/LLVMNative/error_noncallable.js"
+          ],
+          "exit_code": 0,
+          "stdout": "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/error_noncallable-O0\n",
+          "stderr": "",
+          "seconds": 0.146535
+        },
+        {
+          "stage": "runtime-error",
+          "hermes_opt": "O0",
+          "expected_error": "TypeError",
+          "matches_expected": true,
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/error_noncallable-O0"
+          ],
+          "exit_code": 1,
+          "stdout": "",
+          "stderr": "Uncaught TypeError: 3 is not a function\n    at global (native)\n",
+          "seconds": 0.003406
+        },
+        {
+          "stage": "error-build",
+          "hermes_opt": "O",
+          "command": [
+            "/home/manuel/.pyenv/versions/3.13.2/bin/python3",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/utils/shllvm.py",
+            "build",
+            "--build-dir",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm",
+            "--llvm-bin",
+            "/usr/lib/llvm-18/bin",
+            "--no-runtime-build",
+            "--hermes-opt",
+            "O",
+            "-o",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/error_noncallable-O",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/test/LLVMNative/error_noncallable.js"
+          ],
+          "exit_code": 0,
+          "stdout": "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/error_noncallable-O\n",
+          "stderr": "",
+          "seconds": 0.142192
+        },
+        {
+          "stage": "runtime-error",
+          "hermes_opt": "O",
+          "expected_error": "TypeError",
+          "matches_expected": true,
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/error_noncallable-O"
+          ],
+          "exit_code": 1,
+          "stdout": "",
+          "stderr": "Uncaught TypeError: 3 is not a function\n    at global (native)\n",
+          "seconds": 0.003373
+        }
+      ]
+    },
+    {
+      "name": "unsupported_const_assignment.js",
+      "kind": "compile-rejection",
+      "passed": true,
+      "existing_output_preserved": true,
+      "records": [
+        {
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/bin/shermes",
+            "-O0",
+            "-emit-llvm",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/test/LLVMNative/unsupported_const_assignment.js",
+            "-o",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/unsupported_const_assignment.ll"
+          ],
+          "exit_code": 1,
+          "stdout": "",
+          "stderr": "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/test/LLVMNative/unsupported_const_assignment.js:2:7: error: invalid assignment left-hand side\ntry { value = 2; } catch (e) { print(e.name); }\n      ^~~~~\nEmitted 1 errors. exiting.\n",
+          "seconds": 0.001333
+        }
+      ]
+    },
+    {
+      "name": "unsupported_eval.js",
+      "kind": "compile-rejection",
+      "passed": true,
+      "existing_output_preserved": true,
+      "records": [
+        {
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/bin/shermes",
+            "-O0",
+            "-emit-llvm",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/test/LLVMNative/unsupported_eval.js",
+            "-o",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/unsupported_eval.ll"
+          ],
+          "exit_code": 1,
+          "stdout": "",
+          "stderr": "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/test/LLVMNative/unsupported_eval.js:1:15: warning: Direct call to eval(), but lexical scope is not supported.\nconst value = eval('1 + 2');\n              ^~~~\n/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/test/LLVMNative/unsupported_eval.js:1:19: error: direct LLVM backend: unsupported instruction DirectEvalInst\nconst value = eval('1 + 2');\n                  ^\n",
+          "seconds": 0.001827
+        }
+      ]
+    },
+    {
+      "name": "unsupported_generator.js",
+      "kind": "compile-rejection",
+      "passed": true,
+      "existing_output_preserved": true,
+      "records": [
+        {
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/bin/shermes",
+            "-O0",
+            "-emit-llvm",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/test/LLVMNative/unsupported_generator.js",
+            "-o",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/shllvm-tests/unsupported_generator.ll"
+          ],
+          "exit_code": 1,
+          "stdout": "",
+          "stderr": "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/test/LLVMNative/unsupported_generator.js:1:1: error: direct LLVM backend: unsupported instruction CreateGeneratorInst\nfunction* sequence() { yield 1; yield 2; }\n^\n",
+          "seconds": 0.001416
+        }
+      ]
+    }
+  ]
+}

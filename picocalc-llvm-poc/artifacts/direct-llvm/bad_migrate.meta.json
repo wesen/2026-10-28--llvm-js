@@ -1,0 +1,27 @@
+{
+  "size": 8876,
+  "sha256": "25c84b3ad077e9717e7781d30aca7296c51ebe90d0b556e603a8dc3ead3938c8",
+  "entry": 1048604,
+  "segments": [
+    {
+      "vaddr": 1048576,
+      "filesz": 4140,
+      "memsz": 4140,
+      "flags": 5
+    }
+  ],
+  "target": "riscv32-unknown-elf",
+  "march": "rv32im",
+  "abi": "ilp32",
+  "no_libc": true,
+  "language": "js",
+  "backend": "direct-llvm",
+  "source_sha256": "368852fa728ea13bc2990333974979b6c51348d80adc0bf951184066853a0b39",
+  "generated_sha256": "ea23b480b2bb31a5718eb581bfe07e2cead2a63208bf8a8e6695d6e0f2a50ae2",
+  "optimization": "2",
+  "timings_ms": {
+    "frontend": 293.6035709999487,
+    "llvm_compile": 30.321426000227802,
+    "link": 16.198345999328012
+  }
+}

@@ -1,0 +1,266 @@
+{
+  "note": "Captured immediately after the final full differential matrix, after the verifier guard, static/shared driver target fix, and final VM dependency rebuild. File identities were unchanged across the complete final gate. Historical matrix and focused review evidence remain byte-for-byte preserved.",
+  "started_at": "2026-10-28T14:03:14.946106+00:00",
+  "captured_at": "2026-10-28T14:03:36.339988+00:00",
+  "command": [
+    "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+    "utils/test_shllvm.py",
+    "--jobs",
+    "2",
+    "--output",
+    "docs/llvm/evidence/final-validation.json"
+  ],
+  "exit_code": 0,
+  "seconds": 21.393773,
+  "implementation_and_binaries_unchanged_during_validation": true,
+  "historical_evidence_preserved": true,
+  "historical_evidence_identity": [
+    {
+      "path": "docs/llvm/evidence/validation.json",
+      "bytes": 152749,
+      "sha256": "d5264f84e52dc213cd9a07d39e62dd067b9786ba5be9b412cbf5c8d928f8f87d"
+    },
+    {
+      "path": "docs/llvm/evidence/validated-files.json",
+      "bytes": 5830,
+      "sha256": "250267d486edf49c04fe1e789fa5dea51516ca893fa019591a933c1f745e7915"
+    },
+    {
+      "path": "docs/llvm/evidence/post-review-verifier.json",
+      "bytes": 145042,
+      "sha256": "8b1ad7024c0041cffd93d992f2b941facb4d201e6ab733e2132e121396b79c73"
+    },
+    {
+      "path": "docs/llvm/evidence/post-review-driver.json",
+      "bytes": 14390,
+      "sha256": "75fa7ebe8444a9fa077a8c0b0bc60e4f4be69111ff3f92d3ff9dcab58e5904b2"
+    }
+  ],
+  "validation_evidence": {
+    "path": "docs/llvm/evidence/final-validation.json",
+    "bytes": 152747,
+    "sha256": "c1b8d7afc000589a8c0b88805ff466a754967e99bb61147a9e4f00070e8dac22"
+  },
+  "validation_log": {
+    "path": "docs/llvm/evidence/final-validation.log",
+    "bytes": 1284,
+    "sha256": "157c0c580dd1669c191df49e0ea31f5c21b1fddaa23b8ec22d0d398749007cb1"
+  },
+  "environment": {
+    "LLVM_BIN": "/tmp/llvm-direct-toolchain/bin",
+    "ASAN_OPTIONS": "detect_leaks=0",
+    "ASAN_SYMBOLIZER_PATH": "/tmp/llvm-direct-toolchain/bin/llvm-symbolizer"
+  },
+  "files": [
+    {
+      "path": "build-llvm/bin/shermes",
+      "bytes": 10855056,
+      "sha256": "29c967d6ec9212051d0e38d5d952d8e10e7175d2d2977a42a250a6dbfdcfb7f8"
+    },
+    {
+      "path": "build-llvm/lib/libhermesvm.so",
+      "bytes": 15280032,
+      "sha256": "dac68c34fed2114807d88ab6ae34d556b49c695305391c55550a00b195f24b1e"
+    },
+    {
+      "path": "build-llvm/lib/libshllvm_runtime.a",
+      "bytes": 59216,
+      "sha256": "b65ecc0f2f667f673a6f569ae9a090acb8891233fdfe344bd57c213c43ee82e3"
+    },
+    {
+      "path": "build-llvm/lib/libshllvm_runtime.so",
+      "bytes": 79944,
+      "sha256": "b6fecc3f3f0c2f131fa2de6e300a092d9e658f58ef76319cacb479707f67d7e1"
+    },
+    {
+      "path": "build-llvm/tools/shermes/libshermes_console.so",
+      "bytes": 161864,
+      "sha256": "d20899a17c05691e43deefbac4b795a41e5adbccc3bd97b2e34197c1268c5e46"
+    },
+    {
+      "path": "lib/BCGen/SH/LLVMNative/LLVMBackend.cpp",
+      "bytes": 42406,
+      "sha256": "04569fe6e459ef02a43eddf0e4883748151581955857d9143e03c5ea405b8126"
+    },
+    {
+      "path": "lib/BCGen/SH/LLVMNative/runtime.c",
+      "bytes": 19703,
+      "sha256": "0eb8ddecad472265a09990a19c57a2debdcc046affa9a7d89dadc3ec5b0fce80"
+    },
+    {
+      "path": "lib/BCGen/SH/LLVMNative/runtime.h",
+      "bytes": 6556,
+      "sha256": "f0d71c2c51dd2f7d449ed7b127264a1850ae170530e86dab23ed74d00842c864"
+    },
+    {
+      "path": "include/hermes/BCGen/SH/LLVM.h",
+      "bytes": 515,
+      "sha256": "20226b8859272821b6d4284ad1b9b953cf308ee753523670ab3edd72ca280199"
+    },
+    {
+      "path": "tools/shermes/shermes.cpp",
+      "bytes": 36402,
+      "sha256": "66d4fb5836fe4fcf5e5088afb0e61ece1cf75c6783166775c784ca9c32ceebfb"
+    },
+    {
+      "path": "tools/shermes/compile.cpp",
+      "bytes": 17747,
+      "sha256": "46c87d7417317cdfdd99e143bcbab0f488fdaf2f0b26cdd40c24cef543beb4a7"
+    },
+    {
+      "path": "lib/BCGen/SH/SH.cpp",
+      "bytes": 113312,
+      "sha256": "930b34a91172b876a1b96a3951eb5e44579123fbc800fa1bd8f21abab61cc4ec"
+    },
+    {
+      "path": "test/LLVMNative/unsupported_const_assignment.js",
+      "bytes": 65,
+      "sha256": "ec85bb2ad8a58c470d548e20649507b4304c6428749362c4299c2d939e6f8639"
+    },
+    {
+      "path": "test/LLVMNative/accessors.js",
+      "bytes": 319,
+      "sha256": "c9def10323c3c8bd57bc05e7d4394d33bc90313a2b2206caf5a13a18006ebee4"
+    },
+    {
+      "path": "test/LLVMNative/arrays_callbacks.js",
+      "bytes": 404,
+      "sha256": "edd6f726dd865490f8f6d50f28ca391c7da1ee59ba89c96c647144a1cecb3861"
+    },
+    {
+      "path": "test/LLVMNative/exceptions.js",
+      "bytes": 629,
+      "sha256": "86ef5d86a2e5c3e8dc01d769271dfaae72ce6650469076b1b6e15dc60d6b12a0"
+    },
+    {
+      "path": "test/LLVMNative/arrows_this.js",
+      "bytes": 298,
+      "sha256": "4b300e3b4092ed7f29a338849b037ac8391a50459c08050920dca0ded1cf6a72"
+    },
+    {
+      "path": "test/LLVMNative/coercion.js",
+      "bytes": 356,
+      "sha256": "920a30759cff382450bf40c2264aed91f31fb76c9ab71139806ab3542f153bc3"
+    },
+    {
+      "path": "test/LLVMNative/strings.js",
+      "bytes": 254,
+      "sha256": "585c59480c253588eb55326e2c1d3d318a96284a8e81a392a522ee2b79c481f1"
+    },
+    {
+      "path": "test/LLVMNative/classes.js",
+      "bytes": 512,
+      "sha256": "7a20389b833dbad5fa7dc9590236a201da92be56b279c9d80e57a110ec441b03"
+    },
+    {
+      "path": "test/LLVMNative/functions.js",
+      "bytes": 382,
+      "sha256": "5344c3e6cb57e25eaa167944eef6059573c185bd35e5a4b9493053312a0da97f"
+    },
+    {
+      "path": "test/LLVMNative/control_phi.js",
+      "bytes": 429,
+      "sha256": "853085848d87f76f749b664142fb4d89b7ed775f5b54bc70acf92de9e8125e29"
+    },
+    {
+      "path": "test/LLVMNative/constructors.js",
+      "bytes": 480,
+      "sha256": "6577b9221628cce1cbd6e6a907c6027bc50d946edb64967c363006767d735598"
+    },
+    {
+      "path": "test/LLVMNative/error_noncallable.js",
+      "bytes": 37,
+      "sha256": "13d20dd20bd6af487802aad077b1f949d707ec7e44f1b9bf1747b4a8e62eaf6f"
+    },
+    {
+      "path": "test/LLVMNative/arguments.js",
+      "bytes": 330,
+      "sha256": "399fbad80233c6d5ca6144cdee6251d42032f9dcc50cf7e3127d5701f3cce556"
+    },
+    {
+      "path": "test/LLVMNative/gc_closures.js",
+      "bytes": 436,
+      "sha256": "e2cc29627ab8b921aff3e70f1d8ef95d7314f9be040c56bfa87769b68b732dfd"
+    },
+    {
+      "path": "test/LLVMNative/unsupported_generator.js",
+      "bytes": 75,
+      "sha256": "11fca38f67c2fa38050b0a177c28e391ff87408b1466df1bed5790cc3f09f72b"
+    },
+    {
+      "path": "test/LLVMNative/closures.js",
+      "bytes": 442,
+      "sha256": "3126dfc6d63f9e39d70316b9d99ae46b730ac4cb3526a69d82df3022c81cc7c7"
+    },
+    {
+      "path": "test/LLVMNative/lexical_tdz.js",
+      "bytes": 267,
+      "sha256": "17649e0fd19e538d264e5b7f28b8b10a602a12f704e52a5d30a5b379a3b37efd"
+    },
+    {
+      "path": "test/LLVMNative/objects.js",
+      "bytes": 385,
+      "sha256": "b5921cd8bcc10666245ca233b553f44fb50bae0130848090b48aec0172b22301"
+    },
+    {
+      "path": "test/LLVMNative/error_arrow_constructor.js",
+      "bytes": 28,
+      "sha256": "5171a16af00699428192c27464090baa49ff95e3d74365f44f6054fca0a3f33c"
+    },
+    {
+      "path": "test/LLVMNative/unsupported_eval.js",
+      "bytes": 43,
+      "sha256": "fb6711e26c13e8a2534f41e9c7606b05cfc96c2eb7be9b14eebb740fd7f08f4e"
+    },
+    {
+      "path": "test/LLVMNative/catch_basic.js",
+      "bytes": 41,
+      "sha256": "feafe1e7368a0fc6b3eeffa67c78c771766d91a4d817438e69f770d0dfd547dd"
+    },
+    {
+      "path": "test/LLVMNative/error_missing_global.js",
+      "bytes": 33,
+      "sha256": "d9e5148c22206aa07500f6da20baad64534b43b27537a2106a82b8ed03c2b8b3"
+    },
+    {
+      "path": "examples/llvm/counter.js",
+      "bytes": 1171,
+      "sha256": "8f66bb6972d2589367ecda1c00346451506413988f124a174b3fe5edb241c3af"
+    },
+    {
+      "path": "include/hermes/BCGen/SH/SH.h",
+      "bytes": 885,
+      "sha256": "1510e4ea450edad6d8f97071eac27cd57a7782dec0ade54cb17eed78b336b80f"
+    },
+    {
+      "path": "lib/BCGen/SH/CMakeLists.txt",
+      "bytes": 1602,
+      "sha256": "a69dc352318fe001abd12c62c08179fd8eb7d8a164369b17d8abd79bd1dfa2d5"
+    },
+    {
+      "path": "tools/shermes/compile.h",
+      "bytes": 1738,
+      "sha256": "1e082feec6235af6d6ef4b8e327f8fe65ad10a9bc9a87c0e81d493591b8dcf62"
+    },
+    {
+      "path": "utils/shllvm.py",
+      "bytes": 11099,
+      "sha256": "dc3e04a08fcfafadaf585884880b5a30bee39579520d5b57ffc0ebbf7614a291"
+    },
+    {
+      "path": "utils/test_shllvm.py",
+      "bytes": 9101,
+      "sha256": "2d57414c3de72875719a38acdccf3de3306cd830ac9803702d27f4b83adf187a"
+    },
+    {
+      "path": "utils/test_shllvm_defaults.py",
+      "bytes": 4716,
+      "sha256": "71b6341b739e8c74fc9d5090484eb23054227759cdec747dd7f332314371aa42"
+    },
+    {
+      "path": "utils/test_shllvm_driver.py",
+      "bytes": 4229,
+      "sha256": "c27e825b73108c6b8c4deeeac1ab19fbcbe160b7f9435f80100432620a490e9c"
+    }
+  ]
+}

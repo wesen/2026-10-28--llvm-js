@@ -1,0 +1,73 @@
+{
+  "passed": 5,
+  "total": 5,
+  "results": [
+    {
+      "case": "loop-default",
+      "source": "let f=[]; for(let i=0;i<3;i++){f.push(() => i);} print(f[0](),f[1](),f[2]());\n",
+      "flags": [],
+      "compile_exit": 0,
+      "compile_stderr": "",
+      "expected": "0 1 2\n",
+      "passed": true,
+      "link_exit": 0,
+      "link_stderr": "",
+      "exit": 0,
+      "actual": "0 1 2\n",
+      "stderr": ""
+    },
+    {
+      "case": "loop-explicit-off",
+      "source": "let f=[]; for(let i=0;i<3;i++){f.push(() => i);} print(f[0](),f[1](),f[2]());\n",
+      "flags": [
+        "-Xes6-block-scoping=false"
+      ],
+      "compile_exit": 0,
+      "compile_stderr": "",
+      "expected": "3 3 3\n",
+      "passed": true,
+      "link_exit": 0,
+      "link_stderr": "",
+      "exit": 0,
+      "actual": "3 3 3\n",
+      "stderr": ""
+    },
+    {
+      "case": "tdz-default",
+      "source": "function call(fn){return fn();} function f(){let read=()=>x; try {print(call(read));}catch(e){print(e.name);} let x=7;return read();}print(f());\n",
+      "flags": [],
+      "compile_exit": 0,
+      "compile_stderr": "",
+      "expected": "ReferenceError\n7\n",
+      "passed": true,
+      "link_exit": 0,
+      "link_stderr": "",
+      "exit": 0,
+      "actual": "ReferenceError\n7\n",
+      "stderr": ""
+    },
+    {
+      "case": "tdz-explicit-off",
+      "source": "function call(fn){return fn();} function f(){let read=()=>x; try {print(call(read));}catch(e){print(e.name);} let x=7;return read();}print(f());\n",
+      "flags": [
+        "-Xenable-tdz=false"
+      ],
+      "compile_exit": 0,
+      "compile_stderr": "",
+      "expected": "undefined\n7\n",
+      "passed": true,
+      "link_exit": 0,
+      "link_stderr": "",
+      "exit": 0,
+      "actual": "undefined\n7\n",
+      "stderr": ""
+    },
+    {
+      "case": "static-tdz-diagnostic",
+      "source": "function f(){try {print(x);}catch(e){print(e.name);} let x=7;} f();\n",
+      "exit": 1,
+      "stderr": "/tmp/shllvm-defaults-anejxmgn/static-tdz.js:1:25: error: TDZ violation: reading from uninitialized variable 'x'\nfunction f(){try {print(x);}catch(e){print(e.name);} let x=7;} f();\n                        ^\nEmitted 1 errors. exiting.\n",
+      "passed": true
+    }
+  ]
+}

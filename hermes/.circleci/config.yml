@@ -1,0 +1,73 @@
+version: 2.1
+
+workflows:
+  version: 2
+  build:
+    jobs:
+      - test-macos:
+          matrix:
+            parameters:
+              sanitize: ["ON", "OFF"]
+              gc: ["MALLOC", "HADES"]
+      - test-linux
+
+jobs:
+  test-macos:
+    macos:
+      xcode: 13.4.1
+    resource_class: macos.m1.medium.gen1
+    parameters:
+      sanitize:
+        type: string
+      gc:
+        type: string
+    steps:
+      - checkout:
+          path: hermes
+      - run:
+          name: Setup dependencies
+          command: |
+            brew install cmake ninja
+            # Check out test262 at a pinned revision to reduce flakiness
+            git clone https://github.com/tc39/test262
+            cd test262
+            git checkout 62626e083bd506124aac6c799464d76c2c42851b
+      - run:
+          name: Run Hermes tests and test262
+          command: |
+            # Tests can take a long time to run, since we don't need to attach a debugger
+            # a Debug build with with -O2 lets us avoid timeouts and get results sooner.
+            cmake -S hermes -B build -GNinja -DHERMES_ENABLE_INTL=ON \
+              -DCMAKE_BUILD_TYPE=Debug \
+              -DCMAKE_CXX_FLAGS=-O2 -DCMAKE_C_FLAGS=-O2 \
+              -DHERMESVM_SANITIZE_HANDLES=<< parameters.sanitize >> \
+              -DHERMES_ENABLE_UNDEFINED_BEHAVIOR_SANITIZER=<< parameters.sanitize >> \
+              -DHERMES_ENABLE_ADDRESS_SANITIZER=<< parameters.sanitize >> \
+              -DHERMESVM_GCKIND=<< parameters.gc >>
+            cmake --build build
+            cmake --build build --target check-hermes
+            # TODO(zhaogang): test with --shermes flag as well once we address the harness
+            # code issue with shermes.
+            python3 hermes/utils/test_runner.py --test-intl test262/test -b build/bin
+
+  test-linux:
+    docker:
+      - image: ubuntu:jammy
+    environment:
+      - DEBIAN_FRONTEND: noninteractive
+    working_directory: /root
+    steps:
+      - run:
+          name: Install dependencies
+          command: |
+            apt update
+            apt install -y git openssh-client cmake build-essential \
+                libicu-dev zip python3 tzdata
+      - checkout:
+          path: hermes
+      - run:
+          name: Run Hermes regression tests
+          command: |
+            cmake -S hermes -B build -DCMAKE_BUILD_TYPE=Debug
+            cmake --build build -j 2
+            cmake --build build --target check-hermes -j 4

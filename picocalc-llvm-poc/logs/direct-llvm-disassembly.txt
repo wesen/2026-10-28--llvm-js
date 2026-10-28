@@ -1,0 +1,35 @@
+
+/workspace/scratch/ea758b58c6af/picocalc-llvm-direct/picocalc-llvm-poc/artifacts/direct-llvm/counter_v1.elf:	file format elf32-littleriscv
+
+Disassembly of section .text:
+
+00100000 <pico_world_step>:
+  100000: 93 06 20 00  	li	a3, 0x2
+  100004: 63 8c d5 02  	beq	a1, a3, 0x10003c <pico_world_step+0x3c>
+  100008: 93 06 10 00  	li	a3, 0x1
+  10000c: 63 94 d5 04  	bne	a1, a3, 0x100054 <pico_world_step+0x54>
+  100010: 83 25 45 00  	lw	a1, 0x4(a0)
+  100014: 83 26 85 00  	lw	a3, 0x8(a0)
+  100018: 33 86 c5 00  	add	a2, a1, a2
+  10001c: 23 22 c5 00  	sw	a2, 0x4(a0)
+  100020: 93 86 16 00  	addi	a3, a3, 0x1
+  100024: 23 24 d5 00  	sw	a3, 0x8(a0)
+  100028: 93 08 10 00  	li	a7, 0x1
+  10002c: 13 05 06 00  	mv	a0, a2
+  100030: 73 00 00 00  	ecall
+  100034: 13 05 00 00  	li	a0, 0x0
+  100038: 67 80 00 00  	ret
+  10003c: 83 25 45 00  	lw	a1, 0x4(a0)
+  100040: 93 95 15 00  	slli	a1, a1, 0x1
+  100044: 23 22 b5 00  	sw	a1, 0x4(a0)
+  100048: 93 08 10 00  	li	a7, 0x1
+  10004c: 13 85 05 00  	mv	a0, a1
+  100050: 73 00 00 00  	ecall
+  100054: 13 05 00 00  	li	a0, 0x0
+  100058: 67 80 00 00  	ret
+
+0010005c <pico_world_migrate>:
+  10005c: 93 05 10 00  	li	a1, 0x1
+  100060: 23 20 b5 00  	sw	a1, 0x0(a0)
+  100064: 13 05 00 00  	li	a0, 0x0
+  100068: 67 80 00 00  	ret

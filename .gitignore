@@ -1,0 +1,8 @@
+# Local build and dependency products; packaged evidence remains tracked.
+/hermes/build*/
+/picocalc-llvm-poc/build/
+/picocalc-llvm-poc/node_modules/
+/picocalc-llvm-poc/artifacts/
+__pycache__/
+*.pyc
+.DS_Store

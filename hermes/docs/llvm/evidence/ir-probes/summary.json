@@ -1,0 +1,182 @@
+[
+  {
+    "case": "accessors.js",
+    "hermes": "-O0",
+    "exit": 0,
+    "stderr": ""
+  },
+  {
+    "case": "accessors.js",
+    "hermes": "-O",
+    "exit": 0,
+    "stderr": ""
+  },
+  {
+    "case": "arguments.js",
+    "hermes": "-O0",
+    "exit": 0,
+    "stderr": ""
+  },
+  {
+    "case": "arguments.js",
+    "hermes": "-O",
+    "exit": 0,
+    "stderr": ""
+  },
+  {
+    "case": "arrays_callbacks.js",
+    "hermes": "-O0",
+    "exit": 0,
+    "stderr": ""
+  },
+  {
+    "case": "arrays_callbacks.js",
+    "hermes": "-O",
+    "exit": 0,
+    "stderr": ""
+  },
+  {
+    "case": "arrows_this.js",
+    "hermes": "-O0",
+    "exit": 0,
+    "stderr": ""
+  },
+  {
+    "case": "arrows_this.js",
+    "hermes": "-O",
+    "exit": 0,
+    "stderr": ""
+  },
+  {
+    "case": "catch_basic.js",
+    "hermes": "-O0",
+    "exit": 0,
+    "stderr": ""
+  },
+  {
+    "case": "catch_basic.js",
+    "hermes": "-O",
+    "exit": 0,
+    "stderr": ""
+  },
+  {
+    "case": "classes.js",
+    "hermes": "-O0",
+    "exit": 1,
+    "stderr": "test/LLVMNative/classes.js:2:3: error: direct LLVM backend: buffer object with explicit prototype is not implemented\n  constructor(x) { this.x = x; }\n  ^\n"
+  },
+  {
+    "case": "classes.js",
+    "hermes": "-O",
+    "exit": 1,
+    "stderr": "test/LLVMNative/classes.js:2:3: error: direct LLVM backend: buffer object with explicit prototype is not implemented\n  constructor(x) { this.x = x; }\n  ^\n"
+  },
+  {
+    "case": "closures.js",
+    "hermes": "-O0",
+    "exit": 0,
+    "stderr": ""
+  },
+  {
+    "case": "closures.js",
+    "hermes": "-O",
+    "exit": 0,
+    "stderr": ""
+  },
+  {
+    "case": "coercion.js",
+    "hermes": "-O0",
+    "exit": 0,
+    "stderr": ""
+  },
+  {
+    "case": "coercion.js",
+    "hermes": "-O",
+    "exit": 0,
+    "stderr": ""
+  },
+  {
+    "case": "constructors.js",
+    "hermes": "-O0",
+    "exit": 0,
+    "stderr": ""
+  },
+  {
+    "case": "constructors.js",
+    "hermes": "-O",
+    "exit": 0,
+    "stderr": ""
+  },
+  {
+    "case": "control_phi.js",
+    "hermes": "-O0",
+    "exit": 0,
+    "stderr": ""
+  },
+  {
+    "case": "control_phi.js",
+    "hermes": "-O",
+    "exit": 0,
+    "stderr": ""
+  },
+  {
+    "case": "exceptions.js",
+    "hermes": "-O0",
+    "exit": 0,
+    "stderr": ""
+  },
+  {
+    "case": "exceptions.js",
+    "hermes": "-O",
+    "exit": 1,
+    "stderr": "<unknown>:0: error: direct LLVM backend: buffer object with explicit prototype is not implemented\n"
+  },
+  {
+    "case": "functions.js",
+    "hermes": "-O0",
+    "exit": 0,
+    "stderr": ""
+  },
+  {
+    "case": "functions.js",
+    "hermes": "-O",
+    "exit": 0,
+    "stderr": ""
+  },
+  {
+    "case": "gc_closures.js",
+    "hermes": "-O0",
+    "exit": 0,
+    "stderr": ""
+  },
+  {
+    "case": "gc_closures.js",
+    "hermes": "-O",
+    "exit": 0,
+    "stderr": ""
+  },
+  {
+    "case": "objects.js",
+    "hermes": "-O0",
+    "exit": 0,
+    "stderr": ""
+  },
+  {
+    "case": "objects.js",
+    "hermes": "-O",
+    "exit": 0,
+    "stderr": ""
+  },
+  {
+    "case": "strings.js",
+    "hermes": "-O0",
+    "exit": 0,
+    "stderr": ""
+  },
+  {
+    "case": "strings.js",
+    "hermes": "-O",
+    "exit": 0,
+    "stderr": ""
+  }
+]

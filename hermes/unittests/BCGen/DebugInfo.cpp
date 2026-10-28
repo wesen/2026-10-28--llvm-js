@@ -1,0 +1,247 @@
+/*
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+
+#include "llvh/Support/raw_ostream.h"
+
+#include "hermes/BCGen/HBC/DebugInfo.h"
+#include "hermes/BCGen/HBC/HBC.h"
+#include "hermes/IR/IR.h"
+#include "hermes/IR/IRBuilder.h"
+#include "hermes/SourceMap/SourceMapGenerator.h"
+
+#include "gtest/gtest.h"
+
+using namespace hermes;
+using namespace hermes::hbc;
+
+namespace {
+using Loc = DebugSourceLocation;
+
+void checkAddress(
+    DebugInfo *info,
+    uint32_t offset,
+    uint32_t address,
+    uint32_t file,
+    uint32_t line,
+    uint32_t column,
+    uint32_t statement) {
+  auto location = info->getLocationForAddress(offset, address);
+  ASSERT_TRUE(location.hasValue());
+  EXPECT_EQ(file, location->filenameId);
+  EXPECT_EQ(line, location->line);
+  EXPECT_EQ(column, location->column);
+  EXPECT_EQ(statement, location->statement);
+}
+
+void checkAddressNoLoc(DebugInfo *info, uint32_t offset, uint32_t address) {
+  auto location = info->getLocationForAddress(offset, address);
+  ASSERT_FALSE(location.hasValue());
+}
+
+static DebugInfoGenerator makeGenerator(DebugInfo &info) {
+  DebugInfoGenerator result{info};
+  result.addFilename("file1.js");
+  result.addFilename("file2.js");
+  return result;
+}
+
+TEST(DebugInfo, TestBasicInfo) {
+  DebugInfo info;
+  auto dbg = makeGenerator(info);
+
+  auto debugOffset = dbg.appendSourceLocations(
+      Loc{0, 1, 1, 1, 0}, // Method starts in file1:1,1
+      0,
+      {
+          Loc{0, 1, 2, 1, 1}, // Opcode at address 0 is file1:2,1
+          Loc{2, 1, 3, 1, 1} // Opcode at address 2 is file1:3,1
+      });
+
+  std::move(dbg).generate();
+
+  checkAddress(&info, debugOffset, 0, 1, 2, 1, 1);
+  checkAddress(&info, debugOffset, 2, 1, 3, 1, 1);
+}
+
+TEST(DebugInfo, TestInvalidLocation) {
+  DebugInfo info;
+  auto dbg = makeGenerator(info);
+
+  auto debugOffset = dbg.appendSourceLocations(
+      Loc{0, 1, 1, 1, 0}, // Method starts in file1:1,1
+      0,
+      {
+          Loc{0, 1, 2, 1, 1}, // Opcode at address 0 is file1:2,1
+          Loc{1, 1, 0, 0, 0}, // Opcode at address 1 has no loc
+          Loc{2, 1, 3, 1, 1} // Opcode at address 2 is file1:3,1
+      });
+
+  std::move(dbg).generate();
+
+  checkAddress(&info, debugOffset, 0, 1, 2, 1, 1);
+  checkAddressNoLoc(&info, debugOffset, 1);
+  checkAddress(&info, debugOffset, 2, 1, 3, 1, 1);
+}
+
+TEST(DebugInfo, TestMultipleMethods) {
+  DebugInfo info;
+  auto dbg = makeGenerator(info);
+
+  auto offset1 = dbg.appendSourceLocations(
+      Loc{0, 1, 1, 1, 0}, 0, {Loc{2, 1, 1, 4, 1}, Loc{4, 1, 3, 4, 1}});
+
+  auto offset2 = dbg.appendSourceLocations(
+      Loc{0, 1, 100, 1, 0},
+      0,
+      {Loc{2, 1, 101, 4, 1}, Loc{8, 1, 102, 4, 1}, Loc{16, 1, 103, 4, 1}});
+
+  std::move(dbg).generate();
+
+  checkAddress(&info, offset1, 2, 1, 1, 4, 1);
+  checkAddress(&info, offset2, 8, 1, 102, 4, 1);
+
+  checkAddress(&info, offset1, 4, 1, 3, 4, 1);
+  checkAddress(&info, offset2, 16, 1, 103, 4, 1);
+}
+
+TEST(DebugInfo, TestMultipleFiles) {
+  DebugInfo info;
+  auto dbg = makeGenerator(info);
+
+  auto offset = dbg.appendSourceLocations(
+      Loc{0, 1111, 1, 1, 0}, // Method starts in file #1111
+      0, // 0th function
+      {
+          Loc{2, 2222, 1, 1, 1}, // Continues in #2222
+          Loc{4, 1111, 1, 2, 1}, // Back to 1111
+          Loc{6, 2222, 1, 2, 1} // Back to 2222
+      });
+
+  std::move(dbg).generate();
+
+  checkAddress(&info, offset, 0, 1111, 1, 1, 0);
+  checkAddress(&info, offset, 2, 2222, 1, 1, 1);
+  checkAddress(&info, offset, 4, 1111, 1, 2, 1);
+  checkAddress(&info, offset, 6, 2222, 1, 2, 1);
+}
+
+TEST(DebugInfo, TestLargeDeltas) {
+  // Start at i = 1 because DebugSourceLocation is 1-based.
+  for (uint32_t i = 1; i < INT32_MAX; i += 123457) {
+    DebugInfo info;
+    auto dbg = makeGenerator(info);
+    auto offset = dbg.appendSourceLocations(
+        Loc{0, 1, 1, 1, 0}, 0, {Loc{2, i, i, i, 1}, Loc{4, 1, 2, 2, 1}});
+
+    std::move(dbg).generate();
+
+    checkAddress(&info, offset, 0, 1, 1, 1, 0);
+    checkAddress(&info, offset, 2, i, i, i, 1);
+    checkAddress(&info, offset, 4, 1, 2, 2, 1);
+  }
+}
+
+TEST(DebugInfo, TestGetAddress) {
+  // Smoke test to make sure that the getAddressForLocation works.
+  DebugInfo info;
+  auto dbg = makeGenerator(info);
+
+  dbg.appendSourceLocations(
+      Loc{0, 42, 1, 1, 0}, // Function is in file 42
+      3, // function 3
+      {
+          Loc{0, 42, 2, 1, 1}, // opcode 0 is at file42:2:1
+          Loc{2, 42, 3, 1, 1}, // opcode 2 is at file42:3:1
+      });
+
+  dbg.appendSourceLocations(
+      Loc{0, 12, 1, 1, 0}, // Function is in file 12
+      0, // function 0
+      {
+          Loc{0, 12, 6, 1, 1}, // opcode 0 is at file12:6:1
+          Loc{4, 12, 8, 1, 1}, // opcode 4 is at file12:8:1
+      });
+  dbg.appendSourceLocations(
+      Loc{0, 12, 1, 1, 0}, // Function is in file 12
+      3, // function 3
+      {
+          Loc{0, 12, 2, 1, 1}, // opcode 0 is at file12:2:1
+          Loc{2, 12, 3, 1, 1}, // opcode 2 is at file12:3:1
+      });
+
+  std::move(dbg).generate();
+
+  OptValue<DebugSearchResult> result;
+
+  result = info.getAddressForLocation(42, 3, 1);
+  ASSERT_TRUE(result.hasValue());
+  EXPECT_EQ(3u, result->functionIndex);
+  EXPECT_EQ(2u, result->bytecodeOffset);
+
+  result = info.getAddressForLocation(42, 6, 1);
+  ASSERT_FALSE(result.hasValue());
+
+  result = info.getAddressForLocation(12, 8, 1);
+  ASSERT_TRUE(result.hasValue());
+  EXPECT_EQ(0u, result->functionIndex);
+  EXPECT_EQ(4u, result->bytecodeOffset);
+
+  result = info.getAddressForLocation(12, 3, 1);
+  ASSERT_TRUE(result.hasValue());
+  EXPECT_EQ(3u, result->functionIndex);
+  EXPECT_EQ(2u, result->bytecodeOffset);
+}
+
+TEST(DebugInfo, TestPopulateSourceMapWithInvalidLocations) {
+  DebugInfo info;
+  auto dbg = makeGenerator(info);
+
+  // Function 0: valid start location.
+  dbg.appendSourceLocations(
+      Loc{0, 0, 10, 5, 0}, // Function starts at file1:10:5
+      0,
+      {
+          Loc{0, 1, 11, 1, 1}, // opcode 0 at file1:11:1
+          Loc{2, 1, 12, 1, 1}, // opcode 2 at file1:12:1
+      });
+
+  // Function 1: invalid start location.
+  dbg.appendSourceLocations(
+      Loc{0, 0, 0, 0, 0}, // Invalid: line=0, column=0
+      1,
+      {
+          Loc{0, 1, 20, 1, 1}, // opcode 0 at file1:20:1
+          Loc{2, 1, 21, 1, 1}, // opcode 2 at file1:21:1
+      });
+
+  // Function 2: valid start location.
+  dbg.appendSourceLocations(
+      Loc{0, 0, 30, 5, 0}, // Function starts at file1:30:5
+      2,
+      {
+          Loc{0, 1, 31, 1, 1}, // opcode 0 at file1:31:1
+      });
+
+  std::move(dbg).generate();
+
+  // Create a SourceMapGenerator and populate it.
+  SourceMapGenerator sourceMap;
+  sourceMap.addSource("file1.js");
+
+  // Function offsets: function 0 at offset 0, function 1 at offset 100,
+  // function 2 at offset 200.
+  std::vector<uint32_t> functionOffsets = {0, 100, 200};
+  info.populateSourceMap(&sourceMap, std::move(functionOffsets), 0);
+
+  // Verify the source map was populated without crashing.
+  // The function with invalid start location should be skipped.
+  auto lines = sourceMap.getMappingsLines();
+  ASSERT_EQ(1u, lines.size());
+  // 3 (function 1) + 2 (function 1) + 2 (function 2)
+  ASSERT_EQ(7u, lines[0].size());
+}
+} // end anonymous namespace

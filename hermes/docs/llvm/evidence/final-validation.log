@@ -1,0 +1,43 @@
+Command: ["/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3", "utils/test_shllvm.py", "--jobs", "2", "--output", "docs/llvm/evidence/final-validation.json"]
+Environment: {"LLVM_BIN": "/tmp/llvm-direct-toolchain/bin", "ASAN_OPTIONS": "detect_leaks=0", "ASAN_SYMBOLIZER_PATH": "/tmp/llvm-direct-toolchain/bin/llvm-symbolizer"}
+PASS accessors.js
+PASS arguments.js
+PASS arrays_callbacks.js
+PASS arrows_this.js
+PASS catch_basic.js
+PASS classes.js
+PASS closures.js
+PASS coercion.js
+PASS constructors.js
+PASS control_phi.js
+PASS exceptions.js
+PASS functions.js
+PASS gc_closures.js
+PASS lexical_tdz.js
+PASS objects.js
+PASS strings.js
+PASS error_arrow_constructor.js
+PASS error_missing_global.js
+PASS error_noncallable.js
+PASS unsupported_const_assignment.js
+PASS unsupported_eval.js
+PASS unsupported_generator.js
+{
+  "generated_at_unix": 1793196216.2946854,
+  "source_cases": 22,
+  "passed_cases": 22,
+  "failed_cases": 0,
+  "native_llvm_vs_node_and_c_comparisons": 64,
+  "hermes_optimization_levels": [
+    "O0",
+    "O"
+  ],
+  "llvm_optimization_levels": [
+    "0",
+    "2"
+  ],
+  "asan_options": "detect_leaks=0",
+  "lsan_options": "",
+  "scope": "host native and optional lli execution; not device execution or full ECMAScript conformance"
+}
+Process exit code: 0

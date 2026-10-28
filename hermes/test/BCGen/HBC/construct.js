@@ -1,0 +1,99 @@
+/**
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+
+// RUN: %hermes -target=HBC -dump-bytecode -pretty-disassemble=false -O %s | %FileCheckOrRegen --match-full-lines %s
+
+function foo(x) {
+  this.x = x;
+}
+
+function bar() {
+  return new foo(1);
+}
+
+// Auto-generated content below. Please do not modify manually.
+
+// CHECK:Bytecode File Information:
+// CHECK-NEXT:  Bytecode version number: {{.*}}
+// CHECK-NEXT:  Source hash: {{.*}}
+// CHECK-NEXT:  Function count: 3
+// CHECK-NEXT:  String count: 4
+// CHECK-NEXT:  BigInt count: 0
+// CHECK-NEXT:  String Kind Entry count: 2
+// CHECK-NEXT:  RegExp count: 0
+// CHECK-NEXT:  StringSwitchImm count: 0
+// CHECK-NEXT:  Key buffer size (bytes): 0
+// CHECK-NEXT:  Value buffer size (bytes): 0
+// CHECK-NEXT:  Shape table count: 2
+// CHECK-NEXT:  Segment ID: 0
+// CHECK-NEXT:  CommonJS module count: 0
+// CHECK-NEXT:  CommonJS module count (static): 0
+// CHECK-NEXT:  Function source count: 0
+// CHECK-NEXT:  Bytecode options:
+// CHECK-NEXT:    staticBuiltins: 0
+// CHECK-NEXT:    cjsModulesStaticallyResolved: 0
+
+// CHECK:Global String Table:
+// CHECK-NEXT:s0[ASCII, 0..5]: global
+// CHECK-NEXT:i1[ASCII, 6..8] #9B85A7ED: bar
+// CHECK-NEXT:i2[ASCII, 9..11] #9290584E: foo
+// CHECK-NEXT:i3[ASCII, 12..12] #0001E7F9: x
+
+// CHECK:Object Shape Table:
+// CHECK-NEXT:0[0, 0]
+// CHECK-NEXT:1[0, 0]
+
+// CHECK:Function<global>(1 params, 3 registers, 0 numbers, 1 non-pointers):
+// CHECK-NEXT:Offset in debug table: source 0x0000
+// CHECK-NEXT:[@ 0] DeclareGlobalVar 2<UInt32>
+// CHECK-NEXT:[@ 5] DeclareGlobalVar 1<UInt32>
+// CHECK-NEXT:[@ 10] GetGlobalObject 2<Reg8>
+// CHECK-NEXT:[@ 12] LoadConstUndefined 0<Reg8>
+// CHECK-NEXT:[@ 14] CreateClosure 1<Reg8>, 0<Reg8>, 1<UInt16>
+// CHECK-NEXT:[@ 19] PutByIdLoose 2<Reg8>, 1<Reg8>, 0<UInt8>, 2<UInt16>
+// CHECK-NEXT:[@ 25] CreateClosure 1<Reg8>, 0<Reg8>, 2<UInt16>
+// CHECK-NEXT:[@ 30] PutByIdLoose 2<Reg8>, 1<Reg8>, 1<UInt8>, 1<UInt16>
+// CHECK-NEXT:[@ 36] Ret 0<Reg8>
+
+// CHECK:Function<foo>(2 params, 3 registers, 0 numbers, 1 non-pointers):
+// CHECK-NEXT:Offset in debug table: source 0x0011
+// CHECK-NEXT:[@ 0] LoadParam 2<Reg8>, 1<UInt8>
+// CHECK-NEXT:[@ 3] LoadThisNS 1<Reg8>
+// CHECK-NEXT:[@ 5] PutByIdLoose 1<Reg8>, 2<Reg8>, 0<UInt8>, 3<UInt16>
+// CHECK-NEXT:[@ 11] LoadConstUndefined 0<Reg8>
+// CHECK-NEXT:[@ 13] Ret 0<Reg8>
+
+// CHECK:Function<bar>(1 params, 12 registers, 1 numbers, 0 non-pointers):
+// CHECK-NEXT:Offset in debug table: source 0x0019
+// CHECK-NEXT:[@ 0] GetGlobalObject 1<Reg8>
+// CHECK-NEXT:[@ 2] GetByIdShort 1<Reg8>, 1<Reg8>, 0<UInt8>, 2<UInt8>
+// CHECK-NEXT:[@ 7] CreateThisForNew 2<Reg8>, 1<Reg8>, 1<UInt8>, 1<UInt16>
+// CHECK-NEXT:[@ 13] LoadConstUInt8 3<Reg8>, 1<UInt8>
+// CHECK-NEXT:[@ 16] Mov 4<Reg8>, 2<Reg8>
+// CHECK-NEXT:[@ 19] Construct 1<Reg8>, 1<Reg8>, 2<UInt8>
+// CHECK-NEXT:[@ 23] SelectObject 1<Reg8>, 2<Reg8>, 1<Reg8>
+// CHECK-NEXT:[@ 27] Ret 1<Reg8>
+
+// CHECK:Debug filename table:
+// CHECK-NEXT:  0: {{.*}}construct.js
+
+// CHECK:Debug file table:
+// CHECK-NEXT:  source table offset 0x0000: filename id 0
+
+// CHECK:Debug source table:
+// CHECK-NEXT:  0x0000  function idx 0, starts at line 10 col 1
+// CHECK-NEXT:    bc 0: line 10 col 1
+// CHECK-NEXT:    bc 5: line 10 col 1
+// CHECK-NEXT:    bc 19: line 10 col 1
+// CHECK-NEXT:    bc 30: line 10 col 1
+// CHECK-NEXT:  0x0011  function idx 1, starts at line 10 col 1
+// CHECK-NEXT:    bc 5: line 11 col 10
+// CHECK-NEXT:  0x0019  function idx 2, starts at line 14 col 1
+// CHECK-NEXT:    bc 2: line 15 col 14
+// CHECK-NEXT:    bc 7: line 15 col 17
+// CHECK-NEXT:    bc 19: line 15 col 17
+// CHECK-NEXT:  0x0027  end of debug source table

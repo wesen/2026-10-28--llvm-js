@@ -1,0 +1,68 @@
+/*
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+
+#ifdef HERMES_ENABLE_DEBUGGER
+
+#include "JSLibInternal.h"
+
+namespace hermes {
+namespace vm {
+
+#ifdef HERMES_ENABLE_DEBUGGER
+
+Handle<JSObject> createDebuggerInternalObject(Runtime &runtime) {
+  runtime.debuggerInternalObject_ = JSObject::create(runtime);
+  Handle<JSObject> intern{runtime.debuggerInternalObject_};
+
+  // Configurable property stored in the Debugger
+  // To be used when a debugger transitions to an attached state.
+  defineAccessor(
+      runtime,
+      intern,
+      runtime.getIdentifierTable().registerLazyIdentifier(
+          runtime, createASCIIRef("isDebuggerAttached")),
+      nullptr,
+      isDebuggerAttached,
+      nullptr,
+      true,
+      false);
+
+  // Configurable property to poll whether
+  // the VM will pause the debugger on exceptions.
+  defineAccessor(
+      runtime,
+      intern,
+      runtime.getIdentifierTable().registerLazyIdentifier(
+          runtime, createASCIIRef("shouldPauseOnThrow")),
+      nullptr,
+      shouldPauseOnThrow,
+      nullptr,
+      true,
+      false);
+
+  JSObject::preventExtensionsNonProxy(intern, runtime);
+
+  return intern;
+}
+
+CallResult<HermesValue> isDebuggerAttached(void *ctx, Runtime &runtime) {
+  return HermesValue::encodeBoolValue(
+      runtime.getDebugger().getIsDebuggerAttached());
+}
+
+CallResult<HermesValue> shouldPauseOnThrow(void *ctx, Runtime &runtime) {
+  bool shouldPauseOnThrow = runtime.getDebugger().getPauseOnThrowMode() !=
+      facebook::hermes::debugger::PauseOnThrowMode::None;
+  return HermesValue::encodeBoolValue(shouldPauseOnThrow);
+}
+
+#endif // HERMES_ENABLE_DEBUGGER
+
+} // namespace vm
+} // namespace hermes
+
+#endif // HERMES_ENABLE_DEBUGGER

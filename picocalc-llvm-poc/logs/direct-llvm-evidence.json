@@ -1,0 +1,274 @@
+{
+  "collected_at_utc": "2026-10-28T13:28:19.311872+00:00",
+  "compiler": "Ubuntu clang version 18.1.3 (1ubuntu1)",
+  "node": "v24.22.1",
+  "modules": {
+    "counter_v1": {
+      "size": 8892,
+      "sha256": "6b99bd0f7641749ed6bf4ca27e022e821c4cf34882a568e527cb31e2edac2521",
+      "entry": 1048576,
+      "segments": [
+        {
+          "vaddr": 1048576,
+          "filesz": 4140,
+          "memsz": 4140,
+          "flags": 5
+        }
+      ],
+      "target": "riscv32-unknown-elf",
+      "march": "rv32im",
+      "abi": "ilp32",
+      "no_libc": true,
+      "language": "js",
+      "backend": "direct-llvm",
+      "source_sha256": "ac4296cd7bb356eb1e459f754de50962da73ccdd5be243e0f8f7cab92e8d7529",
+      "generated_sha256": "05ef91cf5573b59e89b71e0c00095783156cbb0ec8ad15e5d9673306eefc39b3",
+      "optimization": "2",
+      "timings_ms": {
+        "frontend": 268.6234530001457,
+        "llvm_compile": 25.697987000057765,
+        "link": 17.492321999270644
+      }
+    },
+    "counter_v2": {
+      "size": 8892,
+      "sha256": "8bd94fddce40c56244cafaad56b4ea4b30bd47fd716b477880fa46df4e0ff12e",
+      "entry": 2097184,
+      "segments": [
+        {
+          "vaddr": 2097152,
+          "filesz": 4140,
+          "memsz": 4140,
+          "flags": 5
+        }
+      ],
+      "target": "riscv32-unknown-elf",
+      "march": "rv32im",
+      "abi": "ilp32",
+      "no_libc": true,
+      "language": "js",
+      "backend": "direct-llvm",
+      "source_sha256": "6dfbae26f33e9e7af4a52f823df62b1bdfd36c472bc47f6aaeb0e18028fa36c4",
+      "generated_sha256": "34689b7aef43dd4b06faf743c8815e59ee51b30e3621c68f6f21ff156bfaa734",
+      "optimization": "2",
+      "timings_ms": {
+        "frontend": 256.66903799992724,
+        "llvm_compile": 27.807823000330245,
+        "link": 23.278217999177286
+      }
+    },
+    "bad_migrate": {
+      "size": 8876,
+      "sha256": "25c84b3ad077e9717e7781d30aca7296c51ebe90d0b556e603a8dc3ead3938c8",
+      "entry": 1048604,
+      "segments": [
+        {
+          "vaddr": 1048576,
+          "filesz": 4140,
+          "memsz": 4140,
+          "flags": 5
+        }
+      ],
+      "target": "riscv32-unknown-elf",
+      "march": "rv32im",
+      "abi": "ilp32",
+      "no_libc": true,
+      "language": "js",
+      "backend": "direct-llvm",
+      "source_sha256": "368852fa728ea13bc2990333974979b6c51348d80adc0bf951184066853a0b39",
+      "generated_sha256": "ea23b480b2bb31a5718eb581bfe07e2cead2a63208bf8a8e6695d6e0f2a50ae2",
+      "optimization": "2",
+      "timings_ms": {
+        "frontend": 293.6035709999487,
+        "llvm_compile": 30.321426000227802,
+        "link": 16.198345999328012
+      }
+    },
+    "display_v1": {
+      "size": 8892,
+      "sha256": "6896c3190616d1c24de0fc1b4032a5a00deff984a8b5fbc08425c13c5c3ef105",
+      "entry": 1048576,
+      "segments": [
+        {
+          "vaddr": 1048576,
+          "filesz": 4140,
+          "memsz": 4140,
+          "flags": 5
+        }
+      ],
+      "target": "riscv32-unknown-elf",
+      "march": "rv32im",
+      "abi": "ilp32",
+      "no_libc": true,
+      "language": "js",
+      "backend": "direct-llvm",
+      "source_sha256": "352649d18f812b810a5ddb661b0c46a92d1e0ccd9c7b151e14c01e4e1e0ad9f9",
+      "generated_sha256": "59b1df8378037fc69a934119fb2db493f9310e7941dcc6d538e542449c38a240",
+      "optimization": "2",
+      "timings_ms": {
+        "frontend": 251.9590829997469,
+        "llvm_compile": 29.039157000624982,
+        "link": 15.816635000192036
+      }
+    },
+    "fault": {
+      "size": 8876,
+      "sha256": "71e50f22f4865ea4b3ef3ded20502997abddd2aae38349f110c2a575aed2019b",
+      "entry": 1048576,
+      "segments": [
+        {
+          "vaddr": 1048576,
+          "filesz": 4140,
+          "memsz": 4140,
+          "flags": 5
+        }
+      ],
+      "target": "riscv32-unknown-elf",
+      "march": "rv32im",
+      "abi": "ilp32",
+      "no_libc": true,
+      "language": "js",
+      "backend": "direct-llvm",
+      "source_sha256": "c91e078696b2fd75cd177208b71b10b3a08244e064cefa862903c833e21862d1",
+      "generated_sha256": "a7e75553215fd23b360bd547edb9907c565fcaf533662d7ccfa7292b53ad17b7",
+      "optimization": "2",
+      "timings_ms": {
+        "frontend": 254.44989900006476,
+        "llvm_compile": 28.140273999269994,
+        "link": 15.854301000217674
+      }
+    },
+    "spin": {
+      "size": 4684,
+      "sha256": "1175952b41e97ff8032a0269dd24c14fe21bbd43bdad03f36b30678015ccb181",
+      "entry": 2097152,
+      "segments": [
+        {
+          "vaddr": 2097152,
+          "filesz": 36,
+          "memsz": 36,
+          "flags": 5
+        }
+      ],
+      "target": "riscv32-unknown-elf",
+      "march": "rv32im",
+      "abi": "ilp32",
+      "no_libc": true,
+      "language": "js",
+      "backend": "direct-llvm",
+      "source_sha256": "8cf81874289785583db50634d3f4197bf27b374095a6f62b5a9474e570ca0bbd",
+      "generated_sha256": "fc4e45cfe9bf6c9d5ae92817134d47289bee027591830a9f55fa77b862e0094e",
+      "optimization": "2",
+      "timings_ms": {
+        "frontend": 276.50622999954066,
+        "llvm_compile": 27.18178400027682,
+        "link": 14.856437999696936
+      }
+    }
+  },
+  "trace": [
+    {
+      "event": "dispatch",
+      "ok": true,
+      "epoch": 1,
+      "schema": 1,
+      "score": 3,
+      "ticks": 1,
+      "flags": 0,
+      "steps": 15,
+      "effects": [
+        3
+      ],
+      "pixels": 0
+    },
+    {
+      "event": "queue",
+      "epoch": 1
+    },
+    {
+      "event": "reload",
+      "ok": true,
+      "epoch": 2,
+      "schema": 2,
+      "score": 3,
+      "ticks": 1,
+      "flags": 42,
+      "migration_steps": 8,
+      "code_slot": "0x200000"
+    },
+    {
+      "event": "stale",
+      "queued_epoch": 1,
+      "current_epoch": 2
+    },
+    {
+      "event": "dispatch",
+      "ok": true,
+      "epoch": 2,
+      "schema": 2,
+      "score": 43,
+      "ticks": 2,
+      "flags": 42,
+      "steps": 17,
+      "effects": [
+        43
+      ],
+      "pixels": 0
+    },
+    {
+      "event": "reload",
+      "ok": false,
+      "epoch": 2,
+      "schema": 2,
+      "score": 43,
+      "ticks": 2,
+      "flags": 42,
+      "reason": "world abort 33"
+    },
+    {
+      "event": "dispatch",
+      "ok": true,
+      "epoch": 2,
+      "schema": 2,
+      "score": 129,
+      "ticks": 2,
+      "flags": 42,
+      "steps": 11,
+      "effects": [
+        129
+      ],
+      "pixels": 0
+    },
+    {
+      "event": "expect",
+      "key": "score",
+      "value": 129,
+      "ok": true
+    },
+    {
+      "event": "expect",
+      "key": "ticks",
+      "value": 2,
+      "ok": true
+    },
+    {
+      "event": "expect",
+      "key": "flags",
+      "value": 42,
+      "ok": true
+    },
+    {
+      "event": "expect",
+      "key": "epoch",
+      "value": 2,
+      "ok": true
+    }
+  ],
+  "source_hashes": {
+    "compiler/js2llvm.js": "6e70c9a545f024ac3638cebf54fa4852c92133f9eae58b8ea5f7cb71f9ae2e2f",
+    "compiler/compile.py": "9ade461ca358b8a61e0d855117eb55067d3891be8e9be8460fb245840fad2c2c",
+    "compiler/jitd.py": "0980a74f6baa1b9f21ff5c97d450e2462d9284b4d3a350c56c6f1bcf92e84dfd",
+    "kernel/pico_sim.cpp": "4e219638072ed474d4e9c18e0783dc0b16997deed33f34a6e10e2a64829743ba",
+    "include/pico_abi.h": "1b055bf0aa2fcb986f8ca3c21e1aefcafae9243949642bd73e8fa5a903fd09f2"
+  }
+}

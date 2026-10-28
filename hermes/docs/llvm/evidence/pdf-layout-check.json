@@ -1,0 +1,112 @@
+{
+  "pages": 26,
+  "issues": [],
+  "page_summary": [
+    {
+      "page": 1,
+      "characters": 452
+    },
+    {
+      "page": 2,
+      "characters": 1162
+    },
+    {
+      "page": 3,
+      "characters": 2489
+    },
+    {
+      "page": 4,
+      "characters": 2013
+    },
+    {
+      "page": 5,
+      "characters": 1872
+    },
+    {
+      "page": 6,
+      "characters": 2058
+    },
+    {
+      "page": 7,
+      "characters": 1976
+    },
+    {
+      "page": 8,
+      "characters": 2821
+    },
+    {
+      "page": 9,
+      "characters": 3093
+    },
+    {
+      "page": 10,
+      "characters": 2876
+    },
+    {
+      "page": 11,
+      "characters": 2232
+    },
+    {
+      "page": 12,
+      "characters": 3119
+    },
+    {
+      "page": 13,
+      "characters": 3103
+    },
+    {
+      "page": 14,
+      "characters": 3212
+    },
+    {
+      "page": 15,
+      "characters": 3097
+    },
+    {
+      "page": 16,
+      "characters": 2470
+    },
+    {
+      "page": 17,
+      "characters": 2729
+    },
+    {
+      "page": 18,
+      "characters": 2940
+    },
+    {
+      "page": 19,
+      "characters": 2721
+    },
+    {
+      "page": 20,
+      "characters": 2486
+    },
+    {
+      "page": 21,
+      "characters": 3036
+    },
+    {
+      "page": 22,
+      "characters": 3171
+    },
+    {
+      "page": 23,
+      "characters": 2709
+    },
+    {
+      "page": 24,
+      "characters": 3361
+    },
+    {
+      "page": 25,
+      "characters": 2125
+    },
+    {
+      "page": 26,
+      "characters": 2451
+    }
+  ],
+  "render_dpi": 90,
+  "visual_review": "all pages rendered and reviewed; representative code, diagrams, tables and references inspected at full size"
+}

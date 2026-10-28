@@ -1,0 +1,57 @@
+/**
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ *
+ * @flow strict
+ * @format
+ */
+
+'use strict';
+
+import type {
+  AnyTypeAnnotation,
+  CallExpression,
+  ClassDeclaration,
+  ExpressionStatement,
+  FunctionDeclaration,
+  FunctionExpression,
+  ImportDeclaration,
+  Literal,
+  MethodDefinition,
+  NewExpression,
+  ReturnStatement,
+  VariableDeclaration,
+  VariableDeclarator,
+} from '../types';
+
+/*
+ * !!! THIS FILE WILL BE OVERWRITTEN BY CODEGEN !!!
+ *
+ * Statically it should only contain the minimal set of
+ * definitions required to typecheck the local code.
+ */
+
+interface FunctionDeclaration_With_id extends FunctionDeclaration {
+  readonly id: NonNullable<FunctionDeclaration['id']>;
+}
+
+export type ESQueryNodeSelectorsWithoutFallback = Readonly<{
+  readonly AnyTypeAnnotation?: (node: AnyTypeAnnotation) => void,
+  readonly CallExpression?: (node: CallExpression) => void,
+  readonly ClassDeclaration?: (node: ClassDeclaration) => void,
+  readonly ExpressionStatement?: (node: ExpressionStatement) => void,
+  readonly FunctionDeclaration?: (node: FunctionDeclaration) => void,
+  readonly 'FunctionDeclaration[id]'?: (
+    node: FunctionDeclaration_With_id,
+  ) => void,
+  readonly FunctionExpression?: (node: FunctionExpression) => void,
+  readonly ImportDeclaration?: (node: ImportDeclaration) => void,
+  readonly Literal?: (node: Literal) => void,
+  readonly MethodDefinition?: (node: MethodDefinition) => void,
+  readonly NewExpression?: (node: NewExpression) => void,
+  readonly ReturnStatement?: (node: ReturnStatement) => void,
+  readonly VariableDeclaration?: (node: VariableDeclaration) => void,
+  readonly VariableDeclarator?: (node: VariableDeclarator) => void,
+}>;

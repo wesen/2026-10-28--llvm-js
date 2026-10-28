@@ -1,0 +1,96 @@
+{
+  "source": "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/classes.js",
+  "source_sha256": "7a20389b833dbad5fa7dc9590236a201da92be56b279c9d80e57a110ec441b03",
+  "llvm_ir": "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/classes-O-llvm2.ll",
+  "llvm_ir_sha256": "3ecdc397f177b934637e78a504972848916c337559a4e501fb992d2874ba78a2",
+  "hermes_optimization": "O",
+  "llvm_optimization": "2",
+  "pipeline": "JavaScript -> Hermes SSA -> LLVM IR -> LLVM",
+  "program_c_generation": false,
+  "runtime_bridge": "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/lib/libshllvm_runtime.a",
+  "runtime_bridge_sha256": "b65ecc0f2f667f673a6f569ae9a090acb8891233fdfe344bd57c213c43ee82e3",
+  "runtime_address_sanitizer": true,
+  "runtime_undefined_behavior_sanitizer": false,
+  "commands": [
+    {
+      "command": [
+        "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/bin/shermes",
+        "-O",
+        "-Xes6-block-scoping",
+        "-Xenable-tdz",
+        "-emit-llvm",
+        "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/classes.js",
+        "-o",
+        "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/shllvm-giunw8ft/program.ll"
+      ],
+      "exit_code": 0,
+      "seconds": 0.014826,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/tmp/llvm-direct-toolchain/root/usr/lib/llvm-18/bin/llvm-as",
+        "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/shllvm-giunw8ft/program.ll",
+        "-o",
+        "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/shllvm-giunw8ft/program.bc"
+      ],
+      "exit_code": 0,
+      "seconds": 0.014302,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/tmp/llvm-direct-toolchain/root/usr/lib/llvm-18/bin/opt",
+        "-passes=verify",
+        "-disable-output",
+        "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/shllvm-giunw8ft/program.bc"
+      ],
+      "exit_code": 0,
+      "seconds": 0.015676,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/tmp/llvm-direct-toolchain/root/usr/lib/llvm-18/bin/opt",
+        "-passes=verify,default<O2>,verify",
+        "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/shllvm-giunw8ft/program.bc",
+        "-o",
+        "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/shllvm-giunw8ft/optimized.bc"
+      ],
+      "exit_code": 0,
+      "seconds": 0.018569,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/tmp/llvm-direct-toolchain/root/usr/lib/llvm-18/bin/clang",
+        "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/classes-O-llvm2.bc",
+        "-O2",
+        "-Wno-override-module",
+        "-fsanitize=address",
+        "-L/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/lib",
+        "-Wl,-rpath,/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/lib",
+        "-L/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/tools/shermes",
+        "-Wl,-rpath,/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/tools/shermes",
+        "-L/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/jsi",
+        "-Wl,-rpath,/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/jsi",
+        "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/lib/libshllvm_runtime.a",
+        "-lshermes_console",
+        "-lhermesvm",
+        "-lm",
+        "-o",
+        "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/shllvm-link-mma790ar/program"
+      ],
+      "exit_code": 0,
+      "seconds": 0.233817,
+      "stdout": "",
+      "stderr": ""
+    }
+  ],
+  "native_executable": "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/classes-O-llvm2",
+  "native_executable_sha256": "d9fbfb4b61c32b1dc1af4de906198e3995a869f8657f389efab79070cdda2327"
+}

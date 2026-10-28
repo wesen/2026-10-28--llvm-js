@@ -1,0 +1,30 @@
+test_backend_failure_preserves_previous_elf (test_direct_llvm.DirectLLVMTests.test_backend_failure_preserves_previous_elf) ... /workspace/scratch/ea758b58c6af/picocalc-llvm-direct/picocalc-llvm-poc/compiler/js2llvm.js:25
+  throw new Error(`${infile}:${at.line + 1}:${at.character + 1}: ${message}`);
+  ^
+
+Error: /tmp/picojit-84lp16gs/module.js:1:57: unsupported expression ArrowFunction
+    at die (/workspace/scratch/ea758b58c6af/picocalc-llvm-direct/picocalc-llvm-poc/compiler/js2llvm.js:25:9)
+    at FunctionEmitter.expression (/workspace/scratch/ea758b58c6af/picocalc-llvm-direct/picocalc-llvm-poc/compiler/js2llvm.js:142:5)
+    at FunctionEmitter.statement (/workspace/scratch/ea758b58c6af/picocalc-llvm-direct/picocalc-llvm-poc/compiler/js2llvm.js:156:40)
+    at FunctionEmitter.body (/workspace/scratch/ea758b58c6af/picocalc-llvm-direct/picocalc-llvm-poc/compiler/js2llvm.js:146:71)
+    at FunctionEmitter.generate (/workspace/scratch/ea758b58c6af/picocalc-llvm-direct/picocalc-llvm-poc/compiler/js2llvm.js:192:10)
+    at Object.<anonymous> (/workspace/scratch/ea758b58c6af/picocalc-llvm-direct/picocalc-llvm-poc/compiler/js2llvm.js:213:54)
+    at Module._compile (node:internal/modules/cjs/loader:1929:14)
+    at Object..js (node:internal/modules/cjs/loader:2060:10)
+    at Module.load (node:internal/modules/cjs/loader:1651:32)
+    at Module._load (node:internal/modules/cjs/loader:1443:12)
+
+Node.js v24.22.1
+ok
+test_default_emits_verifiable_llvm_and_no_generated_c (test_direct_llvm.DirectLLVMTests.test_default_emits_verifiable_llvm_and_no_generated_c) ... ok
+test_direct_lane_explicit_scope_boundary (test_direct_llvm.DirectLLVMTests.test_direct_lane_explicit_scope_boundary) ... ok
+test_integer_boundaries_unsigned_and_wrap (test_direct_llvm.DirectLLVMTests.test_integer_boundaries_unsigned_and_wrap) ... ok
+test_loop_locals_control_flow_and_assignments (test_direct_llvm.DirectLLVMTests.test_loop_locals_control_flow_and_assignments) ... ok
+test_seeded_c_oracle_state_and_effects (test_direct_llvm.DirectLLVMTests.test_seeded_c_oracle_state_and_effects) ... ok
+test_short_circuit_nested_phi_and_side_effects (test_direct_llvm.DirectLLVMTests.test_short_circuit_nested_phi_and_side_effects) ... ok
+test_unsupported_or_invalid_source_rejected_before_ir_output (test_direct_llvm.DirectLLVMTests.test_unsupported_or_invalid_source_rejected_before_ir_output) ... ok
+
+----------------------------------------------------------------------
+Ran 8 tests in 8.677s
+
+OK

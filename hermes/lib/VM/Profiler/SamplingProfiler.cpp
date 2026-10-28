@@ -1,0 +1,317 @@
+/*
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+
+#include "hermes/VM/Profiler/SamplingProfiler.h"
+
+#if HERMESVM_SAMPLING_PROFILER_AVAILABLE
+
+#include "hermes/Support/OSCompat.h"
+#include "hermes/VM/Callable.h"
+#include "hermes/VM/HostModel.h"
+#include "hermes/VM/Runtime.h"
+#include "hermes/VM/RuntimeModule-inline.h"
+#include "hermes/VM/StackFrame-inline.h"
+
+#include "llvh/Support/Compiler.h"
+
+#include "ProfileGenerator.h"
+#include "SamplingProfilerSampler.h"
+#include "TraceSerializer.h"
+
+#include <fcntl.h>
+#include <cassert>
+#include <chrono>
+#include <cmath>
+#include <csignal>
+#include <random>
+#include <thread>
+
+namespace hermes {
+namespace vm {
+
+void SamplingProfiler::registerDomain(Domain *domain) {
+  // If domain is not already registered, add it to the list.
+  auto it = std::find(domains_.begin(), domains_.end(), domain);
+  if (it == domains_.end())
+    domains_.push_back(domain);
+}
+
+SamplingProfiler::NativeFunctionFrameInfo
+SamplingProfiler::registerNativeFunction(NativeFunction *nativeFunction) {
+  // If nativeFunction is not already registered, add it to the list.
+  auto it = std::find(
+      nativeFunctions_.begin(), nativeFunctions_.end(), nativeFunction);
+  if (it != nativeFunctions_.end()) {
+    return it - nativeFunctions_.begin();
+  }
+
+  nativeFunctions_.push_back(nativeFunction);
+  return nativeFunctions_.size() - 1;
+}
+
+void SamplingProfiler::markRootsForCompleteMarking(RootAcceptor &acceptor) {
+  std::lock_guard<std::mutex> lockGuard(runtimeDataLock_);
+  for (Domain *&domain : domains_) {
+    acceptor.acceptPtr(domain);
+  }
+}
+
+void SamplingProfiler::markRoots(RootAcceptor &acceptor) {
+  std::lock_guard<std::mutex> lockGuard(runtimeDataLock_);
+  for (Domain *&domain : domains_) {
+    acceptor.acceptPtr(domain);
+  }
+
+  for (NativeFunction *&fn : nativeFunctions_) {
+    acceptor.acceptPtr(fn);
+  }
+}
+
+uint32_t SamplingProfiler::walkRuntimeStack(
+    StackTrace &sampleStorage,
+    MayAllocate mayAllocate) {
+  unsigned numSkipped = 0;
+
+  // TODO: capture leaf frame IP.
+  const Inst *ip = nullptr;
+  for (ConstStackFramePtr frame : runtime_.getStackFrames()) {
+    // Out of space in the pre-allocated buffer. If we are executing this in
+    // signal handler, truncate the stack trace to the most recent frames.
+    // Otherwise, grow the buffer.
+    if (sampleStorage.stack.size() == sampleStorage.stack.capacity() &&
+        mayAllocate == MayAllocate::No) {
+      ++numSkipped;
+      continue;
+    }
+
+    StackFrame frameStorage;
+    // Whether we successfully captured a stack frame or not.
+    bool capturedFrame = true;
+    // Check if it is pure JS frame.
+    auto *calleeCodeBlock = frame.getCalleeCodeBlock();
+    if (calleeCodeBlock != nullptr) {
+      frameStorage.kind = StackFrame::FrameKind::JSFunction;
+      frameStorage.jsFrame.functionId = calleeCodeBlock->getFunctionID();
+      frameStorage.jsFrame.offset =
+          (ip == nullptr ? 0 : calleeCodeBlock->getOffsetOf(ip));
+      auto *module = calleeCodeBlock->getRuntimeModule();
+      assert(module != nullptr && "Cannot fetch runtimeModule for code block");
+      frameStorage.jsFrame.module = module;
+      // Don't execute a read or write barrier here because this is a signal
+      // handler.
+      registerDomain(module->getDomainForSamplingProfiler(runtime_));
+    } else if (
+        auto *nativeFunction =
+            dyn_vmcast<NativeFunction>(frame.getCalleeClosureUnsafe())) {
+      frameStorage.kind = vmisa<FinalizableNativeFunction>(nativeFunction)
+          ? StackFrame::FrameKind::FinalizableNativeFunction
+          : StackFrame::FrameKind::NativeFunction;
+      frameStorage.nativeFrame = registerNativeFunction(nativeFunction);
+    } else {
+      // TODO: handle BoundFunction.
+      capturedFrame = false;
+    }
+
+    // Update ip to caller for next iteration.
+    ip = frame.getSavedIP();
+    if (capturedFrame) {
+      sampleStorage.stack.push_back(std::move(frameStorage));
+    }
+  }
+  sampleStorage.tid = threadID_;
+  sampleStorage.timeStamp = oscompat::sampling_clock_now();
+  return numSkipped;
+}
+
+SamplingProfiler::SamplingProfiler(Runtime &runtime)
+    : threadID_{oscompat::global_thread_id()}, runtime_{runtime} {
+  threadNames_[threadID_] = oscompat::thread_name();
+}
+
+void SamplingProfiler::dumpSampledStackGlobal(llvh::raw_ostream &OS) {
+  auto globalProfiler = sampling_profiler::Sampler::get();
+  std::lock_guard<std::mutex> lk(globalProfiler->profilerLock_);
+  if (!globalProfiler->profilers_.empty()) {
+    auto *localProfiler = *globalProfiler->profilers_.begin();
+    localProfiler->dumpSampledStack(OS);
+  }
+}
+
+void SamplingProfiler::dumpSampledStack(llvh::raw_ostream &OS) {
+  std::lock_guard<std::mutex> lk(runtimeDataLock_);
+  OS << "dumpSamples called from runtime\n";
+  OS << "Total " << sampledStacks_.size() << " samples\n";
+  for (unsigned i = 0; i < sampledStacks_.size(); ++i) {
+    auto &sample = sampledStacks_[i];
+    uint64_t timeStamp = sample.timeStamp.time_since_epoch().count();
+    OS << "[" << i << "]: tid[" << sample.tid << "], ts[" << timeStamp << "] ";
+
+    // Leaf frame is in sample[0] so dump it backward to
+    // get root => leaf represenation.
+    for (auto iter = sample.stack.rbegin(); iter != sample.stack.rend();
+         ++iter) {
+      const StackFrame &frame = *iter;
+      switch (frame.kind) {
+        case StackFrame::FrameKind::JSFunction:
+          OS << "[JS] " << frame.jsFrame.functionId << ":"
+             << frame.jsFrame.offset;
+          break;
+
+        case StackFrame::FrameKind::NativeFunction: {
+          NativeFunctionPtr nativeFrame = getNativeFunctionPtr(frame);
+          OS << "[Native] " << reinterpret_cast<uintptr_t>(nativeFrame);
+          break;
+        }
+
+        case StackFrame::FrameKind::FinalizableNativeFunction:
+          OS << "[HostFunction] " << getNativeFunctionName(frame);
+          break;
+
+        default:
+          llvm_unreachable("Unknown frame kind");
+      }
+      OS << " => ";
+    }
+    OS << "\n";
+  }
+}
+
+void SamplingProfiler::dumpTraceryTraceGlobal(llvh::raw_ostream &OS) {
+  auto globalProfiler = sampling_profiler::Sampler::get();
+  std::lock_guard<std::mutex> lk(globalProfiler->profilerLock_);
+  if (!globalProfiler->profilers_.empty()) {
+    auto *localProfiler = *globalProfiler->profilers_.begin();
+    localProfiler->dumpTraceryTrace(OS);
+  }
+}
+
+void SamplingProfiler::dumpTraceryTrace(llvh::raw_ostream &OS) {
+  std::lock_guard<std::mutex> lk(runtimeDataLock_);
+  auto pid = oscompat::process_id();
+  hermes::vm::serializeAsTraceryTrace(
+      *this, OS, TraceFormat::create(pid, threadNames_, sampledStacks_));
+  clear();
+}
+
+void SamplingProfiler::dumpChromeTrace(llvh::raw_ostream &OS) {
+  std::lock_guard<std::mutex> lk(runtimeDataLock_);
+  hermes::vm::serializeAsChromeTrace(
+      *this,
+      OS,
+      TraceFormat::create(
+          oscompat::process_id(), threadNames_, sampledStacks_));
+  clear();
+}
+
+facebook::hermes::sampling_profiler::Profile SamplingProfiler::dumpAsProfile() {
+  std::lock_guard<std::mutex> lk(runtimeDataLock_);
+
+  facebook::hermes::sampling_profiler::Profile profile =
+      generateProfile(*this, sampledStacks_);
+
+  clear();
+  return profile;
+}
+
+bool SamplingProfiler::enable(double meanHzFreq) {
+  return sampling_profiler::Sampler::get()->enable(meanHzFreq);
+}
+
+bool SamplingProfiler::disable() {
+  return sampling_profiler::Sampler::get()->disable();
+}
+
+void SamplingProfiler::clear() {
+  sampledStacks_.clear();
+  // Release all strong roots.
+  domains_.clear();
+  nativeFunctions_.clear();
+}
+
+void SamplingProfiler::suspend(
+    SuspendFrameInfo::Kind reason,
+    llvh::StringRef gcSuspendDetails) {
+  // Need to check whether the profiler is enabled without holding the
+  // runtimeDataLock_. Otherwise, we'd have a lock inversion.
+  bool enabled = sampling_profiler::Sampler::get()->enabled();
+
+  std::lock_guard<std::mutex> lk(runtimeDataLock_);
+  if (++suspendCount_ > 1) {
+    // If there are multiple nested suspend calls use a default "multiple" frame
+    // kind for the suspend entry in the call stack.
+    reason = SuspendFrameInfo::Kind::Multiple;
+  } else if (reason == SuspendFrameInfo::Kind::GC && gcSuspendDetails.empty()) {
+    // If no GC reason was provided, use a default "suspend" value.
+    gcSuspendDetails = "suspend";
+  }
+
+  // Only record the stack trace for the first suspend() call.
+  if (LLVM_UNLIKELY(enabled && suspendCount_ == 1)) {
+    recordPreSuspendStack(reason, gcSuspendDetails);
+  }
+}
+
+void SamplingProfiler::resume() {
+  std::lock_guard<std::mutex> lk(runtimeDataLock_);
+  assert(suspendCount_ > 0 && "resume() without suspend()");
+  if (--suspendCount_ == 0) {
+    preSuspendStackStorage_.stack.clear();
+  }
+}
+
+void SamplingProfiler::recordPreSuspendStack(
+    SuspendFrameInfo::Kind reason,
+    llvh::StringRef gcFrame) {
+  SuspendFrameInfo suspendExtraInfo{reason, nullptr};
+  if (reason == SuspendFrameInfo::Kind::GC) {
+    std::pair<std::unordered_set<std::string>::iterator, bool> retPair =
+        gcEventExtraInfoSet_.emplace(gcFrame);
+    suspendExtraInfo.gcFrame = &(*(retPair.first));
+  }
+
+  assert(
+      preSuspendStackStorage_.stack.size() == 0 &&
+      "Pre-suspend stack storage should be empty before sampling.");
+
+  preSuspendStackStorage_.stack.resize(1);
+
+  auto &leafFrame = preSuspendStackStorage_.stack[0];
+  leafFrame.kind = StackFrame::FrameKind::SuspendFrame;
+  leafFrame.suspendFrame = suspendExtraInfo;
+
+  // Leaf frame slot has been used, filling from index 1.
+  walkRuntimeStack(preSuspendStackStorage_, MayAllocate::Yes);
+}
+
+bool operator==(
+    const SamplingProfiler::StackFrame &left,
+    const SamplingProfiler::StackFrame &right) {
+  if (left.kind != right.kind) {
+    return false;
+  }
+  switch (left.kind) {
+    case SamplingProfiler::StackFrame::FrameKind::JSFunction:
+      return left.jsFrame.functionId == right.jsFrame.functionId &&
+          left.jsFrame.offset == right.jsFrame.offset;
+
+    case SamplingProfiler::StackFrame::FrameKind::NativeFunction:
+    case SamplingProfiler::StackFrame::FrameKind::FinalizableNativeFunction:
+      return left.nativeFrame == right.nativeFrame;
+
+    case SamplingProfiler::StackFrame::FrameKind::SuspendFrame:
+      return left.suspendFrame.kind == right.suspendFrame.kind &&
+          left.suspendFrame.gcFrame == right.suspendFrame.gcFrame;
+
+    default:
+      llvm_unreachable("Unknown frame kind");
+  }
+}
+
+} // namespace vm
+} // namespace hermes
+
+#endif // HERMESVM_SAMPLING_PROFILER_AVAILABLE

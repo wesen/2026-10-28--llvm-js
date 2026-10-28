@@ -1,0 +1,74 @@
+{
+  "compiler": "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/bin/shermes",
+  "passed": 6,
+  "total": 6,
+  "results": [
+    {
+      "case": "syntax failure preserves output",
+      "exit": 1,
+      "checks": {
+        "rejected": true,
+        "previous_output_preserved": true,
+        "stdout_empty": true,
+        "diagnostic": true
+      },
+      "pass": true,
+      "stderr": "/tmp/shllvm-driver-1rz9plpk/invalid.js:1:10: error: 'identifier' expected after 'function'\nfunction {\n~~~~~~~~~^\nEmitted 1 errors. exiting.\n"
+    },
+    {
+      "case": "unsupported opcode preserves output",
+      "exit": 1,
+      "checks": {
+        "rejected": true,
+        "previous_output_preserved": true,
+        "stdout_empty": true,
+        "diagnostic": true
+      },
+      "pass": true,
+      "stderr": "/tmp/shllvm-driver-1rz9plpk/unsupported.js:1:7: error: direct LLVM backend: unsupported instruction CreateRegExpInst\nprint(/abc/.test(\"abc\"));\n      ^\n"
+    },
+    {
+      "case": "unsupported opcode produces no partial stdout module",
+      "exit": 1,
+      "checks": {
+        "rejected": true,
+        "stdout_empty": true,
+        "opcode_diagnostic": true
+      },
+      "pass": true,
+      "stderr": "/tmp/shllvm-driver-1rz9plpk/unsupported.js:1:7: error: direct LLVM backend: unsupported instruction CreateRegExpInst\nprint(/abc/.test(\"abc\"));\n      ^\n"
+    },
+    {
+      "case": "default output bypasses C generation and compiler",
+      "exit": 0,
+      "checks": {
+        "success": true,
+        "llvm_output_created": true,
+        "no_generated_c": true
+      },
+      "pass": true,
+      "stderr": ""
+    },
+    {
+      "case": "stdout module has default main",
+      "exit": 0,
+      "checks": {
+        "success": true,
+        "main_present": true
+      },
+      "pass": true,
+      "stderr": ""
+    },
+    {
+      "case": "exported unit suppresses main",
+      "exit": 0,
+      "checks": {
+        "success": true,
+        "main_absent": true,
+        "unit_symbol_present": true
+      },
+      "pass": true,
+      "stderr": ""
+    }
+  ]
+}

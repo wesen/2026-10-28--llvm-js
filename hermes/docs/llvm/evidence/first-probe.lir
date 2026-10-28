@@ -1,0 +1,185 @@
+scope %VS0 [a: any]
+
+function global(): any 
+%BB0:
+  %0 = CreateScopeInst (:environment) %VS0: any, empty: any
+       DeclareGlobalVarInst "sum": string
+       DeclareGlobalVarInst "factorial": string
+       DeclareGlobalVarInst "counter": string
+  %4 = LIRLoadConstInst (:undefined) undefined: undefined
+       StoreFrameInst %0: environment, %4: undefined, [%VS0.a]: any
+  %6 = CreateFunctionInst (:object) %0: environment, %VS0: any, %sum(): functionCode
+  %7 = LIRGetGlobalObjectInst (:object)
+       StorePropertyLooseInst %6: object, %7: object, "sum": string
+  %9 = CreateFunctionInst (:object) %0: environment, %VS0: any, %factorial(): functionCode
+  %10 = LIRGetGlobalObjectInst (:object)
+        StorePropertyLooseInst %9: object, %10: object, "factorial": string
+  %12 = CreateFunctionInst (:object) %0: environment, %VS0: any, %counter(): functionCode
+  %13 = LIRGetGlobalObjectInst (:object)
+        StorePropertyLooseInst %12: object, %13: object, "counter": string
+  %15 = AllocStackInst (:any) $?anon_0_ret: any
+  %16 = LIRLoadConstInst (:undefined) undefined: undefined
+        StoreStackInst %16: undefined, %15: any
+  %18 = LIRGetGlobalObjectInst (:object)
+  %19 = LoadPropertyInst (:any) %18: object, "counter": string
+  %20 = LIRLoadConstInst (:undefined) undefined: undefined
+  %21 = LIRLoadConstInst (:undefined) undefined: undefined
+  %22 = LIRLoadConstInst (:number) 10: number
+  %23 = CallInst (:any) %19: any, empty: any, false: boolean, empty: any, %20: undefined, %21: undefined, %22: number
+        StoreFrameInst %0: environment, %23: any, [%VS0.a]: any
+  %25 = LIRGetGlobalObjectInst (:object)
+  %26 = TryLoadGlobalPropertyInst (:any) %25: object, "print": string
+  %27 = LIRGetGlobalObjectInst (:object)
+  %28 = LoadPropertyInst (:any) %27: object, "sum": string
+  %29 = LIRLoadConstInst (:undefined) undefined: undefined
+  %30 = LIRLoadConstInst (:undefined) undefined: undefined
+  %31 = LIRLoadConstInst (:number) 10: number
+  %32 = CallInst (:any) %28: any, empty: any, false: boolean, empty: any, %29: undefined, %30: undefined, %31: number
+  %33 = LIRGetGlobalObjectInst (:object)
+  %34 = LoadPropertyInst (:any) %33: object, "factorial": string
+  %35 = LIRLoadConstInst (:undefined) undefined: undefined
+  %36 = LIRLoadConstInst (:undefined) undefined: undefined
+  %37 = LIRLoadConstInst (:number) 6: number
+  %38 = CallInst (:any) %34: any, empty: any, false: boolean, empty: any, %35: undefined, %36: undefined, %37: number
+  %39 = LoadFrameInst (:any) %0: environment, [%VS0.a]: any
+  %40 = LoadPropertyInst (:any) %39: any, "next": string
+  %41 = LIRLoadConstInst (:undefined) undefined: undefined
+  %42 = CallInst (:any) %40: any, empty: any, false: boolean, empty: any, %41: undefined, %39: any
+  %43 = LoadFrameInst (:any) %0: environment, [%VS0.a]: any
+  %44 = LoadPropertyInst (:any) %43: any, "next": string
+  %45 = LIRLoadConstInst (:undefined) undefined: undefined
+  %46 = CallInst (:any) %44: any, empty: any, false: boolean, empty: any, %45: undefined, %43: any
+  %47 = LoadFrameInst (:any) %0: environment, [%VS0.a]: any
+  %48 = LoadPropertyInst (:any) %47: any, "current": string
+  %49 = LIRLoadConstInst (:undefined) undefined: undefined
+  %50 = CallInst (:any) %48: any, empty: any, false: boolean, empty: any, %49: undefined, %47: any
+  %51 = LIRLoadConstInst (:undefined) undefined: undefined
+  %52 = LIRLoadConstInst (:undefined) undefined: undefined
+  %53 = CallInst (:any) %26: any, empty: any, false: boolean, empty: any, %51: undefined, %52: undefined, %32: any, %38: any, %42: any, %46: any, %50: any
+        StoreStackInst %53: any, %15: any
+  %55 = LoadStackInst (:any) %15: any
+        ReturnInst %55: any
+function_end
+
+scope %VS1 [n: any, total: any, i: any]
+
+function sum(n: any): any 
+%BB0:
+  %0 = GetParentScopeInst (:environment) %VS0: any, %parentScope: environment
+  %1 = CreateScopeInst (:environment) %VS1: any, %0: environment
+  %2 = LoadParamInst (:any) %n: any
+       StoreFrameInst %1: environment, %2: any, [%VS1.n]: any
+  %4 = LIRLoadConstInst (:undefined) undefined: undefined
+       StoreFrameInst %1: environment, %4: undefined, [%VS1.total]: any
+  %6 = LIRLoadConstInst (:number) 0: number
+       StoreFrameInst %1: environment, %6: number, [%VS1.total]: any
+  %8 = LIRLoadConstInst (:undefined) undefined: undefined
+       StoreFrameInst %1: environment, %8: undefined, [%VS1.i]: any
+  %10 = LIRLoadConstInst (:number) 0: number
+        StoreFrameInst %1: environment, %10: number, [%VS1.i]: any
+  %12 = LoadFrameInst (:any) %1: environment, [%VS1.i]: any
+  %13 = LoadFrameInst (:any) %1: environment, [%VS1.n]: any
+  %14 = BinaryLessThanInst (:boolean) %12: any, %13: any
+        CondBranchInst %14: boolean, %BB1, %BB2
+%BB1:
+  %16 = LoadFrameInst (:any) %1: environment, [%VS1.total]: any
+  %17 = LoadFrameInst (:any) %1: environment, [%VS1.i]: any
+  %18 = BinaryAddInst (:any) %16: any, %17: any
+        StoreFrameInst %1: environment, %18: any, [%VS1.total]: any
+        BranchInst %BB4
+%BB2:
+  %21 = LoadFrameInst (:any) %1: environment, [%VS1.total]: any
+        ReturnInst %21: any
+%BB3:
+  %23 = LoadFrameInst (:any) %1: environment, [%VS1.i]: any
+  %24 = LoadFrameInst (:any) %1: environment, [%VS1.n]: any
+  %25 = BinaryLessThanInst (:boolean) %23: any, %24: any
+        CondBranchInst %25: boolean, %BB1, %BB2
+%BB4:
+  %27 = LoadFrameInst (:any) %1: environment, [%VS1.i]: any
+  %28 = AsNumericInst (:number|bigint) %27: any
+  %29 = UnaryIncInst (:number|bigint) %28: number|bigint
+        StoreFrameInst %1: environment, %29: number|bigint, [%VS1.i]: any
+        BranchInst %BB3
+function_end
+
+scope %VS2 [n: any]
+
+function factorial(n: any): any 
+%BB0:
+  %0 = GetParentScopeInst (:environment) %VS0: any, %parentScope: environment
+  %1 = CreateScopeInst (:environment) %VS2: any, %0: environment
+  %2 = LoadParamInst (:any) %n: any
+       StoreFrameInst %1: environment, %2: any, [%VS2.n]: any
+  %4 = LoadFrameInst (:any) %1: environment, [%VS2.n]: any
+  %5 = LIRLoadConstInst (:number) 2: number
+  %6 = BinaryLessThanInst (:boolean) %4: any, %5: number
+       CondBranchInst %6: boolean, %BB1, %BB2
+%BB1:
+  %8 = LIRLoadConstInst (:number) 1: number
+       ReturnInst %8: number
+%BB2:
+        BranchInst %BB3
+%BB3:
+  %11 = LoadFrameInst (:any) %1: environment, [%VS2.n]: any
+  %12 = LIRGetGlobalObjectInst (:object)
+  %13 = LoadPropertyInst (:any) %12: object, "factorial": string
+  %14 = LoadFrameInst (:any) %1: environment, [%VS2.n]: any
+  %15 = LIRLoadConstInst (:number) 1: number
+  %16 = BinarySubtractInst (:any) %14: any, %15: number
+  %17 = LIRLoadConstInst (:undefined) undefined: undefined
+  %18 = LIRLoadConstInst (:undefined) undefined: undefined
+  %19 = CallInst (:any) %13: any, empty: any, false: boolean, empty: any, %17: undefined, %18: undefined, %16: any
+  %20 = BinaryMultiplyInst (:any) %11: any, %19: any
+        ReturnInst %20: any
+function_end
+
+scope %VS3 [?anon_0_this: any, ?anon_1_new.target: undefined|object, start: any, x: any]
+
+function counter(start: any): any 
+%BB0:
+  %0 = LoadParamInst (:any) %<this>: any
+  %1 = CoerceThisNSInst (:object) %0: any
+  %2 = GetParentScopeInst (:environment) %VS0: any, %parentScope: environment
+  %3 = CreateScopeInst (:environment) %VS3: any, %2: environment
+       StoreFrameInst %3: environment, %1: object, [%VS3.?anon_0_this]: any
+  %5 = GetNewTargetInst (:undefined|object) %new.target: undefined|object
+       StoreFrameInst %3: environment, %5: undefined|object, [%VS3.?anon_1_new.target]: undefined|object
+  %7 = LoadParamInst (:any) %start: any
+       StoreFrameInst %3: environment, %7: any, [%VS3.start]: any
+  %9 = LIRLoadConstInst (:undefined) undefined: undefined
+        StoreFrameInst %3: environment, %9: undefined, [%VS3.x]: any
+  %11 = LoadFrameInst (:any) %3: environment, [%VS3.start]: any
+        StoreFrameInst %3: environment, %11: any, [%VS3.x]: any
+  %13 = AllocObjectLiteralInst (:object) empty: any
+  %14 = CreateFunctionInst (:object) %3: environment, %VS3: any, %next(): functionCode
+        DefineOwnPropertyInst %14: object, %13: object, "next": string, true: boolean
+  %16 = CreateFunctionInst (:object) %3: environment, %VS3: any, %current(): functionCode
+        DefineOwnPropertyInst %16: object, %13: object, "current": string, true: boolean
+        ReturnInst %13: object
+function_end
+
+scope %VS4 []
+
+arrow next(): any 
+%BB0:
+  %0 = GetParentScopeInst (:environment) %VS3: any, %parentScope: environment
+  %1 = CreateScopeInst (:environment) %VS4: any, %0: environment
+  %2 = LoadFrameInst (:any) %0: environment, [%VS3.x]: any
+  %3 = LIRLoadConstInst (:number) 1: number
+  %4 = BinaryAddInst (:any) %2: any, %3: number
+       StoreFrameInst %0: environment, %4: any, [%VS3.x]: any
+  %6 = LoadFrameInst (:any) %0: environment, [%VS3.x]: any
+       ReturnInst %6: any
+function_end
+
+scope %VS5 []
+
+function current(): any 
+%BB0:
+  %0 = GetParentScopeInst (:environment) %VS3: any, %parentScope: environment
+  %1 = CreateScopeInst (:environment) %VS5: any, %0: environment
+  %2 = LoadFrameInst (:any) %0: environment, [%VS3.x]: any
+       ReturnInst %2: any
+function_end
+

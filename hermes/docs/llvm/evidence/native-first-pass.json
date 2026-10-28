@@ -1,0 +1,2580 @@
+{
+  "generated_at_unix": 1793194655.0064495,
+  "source_cases": 21,
+  "passed_cases": 13,
+  "failed_cases": 8,
+  "native_llvm_vs_node_and_c_comparisons": 27,
+  "hermes_optimization_levels": [
+    "O0",
+    "O"
+  ],
+  "llvm_optimization_levels": [
+    "2"
+  ],
+  "asan_options": "detect_leaks=0",
+  "lsan_options": "",
+  "scope": "host native and optional lli execution; not device execution or full ECMAScript conformance",
+  "results": [
+    {
+      "name": "accessors.js",
+      "kind": "positive",
+      "passed": true,
+      "llvm_native_comparisons": 2,
+      "records": [
+        {
+          "stage": "node",
+          "command": [
+            "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
+            "--expose-gc",
+            "-e",
+            "globalThis.print = (...a) => console.log(...a); require(process.argv[1]);",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/accessors.js"
+          ],
+          "exit_code": 0,
+          "stdout": "42 gsg 42\n8 _x,x,add\n",
+          "stderr": "",
+          "seconds": 0.056536
+        },
+        {
+          "stage": "c-build",
+          "hermes_opt": "O0",
+          "command": [
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/bin/shermes",
+            "-O0",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/accessors.js",
+            "-o",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/accessors-O0-c"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "",
+          "seconds": 0.348819
+        },
+        {
+          "stage": "c-run",
+          "hermes_opt": "O0",
+          "matches_node": true,
+          "command": [
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/accessors-O0-c"
+          ],
+          "exit_code": 0,
+          "stdout": "42 gsg 42\n8 _x,x,add\n",
+          "stderr": "",
+          "seconds": 0.033976
+        },
+        {
+          "stage": "llvm-build",
+          "hermes_opt": "O0",
+          "llvm_opt": "2",
+          "command": [
+            "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/utils/shllvm.py",
+            "build",
+            "--build-dir",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm",
+            "--llvm-bin",
+            "/tmp/llvm-direct-toolchain/bin",
+            "--no-runtime-build",
+            "--hermes-opt",
+            "O0",
+            "--llvm-opt",
+            "2",
+            "-o",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/accessors-O0-llvm2",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/accessors.js"
+          ],
+          "exit_code": 0,
+          "stdout": "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/accessors-O0-llvm2\n",
+          "stderr": "",
+          "seconds": 0.40072
+        },
+        {
+          "stage": "llvm-run",
+          "hermes_opt": "O0",
+          "llvm_opt": "2",
+          "matches_node_and_c": true,
+          "command": [
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/accessors-O0-llvm2"
+          ],
+          "exit_code": 0,
+          "stdout": "42 gsg 42\n8 _x,x,add\n",
+          "stderr": "",
+          "seconds": 0.026767
+        },
+        {
+          "stage": "c-build",
+          "hermes_opt": "O",
+          "command": [
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/bin/shermes",
+            "-O",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/accessors.js",
+            "-o",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/accessors-O-c"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "",
+          "seconds": 0.457118
+        },
+        {
+          "stage": "c-run",
+          "hermes_opt": "O",
+          "matches_node": true,
+          "command": [
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/accessors-O-c"
+          ],
+          "exit_code": 0,
+          "stdout": "42 gsg 42\n8 _x,x,add\n",
+          "stderr": "",
+          "seconds": 0.030799
+        },
+        {
+          "stage": "llvm-build",
+          "hermes_opt": "O",
+          "llvm_opt": "2",
+          "command": [
+            "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/utils/shllvm.py",
+            "build",
+            "--build-dir",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm",
+            "--llvm-bin",
+            "/tmp/llvm-direct-toolchain/bin",
+            "--no-runtime-build",
+            "--hermes-opt",
+            "O",
+            "--llvm-opt",
+            "2",
+            "-o",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/accessors-O-llvm2",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/accessors.js"
+          ],
+          "exit_code": 0,
+          "stdout": "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/accessors-O-llvm2\n",
+          "stderr": "",
+          "seconds": 0.55774
+        },
+        {
+          "stage": "llvm-run",
+          "hermes_opt": "O",
+          "llvm_opt": "2",
+          "matches_node_and_c": true,
+          "command": [
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/accessors-O-llvm2"
+          ],
+          "exit_code": 0,
+          "stdout": "42 gsg 42\n8 _x,x,add\n",
+          "stderr": "",
+          "seconds": 0.041406
+        }
+      ]
+    },
+    {
+      "name": "arguments.js",
+      "kind": "positive",
+      "passed": true,
+      "llvm_native_comparisons": 2,
+      "records": [
+        {
+          "stage": "node",
+          "command": [
+            "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
+            "--expose-gc",
+            "-e",
+            "globalThis.print = (...a) => console.log(...a); require(process.argv[1]);",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/arguments.js"
+          ],
+          "exit_code": 0,
+          "stdout": "3:7:9 42 42\n",
+          "stderr": "",
+          "seconds": 0.045028
+        },
+        {
+          "stage": "c-build",
+          "hermes_opt": "O0",
+          "command": [
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/bin/shermes",
+            "-O0",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/arguments.js",
+            "-o",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/arguments-O0-c"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "",
+          "seconds": 0.336119
+        },
+        {
+          "stage": "c-run",
+          "hermes_opt": "O0",
+          "matches_node": true,
+          "command": [
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/arguments-O0-c"
+          ],
+          "exit_code": 0,
+          "stdout": "3:7:9 42 42\n",
+          "stderr": "",
+          "seconds": 0.02077
+        },
+        {
+          "stage": "llvm-build",
+          "hermes_opt": "O0",
+          "llvm_opt": "2",
+          "command": [
+            "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/utils/shllvm.py",
+            "build",
+            "--build-dir",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm",
+            "--llvm-bin",
+            "/tmp/llvm-direct-toolchain/bin",
+            "--no-runtime-build",
+            "--hermes-opt",
+            "O0",
+            "--llvm-opt",
+            "2",
+            "-o",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/arguments-O0-llvm2",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/arguments.js"
+          ],
+          "exit_code": 0,
+          "stdout": "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/arguments-O0-llvm2\n",
+          "stderr": "",
+          "seconds": 0.410651
+        },
+        {
+          "stage": "llvm-run",
+          "hermes_opt": "O0",
+          "llvm_opt": "2",
+          "matches_node_and_c": true,
+          "command": [
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/arguments-O0-llvm2"
+          ],
+          "exit_code": 0,
+          "stdout": "3:7:9 42 42\n",
+          "stderr": "",
+          "seconds": 0.032472
+        },
+        {
+          "stage": "c-build",
+          "hermes_opt": "O",
+          "command": [
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/bin/shermes",
+            "-O",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/arguments.js",
+            "-o",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/arguments-O-c"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "",
+          "seconds": 0.452361
+        },
+        {
+          "stage": "c-run",
+          "hermes_opt": "O",
+          "matches_node": true,
+          "command": [
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/arguments-O-c"
+          ],
+          "exit_code": 0,
+          "stdout": "3:7:9 42 42\n",
+          "stderr": "",
+          "seconds": 0.028646
+        },
+        {
+          "stage": "llvm-build",
+          "hermes_opt": "O",
+          "llvm_opt": "2",
+          "command": [
+            "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/utils/shllvm.py",
+            "build",
+            "--build-dir",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm",
+            "--llvm-bin",
+            "/tmp/llvm-direct-toolchain/bin",
+            "--no-runtime-build",
+            "--hermes-opt",
+            "O",
+            "--llvm-opt",
+            "2",
+            "-o",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/arguments-O-llvm2",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/arguments.js"
+          ],
+          "exit_code": 0,
+          "stdout": "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/arguments-O-llvm2\n",
+          "stderr": "",
+          "seconds": 0.496617
+        },
+        {
+          "stage": "llvm-run",
+          "hermes_opt": "O",
+          "llvm_opt": "2",
+          "matches_node_and_c": true,
+          "command": [
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/arguments-O-llvm2"
+          ],
+          "exit_code": 0,
+          "stdout": "3:7:9 42 42\n",
+          "stderr": "",
+          "seconds": 0.039388
+        }
+      ]
+    },
+    {
+      "name": "arrays_callbacks.js",
+      "kind": "positive",
+      "passed": false,
+      "llvm_native_comparisons": 2,
+      "records": [
+        {
+          "stage": "node",
+          "command": [
+            "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
+            "--expose-gc",
+            "-e",
+            "globalThis.print = (...a) => console.log(...a); require(process.argv[1]);",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/arrays_callbacks.js"
+          ],
+          "exit_code": 0,
+          "stdout": "2,4,6,8 18\n5 4 3\n3 false true\n0 1 2 3\n",
+          "stderr": "",
+          "seconds": 0.100761
+        },
+        {
+          "stage": "c-build",
+          "hermes_opt": "O0",
+          "command": [
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/bin/shermes",
+            "-O0",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/arrays_callbacks.js",
+            "-o",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/arrays_callbacks-O0-c"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "",
+          "seconds": 0.47624
+        },
+        {
+          "stage": "c-run",
+          "hermes_opt": "O0",
+          "matches_node": false,
+          "command": [
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/arrays_callbacks-O0-c"
+          ],
+          "exit_code": 0,
+          "stdout": "2,4,6,8 18\n5 4 3\n3 false true\n4 4 4 4\n",
+          "stderr": "",
+          "seconds": 0.029056
+        },
+        {
+          "stage": "llvm-build",
+          "hermes_opt": "O0",
+          "llvm_opt": "2",
+          "command": [
+            "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/utils/shllvm.py",
+            "build",
+            "--build-dir",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm",
+            "--llvm-bin",
+            "/tmp/llvm-direct-toolchain/bin",
+            "--no-runtime-build",
+            "--hermes-opt",
+            "O0",
+            "--llvm-opt",
+            "2",
+            "-o",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/arrays_callbacks-O0-llvm2",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/arrays_callbacks.js"
+          ],
+          "exit_code": 0,
+          "stdout": "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/arrays_callbacks-O0-llvm2\n",
+          "stderr": "",
+          "seconds": 0.547546
+        },
+        {
+          "stage": "llvm-run",
+          "hermes_opt": "O0",
+          "llvm_opt": "2",
+          "matches_node_and_c": false,
+          "command": [
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/arrays_callbacks-O0-llvm2"
+          ],
+          "exit_code": 0,
+          "stdout": "2,4,6,8 18\n5 4 3\n3 false true\n4 4 4 4\n",
+          "stderr": "",
+          "seconds": 0.030957
+        },
+        {
+          "stage": "c-build",
+          "hermes_opt": "O",
+          "command": [
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/bin/shermes",
+            "-O",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/arrays_callbacks.js",
+            "-o",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/arrays_callbacks-O-c"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "",
+          "seconds": 0.429312
+        },
+        {
+          "stage": "c-run",
+          "hermes_opt": "O",
+          "matches_node": false,
+          "command": [
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/arrays_callbacks-O-c"
+          ],
+          "exit_code": 0,
+          "stdout": "2,4,6,8 18\n5 4 3\n3 false true\n4 4 4 4\n",
+          "stderr": "",
+          "seconds": 0.032648
+        },
+        {
+          "stage": "llvm-build",
+          "hermes_opt": "O",
+          "llvm_opt": "2",
+          "command": [
+            "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/utils/shllvm.py",
+            "build",
+            "--build-dir",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm",
+            "--llvm-bin",
+            "/tmp/llvm-direct-toolchain/bin",
+            "--no-runtime-build",
+            "--hermes-opt",
+            "O",
+            "--llvm-opt",
+            "2",
+            "-o",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/arrays_callbacks-O-llvm2",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/arrays_callbacks.js"
+          ],
+          "exit_code": 0,
+          "stdout": "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/arrays_callbacks-O-llvm2\n",
+          "stderr": "",
+          "seconds": 0.447547
+        },
+        {
+          "stage": "llvm-run",
+          "hermes_opt": "O",
+          "llvm_opt": "2",
+          "matches_node_and_c": false,
+          "command": [
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/arrays_callbacks-O-llvm2"
+          ],
+          "exit_code": 0,
+          "stdout": "2,4,6,8 18\n5 4 3\n3 false true\n4 4 4 4\n",
+          "stderr": "",
+          "seconds": 0.030709
+        }
+      ]
+    },
+    {
+      "name": "arrows_this.js",
+      "kind": "positive",
+      "passed": true,
+      "llvm_native_comparisons": 2,
+      "records": [
+        {
+          "stage": "node",
+          "command": [
+            "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
+            "--expose-gc",
+            "-e",
+            "globalThis.print = (...a) => console.log(...a); require(process.argv[1]);",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/arrows_this.js"
+          ],
+          "exit_code": 0,
+          "stdout": "42 43\n47\n42 42\n",
+          "stderr": "",
+          "seconds": 0.076989
+        },
+        {
+          "stage": "c-build",
+          "hermes_opt": "O0",
+          "command": [
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/bin/shermes",
+            "-O0",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/arrows_this.js",
+            "-o",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/arrows_this-O0-c"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "",
+          "seconds": 0.436876
+        },
+        {
+          "stage": "c-run",
+          "hermes_opt": "O0",
+          "matches_node": true,
+          "command": [
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/arrows_this-O0-c"
+          ],
+          "exit_code": 0,
+          "stdout": "42 43\n47\n42 42\n",
+          "stderr": "",
+          "seconds": 0.02556
+        },
+        {
+          "stage": "llvm-build",
+          "hermes_opt": "O0",
+          "llvm_opt": "2",
+          "command": [
+            "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/utils/shllvm.py",
+            "build",
+            "--build-dir",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm",
+            "--llvm-bin",
+            "/tmp/llvm-direct-toolchain/bin",
+            "--no-runtime-build",
+            "--hermes-opt",
+            "O0",
+            "--llvm-opt",
+            "2",
+            "-o",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/arrows_this-O0-llvm2",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/arrows_this.js"
+          ],
+          "exit_code": 0,
+          "stdout": "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/arrows_this-O0-llvm2\n",
+          "stderr": "",
+          "seconds": 0.466229
+        },
+        {
+          "stage": "llvm-run",
+          "hermes_opt": "O0",
+          "llvm_opt": "2",
+          "matches_node_and_c": true,
+          "command": [
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/arrows_this-O0-llvm2"
+          ],
+          "exit_code": 0,
+          "stdout": "42 43\n47\n42 42\n",
+          "stderr": "",
+          "seconds": 0.030338
+        },
+        {
+          "stage": "c-build",
+          "hermes_opt": "O",
+          "command": [
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/bin/shermes",
+            "-O",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/arrows_this.js",
+            "-o",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/arrows_this-O-c"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "",
+          "seconds": 0.441576
+        },
+        {
+          "stage": "c-run",
+          "hermes_opt": "O",
+          "matches_node": true,
+          "command": [
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/arrows_this-O-c"
+          ],
+          "exit_code": 0,
+          "stdout": "42 43\n47\n42 42\n",
+          "stderr": "",
+          "seconds": 0.026666
+        },
+        {
+          "stage": "llvm-build",
+          "hermes_opt": "O",
+          "llvm_opt": "2",
+          "command": [
+            "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/utils/shllvm.py",
+            "build",
+            "--build-dir",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm",
+            "--llvm-bin",
+            "/tmp/llvm-direct-toolchain/bin",
+            "--no-runtime-build",
+            "--hermes-opt",
+            "O",
+            "--llvm-opt",
+            "2",
+            "-o",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/arrows_this-O-llvm2",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/arrows_this.js"
+          ],
+          "exit_code": 0,
+          "stdout": "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/arrows_this-O-llvm2\n",
+          "stderr": "",
+          "seconds": 0.406275
+        },
+        {
+          "stage": "llvm-run",
+          "hermes_opt": "O",
+          "llvm_opt": "2",
+          "matches_node_and_c": true,
+          "command": [
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/arrows_this-O-llvm2"
+          ],
+          "exit_code": 0,
+          "stdout": "42 43\n47\n42 42\n",
+          "stderr": "",
+          "seconds": 0.036722
+        }
+      ]
+    },
+    {
+      "name": "catch_basic.js",
+      "kind": "positive",
+      "passed": true,
+      "llvm_native_comparisons": 2,
+      "records": [
+        {
+          "stage": "node",
+          "command": [
+            "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
+            "--expose-gc",
+            "-e",
+            "globalThis.print = (...a) => console.log(...a); require(process.argv[1]);",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/catch_basic.js"
+          ],
+          "exit_code": 0,
+          "stdout": "1\n",
+          "stderr": "",
+          "seconds": 0.058879
+        },
+        {
+          "stage": "c-build",
+          "hermes_opt": "O0",
+          "command": [
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/bin/shermes",
+            "-O0",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/catch_basic.js",
+            "-o",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/catch_basic-O0-c"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "",
+          "seconds": 0.34824
+        },
+        {
+          "stage": "c-run",
+          "hermes_opt": "O0",
+          "matches_node": true,
+          "command": [
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/catch_basic-O0-c"
+          ],
+          "exit_code": 0,
+          "stdout": "1\n",
+          "stderr": "",
+          "seconds": 0.031305
+        },
+        {
+          "stage": "llvm-build",
+          "hermes_opt": "O0",
+          "llvm_opt": "2",
+          "command": [
+            "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/utils/shllvm.py",
+            "build",
+            "--build-dir",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm",
+            "--llvm-bin",
+            "/tmp/llvm-direct-toolchain/bin",
+            "--no-runtime-build",
+            "--hermes-opt",
+            "O0",
+            "--llvm-opt",
+            "2",
+            "-o",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/catch_basic-O0-llvm2",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/catch_basic.js"
+          ],
+          "exit_code": 0,
+          "stdout": "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/catch_basic-O0-llvm2\n",
+          "stderr": "",
+          "seconds": 0.380877
+        },
+        {
+          "stage": "llvm-run",
+          "hermes_opt": "O0",
+          "llvm_opt": "2",
+          "matches_node_and_c": true,
+          "command": [
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/catch_basic-O0-llvm2"
+          ],
+          "exit_code": 0,
+          "stdout": "1\n",
+          "stderr": "",
+          "seconds": 0.030468
+        },
+        {
+          "stage": "c-build",
+          "hermes_opt": "O",
+          "command": [
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/bin/shermes",
+            "-O",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/catch_basic.js",
+            "-o",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/catch_basic-O-c"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "",
+          "seconds": 0.428428
+        },
+        {
+          "stage": "c-run",
+          "hermes_opt": "O",
+          "matches_node": true,
+          "command": [
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/catch_basic-O-c"
+          ],
+          "exit_code": 0,
+          "stdout": "1\n",
+          "stderr": "",
+          "seconds": 0.030618
+        },
+        {
+          "stage": "llvm-build",
+          "hermes_opt": "O",
+          "llvm_opt": "2",
+          "command": [
+            "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/utils/shllvm.py",
+            "build",
+            "--build-dir",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm",
+            "--llvm-bin",
+            "/tmp/llvm-direct-toolchain/bin",
+            "--no-runtime-build",
+            "--hermes-opt",
+            "O",
+            "--llvm-opt",
+            "2",
+            "-o",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/catch_basic-O-llvm2",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/catch_basic.js"
+          ],
+          "exit_code": 0,
+          "stdout": "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/catch_basic-O-llvm2\n",
+          "stderr": "",
+          "seconds": 0.401485
+        },
+        {
+          "stage": "llvm-run",
+          "hermes_opt": "O",
+          "llvm_opt": "2",
+          "matches_node_and_c": true,
+          "command": [
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/catch_basic-O-llvm2"
+          ],
+          "exit_code": 0,
+          "stdout": "1\n",
+          "stderr": "",
+          "seconds": 0.045031
+        }
+      ]
+    },
+    {
+      "name": "classes.js",
+      "kind": "positive",
+      "passed": false,
+      "llvm_native_comparisons": 0,
+      "records": [
+        {
+          "stage": "node",
+          "command": [
+            "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
+            "--expose-gc",
+            "-e",
+            "globalThis.print = (...a) => console.log(...a); require(process.argv[1]);",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/classes.js"
+          ],
+          "exit_code": 0,
+          "stdout": "35 30 42 true true base\nTypeError\n",
+          "stderr": "",
+          "seconds": 0.068538
+        },
+        {
+          "stage": "c-build",
+          "hermes_opt": "O0",
+          "command": [
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/bin/shermes",
+            "-O0",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/classes.js",
+            "-o",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/classes-O0-c"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "",
+          "seconds": 0.39168
+        },
+        {
+          "stage": "c-run",
+          "hermes_opt": "O0",
+          "matches_node": true,
+          "command": [
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/classes-O0-c"
+          ],
+          "exit_code": 0,
+          "stdout": "35 30 42 true true base\nTypeError\n",
+          "stderr": "",
+          "seconds": 0.026141
+        },
+        {
+          "stage": "llvm-build",
+          "hermes_opt": "O0",
+          "llvm_opt": "2",
+          "command": [
+            "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/utils/shllvm.py",
+            "build",
+            "--build-dir",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm",
+            "--llvm-bin",
+            "/tmp/llvm-direct-toolchain/bin",
+            "--no-runtime-build",
+            "--hermes-opt",
+            "O0",
+            "--llvm-opt",
+            "2",
+            "-o",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/classes-O0-llvm2",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/classes.js"
+          ],
+          "exit_code": 2,
+          "stdout": "",
+          "stderr": "/usr/bin/ld: /tmp/classes-O0-llvm2-e1ef40.o: in function `shllvm_f1':\nhermes-direct-llvm:(.text+0x1178): undefined reference to `shllvm_object_parent'\nclang: error: linker command failed with exit code 1 (use -v to see invocation)\nshllvm: command failed (1): /tmp/llvm-direct-toolchain/root/usr/lib/llvm-18/bin/clang /workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/classes-O0-llvm2.bc -O2 -Wno-override-module -fsanitize=address -L/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/lib -Wl,-rpath,/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/lib -L/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/tools/shermes -Wl,-rpath,/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/tools/shermes -L/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/jsi -Wl,-rpath,/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/jsi /workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/lib/libshllvm_runtime.a -lshermes_console -lhermesvm -lm -o /workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/shllvm-link-pxgo6byo/program\n",
+          "seconds": 0.452196
+        },
+        {
+          "stage": "c-build",
+          "hermes_opt": "O",
+          "command": [
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/bin/shermes",
+            "-O",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/classes.js",
+            "-o",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/classes-O-c"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "",
+          "seconds": 0.539506
+        },
+        {
+          "stage": "c-run",
+          "hermes_opt": "O",
+          "matches_node": true,
+          "command": [
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/classes-O-c"
+          ],
+          "exit_code": 0,
+          "stdout": "35 30 42 true true base\nTypeError\n",
+          "stderr": "",
+          "seconds": 0.049973
+        },
+        {
+          "stage": "llvm-build",
+          "hermes_opt": "O",
+          "llvm_opt": "2",
+          "command": [
+            "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/utils/shllvm.py",
+            "build",
+            "--build-dir",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm",
+            "--llvm-bin",
+            "/tmp/llvm-direct-toolchain/bin",
+            "--no-runtime-build",
+            "--hermes-opt",
+            "O",
+            "--llvm-opt",
+            "2",
+            "-o",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/classes-O-llvm2",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/classes.js"
+          ],
+          "exit_code": 2,
+          "stdout": "",
+          "stderr": "/usr/bin/ld: /tmp/classes-O-llvm2-3340f0.o: in function `shllvm_f1':\nhermes-direct-llvm:(.text+0xbfe): undefined reference to `shllvm_object_parent'\nclang: error: linker command failed with exit code 1 (use -v to see invocation)\nshllvm: command failed (1): /tmp/llvm-direct-toolchain/root/usr/lib/llvm-18/bin/clang /workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/classes-O-llvm2.bc -O2 -Wno-override-module -fsanitize=address -L/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/lib -Wl,-rpath,/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/lib -L/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/tools/shermes -Wl,-rpath,/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/tools/shermes -L/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/jsi -Wl,-rpath,/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/jsi /workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/lib/libshllvm_runtime.a -lshermes_console -lhermesvm -lm -o /workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/shllvm-link-3cn5fjgn/program\n",
+          "seconds": 0.563475
+        }
+      ]
+    },
+    {
+      "name": "closures.js",
+      "kind": "positive",
+      "passed": true,
+      "llvm_native_comparisons": 2,
+      "records": [
+        {
+          "stage": "node",
+          "command": [
+            "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
+            "--expose-gc",
+            "-e",
+            "globalThis.print = (...a) => console.log(...a); require(process.argv[1]);",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/closures.js"
+          ],
+          "exit_code": 0,
+          "stdout": "41 42 41 41 101 41\n42 43\n210\n",
+          "stderr": "",
+          "seconds": 0.052526
+        },
+        {
+          "stage": "c-build",
+          "hermes_opt": "O0",
+          "command": [
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/bin/shermes",
+            "-O0",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/closures.js",
+            "-o",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/closures-O0-c"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "",
+          "seconds": 0.369889
+        },
+        {
+          "stage": "c-run",
+          "hermes_opt": "O0",
+          "matches_node": true,
+          "command": [
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/closures-O0-c"
+          ],
+          "exit_code": 0,
+          "stdout": "41 42 41 41 101 41\n42 43\n210\n",
+          "stderr": "",
+          "seconds": 0.020648
+        },
+        {
+          "stage": "llvm-build",
+          "hermes_opt": "O0",
+          "llvm_opt": "2",
+          "command": [
+            "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/utils/shllvm.py",
+            "build",
+            "--build-dir",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm",
+            "--llvm-bin",
+            "/tmp/llvm-direct-toolchain/bin",
+            "--no-runtime-build",
+            "--hermes-opt",
+            "O0",
+            "--llvm-opt",
+            "2",
+            "-o",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/closures-O0-llvm2",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/closures.js"
+          ],
+          "exit_code": 0,
+          "stdout": "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/closures-O0-llvm2\n",
+          "stderr": "",
+          "seconds": 0.456212
+        },
+        {
+          "stage": "llvm-run",
+          "hermes_opt": "O0",
+          "llvm_opt": "2",
+          "matches_node_and_c": true,
+          "command": [
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/closures-O0-llvm2"
+          ],
+          "exit_code": 0,
+          "stdout": "41 42 41 41 101 41\n42 43\n210\n",
+          "stderr": "",
+          "seconds": 0.045019
+        },
+        {
+          "stage": "c-build",
+          "hermes_opt": "O",
+          "command": [
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/bin/shermes",
+            "-O",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/closures.js",
+            "-o",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/closures-O-c"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "",
+          "seconds": 0.403779
+        },
+        {
+          "stage": "c-run",
+          "hermes_opt": "O",
+          "matches_node": true,
+          "command": [
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/closures-O-c"
+          ],
+          "exit_code": 0,
+          "stdout": "41 42 41 41 101 41\n42 43\n210\n",
+          "stderr": "",
+          "seconds": 0.025207
+        },
+        {
+          "stage": "llvm-build",
+          "hermes_opt": "O",
+          "llvm_opt": "2",
+          "command": [
+            "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/utils/shllvm.py",
+            "build",
+            "--build-dir",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm",
+            "--llvm-bin",
+            "/tmp/llvm-direct-toolchain/bin",
+            "--no-runtime-build",
+            "--hermes-opt",
+            "O",
+            "--llvm-opt",
+            "2",
+            "-o",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/closures-O-llvm2",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/closures.js"
+          ],
+          "exit_code": 0,
+          "stdout": "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/closures-O-llvm2\n",
+          "stderr": "",
+          "seconds": 0.379423
+        },
+        {
+          "stage": "llvm-run",
+          "hermes_opt": "O",
+          "llvm_opt": "2",
+          "matches_node_and_c": true,
+          "command": [
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/closures-O-llvm2"
+          ],
+          "exit_code": 0,
+          "stdout": "41 42 41 41 101 41\n42 43\n210\n",
+          "stderr": "",
+          "seconds": 0.019619
+        }
+      ]
+    },
+    {
+      "name": "coercion.js",
+      "kind": "positive",
+      "passed": true,
+      "llvm_native_comparisons": 2,
+      "records": [
+        {
+          "stage": "node",
+          "command": [
+            "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
+            "--expose-gc",
+            "-e",
+            "globalThis.print = (...a) => console.log(...a); require(process.argv[1]);",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/coercion.js"
+          ],
+          "exit_code": 0,
+          "stdout": "42 ab value=10 32\ntrue false true false\n-Infinity false 4294967295 2147483647\nobject function undefined object\n",
+          "stderr": "",
+          "seconds": 0.04582
+        },
+        {
+          "stage": "c-build",
+          "hermes_opt": "O0",
+          "command": [
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/bin/shermes",
+            "-O0",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/coercion.js",
+            "-o",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/coercion-O0-c"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "",
+          "seconds": 0.35086
+        },
+        {
+          "stage": "c-run",
+          "hermes_opt": "O0",
+          "matches_node": true,
+          "command": [
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/coercion-O0-c"
+          ],
+          "exit_code": 0,
+          "stdout": "42 ab value=10 32\ntrue false true false\n-Infinity false 4294967295 2147483647\nobject function undefined object\n",
+          "stderr": "",
+          "seconds": 0.032844
+        },
+        {
+          "stage": "llvm-build",
+          "hermes_opt": "O0",
+          "llvm_opt": "2",
+          "command": [
+            "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/utils/shllvm.py",
+            "build",
+            "--build-dir",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm",
+            "--llvm-bin",
+            "/tmp/llvm-direct-toolchain/bin",
+            "--no-runtime-build",
+            "--hermes-opt",
+            "O0",
+            "--llvm-opt",
+            "2",
+            "-o",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/coercion-O0-llvm2",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/coercion.js"
+          ],
+          "exit_code": 0,
+          "stdout": "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/coercion-O0-llvm2\n",
+          "stderr": "",
+          "seconds": 0.368806
+        },
+        {
+          "stage": "llvm-run",
+          "hermes_opt": "O0",
+          "llvm_opt": "2",
+          "matches_node_and_c": true,
+          "command": [
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/coercion-O0-llvm2"
+          ],
+          "exit_code": 0,
+          "stdout": "42 ab value=10 32\ntrue false true false\n-Infinity false 4294967295 2147483647\nobject function undefined object\n",
+          "stderr": "",
+          "seconds": 0.017461
+        },
+        {
+          "stage": "c-build",
+          "hermes_opt": "O",
+          "command": [
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/bin/shermes",
+            "-O",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/coercion.js",
+            "-o",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/coercion-O-c"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "",
+          "seconds": 0.305922
+        },
+        {
+          "stage": "c-run",
+          "hermes_opt": "O",
+          "matches_node": true,
+          "command": [
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/coercion-O-c"
+          ],
+          "exit_code": 0,
+          "stdout": "42 ab value=10 32\ntrue false true false\n-Infinity false 4294967295 2147483647\nobject function undefined object\n",
+          "stderr": "",
+          "seconds": 0.023883
+        },
+        {
+          "stage": "llvm-build",
+          "hermes_opt": "O",
+          "llvm_opt": "2",
+          "command": [
+            "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/utils/shllvm.py",
+            "build",
+            "--build-dir",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm",
+            "--llvm-bin",
+            "/tmp/llvm-direct-toolchain/bin",
+            "--no-runtime-build",
+            "--hermes-opt",
+            "O",
+            "--llvm-opt",
+            "2",
+            "-o",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/coercion-O-llvm2",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/coercion.js"
+          ],
+          "exit_code": 0,
+          "stdout": "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/coercion-O-llvm2\n",
+          "stderr": "",
+          "seconds": 0.373976
+        },
+        {
+          "stage": "llvm-run",
+          "hermes_opt": "O",
+          "llvm_opt": "2",
+          "matches_node_and_c": true,
+          "command": [
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/coercion-O-llvm2"
+          ],
+          "exit_code": 0,
+          "stdout": "42 ab value=10 32\ntrue false true false\n-Infinity false 4294967295 2147483647\nobject function undefined object\n",
+          "stderr": "",
+          "seconds": 0.025901
+        }
+      ]
+    },
+    {
+      "name": "constructors.js",
+      "kind": "positive",
+      "passed": true,
+      "llvm_native_comparisons": 2,
+      "records": [
+        {
+          "stage": "node",
+          "command": [
+            "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
+            "--expose-gc",
+            "-e",
+            "globalThis.print = (...a) => console.log(...a); require(process.argv[1]);",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/constructors.js"
+          ],
+          "exit_code": 0,
+          "stdout": "42 true true\n42 41\nfalse true\n",
+          "stderr": "",
+          "seconds": 0.050224
+        },
+        {
+          "stage": "c-build",
+          "hermes_opt": "O0",
+          "command": [
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/bin/shermes",
+            "-O0",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/constructors.js",
+            "-o",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/constructors-O0-c"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "",
+          "seconds": 0.330535
+        },
+        {
+          "stage": "c-run",
+          "hermes_opt": "O0",
+          "matches_node": true,
+          "command": [
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/constructors-O0-c"
+          ],
+          "exit_code": 0,
+          "stdout": "42 true true\n42 41\nfalse true\n",
+          "stderr": "",
+          "seconds": 0.01989
+        },
+        {
+          "stage": "llvm-build",
+          "hermes_opt": "O0",
+          "llvm_opt": "2",
+          "command": [
+            "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/utils/shllvm.py",
+            "build",
+            "--build-dir",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm",
+            "--llvm-bin",
+            "/tmp/llvm-direct-toolchain/bin",
+            "--no-runtime-build",
+            "--hermes-opt",
+            "O0",
+            "--llvm-opt",
+            "2",
+            "-o",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/constructors-O0-llvm2",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/constructors.js"
+          ],
+          "exit_code": 0,
+          "stdout": "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/constructors-O0-llvm2\n",
+          "stderr": "",
+          "seconds": 0.378129
+        },
+        {
+          "stage": "llvm-run",
+          "hermes_opt": "O0",
+          "llvm_opt": "2",
+          "matches_node_and_c": true,
+          "command": [
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/constructors-O0-llvm2"
+          ],
+          "exit_code": 0,
+          "stdout": "42 true true\n42 41\nfalse true\n",
+          "stderr": "",
+          "seconds": 0.023289
+        },
+        {
+          "stage": "c-build",
+          "hermes_opt": "O",
+          "command": [
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/bin/shermes",
+            "-O",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/constructors.js",
+            "-o",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/constructors-O-c"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "",
+          "seconds": 0.449537
+        },
+        {
+          "stage": "c-run",
+          "hermes_opt": "O",
+          "matches_node": true,
+          "command": [
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/constructors-O-c"
+          ],
+          "exit_code": 0,
+          "stdout": "42 true true\n42 41\nfalse true\n",
+          "stderr": "",
+          "seconds": 0.022532
+        },
+        {
+          "stage": "llvm-build",
+          "hermes_opt": "O",
+          "llvm_opt": "2",
+          "command": [
+            "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/utils/shllvm.py",
+            "build",
+            "--build-dir",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm",
+            "--llvm-bin",
+            "/tmp/llvm-direct-toolchain/bin",
+            "--no-runtime-build",
+            "--hermes-opt",
+            "O",
+            "--llvm-opt",
+            "2",
+            "-o",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/constructors-O-llvm2",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/constructors.js"
+          ],
+          "exit_code": 0,
+          "stdout": "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/constructors-O-llvm2\n",
+          "stderr": "",
+          "seconds": 0.423541
+        },
+        {
+          "stage": "llvm-run",
+          "hermes_opt": "O",
+          "llvm_opt": "2",
+          "matches_node_and_c": true,
+          "command": [
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/constructors-O-llvm2"
+          ],
+          "exit_code": 0,
+          "stdout": "42 true true\n42 41\nfalse true\n",
+          "stderr": "",
+          "seconds": 0.027073
+        }
+      ]
+    },
+    {
+      "name": "control_phi.js",
+      "kind": "positive",
+      "passed": true,
+      "llvm_native_comparisons": 2,
+      "records": [
+        {
+          "stage": "node",
+          "command": [
+            "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
+            "--expose-gc",
+            "-e",
+            "globalThis.print = (...a) => console.log(...a); require(process.argv[1]);",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/control_phi.js"
+          ],
+          "exit_code": 0,
+          "stdout": "6765 36\nfalse true 42 2\n",
+          "stderr": "",
+          "seconds": 0.049328
+        },
+        {
+          "stage": "c-build",
+          "hermes_opt": "O0",
+          "command": [
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/bin/shermes",
+            "-O0",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/control_phi.js",
+            "-o",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/control_phi-O0-c"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "",
+          "seconds": 0.326516
+        },
+        {
+          "stage": "c-run",
+          "hermes_opt": "O0",
+          "matches_node": true,
+          "command": [
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/control_phi-O0-c"
+          ],
+          "exit_code": 0,
+          "stdout": "6765 36\nfalse true 42 2\n",
+          "stderr": "",
+          "seconds": 0.020698
+        },
+        {
+          "stage": "llvm-build",
+          "hermes_opt": "O0",
+          "llvm_opt": "2",
+          "command": [
+            "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/utils/shllvm.py",
+            "build",
+            "--build-dir",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm",
+            "--llvm-bin",
+            "/tmp/llvm-direct-toolchain/bin",
+            "--no-runtime-build",
+            "--hermes-opt",
+            "O0",
+            "--llvm-opt",
+            "2",
+            "-o",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/control_phi-O0-llvm2",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/control_phi.js"
+          ],
+          "exit_code": 0,
+          "stdout": "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/control_phi-O0-llvm2\n",
+          "stderr": "",
+          "seconds": 0.377575
+        },
+        {
+          "stage": "llvm-run",
+          "hermes_opt": "O0",
+          "llvm_opt": "2",
+          "matches_node_and_c": true,
+          "command": [
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/control_phi-O0-llvm2"
+          ],
+          "exit_code": 0,
+          "stdout": "6765 36\nfalse true 42 2\n",
+          "stderr": "",
+          "seconds": 0.020321
+        },
+        {
+          "stage": "c-build",
+          "hermes_opt": "O",
+          "command": [
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/bin/shermes",
+            "-O",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/control_phi.js",
+            "-o",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/control_phi-O-c"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "",
+          "seconds": 0.437652
+        },
+        {
+          "stage": "c-run",
+          "hermes_opt": "O",
+          "matches_node": true,
+          "command": [
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/control_phi-O-c"
+          ],
+          "exit_code": 0,
+          "stdout": "6765 36\nfalse true 42 2\n",
+          "stderr": "",
+          "seconds": 0.023495
+        },
+        {
+          "stage": "llvm-build",
+          "hermes_opt": "O",
+          "llvm_opt": "2",
+          "command": [
+            "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/utils/shllvm.py",
+            "build",
+            "--build-dir",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm",
+            "--llvm-bin",
+            "/tmp/llvm-direct-toolchain/bin",
+            "--no-runtime-build",
+            "--hermes-opt",
+            "O",
+            "--llvm-opt",
+            "2",
+            "-o",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/control_phi-O-llvm2",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/control_phi.js"
+          ],
+          "exit_code": 0,
+          "stdout": "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/control_phi-O-llvm2\n",
+          "stderr": "",
+          "seconds": 0.444082
+        },
+        {
+          "stage": "llvm-run",
+          "hermes_opt": "O",
+          "llvm_opt": "2",
+          "matches_node_and_c": true,
+          "command": [
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/control_phi-O-llvm2"
+          ],
+          "exit_code": 0,
+          "stdout": "6765 36\nfalse true 42 2\n",
+          "stderr": "",
+          "seconds": 0.027372
+        }
+      ]
+    },
+    {
+      "name": "exceptions.js",
+      "kind": "positive",
+      "passed": false,
+      "llvm_native_comparisons": 1,
+      "records": [
+        {
+          "stage": "node",
+          "command": [
+            "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
+            "--expose-gc",
+            "-e",
+            "globalThis.print = (...a) => console.log(...a); require(process.argv[1]);",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/exceptions.js"
+          ],
+          "exit_code": 0,
+          "stdout": "31 66\n42\n0ff2ff\nTypeError\nReferenceError\n",
+          "stderr": "",
+          "seconds": 0.059577
+        },
+        {
+          "stage": "c-build",
+          "hermes_opt": "O0",
+          "command": [
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/bin/shermes",
+            "-O0",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/exceptions.js",
+            "-o",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/exceptions-O0-c"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "",
+          "seconds": 0.322278
+        },
+        {
+          "stage": "c-run",
+          "hermes_opt": "O0",
+          "matches_node": true,
+          "command": [
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/exceptions-O0-c"
+          ],
+          "exit_code": 0,
+          "stdout": "31 66\n42\n0ff2ff\nTypeError\nReferenceError\n",
+          "stderr": "",
+          "seconds": 0.021759
+        },
+        {
+          "stage": "llvm-build",
+          "hermes_opt": "O0",
+          "llvm_opt": "2",
+          "command": [
+            "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/utils/shllvm.py",
+            "build",
+            "--build-dir",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm",
+            "--llvm-bin",
+            "/tmp/llvm-direct-toolchain/bin",
+            "--no-runtime-build",
+            "--hermes-opt",
+            "O0",
+            "--llvm-opt",
+            "2",
+            "-o",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/exceptions-O0-llvm2",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/exceptions.js"
+          ],
+          "exit_code": 0,
+          "stdout": "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/exceptions-O0-llvm2\n",
+          "stderr": "",
+          "seconds": 0.361537
+        },
+        {
+          "stage": "llvm-run",
+          "hermes_opt": "O0",
+          "llvm_opt": "2",
+          "matches_node_and_c": false,
+          "command": [
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/exceptions-O0-llvm2"
+          ],
+          "exit_code": 1,
+          "stdout": "31 66\n42\n0ff2ff\n",
+          "stderr": "AddressSanitizer:DEADLYSIGNAL\n=================================================================\n==485==ERROR: AddressSanitizer: SEGV on unknown address 0x0001ffff7ff8 (pc 0x55fb5f9042c6 bp 0x7fff8db30cd0 sp 0x7fff8db30490 T0)\n==485==The signal is caused by a READ memory access.\n==485==WARNING: invalid path to external symbolizer!\n==485==WARNING: Failed to use and restart external symbolizer!\n    #0 0x55fb5f9042c6  (/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/exceptions-O0-llvm2+0xc62c6) (BuildId: 0b90144c2a5bca8bd39488d1689605b16443ea59)\n    #1 0x7f4a1bdda93d  (/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/lib/libhermesvm.so+0x7a793d) (BuildId: 2f90ecdb0a0c073bd125401130a6140c57d7fee0)\n    #2 0x7f4a1be6d2f6  (/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/lib/libhermesvm.so+0x83a2f6) (BuildId: 2f90ecdb0a0c073bd125401130a6140c57d7fee0)\n    #3 0x7f4a1bebd937  (/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/lib/libhermesvm.so+0x88a937) (BuildId: 2f90ecdb0a0c073bd125401130a6140c57d7fee0)\n    #4 0x55fb5f94946e  (/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/exceptions-O0-llvm2+0x10b46e) (BuildId: 0b90144c2a5bca8bd39488d1689605b16443ea59)\n    #5 0x55fb5f946e33  (/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/exceptions-O0-llvm2+0x108e33) (BuildId: 0b90144c2a5bca8bd39488d1689605b16443ea59)\n    #6 0x55fb5f947e30  (/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/exceptions-O0-llvm2+0x109e30) (BuildId: 0b90144c2a5bca8bd39488d1689605b16443ea59)\n    #7 0x55fb5f945fdf  (/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/exceptions-O0-llvm2+0x107fdf) (BuildId: 0b90144c2a5bca8bd39488d1689605b16443ea59)\n    #8 0x7f4a1bee4bba  (/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/lib/libhermesvm.so+0x8b1bba) (BuildId: 2f90ecdb0a0c073bd125401130a6140c57d7fee0)\n    #9 0x7f4a1bee3f99  (/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/lib/libhermesvm.so+0x8b0f99) (BuildId: 2f90ecdb0a0c073bd125401130a6140c57d7fee0)\n    #10 0x7f4a1bee3914  (/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/lib/libhermesvm.so+0x8b0914) (BuildId: 2f90ecdb0a0c073bd125401130a6140c57d7fee0)\n    #11 0x55fb5f9493ba  (/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/exceptions-O0-llvm2+0x10b3ba) (BuildId: 0b90144c2a5bca8bd39488d1689605b16443ea59)\n    #12 0x7f4a1b3161c9  (/lib/x86_64-linux-gnu/libc.so.6+0x2a1c9) (BuildId: 274eec488d230825a136fa9c4d85370fed7a0a5e)\n    #13 0x7f4a1b31628a  (/lib/x86_64-linux-gnu/libc.so.6+0x2a28a) (BuildId: 274eec488d230825a136fa9c4d85370fed7a0a5e)\n    #14 0x55fb5f86b8a4  (/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/exceptions-O0-llvm2+0x2d8a4) (BuildId: 0b90144c2a5bca8bd39488d1689605b16443ea59)\n\nAddressSanitizer can not provide additional info.\nSUMMARY: AddressSanitizer: SEGV (/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/exceptions-O0-llvm2+0xc62c6) (BuildId: 0b90144c2a5bca8bd39488d1689605b16443ea59) \n==485==ABORTING\n",
+          "seconds": 0.020255
+        },
+        {
+          "stage": "c-build",
+          "hermes_opt": "O",
+          "command": [
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/bin/shermes",
+            "-O",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/exceptions.js",
+            "-o",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/exceptions-O-c"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "",
+          "seconds": 0.392346
+        },
+        {
+          "stage": "c-run",
+          "hermes_opt": "O",
+          "matches_node": true,
+          "command": [
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/exceptions-O-c"
+          ],
+          "exit_code": 0,
+          "stdout": "31 66\n42\n0ff2ff\nTypeError\nReferenceError\n",
+          "stderr": "",
+          "seconds": 0.017591
+        },
+        {
+          "stage": "llvm-build",
+          "hermes_opt": "O",
+          "llvm_opt": "2",
+          "command": [
+            "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/utils/shllvm.py",
+            "build",
+            "--build-dir",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm",
+            "--llvm-bin",
+            "/tmp/llvm-direct-toolchain/bin",
+            "--no-runtime-build",
+            "--hermes-opt",
+            "O",
+            "--llvm-opt",
+            "2",
+            "-o",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/exceptions-O-llvm2",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/exceptions.js"
+          ],
+          "exit_code": 2,
+          "stdout": "",
+          "stderr": "/usr/bin/ld: /tmp/exceptions-O-llvm2-7f9601.o: in function `shllvm_f0':\nhermes-direct-llvm:(.text+0xc5b): undefined reference to `shllvm_object_parent'\nclang: error: linker command failed with exit code 1 (use -v to see invocation)\nshllvm: command failed (1): /tmp/llvm-direct-toolchain/root/usr/lib/llvm-18/bin/clang /workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/exceptions-O-llvm2.bc -O2 -Wno-override-module -fsanitize=address -L/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/lib -Wl,-rpath,/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/lib -L/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/tools/shermes -Wl,-rpath,/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/tools/shermes -L/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/jsi -Wl,-rpath,/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/jsi /workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/lib/libshllvm_runtime.a -lshermes_console -lhermesvm -lm -o /workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/shllvm-link-q8k9ryw1/program\n",
+          "seconds": 0.33911
+        }
+      ]
+    },
+    {
+      "name": "functions.js",
+      "kind": "positive",
+      "passed": true,
+      "llvm_native_comparisons": 2,
+      "records": [
+        {
+          "stage": "node",
+          "command": [
+            "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
+            "--expose-gc",
+            "-e",
+            "globalThis.print = (...a) => console.log(...a); require(process.argv[1]);",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/functions.js"
+          ],
+          "exit_code": 0,
+          "stdout": "40320 true true 42 42\n",
+          "stderr": "",
+          "seconds": 0.039355
+        },
+        {
+          "stage": "c-build",
+          "hermes_opt": "O0",
+          "command": [
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/bin/shermes",
+            "-O0",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/functions.js",
+            "-o",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/functions-O0-c"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "",
+          "seconds": 0.313912
+        },
+        {
+          "stage": "c-run",
+          "hermes_opt": "O0",
+          "matches_node": true,
+          "command": [
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/functions-O0-c"
+          ],
+          "exit_code": 0,
+          "stdout": "40320 true true 42 42\n",
+          "stderr": "",
+          "seconds": 0.024545
+        },
+        {
+          "stage": "llvm-build",
+          "hermes_opt": "O0",
+          "llvm_opt": "2",
+          "command": [
+            "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/utils/shllvm.py",
+            "build",
+            "--build-dir",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm",
+            "--llvm-bin",
+            "/tmp/llvm-direct-toolchain/bin",
+            "--no-runtime-build",
+            "--hermes-opt",
+            "O0",
+            "--llvm-opt",
+            "2",
+            "-o",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/functions-O0-llvm2",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/functions.js"
+          ],
+          "exit_code": 0,
+          "stdout": "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/functions-O0-llvm2\n",
+          "stderr": "",
+          "seconds": 0.362817
+        },
+        {
+          "stage": "llvm-run",
+          "hermes_opt": "O0",
+          "llvm_opt": "2",
+          "matches_node_and_c": true,
+          "command": [
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/functions-O0-llvm2"
+          ],
+          "exit_code": 0,
+          "stdout": "40320 true true 42 42\n",
+          "stderr": "",
+          "seconds": 0.019397
+        },
+        {
+          "stage": "c-build",
+          "hermes_opt": "O",
+          "command": [
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/bin/shermes",
+            "-O",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/functions.js",
+            "-o",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/functions-O-c"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "",
+          "seconds": 0.438617
+        },
+        {
+          "stage": "c-run",
+          "hermes_opt": "O",
+          "matches_node": true,
+          "command": [
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/functions-O-c"
+          ],
+          "exit_code": 0,
+          "stdout": "40320 true true 42 42\n",
+          "stderr": "",
+          "seconds": 0.0245
+        },
+        {
+          "stage": "llvm-build",
+          "hermes_opt": "O",
+          "llvm_opt": "2",
+          "command": [
+            "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/utils/shllvm.py",
+            "build",
+            "--build-dir",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm",
+            "--llvm-bin",
+            "/tmp/llvm-direct-toolchain/bin",
+            "--no-runtime-build",
+            "--hermes-opt",
+            "O",
+            "--llvm-opt",
+            "2",
+            "-o",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/functions-O-llvm2",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/functions.js"
+          ],
+          "exit_code": 0,
+          "stdout": "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/functions-O-llvm2\n",
+          "stderr": "",
+          "seconds": 0.345155
+        },
+        {
+          "stage": "llvm-run",
+          "hermes_opt": "O",
+          "llvm_opt": "2",
+          "matches_node_and_c": true,
+          "command": [
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/functions-O-llvm2"
+          ],
+          "exit_code": 0,
+          "stdout": "40320 true true 42 42\n",
+          "stderr": "",
+          "seconds": 0.022794
+        }
+      ]
+    },
+    {
+      "name": "gc_closures.js",
+      "kind": "positive",
+      "passed": false,
+      "llvm_native_comparisons": 2,
+      "records": [
+        {
+          "stage": "node",
+          "command": [
+            "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
+            "--expose-gc",
+            "-e",
+            "globalThis.print = (...a) => console.log(...a); require(process.argv[1]);",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/gc_closures.js"
+          ],
+          "exit_code": 0,
+          "stdout": "gc-hook function\n2 alive after collection 0,5000,10000,15000,20000,25000,30000,35000,40000,45000\n",
+          "stderr": "",
+          "seconds": 0.070426
+        },
+        {
+          "stage": "c-build",
+          "hermes_opt": "O0",
+          "command": [
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/bin/shermes",
+            "-O0",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/gc_closures.js",
+            "-o",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/gc_closures-O0-c"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "",
+          "seconds": 0.283678
+        },
+        {
+          "stage": "c-run",
+          "hermes_opt": "O0",
+          "matches_node": false,
+          "command": [
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/gc_closures-O0-c"
+          ],
+          "exit_code": 0,
+          "stdout": "gc-hook function\n2 alive after collection 49999,49999,49999,49999,49999,49999,49999,49999,49999,49999\n",
+          "stderr": "",
+          "seconds": 0.118676
+        },
+        {
+          "stage": "llvm-build",
+          "hermes_opt": "O0",
+          "llvm_opt": "2",
+          "command": [
+            "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/utils/shllvm.py",
+            "build",
+            "--build-dir",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm",
+            "--llvm-bin",
+            "/tmp/llvm-direct-toolchain/bin",
+            "--no-runtime-build",
+            "--hermes-opt",
+            "O0",
+            "--llvm-opt",
+            "2",
+            "-o",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/gc_closures-O0-llvm2",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/gc_closures.js"
+          ],
+          "exit_code": 0,
+          "stdout": "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/gc_closures-O0-llvm2\n",
+          "stderr": "",
+          "seconds": 0.426651
+        },
+        {
+          "stage": "llvm-run",
+          "hermes_opt": "O0",
+          "llvm_opt": "2",
+          "matches_node_and_c": false,
+          "command": [
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/gc_closures-O0-llvm2"
+          ],
+          "exit_code": 0,
+          "stdout": "gc-hook function\n2 alive after collection 49999,49999,49999,49999,49999,49999,49999,49999,49999,49999\n",
+          "stderr": "",
+          "seconds": 0.110039
+        },
+        {
+          "stage": "c-build",
+          "hermes_opt": "O",
+          "command": [
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/bin/shermes",
+            "-O",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/gc_closures.js",
+            "-o",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/gc_closures-O-c"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "",
+          "seconds": 0.382684
+        },
+        {
+          "stage": "c-run",
+          "hermes_opt": "O",
+          "matches_node": false,
+          "command": [
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/gc_closures-O-c"
+          ],
+          "exit_code": 0,
+          "stdout": "gc-hook function\n2 alive after collection 49999,49999,49999,49999,49999,49999,49999,49999,49999,49999\n",
+          "stderr": "",
+          "seconds": 0.054119
+        },
+        {
+          "stage": "llvm-build",
+          "hermes_opt": "O",
+          "llvm_opt": "2",
+          "command": [
+            "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/utils/shllvm.py",
+            "build",
+            "--build-dir",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm",
+            "--llvm-bin",
+            "/tmp/llvm-direct-toolchain/bin",
+            "--no-runtime-build",
+            "--hermes-opt",
+            "O",
+            "--llvm-opt",
+            "2",
+            "-o",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/gc_closures-O-llvm2",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/gc_closures.js"
+          ],
+          "exit_code": 0,
+          "stdout": "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/gc_closures-O-llvm2\n",
+          "stderr": "",
+          "seconds": 0.34239
+        },
+        {
+          "stage": "llvm-run",
+          "hermes_opt": "O",
+          "llvm_opt": "2",
+          "matches_node_and_c": false,
+          "command": [
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/gc_closures-O-llvm2"
+          ],
+          "exit_code": 0,
+          "stdout": "gc-hook function\n2 alive after collection 49999,49999,49999,49999,49999,49999,49999,49999,49999,49999\n",
+          "stderr": "",
+          "seconds": 0.090365
+        }
+      ]
+    },
+    {
+      "name": "objects.js",
+      "kind": "positive",
+      "passed": true,
+      "llvm_native_comparisons": 2,
+      "records": [
+        {
+          "stage": "node",
+          "command": [
+            "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
+            "--expose-gc",
+            "-e",
+            "globalThis.print = (...a) => console.log(...a); require(process.argv[1]);",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/objects.js"
+          ],
+          "exit_code": 0,
+          "stdout": "42 14 ok true\ntrue true false true\n42\n",
+          "stderr": "",
+          "seconds": 0.045876
+        },
+        {
+          "stage": "c-build",
+          "hermes_opt": "O0",
+          "command": [
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/bin/shermes",
+            "-O0",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/objects.js",
+            "-o",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/objects-O0-c"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "",
+          "seconds": 0.285728
+        },
+        {
+          "stage": "c-run",
+          "hermes_opt": "O0",
+          "matches_node": true,
+          "command": [
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/objects-O0-c"
+          ],
+          "exit_code": 0,
+          "stdout": "42 14 ok true\ntrue true false true\n42\n",
+          "stderr": "",
+          "seconds": 0.022028
+        },
+        {
+          "stage": "llvm-build",
+          "hermes_opt": "O0",
+          "llvm_opt": "2",
+          "command": [
+            "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/utils/shllvm.py",
+            "build",
+            "--build-dir",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm",
+            "--llvm-bin",
+            "/tmp/llvm-direct-toolchain/bin",
+            "--no-runtime-build",
+            "--hermes-opt",
+            "O0",
+            "--llvm-opt",
+            "2",
+            "-o",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/objects-O0-llvm2",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/objects.js"
+          ],
+          "exit_code": 0,
+          "stdout": "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/objects-O0-llvm2\n",
+          "stderr": "",
+          "seconds": 0.384545
+        },
+        {
+          "stage": "llvm-run",
+          "hermes_opt": "O0",
+          "llvm_opt": "2",
+          "matches_node_and_c": true,
+          "command": [
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/objects-O0-llvm2"
+          ],
+          "exit_code": 0,
+          "stdout": "42 14 ok true\ntrue true false true\n42\n",
+          "stderr": "",
+          "seconds": 0.022823
+        },
+        {
+          "stage": "c-build",
+          "hermes_opt": "O",
+          "command": [
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/bin/shermes",
+            "-O",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/objects.js",
+            "-o",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/objects-O-c"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "",
+          "seconds": 0.372774
+        },
+        {
+          "stage": "c-run",
+          "hermes_opt": "O",
+          "matches_node": true,
+          "command": [
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/objects-O-c"
+          ],
+          "exit_code": 0,
+          "stdout": "42 14 ok true\ntrue true false true\n42\n",
+          "stderr": "",
+          "seconds": 0.023162
+        },
+        {
+          "stage": "llvm-build",
+          "hermes_opt": "O",
+          "llvm_opt": "2",
+          "command": [
+            "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/utils/shllvm.py",
+            "build",
+            "--build-dir",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm",
+            "--llvm-bin",
+            "/tmp/llvm-direct-toolchain/bin",
+            "--no-runtime-build",
+            "--hermes-opt",
+            "O",
+            "--llvm-opt",
+            "2",
+            "-o",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/objects-O-llvm2",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/objects.js"
+          ],
+          "exit_code": 0,
+          "stdout": "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/objects-O-llvm2\n",
+          "stderr": "",
+          "seconds": 0.313834
+        },
+        {
+          "stage": "llvm-run",
+          "hermes_opt": "O",
+          "llvm_opt": "2",
+          "matches_node_and_c": true,
+          "command": [
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/objects-O-llvm2"
+          ],
+          "exit_code": 0,
+          "stdout": "42 14 ok true\ntrue true false true\n42\n",
+          "stderr": "",
+          "seconds": 0.024364
+        }
+      ]
+    },
+    {
+      "name": "strings.js",
+      "kind": "positive",
+      "passed": true,
+      "llvm_native_comparisons": 2,
+      "records": [
+        {
+          "stage": "node",
+          "command": [
+            "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
+            "--expose-gc",
+            "-e",
+            "globalThis.print = (...a) => console.log(...a); require(process.argv[1]);",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/strings.js"
+          ],
+          "exit_code": 0,
+          "stdout": "hello world! 2 233 56606\nbc 3 2\n42\n",
+          "stderr": "",
+          "seconds": 0.051974
+        },
+        {
+          "stage": "c-build",
+          "hermes_opt": "O0",
+          "command": [
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/bin/shermes",
+            "-O0",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/strings.js",
+            "-o",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/strings-O0-c"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "",
+          "seconds": 0.259511
+        },
+        {
+          "stage": "c-run",
+          "hermes_opt": "O0",
+          "matches_node": true,
+          "command": [
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/strings-O0-c"
+          ],
+          "exit_code": 0,
+          "stdout": "hello world! 2 233 56606\nbc 3 2\n42\n",
+          "stderr": "",
+          "seconds": 0.025412
+        },
+        {
+          "stage": "llvm-build",
+          "hermes_opt": "O0",
+          "llvm_opt": "2",
+          "command": [
+            "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/utils/shllvm.py",
+            "build",
+            "--build-dir",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm",
+            "--llvm-bin",
+            "/tmp/llvm-direct-toolchain/bin",
+            "--no-runtime-build",
+            "--hermes-opt",
+            "O0",
+            "--llvm-opt",
+            "2",
+            "-o",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/strings-O0-llvm2",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/strings.js"
+          ],
+          "exit_code": 0,
+          "stdout": "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/strings-O0-llvm2\n",
+          "stderr": "",
+          "seconds": 0.320971
+        },
+        {
+          "stage": "llvm-run",
+          "hermes_opt": "O0",
+          "llvm_opt": "2",
+          "matches_node_and_c": true,
+          "command": [
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/strings-O0-llvm2"
+          ],
+          "exit_code": 0,
+          "stdout": "hello world! 2 233 56606\nbc 3 2\n42\n",
+          "stderr": "",
+          "seconds": 0.018265
+        },
+        {
+          "stage": "c-build",
+          "hermes_opt": "O",
+          "command": [
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/bin/shermes",
+            "-O",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/strings.js",
+            "-o",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/strings-O-c"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "",
+          "seconds": 0.343546
+        },
+        {
+          "stage": "c-run",
+          "hermes_opt": "O",
+          "matches_node": true,
+          "command": [
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/strings-O-c"
+          ],
+          "exit_code": 0,
+          "stdout": "hello world! 2 233 56606\nbc 3 2\n42\n",
+          "stderr": "",
+          "seconds": 0.022396
+        },
+        {
+          "stage": "llvm-build",
+          "hermes_opt": "O",
+          "llvm_opt": "2",
+          "command": [
+            "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/utils/shllvm.py",
+            "build",
+            "--build-dir",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm",
+            "--llvm-bin",
+            "/tmp/llvm-direct-toolchain/bin",
+            "--no-runtime-build",
+            "--hermes-opt",
+            "O",
+            "--llvm-opt",
+            "2",
+            "-o",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/strings-O-llvm2",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/strings.js"
+          ],
+          "exit_code": 0,
+          "stdout": "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/strings-O-llvm2\n",
+          "stderr": "",
+          "seconds": 0.313011
+        },
+        {
+          "stage": "llvm-run",
+          "hermes_opt": "O",
+          "llvm_opt": "2",
+          "matches_node_and_c": true,
+          "command": [
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/strings-O-llvm2"
+          ],
+          "exit_code": 0,
+          "stdout": "hello world! 2 233 56606\nbc 3 2\n42\n",
+          "stderr": "",
+          "seconds": 0.020621
+        }
+      ]
+    },
+    {
+      "name": "error_arrow_constructor.js",
+      "kind": "runtime-error",
+      "passed": false,
+      "records": [
+        {
+          "stage": "error-build",
+          "hermes_opt": "O0",
+          "command": [
+            "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/utils/shllvm.py",
+            "build",
+            "--build-dir",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm",
+            "--llvm-bin",
+            "/tmp/llvm-direct-toolchain/bin",
+            "--no-runtime-build",
+            "--hermes-opt",
+            "O0",
+            "-o",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/error_arrow_constructor-O0",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/error_arrow_constructor.js"
+          ],
+          "exit_code": 0,
+          "stdout": "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/error_arrow_constructor-O0\n",
+          "stderr": "",
+          "seconds": 0.375182
+        },
+        {
+          "stage": "runtime-error",
+          "hermes_opt": "O0",
+          "expected_error": "TypeError",
+          "matches_expected": false,
+          "command": [
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/error_arrow_constructor-O0"
+          ],
+          "exit_code": 1,
+          "stdout": "",
+          "stderr": "AddressSanitizer:DEADLYSIGNAL\n=================================================================\n==660==ERROR: AddressSanitizer: SEGV on unknown address 0x0001ffff7ff8 (pc 0x55a4d94172b6 bp 0x7fff05400330 sp 0x7fff053ffaf0 T0)\n==660==The signal is caused by a READ memory access.\n==660==WARNING: invalid path to external symbolizer!\n==660==WARNING: Failed to use and restart external symbolizer!\n    #0 0x55a4d94172b6  (/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/error_arrow_constructor-O0+0xc62b6) (BuildId: 67aa85da343ac334e491a7e9f27f14f96c039ba1)\n    #1 0x7f03bc54493d  (/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/lib/libhermesvm.so+0x7a793d) (BuildId: 2f90ecdb0a0c073bd125401130a6140c57d7fee0)\n    #2 0x7f03bc5d72f6  (/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/lib/libhermesvm.so+0x83a2f6) (BuildId: 2f90ecdb0a0c073bd125401130a6140c57d7fee0)\n    #3 0x7f03bc627937  (/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/lib/libhermesvm.so+0x88a937) (BuildId: 2f90ecdb0a0c073bd125401130a6140c57d7fee0)\n    #4 0x55a4d945a4be  (/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/error_arrow_constructor-O0+0x1094be) (BuildId: 67aa85da343ac334e491a7e9f27f14f96c039ba1)\n    #5 0x55a4d9457f73  (/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/error_arrow_constructor-O0+0x106f73) (BuildId: 67aa85da343ac334e491a7e9f27f14f96c039ba1)\n    #6 0x55a4d9458e80  (/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/error_arrow_constructor-O0+0x107e80) (BuildId: 67aa85da343ac334e491a7e9f27f14f96c039ba1)\n    #7 0x55a4d9457e9f  (/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/error_arrow_constructor-O0+0x106e9f) (BuildId: 67aa85da343ac334e491a7e9f27f14f96c039ba1)\n    #8 0x7f03bc64ebba  (/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/lib/libhermesvm.so+0x8b1bba) (BuildId: 2f90ecdb0a0c073bd125401130a6140c57d7fee0)\n    #9 0x7f03bc64df99  (/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/lib/libhermesvm.so+0x8b0f99) (BuildId: 2f90ecdb0a0c073bd125401130a6140c57d7fee0)\n    #10 0x7f03bc64d914  (/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/lib/libhermesvm.so+0x8b0914) (BuildId: 2f90ecdb0a0c073bd125401130a6140c57d7fee0)\n    #11 0x55a4d945a40a  (/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/error_arrow_constructor-O0+0x10940a) (BuildId: 67aa85da343ac334e491a7e9f27f14f96c039ba1)\n    #12 0x7f03bba801c9  (/lib/x86_64-linux-gnu/libc.so.6+0x2a1c9) (BuildId: 274eec488d230825a136fa9c4d85370fed7a0a5e)\n    #13 0x7f03bba8028a  (/lib/x86_64-linux-gnu/libc.so.6+0x2a28a) (BuildId: 274eec488d230825a136fa9c4d85370fed7a0a5e)\n    #14 0x55a4d937e894  (/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/error_arrow_constructor-O0+0x2d894) (BuildId: 67aa85da343ac334e491a7e9f27f14f96c039ba1)\n\nAddressSanitizer can not provide additional info.\nSUMMARY: AddressSanitizer: SEGV (/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/error_arrow_constructor-O0+0xc62b6) (BuildId: 67aa85da343ac334e491a7e9f27f14f96c039ba1) \n==660==ABORTING\n",
+          "seconds": 0.032542
+        },
+        {
+          "stage": "error-build",
+          "hermes_opt": "O",
+          "command": [
+            "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/utils/shllvm.py",
+            "build",
+            "--build-dir",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm",
+            "--llvm-bin",
+            "/tmp/llvm-direct-toolchain/bin",
+            "--no-runtime-build",
+            "--hermes-opt",
+            "O",
+            "-o",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/error_arrow_constructor-O",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/error_arrow_constructor.js"
+          ],
+          "exit_code": 2,
+          "stdout": "",
+          "stderr": "/usr/bin/ld: /tmp/error_arrow_constructor-O-0fdcfb.o: in function `shllvm_f0':\nhermes-direct-llvm:(.text+0x11c): undefined reference to `shllvm_object_parent'\nclang: error: linker command failed with exit code 1 (use -v to see invocation)\nshllvm: command failed (1): /tmp/llvm-direct-toolchain/root/usr/lib/llvm-18/bin/clang /workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/error_arrow_constructor-O.bc -O2 -Wno-override-module -fsanitize=address -L/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/lib -Wl,-rpath,/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/lib -L/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/tools/shermes -Wl,-rpath,/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/tools/shermes -L/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/jsi -Wl,-rpath,/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/jsi /workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/lib/libshllvm_runtime.a -lshermes_console -lhermesvm -lm -o /workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/shllvm-link-4t7smyiw/program\n",
+          "seconds": 0.385788
+        }
+      ]
+    },
+    {
+      "name": "error_missing_global.js",
+      "kind": "runtime-error",
+      "passed": false,
+      "records": [
+        {
+          "stage": "error-build",
+          "hermes_opt": "O0",
+          "command": [
+            "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/utils/shllvm.py",
+            "build",
+            "--build-dir",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm",
+            "--llvm-bin",
+            "/tmp/llvm-direct-toolchain/bin",
+            "--no-runtime-build",
+            "--hermes-opt",
+            "O0",
+            "-o",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/error_missing_global-O0",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/error_missing_global.js"
+          ],
+          "exit_code": 0,
+          "stdout": "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/error_missing_global-O0\n",
+          "stderr": "",
+          "seconds": 0.47898
+        },
+        {
+          "stage": "runtime-error",
+          "hermes_opt": "O0",
+          "expected_error": "ReferenceError",
+          "matches_expected": false,
+          "command": [
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/error_missing_global-O0"
+          ],
+          "exit_code": 1,
+          "stdout": "",
+          "stderr": "AddressSanitizer:DEADLYSIGNAL\n=================================================================\n==678==ERROR: AddressSanitizer: SEGV on unknown address 0x0001ffff7ff8 (pc 0x55efb2b2d2b6 bp 0x7fffa38fecd0 sp 0x7fffa38fe490 T0)\n==678==The signal is caused by a READ memory access.\n==678==WARNING: invalid path to external symbolizer!\n==678==WARNING: Failed to use and restart external symbolizer!\n    #0 0x55efb2b2d2b6  (/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/error_missing_global-O0+0xc62b6) (BuildId: 322b07871eaf206f55fdc4c022d44b93ab803ad5)\n    #1 0x7fd68580593d  (/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/lib/libhermesvm.so+0x7a793d) (BuildId: 2f90ecdb0a0c073bd125401130a6140c57d7fee0)\n    #2 0x7fd6858982f6  (/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/lib/libhermesvm.so+0x83a2f6) (BuildId: 2f90ecdb0a0c073bd125401130a6140c57d7fee0)\n    #3 0x7fd6858170bb  (/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/lib/libhermesvm.so+0x7b90bb) (BuildId: 2f90ecdb0a0c073bd125401130a6140c57d7fee0)\n    #4 0x7fd6858eedae  (/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/lib/libhermesvm.so+0x890dae) (BuildId: 2f90ecdb0a0c073bd125401130a6140c57d7fee0)\n    #5 0x55efb2b6f588  (/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/error_missing_global-O0+0x108588) (BuildId: 322b07871eaf206f55fdc4c022d44b93ab803ad5)\n    #6 0x55efb2b6de2a  (/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/error_missing_global-O0+0x106e2a) (BuildId: 322b07871eaf206f55fdc4c022d44b93ab803ad5)\n    #7 0x7fd68590fbba  (/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/lib/libhermesvm.so+0x8b1bba) (BuildId: 2f90ecdb0a0c073bd125401130a6140c57d7fee0)\n    #8 0x7fd68590ef99  (/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/lib/libhermesvm.so+0x8b0f99) (BuildId: 2f90ecdb0a0c073bd125401130a6140c57d7fee0)\n    #9 0x7fd68590e914  (/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/lib/libhermesvm.so+0x8b0914) (BuildId: 2f90ecdb0a0c073bd125401130a6140c57d7fee0)\n    #10 0x55efb2b702da  (/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/error_missing_global-O0+0x1092da) (BuildId: 322b07871eaf206f55fdc4c022d44b93ab803ad5)\n    #11 0x7fd684d411c9  (/lib/x86_64-linux-gnu/libc.so.6+0x2a1c9) (BuildId: 274eec488d230825a136fa9c4d85370fed7a0a5e)\n    #12 0x7fd684d4128a  (/lib/x86_64-linux-gnu/libc.so.6+0x2a28a) (BuildId: 274eec488d230825a136fa9c4d85370fed7a0a5e)\n    #13 0x55efb2a94894  (/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/error_missing_global-O0+0x2d894) (BuildId: 322b07871eaf206f55fdc4c022d44b93ab803ad5)\n\nAddressSanitizer can not provide additional info.\nSUMMARY: AddressSanitizer: SEGV (/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/error_missing_global-O0+0xc62b6) (BuildId: 322b07871eaf206f55fdc4c022d44b93ab803ad5) \n==678==ABORTING\n",
+          "seconds": 0.034001
+        },
+        {
+          "stage": "error-build",
+          "hermes_opt": "O",
+          "command": [
+            "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/utils/shllvm.py",
+            "build",
+            "--build-dir",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm",
+            "--llvm-bin",
+            "/tmp/llvm-direct-toolchain/bin",
+            "--no-runtime-build",
+            "--hermes-opt",
+            "O",
+            "-o",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/error_missing_global-O",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/error_missing_global.js"
+          ],
+          "exit_code": 0,
+          "stdout": "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/error_missing_global-O\n",
+          "stderr": "",
+          "seconds": 0.417475
+        },
+        {
+          "stage": "runtime-error",
+          "hermes_opt": "O",
+          "expected_error": "ReferenceError",
+          "matches_expected": false,
+          "command": [
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/error_missing_global-O"
+          ],
+          "exit_code": 1,
+          "stdout": "",
+          "stderr": "AddressSanitizer:DEADLYSIGNAL\n=================================================================\n==688==ERROR: AddressSanitizer: SEGV on unknown address 0x0001ffff7ff8 (pc 0x559f69eaf2b6 bp 0x7ffc4dc34cf0 sp 0x7ffc4dc344b0 T0)\n==688==The signal is caused by a READ memory access.\n==688==WARNING: invalid path to external symbolizer!\n==688==WARNING: Failed to use and restart external symbolizer!\n    #0 0x559f69eaf2b6  (/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/error_missing_global-O+0xc62b6) (BuildId: ef9a5cf96e4a35c311fe3846b05edd02f0db300f)\n    #1 0x7f97de28493d  (/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/lib/libhermesvm.so+0x7a793d) (BuildId: 2f90ecdb0a0c073bd125401130a6140c57d7fee0)\n    #2 0x7f97de3172f6  (/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/lib/libhermesvm.so+0x83a2f6) (BuildId: 2f90ecdb0a0c073bd125401130a6140c57d7fee0)\n    #3 0x7f97de2960bb  (/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/lib/libhermesvm.so+0x7b90bb) (BuildId: 2f90ecdb0a0c073bd125401130a6140c57d7fee0)\n    #4 0x7f97de36ddae  (/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/lib/libhermesvm.so+0x890dae) (BuildId: 2f90ecdb0a0c073bd125401130a6140c57d7fee0)\n    #5 0x559f69ef1518  (/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/error_missing_global-O+0x108518) (BuildId: ef9a5cf96e4a35c311fe3846b05edd02f0db300f)\n    #6 0x559f69eefdd5  (/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/error_missing_global-O+0x106dd5) (BuildId: ef9a5cf96e4a35c311fe3846b05edd02f0db300f)\n    #7 0x7f97de38ebba  (/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/lib/libhermesvm.so+0x8b1bba) (BuildId: 2f90ecdb0a0c073bd125401130a6140c57d7fee0)\n    #8 0x7f97de38df99  (/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/lib/libhermesvm.so+0x8b0f99) (BuildId: 2f90ecdb0a0c073bd125401130a6140c57d7fee0)\n    #9 0x7f97de38d914  (/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/lib/libhermesvm.so+0x8b0914) (BuildId: 2f90ecdb0a0c073bd125401130a6140c57d7fee0)\n    #10 0x559f69ef226a  (/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/error_missing_global-O+0x10926a) (BuildId: ef9a5cf96e4a35c311fe3846b05edd02f0db300f)\n    #11 0x7f97dd7c01c9  (/lib/x86_64-linux-gnu/libc.so.6+0x2a1c9) (BuildId: 274eec488d230825a136fa9c4d85370fed7a0a5e)\n    #12 0x7f97dd7c028a  (/lib/x86_64-linux-gnu/libc.so.6+0x2a28a) (BuildId: 274eec488d230825a136fa9c4d85370fed7a0a5e)\n    #13 0x559f69e16894  (/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/error_missing_global-O+0x2d894) (BuildId: ef9a5cf96e4a35c311fe3846b05edd02f0db300f)\n\nAddressSanitizer can not provide additional info.\nSUMMARY: AddressSanitizer: SEGV (/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/error_missing_global-O+0xc62b6) (BuildId: ef9a5cf96e4a35c311fe3846b05edd02f0db300f) \n==688==ABORTING\n",
+          "seconds": 0.045748
+        }
+      ]
+    },
+    {
+      "name": "error_noncallable.js",
+      "kind": "runtime-error",
+      "passed": false,
+      "records": [
+        {
+          "stage": "error-build",
+          "hermes_opt": "O0",
+          "command": [
+            "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/utils/shllvm.py",
+            "build",
+            "--build-dir",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm",
+            "--llvm-bin",
+            "/tmp/llvm-direct-toolchain/bin",
+            "--no-runtime-build",
+            "--hermes-opt",
+            "O0",
+            "-o",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/error_noncallable-O0",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/error_noncallable.js"
+          ],
+          "exit_code": 0,
+          "stdout": "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/error_noncallable-O0\n",
+          "stderr": "",
+          "seconds": 0.345041
+        },
+        {
+          "stage": "runtime-error",
+          "hermes_opt": "O0",
+          "expected_error": "TypeError",
+          "matches_expected": false,
+          "command": [
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/error_noncallable-O0"
+          ],
+          "exit_code": 1,
+          "stdout": "",
+          "stderr": "AddressSanitizer:DEADLYSIGNAL\n=================================================================\n==698==ERROR: AddressSanitizer: SEGV on unknown address 0x0001ffff7ff8 (pc 0x55e7e701a2b6 bp 0x7ffe0859e810 sp 0x7ffe0859dfd0 T0)\n==698==The signal is caused by a READ memory access.\n==698==WARNING: invalid path to external symbolizer!\n==698==WARNING: Failed to use and restart external symbolizer!\n    #0 0x55e7e701a2b6  (/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/error_noncallable-O0+0xc62b6) (BuildId: a98dcd0a27585799fe1a56a240dee8537d9bc78d)\n    #1 0x7f66ac86793d  (/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/lib/libhermesvm.so+0x7a793d) (BuildId: 2f90ecdb0a0c073bd125401130a6140c57d7fee0)\n    #2 0x7f66ac8fa2f6  (/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/lib/libhermesvm.so+0x83a2f6) (BuildId: 2f90ecdb0a0c073bd125401130a6140c57d7fee0)\n    #3 0x7f66ac8fc017  (/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/lib/libhermesvm.so+0x83c017) (BuildId: 2f90ecdb0a0c073bd125401130a6140c57d7fee0)\n    #4 0x7f66ac94aec3  (/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/lib/libhermesvm.so+0x88aec3) (BuildId: 2f90ecdb0a0c073bd125401130a6140c57d7fee0)\n    #5 0x55e7e705bda0  (/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/error_noncallable-O0+0x107da0) (BuildId: a98dcd0a27585799fe1a56a240dee8537d9bc78d)\n    #6 0x55e7e705aec4  (/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/error_noncallable-O0+0x106ec4) (BuildId: a98dcd0a27585799fe1a56a240dee8537d9bc78d)\n    #7 0x7f66ac971bba  (/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/lib/libhermesvm.so+0x8b1bba) (BuildId: 2f90ecdb0a0c073bd125401130a6140c57d7fee0)\n    #8 0x7f66ac970f99  (/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/lib/libhermesvm.so+0x8b0f99) (BuildId: 2f90ecdb0a0c073bd125401130a6140c57d7fee0)\n    #9 0x7f66ac970914  (/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/lib/libhermesvm.so+0x8b0914) (BuildId: 2f90ecdb0a0c073bd125401130a6140c57d7fee0)\n    #10 0x55e7e705d32a  (/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/error_noncallable-O0+0x10932a) (BuildId: a98dcd0a27585799fe1a56a240dee8537d9bc78d)\n    #11 0x7f66abda31c9  (/lib/x86_64-linux-gnu/libc.so.6+0x2a1c9) (BuildId: 274eec488d230825a136fa9c4d85370fed7a0a5e)\n    #12 0x7f66abda328a  (/lib/x86_64-linux-gnu/libc.so.6+0x2a28a) (BuildId: 274eec488d230825a136fa9c4d85370fed7a0a5e)\n    #13 0x55e7e6f81894  (/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/error_noncallable-O0+0x2d894) (BuildId: a98dcd0a27585799fe1a56a240dee8537d9bc78d)\n\nAddressSanitizer can not provide additional info.\nSUMMARY: AddressSanitizer: SEGV (/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/error_noncallable-O0+0xc62b6) (BuildId: a98dcd0a27585799fe1a56a240dee8537d9bc78d) \n==698==ABORTING\n",
+          "seconds": 0.022851
+        },
+        {
+          "stage": "error-build",
+          "hermes_opt": "O",
+          "command": [
+            "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/utils/shllvm.py",
+            "build",
+            "--build-dir",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm",
+            "--llvm-bin",
+            "/tmp/llvm-direct-toolchain/bin",
+            "--no-runtime-build",
+            "--hermes-opt",
+            "O",
+            "-o",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/error_noncallable-O",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/error_noncallable.js"
+          ],
+          "exit_code": 0,
+          "stdout": "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/error_noncallable-O\n",
+          "stderr": "",
+          "seconds": 0.326243
+        },
+        {
+          "stage": "runtime-error",
+          "hermes_opt": "O",
+          "expected_error": "TypeError",
+          "matches_expected": false,
+          "command": [
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/error_noncallable-O"
+          ],
+          "exit_code": 1,
+          "stdout": "",
+          "stderr": "AddressSanitizer:DEADLYSIGNAL\n=================================================================\n==708==ERROR: AddressSanitizer: SEGV on unknown address 0x0001ffff7ff8 (pc 0x55a02ab192b6 bp 0x7ffc51acae90 sp 0x7ffc51aca650 T0)\n==708==The signal is caused by a READ memory access.\n==708==WARNING: invalid path to external symbolizer!\n==708==WARNING: Failed to use and restart external symbolizer!\n    #0 0x55a02ab192b6  (/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/error_noncallable-O+0xc62b6) (BuildId: 76161c5378524f70f10b3fcf9d20f706d826bca0)\n    #1 0x7fbbc4b7593d  (/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/lib/libhermesvm.so+0x7a793d) (BuildId: 2f90ecdb0a0c073bd125401130a6140c57d7fee0)\n    #2 0x7fbbc4c082f6  (/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/lib/libhermesvm.so+0x83a2f6) (BuildId: 2f90ecdb0a0c073bd125401130a6140c57d7fee0)\n    #3 0x7fbbc4c0a017  (/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/lib/libhermesvm.so+0x83c017) (BuildId: 2f90ecdb0a0c073bd125401130a6140c57d7fee0)\n    #4 0x7fbbc4c58ec3  (/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/lib/libhermesvm.so+0x88aec3) (BuildId: 2f90ecdb0a0c073bd125401130a6140c57d7fee0)\n    #5 0x55a02ab5acc0  (/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/error_noncallable-O+0x107cc0) (BuildId: 76161c5378524f70f10b3fcf9d20f706d826bca0)\n    #6 0x55a02ab59df4  (/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/error_noncallable-O+0x106df4) (BuildId: 76161c5378524f70f10b3fcf9d20f706d826bca0)\n    #7 0x7fbbc4c7fbba  (/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/lib/libhermesvm.so+0x8b1bba) (BuildId: 2f90ecdb0a0c073bd125401130a6140c57d7fee0)\n    #8 0x7fbbc4c7ef99  (/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/lib/libhermesvm.so+0x8b0f99) (BuildId: 2f90ecdb0a0c073bd125401130a6140c57d7fee0)\n    #9 0x7fbbc4c7e914  (/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/lib/libhermesvm.so+0x8b0914) (BuildId: 2f90ecdb0a0c073bd125401130a6140c57d7fee0)\n    #10 0x55a02ab5c24a  (/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/error_noncallable-O+0x10924a) (BuildId: 76161c5378524f70f10b3fcf9d20f706d826bca0)\n    #11 0x7fbbc40b11c9  (/lib/x86_64-linux-gnu/libc.so.6+0x2a1c9) (BuildId: 274eec488d230825a136fa9c4d85370fed7a0a5e)\n    #12 0x7fbbc40b128a  (/lib/x86_64-linux-gnu/libc.so.6+0x2a28a) (BuildId: 274eec488d230825a136fa9c4d85370fed7a0a5e)\n    #13 0x55a02aa80894  (/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/error_noncallable-O+0x2d894) (BuildId: 76161c5378524f70f10b3fcf9d20f706d826bca0)\n\nAddressSanitizer can not provide additional info.\nSUMMARY: AddressSanitizer: SEGV (/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/error_noncallable-O+0xc62b6) (BuildId: 76161c5378524f70f10b3fcf9d20f706d826bca0) \n==708==ABORTING\n",
+          "seconds": 0.023755
+        }
+      ]
+    },
+    {
+      "name": "unsupported_catch.js",
+      "kind": "compile-rejection",
+      "passed": false,
+      "existing_output_preserved": false,
+      "records": [
+        {
+          "command": [
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/bin/shermes",
+            "-O0",
+            "-emit-llvm",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/unsupported_catch.js",
+            "-o",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/unsupported_catch.ll"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "",
+          "seconds": 0.017103
+        }
+      ]
+    },
+    {
+      "name": "unsupported_eval.js",
+      "kind": "compile-rejection",
+      "passed": true,
+      "existing_output_preserved": true,
+      "records": [
+        {
+          "command": [
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/bin/shermes",
+            "-O0",
+            "-emit-llvm",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/unsupported_eval.js",
+            "-o",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/unsupported_eval.ll"
+          ],
+          "exit_code": 1,
+          "stdout": "",
+          "stderr": "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/unsupported_eval.js:1:15: warning: Direct call to eval(), but lexical scope is not supported.\nconst value = eval('1 + 2');\n              ^~~~\n/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/unsupported_eval.js:1:19: error: direct LLVM backend: unsupported instruction DirectEvalInst\nconst value = eval('1 + 2');\n                  ^\n",
+          "seconds": 0.010365
+        }
+      ]
+    },
+    {
+      "name": "unsupported_generator.js",
+      "kind": "compile-rejection",
+      "passed": true,
+      "existing_output_preserved": true,
+      "records": [
+        {
+          "command": [
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/bin/shermes",
+            "-O0",
+            "-emit-llvm",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/unsupported_generator.js",
+            "-o",
+            "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/unsupported_generator.ll"
+          ],
+          "exit_code": 1,
+          "stdout": "",
+          "stderr": "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/unsupported_generator.js:1:1: error: direct LLVM backend: unsupported instruction CreateGeneratorInst\nfunction* sequence() { yield 1; yield 2; }\n^\n",
+          "seconds": 0.009956
+        }
+      ]
+    }
+  ]
+}

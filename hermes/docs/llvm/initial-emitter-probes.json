@@ -1,0 +1,146 @@
+[
+  {
+    "case": "accessors.js",
+    "opt": "O0",
+    "exit": 0,
+    "stderr": ""
+  },
+  {
+    "case": "accessors.js",
+    "opt": "O",
+    "exit": 1,
+    "stderr": "<unknown>:0: error: direct LLVM backend: unsupported instruction StringConcatInst\n"
+  },
+  {
+    "case": "arguments.js",
+    "opt": "O0",
+    "exit": 0,
+    "stderr": ""
+  },
+  {
+    "case": "arguments.js",
+    "opt": "O",
+    "exit": 1,
+    "stderr": "<unknown>:0: error: direct LLVM backend: unsupported instruction StringConcatInst\n"
+  },
+  {
+    "case": "arrays_callbacks.js",
+    "opt": "O0",
+    "exit": 0,
+    "stderr": ""
+  },
+  {
+    "case": "arrays_callbacks.js",
+    "opt": "O",
+    "exit": 0,
+    "stderr": ""
+  },
+  {
+    "case": "arrows_this.js",
+    "opt": "O0",
+    "exit": 0,
+    "stderr": ""
+  },
+  {
+    "case": "arrows_this.js",
+    "opt": "O",
+    "exit": 1,
+    "stderr": "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/arrows_this.js:1:15: error: direct LLVM backend: unsupported instruction PrStoreInst\nconst owner = {\n              ^\n"
+  },
+  {
+    "case": "closures.js",
+    "opt": "O0",
+    "exit": 0,
+    "stderr": ""
+  },
+  {
+    "case": "closures.js",
+    "opt": "O",
+    "exit": 1,
+    "stderr": "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/closures.js:3:10: error: direct LLVM backend: unsupported instruction PrStoreInst\n  return { inc: () => ++n, dec: function () { return --n; }, read: () => n };\n         ^\n"
+  },
+  {
+    "case": "coercion.js",
+    "opt": "O0",
+    "exit": 0,
+    "stderr": ""
+  },
+  {
+    "case": "coercion.js",
+    "opt": "O",
+    "exit": 1,
+    "stderr": "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/coercion.js:2:11: error: direct LLVM backend: unsupported instruction PrStoreInst\nconst a = {valueOf() { trace += 'a'; return 10; }};\n          ^\n"
+  },
+  {
+    "case": "constructors.js",
+    "opt": "O0",
+    "exit": 0,
+    "stderr": ""
+  },
+  {
+    "case": "constructors.js",
+    "opt": "O",
+    "exit": 0,
+    "stderr": ""
+  },
+  {
+    "case": "control_phi.js",
+    "opt": "O0",
+    "exit": 0,
+    "stderr": ""
+  },
+  {
+    "case": "control_phi.js",
+    "opt": "O",
+    "exit": 0,
+    "stderr": ""
+  },
+  {
+    "case": "functions.js",
+    "opt": "O0",
+    "exit": 0,
+    "stderr": ""
+  },
+  {
+    "case": "functions.js",
+    "opt": "O",
+    "exit": 0,
+    "stderr": ""
+  },
+  {
+    "case": "gc_closures.js",
+    "opt": "O0",
+    "exit": 0,
+    "stderr": ""
+  },
+  {
+    "case": "gc_closures.js",
+    "opt": "O",
+    "exit": 1,
+    "stderr": "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/gc_closures.js:8:13: error: direct LLVM backend: unsupported instruction PrStoreInst\n  const o = {i, text: 'garbage-' + i, list: [i, i + 1, i + 2]};\n            ^\n"
+  },
+  {
+    "case": "objects.js",
+    "opt": "O0",
+    "exit": 0,
+    "stderr": ""
+  },
+  {
+    "case": "objects.js",
+    "opt": "O",
+    "exit": 1,
+    "stderr": "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/objects.js:2:13: error: direct LLVM backend: unsupported instruction PrStoreInst\nconst obj = {value: 3, nested: {x: 7}, tag: 'ok'};\n            ^\n"
+  },
+  {
+    "case": "strings.js",
+    "opt": "O0",
+    "exit": 0,
+    "stderr": ""
+  },
+  {
+    "case": "strings.js",
+    "opt": "O",
+    "exit": 1,
+    "stderr": "<unknown>:0: error: direct LLVM backend: unsupported instruction StringConcatInst\n"
+  }
+]

@@ -1,0 +1,96 @@
+{
+  "source": "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/closures.js",
+  "source_sha256": "3126dfc6d63f9e39d70316b9d99ae46b730ac4cb3526a69d82df3022c81cc7c7",
+  "llvm_ir": "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/closures-O-llvm2.ll",
+  "llvm_ir_sha256": "2b23da0235098e0381ace2cabaed9925b40a94077030d8fe33d62eea0a222927",
+  "hermes_optimization": "O",
+  "llvm_optimization": "2",
+  "pipeline": "JavaScript -> Hermes SSA -> LLVM IR -> LLVM",
+  "program_c_generation": false,
+  "runtime_bridge": "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/lib/libshllvm_runtime.a",
+  "runtime_bridge_sha256": "b65ecc0f2f667f673a6f569ae9a090acb8891233fdfe344bd57c213c43ee82e3",
+  "runtime_address_sanitizer": true,
+  "runtime_undefined_behavior_sanitizer": false,
+  "commands": [
+    {
+      "command": [
+        "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/bin/shermes",
+        "-O",
+        "-Xes6-block-scoping",
+        "-Xenable-tdz",
+        "-emit-llvm",
+        "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/test/LLVMNative/closures.js",
+        "-o",
+        "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/shllvm-b9nyeqd4/program.ll"
+      ],
+      "exit_code": 0,
+      "seconds": 0.016919,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/tmp/llvm-direct-toolchain/root/usr/lib/llvm-18/bin/llvm-as",
+        "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/shllvm-b9nyeqd4/program.ll",
+        "-o",
+        "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/shllvm-b9nyeqd4/program.bc"
+      ],
+      "exit_code": 0,
+      "seconds": 0.016203,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/tmp/llvm-direct-toolchain/root/usr/lib/llvm-18/bin/opt",
+        "-passes=verify",
+        "-disable-output",
+        "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/shllvm-b9nyeqd4/program.bc"
+      ],
+      "exit_code": 0,
+      "seconds": 0.013966,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/tmp/llvm-direct-toolchain/root/usr/lib/llvm-18/bin/opt",
+        "-passes=verify,default<O2>,verify",
+        "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/shllvm-b9nyeqd4/program.bc",
+        "-o",
+        "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/shllvm-b9nyeqd4/optimized.bc"
+      ],
+      "exit_code": 0,
+      "seconds": 0.024962,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/tmp/llvm-direct-toolchain/root/usr/lib/llvm-18/bin/clang",
+        "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/closures-O-llvm2.bc",
+        "-O2",
+        "-Wno-override-module",
+        "-fsanitize=address",
+        "-L/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/lib",
+        "-Wl,-rpath,/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/lib",
+        "-L/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/tools/shermes",
+        "-Wl,-rpath,/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/tools/shermes",
+        "-L/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/jsi",
+        "-Wl,-rpath,/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/jsi",
+        "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/lib/libshllvm_runtime.a",
+        "-lshermes_console",
+        "-lhermesvm",
+        "-lm",
+        "-o",
+        "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/shllvm-link-poin_6tj/program"
+      ],
+      "exit_code": 0,
+      "seconds": 0.220286,
+      "stdout": "",
+      "stderr": ""
+    }
+  ],
+  "native_executable": "/workspace/scratch/ea758b58c6af/hermes-llvm-lab/build-llvm/shllvm-tests/closures-O-llvm2",
+  "native_executable_sha256": "2e4403c1709d4b2edecbdc826b7fb8e517aa2fd51702ccdf006c51f014aabc90"
+}

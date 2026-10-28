@@ -1,0 +1,32 @@
+*~
+*#
+TAGS
+
+# Howtoeven
+.howtoeven
+
+# buck
+buck-out
+.buckd
+.buckconfig.local
+
+# Python
+*.pyc
+
+# Mac
+.DS_Store
+
+
+# VS Code and Visual Studio
+.vs
+.vscode
+
+.git/
+.idea/
+cmake-build*/
+
+# clangd cache
+/.cache/
+
+# Compilation database
+/compile_commands.json
