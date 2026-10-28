@@ -1,0 +1,19 @@
+{
+  "generated_at_unix": 1793228274.46826,
+  "source_cases": 22,
+  "passed_cases": 22,
+  "failed_cases": 0,
+  "native_llvm_vs_node_and_c_comparisons": 68,
+  "hermes_optimization_levels": [
+    "O0",
+    "O"
+  ],
+  "llvm_optimization_levels": [
+    "0",
+    "2"
+  ],
+  "asan_options": "",
+  "lsan_options": "",
+  "scope": "host native and optional lli execution; not device execution or full ECMAScript conformance",
+  "full_report_sha256": "f0509b0e86893487d539f38fe710461a030f6310eb5fcfa465ca669ff887108d"
+}

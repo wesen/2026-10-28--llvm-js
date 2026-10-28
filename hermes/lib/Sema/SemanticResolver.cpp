@@ -2771,12 +2771,10 @@ bool SemanticResolver::isLValue(ESTree::Node *node) {
         return false;
       }
     } else {
-      // IMPORTANT: this is not spec compliant!
-      // In loose mode it should be possible to assign to "arguments".
-      // But that is a corner case that is difficult to handle, so for now
-      // we are prohibiting it.
+      // Sloppy assignments replace the binding, not the arguments object.
+      // Mark its owning function even when the write occurs in an arrow.
       if (decl->special == Decl::Special::Arguments)
-        return false;
+        decl->scope->parentFunction->argumentsMayBeAssigned = true;
     }
 
     return true;

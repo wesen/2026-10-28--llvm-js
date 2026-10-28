@@ -29,6 +29,7 @@ FunctionInfo::FunctionInfo(
       simpleParameterList(function->simpleParameterList),
       hasParameterExpressions(function->hasParameterExpressions),
       usesArguments(function->usesArguments),
+      argumentsMayBeAssigned(function->argumentsMayBeAssigned),
       containsArrowFunctions(function->containsArrowFunctions),
       containsArrowFunctionsUsingArguments(
           function->containsArrowFunctionsUsingArguments),

@@ -337,6 +337,11 @@ class FunctionInfo {
   /// Whether this function references "arguments" identifier.
   bool usesArguments = false;
 
+  /// A sloppy assignment targets this function's implicit arguments binding.
+  /// This includes writes from lexically nested arrows. IRGen must give the
+  /// binding mutable storage rather than substituting CreateArgumentsInst.
+  bool argumentsMayBeAssigned = false;
+
   /// Whether this function contains arrow functions.
   bool containsArrowFunctions = false;
 

@@ -219,3 +219,45 @@ Run `python3 hermes/utils/test_shllvm_test262_runner.py` and the ticket inventor
 
 ### Technical details
 Inventory phases: 48,881 positive files, 4,660 parse-negative files, 40 runtime-negative files, and 34 resolution-negative files. Full inventory output remains `/tmp/llvm-test262-inventory.json`; the committed summary retains its hash and complete feature frequencies.
+
+## Step 5: Qualify mutable arguments bindings and compare the same baseline
+
+The arguments implementation passed its focused execution matrix and then the complete regression gates. The same 353 Test262 variants now contain 349 passes, three semantic failures, and one unsupported case. The previously failing strict-caller Function-constructor case now passes, with no previously passing variant lost.
+
+### Prompt Context
+See Step 1. The separate metadata/specification checkpoint is commit `219cdc5` — “Fix empty Test262 metadata lists and pin specification artifact.”
+
+### What I did
+- Ran the focused `arguments_reassignment` extension case through C, all four native frontend/LLVM combinations, and lli.
+- Added asynchronous suspension/GC coverage to the fixture before the full gate.
+- Updated the inherited `Sema/assign-arguments.js` test to accept sloppy assignment and explicitly retain a strict function rejection.
+- Ran lit on `assign-arguments.js` and `invalid-args-eval.js`: 2/2 passed.
+- Ran full core and extension gates: 22/22 and 54/54 source contracts passed, including the new fixture.
+- Repeated the pinned variable/await baseline and retained the before/after evidence.
+
+### Why
+The change affects shared semantic analysis and IR generation, so LLVM-only output is insufficient. C comparison, optimized native execution, generator/async suspension, strict diagnostics, and broad regression checks exercise different consequences of the new binding representation.
+
+### What worked
+The focused test matched Node, C, native LLVM, and lli. The complete gate was fingerprint-stable. The original measured `12.2.1-17-s.js` failure is fixed.
+
+### What didn't work
+The remaining baseline failures still involve unsupported sloppy direct eval, and `with` remains unsupported. They are retained as failures; this patch does not reinterpret them as passes. No additional arguments regression failure occurred.
+
+### What I learned
+The existing captured-cell machinery correctly supports replacement values across default-parameter evaluation, escaping arrows, generator suspension, and async resumption once semantic ownership and the slot type are correct.
+
+### What was tricky to build
+A shared semantic-header change rebuilt 260 targets. Validation waited for the completed build before fingerprinting binaries. Generated lit scripts were removed individually after the successful run.
+
+### What warrants a second pair of eyes
+Review arguments aliasing and performance outside the tested replacement cases. `var arguments` aliasing and mapped parameters retain their existing separate semantics and are not claimed fixed here.
+
+### What should be done in the future
+Move LLVM's statically provable const/TDZ failures to the required runtime phase, and continue work on the remaining measured dynamic-scope gaps.
+
+### Code review instructions
+Compare the `baseline-milestone-1.json` and `baseline-arguments.json` variant outcomes, then inspect the focused fixture and the semantic/IRGen patch. The existing strict diagnostic test is an important guard against broadening invalid strict syntax.
+
+### Technical details
+All checks used the existing host64 configuration. The new extension total is 54 because one regression source was added; that total remains separate from 353 upstream Test262 variants and the synthetic runner probes.

@@ -870,7 +870,9 @@ void ESTreeIRGen::initCaptureStateInES5FunctionHelper() {
   // full captured state.
   bool hasLocalEval =
       curFunction()->getSemInfo()->getFunctionBodyScope()->localEval;
+  bool mutableArguments = curFunction()->getSemInfo()->argumentsMayBeAssigned;
   if (!(curFunction()->getSemInfo()->containsArrowFunctions || hasLocalEval ||
+        mutableArguments ||
         ((Mod->getContext().getDebugInfoSetting() == DebugInfoSetting::ALL) &&
          isLegacyClassConstructor)))
     return;
@@ -901,12 +903,13 @@ void ESTreeIRGen::initCaptureStateInES5FunctionHelper() {
   // "arguments".
   if (!curFunction()->capturedState.arguments &&
       (curFunction()->getSemInfo()->containsArrowFunctionsUsingArguments ||
+       mutableArguments ||
        (hasLocalEval &&
         curFunction()->getSemInfo()->argumentsDecl.hasValue()))) {
     auto *args = Builder.createVariable(
         scope,
         genAnonymousLabelName("arguments"),
-        Type::createObject(),
+        Type::createAnyType(),
         /* hidden */ true);
     curFunction()->capturedState.arguments = args;
     emitStore(curFunction()->createArgumentsInst, args, true);
