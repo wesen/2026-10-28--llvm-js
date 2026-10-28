@@ -18,7 +18,7 @@ WhenToUse: "Onboarding, architecture review, and implementation planning."
 
 # ECMAScript conformance architecture and intern implementation guide
 
-This ticket delivers an intern-oriented architecture and implementation plan for the verified direct LLVM JavaScript release. Documentation is complete; language conformance implementation remains proposed future work.
+This ticket delivers an intern-oriented architecture and implementation plan for the verified direct LLVM JavaScript release. Documentation is complete and conformance implementation is active. The detailed diary records committed runner, metadata, arguments-binding, and runtime-error-timing milestones; the remaining roadmap stays open.
 
 ## Documents
 
@@ -30,4 +30,4 @@ This ticket delivers an intern-oriented architecture and implementation plan for
 
 ## Scope
 
-Explain the existing source and runtime, identify evidenced boundaries, define a measurable conformance program, and upload the guide plus research ledger as one reMarkable document. Full ECMAScript implementation and device deployment are outside this documentation ticket. The implementation backlog is preserved in the guide and tasks.
+Explain the existing source and runtime, identify evidenced boundaries, define a measurable conformance program, and upload the guide plus research ledger as one reMarkable document. The user subsequently authorized implementation. Compiler/runtime work and its validation now continue in this ticket; full ECMAScript conformance and device deployment are not yet established. The remaining backlog is preserved in the guide and tasks.

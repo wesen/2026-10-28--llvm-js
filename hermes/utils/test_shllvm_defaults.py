@@ -31,6 +31,10 @@ def main():
         ("loop-explicit-off", loop, ["-Xes6-block-scoping=false"], "3 3 3\n"),
         ("tdz-default", tdz, [], "ReferenceError\n7\n"),
         ("tdz-explicit-off", tdz, ["-Xenable-tdz=false"], "undefined\n7\n"),
+        ("static-tdz-read", "function f(){try {print(x);}catch(e){print(e.name);} let x=7;} f();\n", [], "ReferenceError\n"),
+        ("static-tdz-write", "function f(){try {x=1;}catch(e){print(e.name);} let x=7;} f();\n", [], "ReferenceError\n"),
+        ("const-runtime", "const x=1; try{x=2;}catch(e){print(e.name);} print(x);\n", [], "TypeError\n1\n"),
+        ("unexecuted-const-write", "function unused(){const x=1; x=2;} print('accepted');\n", [], "accepted\n"),
     ]
     results = []
     with tempfile.TemporaryDirectory(prefix="shllvm-defaults-") as temporary:
@@ -62,19 +66,6 @@ def main():
                                   passed=run.returncode == 0 and run.stdout == expected)
             results.append(record)
 
-        # Preserve the frontend's documented limit: an obvious TDZ violation
-        # is an early diagnostic, including when source surrounds it with try.
-        source = "function f(){try {print(x);}catch(e){print(e.name);} let x=7;} f();\n"
-        source_path = directory / "static-tdz.js"
-        source_path.write_text(source)
-        compiled = subprocess.run(
-            [str(build / "bin/shermes"), "-O0", "--emit-llvm", str(source_path), "-o", "-"],
-            capture_output=True, text=True, timeout=30,
-        )
-        results.append({"case": "static-tdz-diagnostic", "source": source,
-                        "exit": compiled.returncode, "stderr": compiled.stderr,
-                        "passed": compiled.returncode != 0 and compiled.stdout == ""
-                        and "TDZ violation" in compiled.stderr})
 
     report = {"passed": sum(item["passed"] for item in results),
               "total": len(results), "results": results}

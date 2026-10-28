@@ -261,3 +261,89 @@ Compare the `baseline-milestone-1.json` and `baseline-arguments.json` variant ou
 
 ### Technical details
 All checks used the existing host64 configuration. The new extension total is 54 because one regression source was added; that total remains separate from 353 upstream Test262 variants and the synthetic runner probes.
+
+## Step 6: Use ECMAScript runtime error timing in the ordinary LLVM workflow
+
+The arguments milestone is committed as `f3b2fee`. The next correction removes a mismatch between the conformance runner and ordinary LLVM compilation: the runner explicitly enabled the existing compliance setting, but ordinary `shermes -emit-llvm` still rejected some catchable runtime errors during compilation. LLVM output now enables the same semantic setting by default.
+
+### Prompt Context
+See Step 1. This changes ordinary user-visible language behavior, not merely test configuration.
+
+### What I did
+- Enabled the shared compliance error-timing setting whenever the output target is LLVM.
+- Replaced the default-check harness's historical static-TDZ rejection contract with runtime read/write checks, const reassignment, and an unexecuted invalid assignment.
+- Added a regression covering const writes/updates, TDZ reads/writes, private getter/setter/method errors, and deletion of a super property.
+- Updated the current architecture documentation while retaining historical imported evidence.
+- Verified the new fixture's expected result with Node and started the rebuild and focused/default checks.
+
+### Why
+A valid program can catch these errors or never execute the offending operation. Rejecting the whole source changes observable semantics. The compiler already emits the necessary runtime checks under its compliance setting, so enabling that setting for LLVM avoids a second implementation of the same rules.
+
+### What worked
+The Node script oracle prints `language-error-timing-ok`. The source change is isolated to LLVM context configuration; validation of emitted behavior follows.
+
+### What didn't work
+No new failed validation is claimed at this stage. The earlier defaults harness intentionally expected the wrong conformance phase; its expectation is now replaced with executable runtime contracts.
+
+### What I learned
+The setting also controls premature diagnostics for private getter/setter/method operations and delete-super. Those paths need direct runtime coverage, not just a const-assignment example.
+
+### What was tricky to build
+The C frontend retains different default diagnostic policy. The new fixture records this oracle limitation explicitly and still compares native output with Node. Strict syntax rejection is not disabled by the compliance setting.
+
+### What warrants a second pair of eyes
+Review all uses of `CodeGenerationSettings::test262` and confirm the change does not turn actual grammar or strict-mode errors into accepted programs. Explicit TDZ/block-scoping overrides remain diagnostic nonconforming configurations.
+
+### What should be done in the future
+Qualify the full extension and publication gates after the focused cases, then continue closing dynamic-scope gaps measured by the pinned baseline.
+
+### Code review instructions
+Start with `createContext` in `tools/shermes/shermes.cpp`, then the eight raw-default cases and `language_error_timing.js`. Historical reports should remain historical rather than being rewritten to claim this behavior existed in the imported release.
+
+### Technical details
+The ordinary LLVM path now sets `codeGenOpts.test262` independently of the explicit `-test262` option. The existing bytecode/C frontend default policy is unchanged.
+
+### Step 6 validation correction
+
+The first full core run passed 21/22. Its sole failure was the historical `unsupported_const_assignment.js` contract: the compiler now returned exit 0 and replaced the sentinel output because this valid source correctly compiled. The recorded failure was `existing_output_preserved: false`, not a code-generation failure. Converted that fixture to `error_const_assignment.js` with an uncaught const assignment so the core suite now checks runtime TypeError; catchability is covered by the defaults and new extension fixture. Removed the obsolete const-rejection diagnostic branch from the core harness. The full extension gate already passed 55/55, defaults passed 8/8, and publication checks passed 6/6. Only the affected core gate needs a rerun.
+
+## Step 7: Qualify default error timing and expand Function-family coverage
+
+The corrected core contract now passes, completing this milestone's validation. Ordinary LLVM compilation preserves runtime error timing for the tested const, TDZ, private-access, and super-delete cases. A separately executed Function-family baseline supplies additional measured work rather than assuming all builtins are conforming.
+
+### Prompt Context
+See Step 1. This checkpoint closes the error-timing implementation step, not the overall ECMAScript program.
+
+### What I did
+- Re-ran the affected full core gate after migrating the const fixture: 22/22 passed.
+- Retained the completed full extension gate: 55/55 passed, with stable fingerprints.
+- Retained raw-default 8/8 and driver-publication 6/6 results.
+- Completed `test/built-ins/Function` at frontend O0 / LLVM O0: 893 variants, 721 pass, 146 semantic failures, and 26 unsupported.
+- Preserved compact per-variant Function results and full failure commands in the ticket evidence.
+
+### Why
+Runtime error timing needs validation in the ordinary driver, independently from the conformance runner's explicit flags. The Function family tests dynamic construction, calls, binding, source representation, and legacy properties, providing a useful next investigation set.
+
+### What worked
+All affected regression gates are green. The expanded Function run completed without changed inputs or a dirty pinned suite.
+
+### What didn't work
+The Function baseline retains substantial failures, including caller-property restrictions and function-source representations. Constructor tests with a trailing parameter line comment currently throw SyntaxError. No exclusions were added to hide these results.
+
+### What I learned
+The runtime constructs dynamic functions without a newline between parameter text and the closing parenthesis. A trailing line comment can therefore consume generated syntax. Separately, source-unavailable functions currently synthesize `[bytecode]` text rather than a standard NativeFunction representation. Those are separate changes with different compatibility and validation scope.
+
+### What was tricky to build
+Changing semantics requires migrating obsolete rejection tests without weakening their replacements. The core now requires an actual runtime TypeError, and separate positive cases require catchability and acceptance of unexecuted invalid operations.
+
+### What warrants a second pair of eyes
+Review the test migration and the C-oracle qualification. Full conformance remains unproven; the new baseline demonstrates outstanding work.
+
+### What should be done in the future
+Correct dynamic-function source boundaries, then address source representation and the broader runtime gaps under explicit tests.
+
+### Code review instructions
+Read the original core failure in Step 6, the replacement fixture, and the raw-default tests before reviewing the green receipts. Function-family failures are in `implementation-evidence/function-baseline.json`.
+
+### Technical details
+Current release regression totals are 22 core contracts and 55 extension contracts. Function baseline counts are variants and must not be added to the source-contract totals as if they used the same unit.

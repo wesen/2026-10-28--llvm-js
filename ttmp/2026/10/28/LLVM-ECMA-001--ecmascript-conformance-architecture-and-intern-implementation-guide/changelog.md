@@ -19,3 +19,7 @@ Implemented initial pinned LLVM Test262 runner and trustworthy native exception 
 ## 2026-10-28
 
 Implemented mutable sloppy arguments bindings, including arrow captures and suspension. Full core 22/22 and extensions 54/54 pass; pinned baseline improves from 348 to 349 passing variants without regressions. Strict-mode diagnostics retain 2/2 lit passes.
+
+## 2026-10-28
+
+Enabled runtime error timing for normal LLVM output. Migrated obsolete const rejection; core 22/22, extensions 55/55, raw defaults 8/8, driver checks 6/6. Expanded Function baseline: 721 pass, 146 semantic failures, 26 unsupported across 893 variants.

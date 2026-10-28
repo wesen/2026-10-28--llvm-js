@@ -149,8 +149,7 @@ def main():
         output.write_bytes(sentinel)
         compilation = run([compiler, "-O0", "-emit-llvm", src, "-o", output], env=env)
         preserved = output.read_bytes() == sentinel
-        expected_diagnostic = ("invalid assignment left-hand side" if "const_assignment" in src.name
-                               else "admission limit" if "root_limit" in src.name else "unsupported")
+        expected_diagnostic = "admission limit" if "root_limit" in src.name else "unsupported"
         passed = compilation["exit_code"] != 0 and expected_diagnostic in compilation["stderr"].lower() and preserved
         results.append({"name": src.name, "kind": "compile-rejection", "passed": passed,
                         "existing_output_preserved": preserved, "records": [compilation]})

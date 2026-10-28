@@ -602,7 +602,11 @@ void setWarningsAreErrorsFromFlags(SourceErrorManager &sm) {
 /// \return the Context.
 std::shared_ptr<Context> createContext() {
   CodeGenerationSettings codeGenOpts;
-  codeGenOpts.test262 = cli::compilerRuntimeFlags.Test262;
+  // LLVM programs use ECMAScript error timing: const writes, TDZ accesses,
+  // and invalid private/super operations may be caught at runtime. The shared
+  // compliance setting already emits these checks without rejecting the file.
+  codeGenOpts.test262 = cli::compilerRuntimeFlags.Test262 ||
+      cli::OutputLevel == OutputLevelKind::LLVM;
   // Test262 and direct LLVM emission use modern lexical-binding semantics by
   // default. Preserve an explicit override, and keep other modes' defaults.
   codeGenOpts.enableTDZ =

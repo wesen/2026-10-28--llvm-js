@@ -1,0 +1,123 @@
+{
+  "passed": 8,
+  "total": 8,
+  "results": [
+    {
+      "case": "loop-default",
+      "source": "let f=[]; for(let i=0;i<3;i++){f.push(() => i);} print(f[0](),f[1](),f[2]());\n",
+      "flags": [],
+      "compile_exit": 0,
+      "compile_stderr": "",
+      "expected": "0 1 2\n",
+      "passed": true,
+      "link_exit": 0,
+      "link_stderr": "",
+      "exit": 0,
+      "actual": "0 1 2\n",
+      "stderr": ""
+    },
+    {
+      "case": "loop-explicit-off",
+      "source": "let f=[]; for(let i=0;i<3;i++){f.push(() => i);} print(f[0](),f[1](),f[2]());\n",
+      "flags": [
+        "-Xes6-block-scoping=false"
+      ],
+      "compile_exit": 0,
+      "compile_stderr": "",
+      "expected": "3 3 3\n",
+      "passed": true,
+      "link_exit": 0,
+      "link_stderr": "",
+      "exit": 0,
+      "actual": "3 3 3\n",
+      "stderr": ""
+    },
+    {
+      "case": "tdz-default",
+      "source": "function call(fn){return fn();} function f(){let read=()=>x; try {print(call(read));}catch(e){print(e.name);} let x=7;return read();}print(f());\n",
+      "flags": [],
+      "compile_exit": 0,
+      "compile_stderr": "",
+      "expected": "ReferenceError\n7\n",
+      "passed": true,
+      "link_exit": 0,
+      "link_stderr": "",
+      "exit": 0,
+      "actual": "ReferenceError\n7\n",
+      "stderr": ""
+    },
+    {
+      "case": "tdz-explicit-off",
+      "source": "function call(fn){return fn();} function f(){let read=()=>x; try {print(call(read));}catch(e){print(e.name);} let x=7;return read();}print(f());\n",
+      "flags": [
+        "-Xenable-tdz=false"
+      ],
+      "compile_exit": 0,
+      "compile_stderr": "",
+      "expected": "undefined\n7\n",
+      "passed": true,
+      "link_exit": 0,
+      "link_stderr": "",
+      "exit": 0,
+      "actual": "undefined\n7\n",
+      "stderr": ""
+    },
+    {
+      "case": "static-tdz-read",
+      "source": "function f(){try {print(x);}catch(e){print(e.name);} let x=7;} f();\n",
+      "flags": [],
+      "compile_exit": 0,
+      "compile_stderr": "/tmp/shllvm-defaults-d7qbgu7v/static-tdz-read.js:1:25: warning: TDZ violation: reading from uninitialized variable 'x'\nfunction f(){try {print(x);}catch(e){print(e.name);} let x=7;} f();\n                        ^\n",
+      "expected": "ReferenceError\n",
+      "passed": true,
+      "link_exit": 0,
+      "link_stderr": "",
+      "exit": 0,
+      "actual": "ReferenceError\n",
+      "stderr": ""
+    },
+    {
+      "case": "static-tdz-write",
+      "source": "function f(){try {x=1;}catch(e){print(e.name);} let x=7;} f();\n",
+      "flags": [],
+      "compile_exit": 0,
+      "compile_stderr": "/tmp/shllvm-defaults-d7qbgu7v/static-tdz-write.js:1:20: warning: TDZ violation: writing to uninitialized variable 'x'\nfunction f(){try {x=1;}catch(e){print(e.name);} let x=7;} f();\n                   ^\n",
+      "expected": "ReferenceError\n",
+      "passed": true,
+      "link_exit": 0,
+      "link_stderr": "",
+      "exit": 0,
+      "actual": "ReferenceError\n",
+      "stderr": ""
+    },
+    {
+      "case": "const-runtime",
+      "source": "const x=1; try{x=2;}catch(e){print(e.name);} print(x);\n",
+      "flags": [],
+      "compile_exit": 0,
+      "compile_stderr": "",
+      "expected": "TypeError\n1\n",
+      "passed": true,
+      "link_exit": 0,
+      "link_stderr": "",
+      "exit": 0,
+      "actual": "TypeError\n1\n",
+      "stderr": ""
+    },
+    {
+      "case": "unexecuted-const-write",
+      "source": "function unused(){const x=1; x=2;} print('accepted');\n",
+      "flags": [],
+      "compile_exit": 0,
+      "compile_stderr": "",
+      "expected": "accepted\n",
+      "passed": true,
+      "link_exit": 0,
+      "link_stderr": "",
+      "exit": 0,
+      "actual": "accepted\n",
+      "stderr": ""
+    }
+  ],
+  "full_report_sha256": "660554b6805fb593d834264ad1621a34e3cdb8e403f63517a20e69774dce032e"
+}
