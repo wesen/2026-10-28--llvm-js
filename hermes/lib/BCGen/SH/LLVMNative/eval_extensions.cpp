@@ -244,6 +244,9 @@ CallResult<HermesValue> evaluate(
   // is kept across a call that can allocate.
   if (!toPHV(source)->isString())
     return *toPHV(source);
+  if (callerFlags & SHLLVM_EVAL_CALLER_DERIVED_CONSTRUCTOR)
+    return runtime.raiseSyntaxError(
+        "LLVM backend: direct eval in a derived constructor is not supported");
   std::string code;
   {
     auto view = StringPrimitive::createStringView(
@@ -252,12 +255,12 @@ CallResult<HermesValue> evaluate(
       code.assign(view.begin(), view.end());
     } else {
       SmallU16String<4> allocator;
-      convertUTF16ToUTF8WithReplacements(code, view.getUTF16Ref(allocator));
+      convertUTF16ToUTF8PreservingSurrogates(code, view.getUTF16Ref(allocator));
     }
   }
   if (!runtime.enableEval)
     return runtime.raiseEvalUnsupported(code);
-  if (!(callerFlags & 1)) {
+  if (!(callerFlags & SHLLVM_EVAL_CALLER_STRICT)) {
     auto strictSource = evalSourceIsStrict(runtime, code);
     if (strictSource == ExecutionStatus::EXCEPTION)
       return ExecutionStatus::EXCEPTION;
@@ -269,6 +272,7 @@ CallResult<HermesValue> evaluate(
 
   hbc::CompileFlags flags;
   flags.strict = true;
+  flags.allowSurrogatesInSource = true;
   flags.debug = true;
   flags.lazy = false;
   flags.includeLibHermes = false;
@@ -283,7 +287,7 @@ CallResult<HermesValue> evaluate(
   CompileResult compiled;
   executeInStack(runtime.getStackExecutor(), [&]() {
     compiled = compileInNativeEnvironment(
-        std::move(code), scopes, scopeCount, flags, callerFlags & 2);
+        std::move(code), scopes, scopeCount, flags, callerFlags & SHLLVM_EVAL_CALLER_GLOBAL);
   });
   if (!compiled.first)
     return runtime.raiseSyntaxError(TwineChar16(compiled.second));

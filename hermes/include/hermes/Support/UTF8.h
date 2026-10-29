@@ -234,6 +234,13 @@ void convertUTF16ToUTF8WithSingleSurrogates(
     std::string &dest,
     llvh::ArrayRef<char16_t> input);
 
+/// Encode runtime source without replacing lone UTF-16 surrogates. Valid
+/// pairs become scalar UTF-8; unpaired code units use the internal extended
+/// encoding accepted only by parsers with allowSurrogatesInSource enabled.
+void convertUTF16ToUTF8PreservingSurrogates(
+    std::string &dest,
+    llvh::ArrayRef<char16_t> input);
+
 /// Convert a UTF-16 encoded string \p input to UTF-8 stored in \p dest,
 /// replacing unpaired surrogates halves with the Unicode replacement character.
 /// \param maxCharacters If non-zero, the maximum number of characters to

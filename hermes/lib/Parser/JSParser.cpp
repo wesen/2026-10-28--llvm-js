@@ -28,6 +28,10 @@ bool JSParser::isStrictMode() const {
   return impl_->isStrictMode();
 }
 
+void JSParser::setAllowSurrogatesInSource(bool allow) {
+  impl_->getLexer().setAllowSurrogatesInSource(allow);
+}
+
 void JSParser::setStrictMode(bool mode) {
   return impl_->setStrictMode(mode);
 }

@@ -306,7 +306,8 @@ static void compileEvalWorker(void *argPtr) {
   // small functions, so it won't violate invariants on what the caller is
   // expecting. e.g. when 'eval' calls this function with lazy compilation
   // enabled, it copies the source into the MemoryBuffer.
-  if (context.isLazyCompilation() && data->compileFlags.lazy) {
+  if (context.isLazyCompilation() && data->compileFlags.lazy &&
+      !data->compileFlags.allowSurrogatesInSource) {
     auto preParser = parser::JSParser::preParseBuffer(
         context, fileBufId, data->compileFlags.strict);
     if (!preParser) {
@@ -320,6 +321,7 @@ static void compileEvalWorker(void *argPtr) {
 
   parser::JSParser parser(context, fileBufId, parserMode);
   parser.setStrictMode(data->compileFlags.strict);
+  parser.setAllowSurrogatesInSource(data->compileFlags.allowSurrogatesInSource);
 
   auto optParsed = parser.parse();
   if (!optParsed) {

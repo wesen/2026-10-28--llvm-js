@@ -411,6 +411,10 @@ class JSLexer {
 
   bool strictMode_;
 
+  /// Runtime source strings can contain lone UTF-16 surrogate code units.
+  /// Ordinary UTF-8 source files retain scalar-value validation by default.
+  bool allowSurrogatesInSource_{false};
+
   /// Whether to store the comments instead of skipping them.
   bool storeComments_{false};
 
@@ -463,6 +467,10 @@ class JSLexer {
   std::vector<StoredToken> tokenStorage_{};
 
  public:
+  void setAllowSurrogatesInSource(bool allow) {
+    allowSurrogatesInSource_ = allow;
+  }
+
   /// \param convertSurrogates See member variable \p convertSurrogates_.
   explicit JSLexer(
       std::unique_ptr<llvh::MemoryBuffer> input,
@@ -1144,22 +1152,29 @@ inline void JSLexer::appendUnicodeToStorage(
 
 inline uint32_t JSLexer::decodeUTF8() {
   const char *saveStart = curCharPtr_;
-  return hermes::decodeUTF8<false>(
-      curCharPtr_, [this, saveStart](const Twine &msg) {
-        error(SMLoc::getFromPointer(saveStart), msg);
-      });
+  auto error = [this, saveStart](const Twine &msg) {
+    this->error(SMLoc::getFromPointer(saveStart), msg);
+  };
+  return allowSurrogatesInSource_
+      ? hermes::decodeUTF8<true>(curCharPtr_, error)
+      : hermes::decodeUTF8<false>(curCharPtr_, error);
 }
 
 inline uint32_t JSLexer::_decodeUTF8SlowPath(const char *&at) {
-  return hermes::_decodeUTF8SlowPath<false>(at, [this, at](const Twine &msg) {
-    error(SMLoc::getFromPointer(at), msg);
-  });
+  auto error = [this, at](const Twine &msg) {
+    this->error(SMLoc::getFromPointer(at), msg);
+  };
+  return allowSurrogatesInSource_
+      ? hermes::_decodeUTF8SlowPath<true>(at, error)
+      : hermes::_decodeUTF8SlowPath<false>(at, error);
 }
 
 inline std::pair<uint32_t, const char *> JSLexer::_peekUTF8(
     const char *at) const {
-  uint32_t ch =
-      hermes::_decodeUTF8SlowPath<false>(at, [](const llvh::Twine &) {});
+  auto ignore = [](const llvh::Twine &) {};
+  uint32_t ch = allowSurrogatesInSource_
+      ? hermes::_decodeUTF8SlowPath<true>(at, ignore)
+      : hermes::_decodeUTF8SlowPath<false>(at, ignore);
   return std::make_pair(ch, at);
 }
 

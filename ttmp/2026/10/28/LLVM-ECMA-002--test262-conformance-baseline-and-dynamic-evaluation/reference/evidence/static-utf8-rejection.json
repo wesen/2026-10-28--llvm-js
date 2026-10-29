@@ -1,0 +1,34 @@
+{
+  "compiler_sha256": "c1eafd7f4e56ba61e649c550cfdedb579515bc77ea7258040c74c48ad98f0202",
+  "results": [
+    {
+      "code_unit": 55296,
+      "source_hex": "7072696e742827eda08027293b0a",
+      "command": [
+        "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/bin/shermes",
+        "-emit-llvm",
+        "/tmp/llvm-static-utf8-5bi9oxd2/invalid-d800.js",
+        "-o",
+        "/tmp/llvm-static-utf8-5bi9oxd2/invalid-d800.ll"
+      ],
+      "exit": 1,
+      "stderr": "/tmp/llvm-static-utf8-5bi9oxd2/invalid-d800.js:1:8: error: Invalid UTF-8 code point 0xd800\nprint('\ufffd\ufffd\ufffd');\nEmitted 1 errors. exiting.\n",
+      "passed": true
+    },
+    {
+      "code_unit": 56320,
+      "source_hex": "7072696e742827edb08027293b0a",
+      "command": [
+        "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/bin/shermes",
+        "-emit-llvm",
+        "/tmp/llvm-static-utf8-5bi9oxd2/invalid-dc00.js",
+        "-o",
+        "/tmp/llvm-static-utf8-5bi9oxd2/invalid-dc00.ll"
+      ],
+      "exit": 1,
+      "stderr": "/tmp/llvm-static-utf8-5bi9oxd2/invalid-dc00.js:1:8: error: Invalid UTF-8 code point 0xdc00\nprint('\ufffd\ufffd\ufffd');\nEmitted 1 errors. exiting.\n",
+      "passed": true
+    }
+  ],
+  "passed": true
+}

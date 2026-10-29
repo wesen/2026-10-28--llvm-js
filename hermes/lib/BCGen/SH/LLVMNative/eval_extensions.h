@@ -6,6 +6,12 @@
 extern "C" {
 #endif
 
+enum SHLLVMEvalCallerFlags {
+  SHLLVM_EVAL_CALLER_STRICT = 1,
+  SHLLVM_EVAL_CALLER_GLOBAL = 2,
+  SHLLVM_EVAL_CALLER_DERIVED_CONSTRUCTOR = 4
+};
+
 enum SHLLVMEvalBindingFlags {
   SHLLVM_EVAL_BINDING_TDZ = 1,
   SHLLVM_EVAL_BINDING_CONST = 2,
@@ -30,10 +36,10 @@ typedef struct SHLLVMEvalScope {
 
 /* Every value pointer addresses an existing rooted SHLegacyValue slot. Dynamic
  * strings are compiled to Hermes bytecode and run in the VM; this is a semantic
- * runtime service, not runtime LLVM compilation. caller_flags bit 0 is strict,
- * bit 1 indicates the global function. Non-string inputs pass through even in
+ * runtime service, not runtime LLVM compilation. caller_flags uses SHLLVMEvalCallerFlags. Non-string inputs pass through even in
  * a non-strict caller. Non-strict evaluated source from a sloppy caller raises an explicit
- * SyntaxError; a real strict directive in evaluated source is admitted. */
+ * SyntaxError; a real strict directive in evaluated source is admitted.
+ * Derived-constructor context rejects strings after non-string passthrough. */
 void shllvm_eval_direct(
     void *out,
     void *runtime,

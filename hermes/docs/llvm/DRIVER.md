@@ -138,8 +138,11 @@ calls and property operations, with the included indexed-property corrections.
 Direct string eval in a strict caller, or with a genuine strict directive in
 the evaluated source, uses actual native environment cells. Dynamically
 supplied eval and Function strings compile to Hermes bytecode. General
-non-strict direct string eval, evaluated super/private-name context and direct eval in
-derived constructors have explicit remaining limits described in the report.
+non-strict direct string eval and evaluated super/private-name context retain
+explicit limits. Derived constructors and their captured arrows reject string
+eval at runtime; non-string arguments pass through unchanged, including before
+`super()`. Runtime source strings preserve UTF-16 code units, including lone
+surrogates; ordinary source files retain UTF-8 scalar-value validation.
 
 The ordinary LLVM frontend now preserves runtime error timing for const
 assignment and TDZ operations, including catchable exceptions. Dynamic strict

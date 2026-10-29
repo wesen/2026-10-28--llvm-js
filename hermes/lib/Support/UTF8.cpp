@@ -176,6 +176,22 @@ std::pair<uint32_t, uint32_t> convertUTF16ToUTF8BufferWithReplacements(
   return {numRead, numWritten};
 }
 
+void convertUTF16ToUTF8PreservingSurrogates(
+    std::string &dest,
+    llvh::ArrayRef<char16_t> input) {
+  dest.clear();
+  dest.reserve(input.size());
+  for (auto cursor = input.begin(), end = input.end(); cursor != end;) {
+    uint32_t codePoint = *cursor++;
+    if (isHighSurrogate(codePoint) && cursor != end && isLowSurrogate(*cursor))
+      codePoint = utf16SurrogatePairToCodePoint(codePoint, *cursor++);
+    char buffer[UTF8CodepointMaxBytes];
+    char *out = buffer;
+    encodeUTF8(out, codePoint);
+    dest.append(buffer, out);
+  }
+}
+
 void convertUTF16ToUTF8WithSingleSurrogates(
     std::string &dest,
     llvh::ArrayRef<char16_t> input) {

@@ -479,10 +479,6 @@ void FunctionEmitter::emitCall(BaseCallInst &instruction, bool builtin) {
 }
 
 void FunctionEmitter::emitEval(DirectEvalInst &instruction) {
-  if (instruction.getDerivedConstructorContext()) {
-    fail(&instruction, "direct eval in a derived constructor is not supported");
-    return;
-  }
   // Descriptor order is physical outer-to-inner Environment order. Bindings
   // are the semantically visible operands collected by IRGen, not every slot
   // in a merged VariableScope (which can include shadowed/out-of-scope names).
@@ -521,7 +517,11 @@ void FunctionEmitter::emitEval(DirectEvalInst &instruction) {
       ptr(slot(instruction.getEnvironment())), ptr(slot(instruction.getThisValue())),
       ptr(slot(instruction.getNewTarget())),
       ptr("@shllvm_eval_scopes" + std::to_string(id)), u32(scopes.size()),
-      u32((instruction.getStrictCaller() ? 1 : 0) | (instruction.getGlobalCaller() ? 2 : 0))});
+      u32((instruction.getStrictCaller() ? SHLLVM_EVAL_CALLER_STRICT : 0) |
+          (instruction.getGlobalCaller() ? SHLLVM_EVAL_CALLER_GLOBAL : 0) |
+          (instruction.getDerivedConstructorContext()
+               ? SHLLVM_EVAL_CALLER_DERIVED_CONSTRUCTOR
+               : 0))});
 }
 
 void FunctionEmitter::emitInstruction(Instruction &i) {

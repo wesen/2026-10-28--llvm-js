@@ -8,7 +8,11 @@ Topics:
 DocType: reference
 Intent: long-term
 Owners: []
-RelatedFiles: []
+RelatedFiles:
+    - Path: repo://hermes/lib/BCGen/SH/LLVMNative/eval_extensions.cpp
+      Note: Eval source admission and derived non-string passthrough
+    - Path: repo://hermes/lib/Support/UTF8.cpp
+      Note: Runtime source encoding preserves surrogate code units
 ExternalSources: []
 Summary: ""
 LastUpdated: 2026-10-28T19:53:27.698270549-04:00
@@ -419,3 +423,40 @@ The broad profile is frontend O0 / LLVM O0, 16 workers, 60-second compilation an
 
 ### Step 10 validation follow-up
 The original-build timeout recheck completed with unchanged inputs: 18 variants, three passes and 15 semantic failures, no timeouts. The runner expands each selected source into both strict/sloppy variants; among the nine originally timed-out strict variants, three pass and six fail semantically. Preserved the complete rerun in reference/evidence/timeouts-before.json. Only after this finished was the pending source rebuilt.
+
+## Step 11: Qualify eval passthrough and runtime source encoding
+
+Built the prepared changes after the complete baseline and original-build timeout recheck. Both repairs pass their focused tests and the complete native regression gates. The selected eval family has no status regressions, and six previously failing strict RegExp variants now pass when rechecked with the same larger time budget.
+
+### Prompt Context
+See Step 1 and Step 9. This checkpoint completes the measured baseline and bounded input-semantics increment; it does not close the ticket's larger declaration-storage and source-context work.
+
+### What I did
+Ran `cmake --build hermes/build-llvm --target shermes shllvm_runtime shllvm_runtime_shared --parallel 4`, then the four-case eval-derived/UTF16 selection, the full core and extension gates, the 474-variant eval selection, and scripts/05-recheck-baseline-timeouts.py on the repaired build. Added scripts/06-check-static-utf8-rejection.py. Updated the driver boundaries and analysis with actual behavior and separate follow-up evidence.
+
+### Why
+The parser mode affects multiple runtime compilation paths. Qualification must cover both semantic preservation inside strings and unchanged ordinary file admission. The derived-constructor change also moves a rejection from compile time to runtime, so both old boundary fixtures and valid passthrough need independent checks.
+
+### What worked
+Build exit 0. Focused gate 4/4, with 16 native and four real lli executions. Full core 22/22; full extension 65/65, 256 native and 64 lli executions, unchanged input fingerprints. Static high/low surrogate source probes both reject with exit 1 and Invalid UTF-8 diagnostics. The 474 eval statuses exactly match the prior 390-pass/76-semantic-failure/eight-unsupported result. At a 120-second runtime limit, the timeout-source selection improves from 3/18 to 9/18 passes with six strict RegExp failure-to-pass transitions and no pass regressions.
+
+### What didn't work
+Nine sloppy variants in the timeout-source selection remain semantic failures because general non-strict direct eval is still rejected. General/global declaration semantics and private/super/derived string contexts remain unfinished. No full-suite run on the newer binaries is claimed.
+
+### What I learned
+The Unicode mismatch was independently observable and also explained six failures in the longer-budget RegExp experiment. The original ten-second timeouts hid those semantic differences; preserving both budgets and both builds makes the attribution reviewable.
+
+### What was tricky to build
+All lexer decoder entry points must agree about surrogate admission. The ordinary source parser must remain strict about UTF-8 while runtime-supplied strings preserve their existing code units. For derived constructors, passthrough must happen before source-context rejection and before any receiver-sensitive operation.
+
+### What warrants a second pair of eyes
+Review the new parser flag's eager-parse policy, the runtime conversion callers, and the caller flag ABI. Review that the two migrated derived string fixtures now expect runtime rejection rather than compilation failure. The broader fixed-slot environment representation is unchanged.
+
+### What should be done in the future
+Implement extensible sloppy-eval declaration storage and native/bytecode identifier resolution, correct global lexical and eval declaration policies, and extend private/super/derived string contexts. Complete the edition-membership audit before claiming an edition-qualified conformance score. The deferred module work remains separate.
+
+### Code review instructions
+Start with the analysis's Subsequent eval input corrections section. Follow convertUTF16ToUTF8PreservingSurrogates through runtime eval and parser flags. Read eval_derived_non_string.js, eval_utf16_source.js, and both boundary metadata changes. Compare evidence/eval-input-comparison.json with the preserved before/after receipts.
+
+### Technical details
+Native optimization coverage remains frontend O0/O by LLVM O0/O2, with real lli at frontend O / LLVM O2. The source-file rejection receipt identifies the rebuilt compiler by SHA-256. The historical full baseline remains tied to 20fd0f6. Evidence and documentation publication commit: b21f8b5.

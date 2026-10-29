@@ -234,7 +234,7 @@ ExecutionStatus Interpreter::caseDirectEval(
       code.assign(view.begin(), view.end());
     } else {
       SmallU16String<4> allocator;
-      convertUTF16ToUTF8WithReplacements(code, view.getUTF16Ref(allocator));
+      convertUTF16ToUTF8PreservingSurrogates(code, view.getUTF16Ref(allocator));
     }
   }
   if (!strictCaller) {

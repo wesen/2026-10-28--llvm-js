@@ -131,3 +131,51 @@ Representative failure samples are bounded by family, status, and observed phase
 The first priority is to review the largest failure groups and distinguish missing host services from engine defects. The second is to implement the measured eval environment changes under focused regression tests. General sloppy declaration injection requires a coordinated compiler/runtime change and should not be enabled before its binding and lifetime contracts are satisfied.
 
 Modules, realms, and shared-memory agents need explicit host designs. Their current unsupported records provide a measured starting point but do not constitute implementation. The separate requested module follow-up should use this baseline's scope distinctions rather than interpreting every unsupported module test as a parser defect.
+
+## Subsequent eval input corrections
+
+The completed baseline remains an experiment on runtime source 20fd0f6. Subsequent repairs have separate regression evidence and must not be described as having run the entire baseline until a new full experiment is completed. Two repairs address the input boundary of dynamic evaluation without implementing dynamic declaration injection.
+
+### Non-string values in derived constructor contexts
+
+The eval operation first examines its argument. A value that is not a string is returned unchanged. This rule includes undefined when no argument is supplied and object identity when an object is supplied. No conversion to string occurs. A restriction on compiling source in a derived constructor therefore does not justify rejecting every syntactic eval call in that constructor.
+
+Previously, FunctionEmitter::emitEval rejected a DirectEvalInst with derived-constructor context during LLVM emission. The repair carries that context through the existing caller-flags argument of shllvm_eval_direct. The bridge first returns a non-string argument; only a string reaches the derived-context rejection. Unsupported string evaluation remains an explicit SyntaxError at runtime. This also allows valid functions to compile when an unsupported string path is never executed.
+
+```text
+caller evaluates eval argument expression
+    -> runtime tests value tag
+        -> non-string: return the same tagged value
+        -> string and derived context: raise boundary SyntaxError
+        -> admitted string: compile in the caller context
+```
+
+Evaluation order matters before super(). Accessing this at that point normally throws because the derived constructor has not initialized its receiver. The existing IR path loads the captured this cell without imposing a receiver read; the bridge's non-string branch does not inspect that cell. The fixture tests both direct calls and captured arrows before and after super(), an escaping arrow after GC, missing arguments, primitive values, and an object whose toString throws if incorrectly called. A separate throwing argument verifies that argument evaluation still precedes the eval operation.
+
+### UTF-16 preservation across runtime compilation
+
+JavaScript strings are sequences of UTF-16 code units. A code unit in the surrogate range can exist without a matching adjacent surrogate. Source supplied to eval or Function therefore cannot be converted with a routine that silently replaces such units. The recorded probe demonstrates the consequence: a literal containing code unit 55296 became code unit 65533 after evaluation on the original build.
+
+convertUTF16ToUTF8PreservingSurrogates produces the byte representation consumed by the runtime parser. A valid high/low pair becomes its scalar code point and ordinary four-byte UTF-8 encoding. An unmatched surrogate retains its numerical value in a three-byte extended encoding. Combining valid pairs is necessary: an astral identifier must be classified as one Unicode code point rather than two invalid identifier characters.
+
+```text
+for each input code unit:
+    if it is high-surrogate and followed by low-surrogate:
+        combine the pair into one scalar code point
+        consume both code units
+    otherwise:
+        retain the code unit value
+    encode that value into the runtime source buffer
+```
+
+The parser receives an explicit allowSurrogatesInSource flag. Consuming, slow-path, and peeking decoders use the same setting. Native-context eval compilation, VM direct eval, indirect eval, and Function construction must all propagate the setting. Runtime source is eagerly parsed in this mode so a deferred parser cannot accidentally lose the encoding policy. Ordinary source-file compilation defaults to scalar-value validation and still rejects directly encoded surrogate bytes.
+
+The regression fixture checks direct and indirect eval, strict source in a sloppy caller, Function bodies, ordinary and raw template strings, RegExp literals, astral identifiers, a rejected lone-surrogate identifier, nested bytecode evaluation, and an escaping closure retained across collection. A separate source-file probe checks both high and low surrogate rejection with the compiler's actual Invalid UTF-8 diagnostics. These contracts distinguish source preservation from a general relaxation of lexical grammar.
+
+### Qualification of the input corrections
+
+The rebuilt compiler and runtime pass 22/22 core contracts and 65/65 extension contracts. The extension gate includes 256 native executions across four frontend/LLVM optimization combinations and 64 real lli executions; expected runtime errors and unsupported string-context rejections remain distinct from positive programs. All gate input fingerprints remained unchanged. Both malformed-static-source probes reject with exit status 1 and the expected UTF-8 diagnostic.
+
+The 474-variant eval selection retains exactly the same statuses as the previous strict-source build: 390 passes, 76 semantic failures, and eight unsupported variants. The two new input fixtures add coverage beyond that selected family. The separately rerun nine timeout source files expand to 18 strict/sloppy variants. At the same 120-second budget, results improve from three passes and 15 semantic failures to nine passes and nine semantic failures. Six strict RegExp variants change from failure to pass; all nine originally timed-out strict variants now pass. The remaining sloppy variants still encounter unsupported non-strict direct eval behavior. This comparison does not change the published broad baseline's nine timeout records.
+
+Receipts are `eval-input-core.json`, `eval-input-extensions.json`, `eval-input-focused.json`, `static-utf8-rejection.json`, `eval-input-test262.json`, `timeouts-after.json`, and `eval-input-comparison.json` under reference/evidence. The full baseline has not been rerun on this newer build. General sloppy eval, global lexical integration, and string evaluation using private/super/derived contexts remain separate unfinished work.

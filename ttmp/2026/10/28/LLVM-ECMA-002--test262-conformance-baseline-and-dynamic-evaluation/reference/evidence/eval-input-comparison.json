@@ -1,0 +1,63 @@
+{
+  "scope": "focused follow-up; broad baseline unchanged",
+  "timeout_profile_before": {
+    "semantic_failure": 15,
+    "pass": 3
+  },
+  "timeout_profile_after": {
+    "semantic_failure": 9,
+    "pass": 9
+  },
+  "status_changes": [
+    {
+      "test": "test/annexB/built-ins/RegExp/RegExp-leading-escape-BMP.js",
+      "variant": "strict",
+      "before": "semantic_failure",
+      "after": "pass"
+    },
+    {
+      "test": "test/annexB/built-ins/RegExp/RegExp-trailing-escape-BMP.js",
+      "variant": "strict",
+      "before": "semantic_failure",
+      "after": "pass"
+    },
+    {
+      "test": "test/language/literals/regexp/S7.8.5_A1.1_T2.js",
+      "variant": "strict",
+      "before": "semantic_failure",
+      "after": "pass"
+    },
+    {
+      "test": "test/language/literals/regexp/S7.8.5_A1.4_T2.js",
+      "variant": "strict",
+      "before": "semantic_failure",
+      "after": "pass"
+    },
+    {
+      "test": "test/language/literals/regexp/S7.8.5_A2.1_T2.js",
+      "variant": "strict",
+      "before": "semantic_failure",
+      "after": "pass"
+    },
+    {
+      "test": "test/language/literals/regexp/S7.8.5_A2.4_T2.js",
+      "variant": "strict",
+      "before": "semantic_failure",
+      "after": "pass"
+    }
+  ],
+  "eval_selection": {
+    "variants": 474,
+    "before": {
+      "pass": 390,
+      "semantic_failure": 76,
+      "unsupported": 8
+    },
+    "after": {
+      "pass": 390,
+      "semantic_failure": 76,
+      "unsupported": 8
+    },
+    "all_variant_statuses_identical": true
+  }
+}

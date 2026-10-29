@@ -63,6 +63,10 @@ class JSParser {
 
   void setStrictMode(bool mode);
 
+  /// Accept the internal source encoding of unpaired UTF-16 surrogates.
+  /// This is for runtime source strings, not ordinary UTF-8 input files.
+  void setAllowSurrogatesInSource(bool allow);
+
   /// \return the source URL from the magic comment, or an empty string if there
   /// was no magic comment.
   llvh::StringRef getSourceURL() const;

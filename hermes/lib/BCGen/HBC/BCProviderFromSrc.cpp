@@ -147,7 +147,8 @@ BCProviderFromSrc::create(
   context->setPreemptiveFileCompilationThreshold(
       compileFlags.preemptiveFileCompilationThreshold);
 
-  if (compileFlags.lazy && !runOptimizationPasses) {
+  if (compileFlags.lazy && !runOptimizationPasses &&
+      !compileFlags.allowSurrogatesInSource) {
     context->setLazyCompilation(true);
   }
 
@@ -206,6 +207,7 @@ BCProviderFromSrc::create(
 
   auto semCtx = std::make_shared<sema::SemContext>(*context);
   parser::JSParser parser(*context, fileBufId, parserMode);
+  parser.setAllowSurrogatesInSource(compileFlags.allowSurrogatesInSource);
   auto parsed = parser.parse();
 
   // If we are using lazy parse mode, we should have already detected the 'use

@@ -32,6 +32,7 @@ CallResult<bool> evalSourceIsStrict(Runtime &runtime, llvh::StringRef utf8code) 
     context.setEnableAsyncGenerators(runtime.hasAsyncGenerators());
     SimpleDiagHandlerRAII diagnostics(context.getSourceErrorManager());
     parser::JSParser parser(context, utf8code);
+    parser.setAllowSurrogatesInSource(true);
     auto program = parser.parse();
     if (!program || diagnostics.haveErrors()) {
       error = diagnostics.getErrorString();
@@ -72,6 +73,7 @@ CallResult<HermesValue> evalInEnvironment(
 
   hbc::CompileFlags compileFlags;
   compileFlags.strict = strictCaller;
+  compileFlags.allowSurrogatesInSource = true;
   compileFlags.includeLibHermes = false;
   compileFlags.verifyIR = runtime.verifyEvalIR;
   compileFlags.emitAsyncBreakCheck = runtime.asyncBreakCheckInEval;
@@ -174,7 +176,7 @@ CallResult<HermesValue> directEval(
     code = std::string(view.begin(), view.end());
   } else {
     SmallU16String<4> allocator;
-    convertUTF16ToUTF8WithReplacements(code, view.getUTF16Ref(allocator));
+    convertUTF16ToUTF8PreservingSurrogates(code, view.getUTF16Ref(allocator));
   }
 
   return evalInEnvironment(

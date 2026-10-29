@@ -45,6 +45,9 @@ struct CompileFlags {
   unsigned preemptiveFunctionCompilationThreshold{160};
 
   bool strict{false};
+  /// Source produced from a runtime UTF-16 string may encode lone surrogates.
+  /// Such source is eagerly parsed; ordinary file compilation keeps this off.
+  bool allowSurrogatesInSource{false};
   /// The value is optional; when it is set, the optimization setting is based
   /// on the value; when it is unset, it means the parser needs to automatically
   /// detect the 'use static builtin' directive and set the optimization setting
