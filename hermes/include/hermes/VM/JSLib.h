@@ -46,6 +46,11 @@ void createHermesBuiltins(Runtime &runtime);
 
 std::unique_ptr<JSLibStorage> createJSLibStorage();
 
+/// Parse an eval script without semantic resolution and report whether its
+/// directive prologue requests strict mode. Used before admitting direct eval
+/// from a non-strict caller; final compilation still resolves caller context.
+CallResult<bool> evalSourceIsStrict(Runtime &runtime, llvh::StringRef utf8code);
+
 /// eval() entry point. Evaluate the given source \p utf8code within the given
 /// \p environment. If a local eval is desired, then both codeBlock and
 /// lexicalScope must be set.

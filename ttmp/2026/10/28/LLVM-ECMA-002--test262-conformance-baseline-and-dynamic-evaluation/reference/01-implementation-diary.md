@@ -102,3 +102,58 @@ Read `bounded_results`, `shard_paths`, and `protect_output`, followed by Schedul
 
 ### Technical details
 Pre-change results are in `reference/evidence/eval-before.json`. The exact command selected `test/language/eval-code test/built-ins/eval` at frontend O0 / LLVM O0. `/tmp/llvm-002-serial.json` and `/tmp/llvm-002-parallel.json` are local integration receipts; their status equivalence was checked in Python.
+
+## Step 3: Admit strict evaluated strings from sloppy callers
+
+Runner infrastructure and the pre-change baseline were committed as `fd08c16`. Added a shared parser-based strictness check and used it in both native direct eval and the bytecode interpreter. This is an admission change for strictly evaluated source, not general sloppy declaration injection.
+
+### Prompt Context
+See Step 1 and the user's instruction to finish this work first.
+
+### What I did
+Added `evalSourceIsStrict` to the runtime eval implementation. It parses on the compiler stack executor and inspects parser-produced directive nodes without global semantic resolution. Native and interpreter callers retain non-string passthrough and require either a strict caller or a genuine strict directive. Added a fixture for native and dynamic callers, shared mutations, GC, this, arguments, new.target, nested eval, no var leakage, const errors, and TDZ.
+
+### Why
+Strict evaluation does not introduce caller variable bindings, so it can use the existing shared-slot mechanism. Parser metadata distinguishes actual directives from comments, escapes, and parenthesized strings. Global semantic resolution during detection would reject valid constructor new.target.
+
+### What worked
+The independent Node oracle prints `strict-source-eval-ok`. The runtime build is in progress; native success is not yet asserted.
+
+### What didn't work
+No native validation result is available at this checkpoint. General non-strict source remains explicitly rejected.
+
+### What I learned
+JSParser restores parser state when leaving parseProgram, so its post-parse mode is not the appropriate strictness oracle. The AST's directive nodes provide the same spelling-sensitive basis used by semantic directive scanning.
+
+### What was tricky to build
+Nested evaluation executes bytecode, even when its original caller was native. Both entry paths need the same admission rule, while final compilation must still apply the caller's lexical and syntactic context.
+
+### What warrants a second pair of eyes
+Review raw directive spelling, compiler-stack execution, and exception propagation. Verify escaped strings are not accidentally admitted, and ensure genuinely strict source does not leak declarations.
+
+### What should be done in the future
+Run focused native/lli tests, adversarial directive probes, the same pinned eval selection, and the full regression gate. Preserve any failures before correcting them.
+
+### Code review instructions
+Start with evalSourceIsStrict in VM/JSLib/eval.cpp, then its two callers and the new extension fixture.
+
+### Technical details
+The helper returns CallResult<bool>; parser failure becomes a runtime SyntaxError. Accepted source still compiles through the existing strict eval path, preserving existing const/TDZ and environment ownership behavior.
+
+### Step 3 focused failure and correction
+
+The first focused extension run failed in all four native combinations and lli with `Uncaught SyntaxError: sloppy direct string eval is unsupported; use strict evaluated source, a strict caller, or indirect global eval` at `anonymous (eval:1:25)`. Temporary print markers localized the failure to invocation of the nested arrow, after both native strict-source evaluation and the first dynamic Function evaluation had succeeded. Source inspection showed `SemanticResolver::runInScope` used only `semInfo->strict`, ignoring the evaluated program's directive prologue. Updated it to combine caller strictness with `scanDirectives(rootNode->_body).useStrictNode`, before declaration processing and nested-function resolution. The fixture remains unchanged. This repairs semantic strictness inheritance rather than forcing individual nested calls to supply a directive.
+
+### Step 3 rejection-fixture correction
+
+The full extension gate initially passed 57/58. Its sole failure was the new aggregate directive-boundary fixture's Node oracle: `Error: directive lookalike was admitted`. The harness correctly requires unsupported-context sources to be valid successful JavaScript under Node. The fixture had incorrectly asserted the implementation's rejection inside the source itself. Replaced it with six independent valid JavaScript sources, each relying on the harness to check the native rejection and Node success. The runtime implementation did not change. The core gate passed 22/22 and the strict-source positive fixture passed all native/lli combinations, including the previously failing nested arrow.
+
+### Broad-run scheduling adjustment
+
+The initial full selection used six workers and processed roughly 2,800 variants in three minutes. Stopped that run deliberately with Ctrl-C to increase concurrency to sixteen workers on this eight-CPU, 64-GB host; compiler/linker subprocess waits leave opportunities for overlap. The interrupted report remains `complete: false` and is preserved locally as `/tmp/llvm-002-full-interrupted.json`. Restarted from the beginning with the same immutable build and `--jobs 16 --compact --checkpoint-every 2000 test`. No results from the interrupted run will be added to the final totals.
+
+### Step 3 final regression qualification
+
+The corrected complete extension gate passes 63/63 source contracts with unchanged inputs; the core gate passes 22/22. This includes the strict-source positive fixture at all four native optimization combinations and real lli, and all six directive-lookalike rejection contracts. Receipts are `reference/evidence/strict-eval-extensions.json` and `strict-eval-core.json`. General non-strict eval remains unsupported. The first post-change eval-family run (before the nested strictness resolver correction) improved from 381 to 390 passes without a previously passing variant regressing; final full-profile evidence will supersede that intermediate measurement.
+
+A source-path audit corrected the guide's Environment declaration reference from a nonexistent standalone header to `hermes/include/hermes/VM/Callable.h`. All literal repository file references then resolved. Uploaded the corrected guide under a new name, preserving any annotations on the first upload: `OK: uploaded LLVM-ECMA-002-Intern-Guide-Revision-2.pdf -> /ai/2026/10/28/LLVM-ECMA-002`. This is cloud-delivery evidence.

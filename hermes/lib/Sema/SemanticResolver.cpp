@@ -136,7 +136,11 @@ bool SemanticResolver::runInScope(
     // Pop the scope to prepare for another run of SemanticResolver.
     bindingTable_.activateScope({});
   });
-  rootNode->strictness = makeStrictness(semInfo->strict);
+  // Direct eval inherits caller strictness, but its own directive prologue
+  // can also enable strict mode. Propagate that mode to nested functions and
+  // declaration processing, independently of the parser's initial mode.
+  bool strict = semInfo->strict || scanDirectives(rootNode->_body).useStrictNode;
+  rootNode->strictness = makeStrictness(strict);
 
   canReferenceSuper_ = parentHadSuperBinding;
 
@@ -145,7 +149,7 @@ bool SemanticResolver::runInScope(
       *this,
       rootNode,
       semInfo,
-      semInfo->strict,
+      strict,
       FunctionInfo::ConstructorKind::None,
       {}};
   curFunctionInfo()->isProgramNode = true;

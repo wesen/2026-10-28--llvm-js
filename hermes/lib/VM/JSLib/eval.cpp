@@ -11,6 +11,7 @@
 #include "hermes/Parser/JSParser.h"
 #include "hermes/Support/MemoryBuffer.h"
 #include "hermes/Support/ScopeChain.h"
+#include "hermes/Support/SimpleDiagHandler.h"
 #include "hermes/VM/JSLib.h"
 #include "hermes/VM/Runtime.h"
 #include "hermes/VM/StringPrimitive.h"
@@ -20,6 +21,40 @@
 
 namespace hermes {
 namespace vm {
+
+CallResult<bool> evalSourceIsStrict(Runtime &runtime, llvh::StringRef utf8code) {
+  bool parsed = false;
+  bool strict = false;
+  std::string error;
+  executeInStack(runtime.getStackExecutor(), [&]() {
+    Context context;
+    context.setEnableES6BlockScoping(true);
+    context.setEnableAsyncGenerators(runtime.hasAsyncGenerators());
+    SimpleDiagHandlerRAII diagnostics(context.getSourceErrorManager());
+    parser::JSParser parser(context, utf8code);
+    auto program = parser.parse();
+    if (!program || diagnostics.haveErrors()) {
+      error = diagnostics.getErrorString();
+      return;
+    }
+    parsed = true;
+    // Use the parser's raw directive spelling: escaped and parenthesized
+    // strings must not become strict directives. Do not resolve a global AST
+    // here, because eval may legitimately inherit constructor new.target.
+    for (auto &node : (*program)->_body) {
+      auto *statement = llvh::dyn_cast<ESTree::ExpressionStatementNode>(&node);
+      if (!statement || !statement->_directive)
+        break;
+      if (statement->_directive->str() == "use strict") {
+        strict = true;
+        break;
+      }
+    }
+  });
+  if (!parsed)
+    return runtime.raiseSyntaxError(TwineChar16(error));
+  return strict;
+}
 
 CallResult<HermesValue> evalInEnvironment(
     Runtime &runtime,

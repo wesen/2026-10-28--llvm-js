@@ -13,6 +13,7 @@
 #include "hermes/Sema/SemContext.h"
 #include "hermes/Support/Buffer.h"
 #include "hermes/VM/Callable.h"
+#include "hermes/VM/JSLib.h"
 #include "hermes/VM/StaticHUtils.h"
 #include "hermes/VM/StringPrimitive.h"
 #include "hermes/VM/StringView.h"
@@ -243,11 +244,6 @@ CallResult<HermesValue> evaluate(
   // is kept across a call that can allocate.
   if (!toPHV(source)->isString())
     return *toPHV(source);
-  if (!(callerFlags & 1))
-    return runtime.raiseSyntaxError(
-        "LLVM backend: sloppy direct string eval is unsupported; "
-        "use a strict caller or indirect global eval");
-
   std::string code;
   {
     auto view = StringPrimitive::createStringView(
@@ -261,6 +257,15 @@ CallResult<HermesValue> evaluate(
   }
   if (!runtime.enableEval)
     return runtime.raiseEvalUnsupported(code);
+  if (!(callerFlags & 1)) {
+    auto strictSource = evalSourceIsStrict(runtime, code);
+    if (strictSource == ExecutionStatus::EXCEPTION)
+      return ExecutionStatus::EXCEPTION;
+    if (!*strictSource)
+      return runtime.raiseSyntaxError(
+          "LLVM backend: sloppy direct string eval is unsupported; "
+          "use strict evaluated source, a strict caller, or indirect global eval");
+  }
 
   hbc::CompileFlags flags;
   flags.strict = true;

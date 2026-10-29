@@ -320,7 +320,7 @@ Paths below are repository-relative and refer to the starting revision unless a 
 | `hermes/lib/VM/JSLib/JSLibInternal.cpp` | `createDynamicFunction` | Where is Function source assembled and compiled? |
 | `hermes/lib/IRGen/ESTreeIRGen-expr.cpp` | direct-eval generation | Which source contexts become IR operands? |
 | `hermes/lib/Sema/SemanticResolver.cpp` | declaration and assignment resolution | Which names are resolved before native execution? |
-| `hermes/include/hermes/VM/Environment.h` | environment storage | What must change to trace dynamic binding storage? |
+| `hermes/include/hermes/VM/Callable.h` | environment storage | What must change to trace dynamic binding storage? |
 | `hermes/test/LLVMNativeExtensions/eval_*.js` | lexical, GC, and rejection contracts | Which boundaries already have executable evidence? |
 
 ## 15. Exercises and completion criteria

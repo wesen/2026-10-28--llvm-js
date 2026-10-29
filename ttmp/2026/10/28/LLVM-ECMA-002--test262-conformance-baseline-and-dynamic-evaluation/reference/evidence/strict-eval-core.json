@@ -1,0 +1,148 @@
+{
+  "generated_at_unix": 1793232771.321716,
+  "source_cases": 22,
+  "passed_cases": 22,
+  "failed_cases": 0,
+  "native_llvm_vs_node_and_c_comparisons": 68,
+  "hermes_optimization_levels": [
+    "O0",
+    "O"
+  ],
+  "llvm_optimization_levels": [
+    "0",
+    "2"
+  ],
+  "asan_options": "",
+  "lsan_options": "",
+  "scope": "host native and optional lli execution; not device execution or full ECMAScript conformance",
+  "results": [
+    {
+      "name": "accessors.js",
+      "kind": "positive",
+      "passed": true,
+      "llvm_native_comparisons": 4
+    },
+    {
+      "name": "arguments.js",
+      "kind": "positive",
+      "passed": true,
+      "llvm_native_comparisons": 4
+    },
+    {
+      "name": "arrays_callbacks.js",
+      "kind": "positive",
+      "passed": true,
+      "llvm_native_comparisons": 4
+    },
+    {
+      "name": "arrows_this.js",
+      "kind": "positive",
+      "passed": true,
+      "llvm_native_comparisons": 4
+    },
+    {
+      "name": "catch_basic.js",
+      "kind": "positive",
+      "passed": true,
+      "llvm_native_comparisons": 4
+    },
+    {
+      "name": "classes.js",
+      "kind": "positive",
+      "passed": true,
+      "llvm_native_comparisons": 4
+    },
+    {
+      "name": "closures.js",
+      "kind": "positive",
+      "passed": true,
+      "llvm_native_comparisons": 4
+    },
+    {
+      "name": "coercion.js",
+      "kind": "positive",
+      "passed": true,
+      "llvm_native_comparisons": 4
+    },
+    {
+      "name": "constructors.js",
+      "kind": "positive",
+      "passed": true,
+      "llvm_native_comparisons": 4
+    },
+    {
+      "name": "control_phi.js",
+      "kind": "positive",
+      "passed": true,
+      "llvm_native_comparisons": 4
+    },
+    {
+      "name": "exceptions.js",
+      "kind": "positive",
+      "passed": true,
+      "llvm_native_comparisons": 4
+    },
+    {
+      "name": "functions.js",
+      "kind": "positive",
+      "passed": true,
+      "llvm_native_comparisons": 4
+    },
+    {
+      "name": "gc_closures.js",
+      "kind": "positive",
+      "passed": true,
+      "llvm_native_comparisons": 4
+    },
+    {
+      "name": "generator_smoke.js",
+      "kind": "positive",
+      "passed": true,
+      "llvm_native_comparisons": 4
+    },
+    {
+      "name": "lexical_tdz.js",
+      "kind": "positive",
+      "passed": true,
+      "llvm_native_comparisons": 4
+    },
+    {
+      "name": "objects.js",
+      "kind": "positive",
+      "passed": true,
+      "llvm_native_comparisons": 4
+    },
+    {
+      "name": "strings.js",
+      "kind": "positive",
+      "passed": true,
+      "llvm_native_comparisons": 4
+    },
+    {
+      "name": "error_arrow_constructor.js",
+      "kind": "runtime-error",
+      "passed": true
+    },
+    {
+      "name": "error_const_assignment.js",
+      "kind": "runtime-error",
+      "passed": true
+    },
+    {
+      "name": "error_missing_global.js",
+      "kind": "runtime-error",
+      "passed": true
+    },
+    {
+      "name": "error_noncallable.js",
+      "kind": "runtime-error",
+      "passed": true
+    },
+    {
+      "name": "unsupported_root_limit.js",
+      "kind": "compile-rejection",
+      "passed": true,
+      "existing_output_preserved": true
+    }
+  ]
+}

@@ -32,7 +32,8 @@ typedef struct SHLLVMEvalScope {
  * strings are compiled to Hermes bytecode and run in the VM; this is a semantic
  * runtime service, not runtime LLVM compilation. caller_flags bit 0 is strict,
  * bit 1 indicates the global function. Non-string inputs pass through even in
- * a non-strict caller. Sloppy string direct eval raises an explicit SyntaxError. */
+ * a non-strict caller. Non-strict evaluated source from a sloppy caller raises an explicit
+ * SyntaxError; a real strict directive in evaluated source is admitted. */
 void shllvm_eval_direct(
     void *out,
     void *runtime,

@@ -135,17 +135,15 @@ and corrected during implementation.
 Generators, RegExp/BigInt literals and private-field operations now have direct
 LLVM emission. Typed-array objects use the existing runtime through generic
 calls and property operations, with the included indexed-property corrections.
-Direct string eval in a strict caller uses actual native environment cells;
-dynamically supplied eval and Function strings compile to Hermes bytecode. A
-strict directive only inside a string from a sloppy caller is also rejected.
-General sloppy
-direct string eval, evaluated super/private-name context and direct eval in
+Direct string eval in a strict caller, or with a genuine strict directive in
+the evaluated source, uses actual native environment cells. Dynamically
+supplied eval and Function strings compile to Hermes bytecode. General
+non-strict direct string eval, evaluated super/private-name context and direct eval in
 derived constructors have explicit remaining limits described in the report.
 
-The pinned native frontend still rejects direct source assignment to a `const`
-binding during compilation, even inside `try`; standard JavaScript can raise
-a catchable runtime TypeError. Dynamic strict evaluation uses runtime const
-checks. Specialized internal typed-object/fast-array IR remains distinct from
+The ordinary LLVM frontend now preserves runtime error timing for const
+assignment and TDZ operations, including catchable exceptions. Dynamic strict
+evaluation also uses runtime const checks. Specialized internal typed-object/fast-array IR remains distinct from
 ordinary JavaScript typed arrays. This is an experimental backend over a
 pinned language/runtime pipeline, with targeted evidence for its features.
 

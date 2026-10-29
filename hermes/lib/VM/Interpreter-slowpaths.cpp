@@ -201,11 +201,6 @@ ExecutionStatus Interpreter::caseDirectEval(
     return ExecutionStatus::RETURNED;
   }
 
-  if (!strictCaller)
-    return runtime.raiseSyntaxError(
-        "sloppy direct string eval is unsupported; "
-        "use a strict caller or indirect global eval");
-
   // The retained debug table describes the physical environment and lexical
   // scope at this bytecode instruction. Use the same mapping as debugger eval,
   // so dynamic functions and nested eval do not fall back to global lookup.
@@ -241,6 +236,15 @@ ExecutionStatus Interpreter::caseDirectEval(
       SmallU16String<4> allocator;
       convertUTF16ToUTF8WithReplacements(code, view.getUTF16Ref(allocator));
     }
+  }
+  if (!strictCaller) {
+    auto strictSource = evalSourceIsStrict(runtime, code);
+    if (strictSource == ExecutionStatus::EXCEPTION)
+      return ExecutionStatus::EXCEPTION;
+    if (!*strictSource)
+      return runtime.raiseSyntaxError(
+          "sloppy direct string eval is unsupported; "
+          "use strict evaluated source, a strict caller, or indirect global eval");
   }
   auto cr = evalInEnvironment(
       runtime,
