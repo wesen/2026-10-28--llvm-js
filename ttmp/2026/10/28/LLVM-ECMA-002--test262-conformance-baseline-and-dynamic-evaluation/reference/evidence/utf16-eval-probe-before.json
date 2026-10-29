@@ -1,0 +1,19 @@
+{
+  "scope": "diagnostic source conversion probe; not a Test262 result",
+  "source": "ttmp/2026/10/28/LLVM-ECMA-002--test262-conformance-baseline-and-dynamic-evaluation/scripts/04-eval-utf16-probe.js",
+  "source_sha256": "b200c59c1d25432b667ade42bea6ad3055103c9c63b6623a52cd215707b5d23d",
+  "runtime_source_commit": "20fd0f6",
+  "node_output": "65 65\n55296 55296\n56320 56320\n",
+  "native_output": "65 65\n55296 65533\n56320 65533\n",
+  "native_command": [
+    "python3",
+    "hermes/utils/shllvm.py",
+    "run",
+    "--build-dir",
+    "hermes/build-llvm",
+    "--llvm-bin",
+    "/usr/lib/llvm-18/bin",
+    "--no-runtime-build",
+    "ttmp/2026/10/28/LLVM-ECMA-002--test262-conformance-baseline-and-dynamic-evaluation/scripts/04-eval-utf16-probe.js"
+  ]
+}

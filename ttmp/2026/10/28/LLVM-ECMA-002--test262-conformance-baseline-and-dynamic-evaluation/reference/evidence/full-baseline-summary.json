@@ -1,0 +1,3597 @@
+{
+  "scope": "exploratory pinned-suite selection; not an edition-qualified conformance claim",
+  "variants_and_metadata_errors": 102992,
+  "fixture_files": 294,
+  "counts": {
+    "unsupported": 6584,
+    "pass": 76801,
+    "semantic_failure": 19598,
+    "timeout": 9
+  },
+  "families": {
+    "test/annexB/built-ins": {
+      "unsupported": 32,
+      "pass": 192,
+      "semantic_failure": 256,
+      "timeout": 2
+    },
+    "test/annexB/language": {
+      "unsupported": 73,
+      "semantic_failure": 339,
+      "pass": 483
+    },
+    "test/built-ins/AbstractModuleSource": {
+      "unsupported": 8
+    },
+    "test/built-ins/AggregateError": {
+      "pass": 48,
+      "unsupported": 2
+    },
+    "test/built-ins/Array": {
+      "pass": 5545,
+      "semantic_failure": 530,
+      "unsupported": 44
+    },
+    "test/built-ins/ArrayBuffer": {
+      "semantic_failure": 254,
+      "pass": 158,
+      "unsupported": 30
+    },
+    "test/built-ins/ArrayIteratorPrototype": {
+      "pass": 46
+    },
+    "test/built-ins/AsyncDisposableStack": {
+      "semantic_failure": 202,
+      "unsupported": 6
+    },
+    "test/built-ins/AsyncFromSyncIteratorPrototype": {
+      "pass": 76
+    },
+    "test/built-ins/AsyncFunction": {
+      "pass": 34,
+      "unsupported": 2
+    },
+    "test/built-ins/AsyncGeneratorFunction": {
+      "pass": 14,
+      "semantic_failure": 28,
+      "unsupported": 4
+    },
+    "test/built-ins/AsyncGeneratorPrototype": {
+      "semantic_failure": 34,
+      "pass": 62
+    },
+    "test/built-ins/AsyncIteratorPrototype": {
+      "semantic_failure": 26
+    },
+    "test/built-ins/Atomics": {
+      "unsupported": 768,
+      "semantic_failure": 10
+    },
+    "test/built-ins/BigInt": {
+      "pass": 150,
+      "semantic_failure": 2,
+      "unsupported": 2
+    },
+    "test/built-ins/Boolean": {
+      "pass": 98,
+      "semantic_failure": 1,
+      "unsupported": 2
+    },
+    "test/built-ins/DataView": {
+      "unsupported": 80,
+      "pass": 952,
+      "semantic_failure": 88
+    },
+    "test/built-ins/Date": {
+      "pass": 1148,
+      "unsupported": 20,
+      "semantic_failure": 20
+    },
+    "test/built-ins/DisposableStack": {
+      "semantic_failure": 182,
+      "unsupported": 4
+    },
+    "test/built-ins/Error": {
+      "pass": 132,
+      "unsupported": 10,
+      "semantic_failure": 44
+    },
+    "test/built-ins/FinalizationRegistry": {
+      "pass": 92,
+      "unsupported": 2
+    },
+    "test/built-ins/Function": {
+      "pass": 831,
+      "semantic_failure": 36,
+      "unsupported": 26
+    },
+    "test/built-ins/GeneratorFunction": {
+      "pass": 42,
+      "unsupported": 4
+    },
+    "test/built-ins/GeneratorPrototype": {
+      "pass": 122
+    },
+    "test/built-ins/Infinity": {
+      "pass": 10
+    },
+    "test/built-ins/Iterator": {
+      "pass": 878,
+      "unsupported": 2,
+      "semantic_failure": 428
+    },
+    "test/built-ins/JSON": {
+      "pass": 286,
+      "semantic_failure": 42,
+      "unsupported": 4
+    },
+    "test/built-ins/Map": {
+      "semantic_failure": 8,
+      "pass": 393,
+      "unsupported": 4
+    },
+    "test/built-ins/MapIteratorPrototype": {
+      "pass": 22
+    },
+    "test/built-ins/Math": {
+      "pass": 650,
+      "unsupported": 2,
+      "semantic_failure": 2
+    },
+    "test/built-ins/NaN": {
+      "pass": 10
+    },
+    "test/built-ins/NativeErrors": {
+      "pass": 176,
+      "unsupported": 12
+    },
+    "test/built-ins/Number": {
+      "pass": 676,
+      "unsupported": 4
+    },
+    "test/built-ins/Object": {
+      "pass": 6758,
+      "semantic_failure": 40,
+      "unsupported": 4
+    },
+    "test/built-ins/Promise": {
+      "pass": 1448,
+      "semantic_failure": 8,
+      "unsupported": 2
+    },
+    "test/built-ins/Proxy": {
+      "unsupported": 82,
+      "pass": 524,
+      "semantic_failure": 1
+    },
+    "test/built-ins/Reflect": {
+      "pass": 306
+    },
+    "test/built-ins/RegExp": {
+      "pass": 3254,
+      "unsupported": 402,
+      "semantic_failure": 100
+    },
+    "test/built-ins/RegExpStringIteratorPrototype": {
+      "pass": 34
+    },
+    "test/built-ins/Set": {
+      "semantic_failure": 8,
+      "pass": 752,
+      "unsupported": 4
+    },
+    "test/built-ins/SetIteratorPrototype": {
+      "pass": 22
+    },
+    "test/built-ins/ShadowRealm": {
+      "semantic_failure": 114,
+      "unsupported": 10
+    },
+    "test/built-ins/SharedArrayBuffer": {
+      "unsupported": 208
+    },
+    "test/built-ins/String": {
+      "pass": 2393,
+      "unsupported": 39,
+      "semantic_failure": 11
+    },
+    "test/built-ins/StringIteratorPrototype": {
+      "pass": 14
+    },
+    "test/built-ins/SuppressedError": {
+      "semantic_failure": 42,
+      "unsupported": 2
+    },
+    "test/built-ins/Symbol": {
+      "unsupported": 38,
+      "semantic_failure": 12,
+      "pass": 142
+    },
+    "test/built-ins/Temporal": {
+      "semantic_failure": 9154,
+      "unsupported": 56
+    },
+    "test/built-ins/ThrowTypeError": {
+      "unsupported": 2,
+      "semantic_failure": 7,
+      "pass": 19
+    },
+    "test/built-ins/TypedArray": {
+      "semantic_failure": 660,
+      "pass": 2208,
+      "unsupported": 22
+    },
+    "test/built-ins/TypedArrayConstructors": {
+      "pass": 1268,
+      "unsupported": 150,
+      "semantic_failure": 28
+    },
+    "test/built-ins/Uint8Array": {
+      "pass": 136,
+      "semantic_failure": 4
+    },
+    "test/built-ins/WeakMap": {
+      "pass": 279,
+      "unsupported": 2
+    },
+    "test/built-ins/WeakRef": {
+      "pass": 56,
+      "unsupported": 2
+    },
+    "test/built-ins/WeakSet": {
+      "pass": 168,
+      "unsupported": 2
+    },
+    "test/built-ins/decodeURI": {
+      "pass": 110
+    },
+    "test/built-ins/decodeURIComponent": {
+      "pass": 112
+    },
+    "test/built-ins/encodeURI": {
+      "pass": 62
+    },
+    "test/built-ins/encodeURIComponent": {
+      "pass": 62
+    },
+    "test/built-ins/eval": {
+      "pass": 20
+    },
+    "test/built-ins/global": {
+      "pass": 48,
+      "semantic_failure": 8
+    },
+    "test/built-ins/isFinite": {
+      "pass": 30
+    },
+    "test/built-ins/isNaN": {
+      "pass": 30
+    },
+    "test/built-ins/parseFloat": {
+      "pass": 108
+    },
+    "test/built-ins/parseInt": {
+      "pass": 110
+    },
+    "test/built-ins/undefined": {
+      "pass": 11,
+      "semantic_failure": 1
+    },
+    "test/harness/assert-false.js": {
+      "pass": 2
+    },
+    "test/harness/assert-notsamevalue-nan.js": {
+      "pass": 2
+    },
+    "test/harness/assert-notsamevalue-notsame.js": {
+      "pass": 2
+    },
+    "test/harness/assert-notsamevalue-objects.js": {
+      "pass": 2
+    },
+    "test/harness/assert-notsamevalue-tostring.js": {
+      "pass": 2
+    },
+    "test/harness/assert-notsamevalue-zeros.js": {
+      "pass": 2
+    },
+    "test/harness/assert-obj.js": {
+      "pass": 2
+    },
+    "test/harness/assert-samevalue-nan.js": {
+      "pass": 2
+    },
+    "test/harness/assert-samevalue-objects.js": {
+      "pass": 2
+    },
+    "test/harness/assert-samevalue-same.js": {
+      "pass": 2
+    },
+    "test/harness/assert-samevalue-tostring.js": {
+      "pass": 2
+    },
+    "test/harness/assert-samevalue-zeros.js": {
+      "pass": 2
+    },
+    "test/harness/assert-throws-custom-typeerror.js": {
+      "pass": 2
+    },
+    "test/harness/assert-throws-custom.js": {
+      "pass": 2
+    },
+    "test/harness/assert-throws-incorrect-ctor.js": {
+      "pass": 2
+    },
+    "test/harness/assert-throws-native.js": {
+      "pass": 2
+    },
+    "test/harness/assert-throws-no-arg.js": {
+      "pass": 2
+    },
+    "test/harness/assert-throws-no-error.js": {
+      "pass": 2
+    },
+    "test/harness/assert-throws-null-fn.js": {
+      "pass": 2
+    },
+    "test/harness/assert-throws-null.js": {
+      "pass": 2
+    },
+    "test/harness/assert-throws-primitive.js": {
+      "pass": 2
+    },
+    "test/harness/assert-throws-same-realm.js": {
+      "semantic_failure": 2
+    },
+    "test/harness/assert-throws-single-arg.js": {
+      "pass": 2
+    },
+    "test/harness/assert-tostring.js": {
+      "pass": 2
+    },
+    "test/harness/assert-true.js": {
+      "pass": 2
+    },
+    "test/harness/assertRelativeDateMs.js": {
+      "pass": 2
+    },
+    "test/harness/asyncHelpers-asyncTest-func-throws-sync.js": {
+      "pass": 2
+    },
+    "test/harness/asyncHelpers-asyncTest-rejects-non-callable.js": {
+      "pass": 2
+    },
+    "test/harness/asyncHelpers-asyncTest-return-not-thenable.js": {
+      "pass": 2
+    },
+    "test/harness/asyncHelpers-asyncTest-returns-undefined.js": {
+      "pass": 2
+    },
+    "test/harness/asyncHelpers-asyncTest-then-rejects.js": {
+      "pass": 2
+    },
+    "test/harness/asyncHelpers-asyncTest-then-resolves.js": {
+      "pass": 2
+    },
+    "test/harness/asyncHelpers-asyncTest-without-async-flag.js": {
+      "pass": 2
+    },
+    "test/harness/asyncHelpers-throwsAsync-custom-typeerror.js": {
+      "pass": 2
+    },
+    "test/harness/asyncHelpers-throwsAsync-custom.js": {
+      "pass": 2
+    },
+    "test/harness/asyncHelpers-throwsAsync-func-never-settles.js": {
+      "pass": 2
+    },
+    "test/harness/asyncHelpers-throwsAsync-func-throws-sync.js": {
+      "pass": 2
+    },
+    "test/harness/asyncHelpers-throwsAsync-incorrect-ctor.js": {
+      "pass": 2
+    },
+    "test/harness/asyncHelpers-throwsAsync-invalid-func.js": {
+      "pass": 2
+    },
+    "test/harness/asyncHelpers-throwsAsync-native.js": {
+      "pass": 2
+    },
+    "test/harness/asyncHelpers-throwsAsync-no-arg.js": {
+      "pass": 2
+    },
+    "test/harness/asyncHelpers-throwsAsync-no-error.js": {
+      "pass": 2
+    },
+    "test/harness/asyncHelpers-throwsAsync-null.js": {
+      "pass": 2
+    },
+    "test/harness/asyncHelpers-throwsAsync-primitive.js": {
+      "pass": 2
+    },
+    "test/harness/asyncHelpers-throwsAsync-resolved-error.js": {
+      "pass": 2
+    },
+    "test/harness/asyncHelpers-throwsAsync-same-realm.js": {
+      "semantic_failure": 2
+    },
+    "test/harness/asyncHelpers-throwsAsync-single-arg.js": {
+      "pass": 2
+    },
+    "test/harness/byteConversionValues.js": {
+      "pass": 2
+    },
+    "test/harness/compare-array-arguments.js": {
+      "pass": 2
+    },
+    "test/harness/compare-array-arraylike.js": {
+      "pass": 2
+    },
+    "test/harness/compare-array-different-elements.js": {
+      "pass": 2
+    },
+    "test/harness/compare-array-different-length.js": {
+      "pass": 2
+    },
+    "test/harness/compare-array-empty.js": {
+      "pass": 2
+    },
+    "test/harness/compare-array-falsy-arguments.js": {
+      "pass": 2
+    },
+    "test/harness/compare-array-message.js": {
+      "pass": 2
+    },
+    "test/harness/compare-array-same-elements-different-order.js": {
+      "pass": 2
+    },
+    "test/harness/compare-array-same-elements-same-order.js": {
+      "pass": 2
+    },
+    "test/harness/compare-array-samevalue.js": {
+      "pass": 2
+    },
+    "test/harness/compare-array-sparse.js": {
+      "pass": 2
+    },
+    "test/harness/compare-array-symbol.js": {
+      "pass": 2
+    },
+    "test/harness/dateConstants.js": {
+      "pass": 2
+    },
+    "test/harness/decimalToHexString.js": {
+      "pass": 2
+    },
+    "test/harness/deepEqual-array.js": {
+      "unsupported": 2
+    },
+    "test/harness/deepEqual-circular.js": {
+      "unsupported": 2
+    },
+    "test/harness/deepEqual-deep.js": {
+      "unsupported": 2
+    },
+    "test/harness/deepEqual-mapset.js": {
+      "unsupported": 2
+    },
+    "test/harness/deepEqual-object.js": {
+      "unsupported": 2
+    },
+    "test/harness/deepEqual-primitives-bigint.js": {
+      "unsupported": 2
+    },
+    "test/harness/deepEqual-primitives.js": {
+      "unsupported": 2
+    },
+    "test/harness/detachArrayBuffer-host-detachArrayBuffer.js": {
+      "pass": 2
+    },
+    "test/harness/detachArrayBuffer.js": {
+      "pass": 2
+    },
+    "test/harness/fnGlobalObject.js": {
+      "pass": 2
+    },
+    "test/harness/isConstructor.js": {
+      "pass": 2
+    },
+    "test/harness/nans.js": {
+      "pass": 2
+    },
+    "test/harness/nativeFunctionMatcher.js": {
+      "pass": 2
+    },
+    "test/harness/promiseHelper.js": {
+      "pass": 2
+    },
+    "test/harness/propertyhelper-verifyconfigurable-configurable-object.js": {
+      "pass": 2
+    },
+    "test/harness/propertyhelper-verifyconfigurable-configurable.js": {
+      "pass": 2
+    },
+    "test/harness/propertyhelper-verifyconfigurable-not-configurable.js": {
+      "pass": 2
+    },
+    "test/harness/propertyhelper-verifyenumerable-enumerable-symbol.js": {
+      "pass": 2
+    },
+    "test/harness/propertyhelper-verifyenumerable-enumerable.js": {
+      "pass": 2
+    },
+    "test/harness/propertyhelper-verifyenumerable-not-enumerable-symbol.js": {
+      "pass": 2
+    },
+    "test/harness/propertyhelper-verifyenumerable-not-enumerable.js": {
+      "pass": 2
+    },
+    "test/harness/propertyhelper-verifynotconfigurable-configurable.js": {
+      "pass": 2
+    },
+    "test/harness/propertyhelper-verifynotconfigurable-not-configurable.js": {
+      "pass": 2
+    },
+    "test/harness/propertyhelper-verifynotenumerable-enumerable-symbol.js": {
+      "pass": 2
+    },
+    "test/harness/propertyhelper-verifynotenumerable-enumerable.js": {
+      "pass": 2
+    },
+    "test/harness/propertyhelper-verifynotenumerable-not-enumerable-symbol.js": {
+      "pass": 2
+    },
+    "test/harness/propertyhelper-verifynotenumerable-not-enumerable.js": {
+      "pass": 2
+    },
+    "test/harness/propertyhelper-verifynotwritable-not-writable-strict.js": {
+      "pass": 2
+    },
+    "test/harness/propertyhelper-verifynotwritable-writable.js": {
+      "pass": 2
+    },
+    "test/harness/propertyhelper-verifywritable-array-length.js": {
+      "pass": 2
+    },
+    "test/harness/propertyhelper-verifywritable-not-writable.js": {
+      "pass": 2
+    },
+    "test/harness/propertyhelper-verifywritable-writable.js": {
+      "pass": 2
+    },
+    "test/harness/proxytrapshelper-default.js": {
+      "pass": 2
+    },
+    "test/harness/proxytrapshelper-overrides.js": {
+      "pass": 2
+    },
+    "test/harness/sta.js": {
+      "pass": 2
+    },
+    "test/harness/tcoHelper.js": {
+      "pass": 2
+    },
+    "test/harness/testTypedArray-conversions-call-error.js": {
+      "pass": 2
+    },
+    "test/harness/testTypedArray-conversions.js": {
+      "pass": 2
+    },
+    "test/harness/testTypedArray.js": {
+      "pass": 2
+    },
+    "test/harness/verifyProperty-arguments.js": {
+      "pass": 2
+    },
+    "test/harness/verifyProperty-configurable-object.js": {
+      "pass": 2
+    },
+    "test/harness/verifyProperty-desc-is-not-object.js": {
+      "pass": 2
+    },
+    "test/harness/verifyProperty-noproperty.js": {
+      "pass": 2
+    },
+    "test/harness/verifyProperty-restore-accessor-symbol.js": {
+      "pass": 2
+    },
+    "test/harness/verifyProperty-restore-accessor.js": {
+      "pass": 2
+    },
+    "test/harness/verifyProperty-restore-symbol.js": {
+      "pass": 2
+    },
+    "test/harness/verifyProperty-restore.js": {
+      "pass": 2
+    },
+    "test/harness/verifyProperty-same-value.js": {
+      "pass": 2
+    },
+    "test/harness/verifyProperty-string-prop.js": {
+      "pass": 2
+    },
+    "test/harness/verifyProperty-symbol-prop.js": {
+      "pass": 2
+    },
+    "test/harness/verifyProperty-undefined-desc.js": {
+      "pass": 2
+    },
+    "test/harness/verifyProperty-value-error.js": {
+      "pass": 2
+    },
+    "test/harness/verifyProperty-value.js": {
+      "pass": 2
+    },
+    "test/harness/wellKnownIntrinsicObjects.js": {
+      "pass": 2
+    },
+    "test/intl402/Array": {
+      "pass": 2,
+      "semantic_failure": 2
+    },
+    "test/intl402/BigInt": {
+      "pass": 8,
+      "semantic_failure": 12,
+      "unsupported": 2
+    },
+    "test/intl402/Collator": {
+      "semantic_failure": 104,
+      "unsupported": 26
+    },
+    "test/intl402/Date": {
+      "semantic_failure": 6,
+      "unsupported": 2,
+      "pass": 16
+    },
+    "test/intl402/DateTimeFormat": {
+      "semantic_failure": 442,
+      "unsupported": 48
+    },
+    "test/intl402/DisplayNames": {
+      "semantic_failure": 112,
+      "unsupported": 2
+    },
+    "test/intl402/DurationFormat": {
+      "unsupported": 78,
+      "semantic_failure": 142
+    },
+    "test/intl402/FallbackSymbol": {
+      "semantic_failure": 4
+    },
+    "test/intl402/Intl": {
+      "semantic_failure": 78,
+      "unsupported": 54
+    },
+    "test/intl402/ListFormat": {
+      "unsupported": 6,
+      "semantic_failure": 156
+    },
+    "test/intl402/Locale": {
+      "semantic_failure": 376,
+      "unsupported": 4
+    },
+    "test/intl402/Number": {
+      "pass": 6,
+      "semantic_failure": 6,
+      "unsupported": 2
+    },
+    "test/intl402/NumberFormat": {
+      "semantic_failure": 398,
+      "unsupported": 104
+    },
+    "test/intl402/PluralRules": {
+      "semantic_failure": 96,
+      "unsupported": 10
+    },
+    "test/intl402/RelativeTimeFormat": {
+      "unsupported": 6,
+      "semantic_failure": 154
+    },
+    "test/intl402/Segmenter": {
+      "unsupported": 8,
+      "semantic_failure": 150
+    },
+    "test/intl402/String": {
+      "pass": 14,
+      "semantic_failure": 22,
+      "unsupported": 2
+    },
+    "test/intl402/Temporal": {
+      "semantic_failure": 3130,
+      "unsupported": 928
+    },
+    "test/intl402/TypedArray": {
+      "pass": 2
+    },
+    "test/intl402/constructors-string-and-single-element-array.js": {
+      "unsupported": 2
+    },
+    "test/intl402/constructors-taint-Object-prototype-2.js": {
+      "unsupported": 2
+    },
+    "test/intl402/constructors-taint-Object-prototype.js": {
+      "unsupported": 2
+    },
+    "test/intl402/default-locale-is-canonicalized.js": {
+      "unsupported": 2
+    },
+    "test/intl402/default-locale-is-supported.js": {
+      "unsupported": 2
+    },
+    "test/intl402/fallback-locales-are-supported.js": {
+      "unsupported": 2
+    },
+    "test/intl402/language-tags-canonicalized.js": {
+      "unsupported": 2
+    },
+    "test/intl402/language-tags-invalid.js": {
+      "unsupported": 2
+    },
+    "test/intl402/language-tags-valid.js": {
+      "unsupported": 2
+    },
+    "test/intl402/language-tags-with-underscore.js": {
+      "unsupported": 2
+    },
+    "test/intl402/supportedLocalesOf-consistent-with-resolvedOptions.js": {
+      "unsupported": 2
+    },
+    "test/intl402/supportedLocalesOf-default-locale-and-zxx-locale.js": {
+      "unsupported": 2
+    },
+    "test/intl402/supportedLocalesOf-duplicate-elements-removed.js": {
+      "unsupported": 2
+    },
+    "test/intl402/supportedLocalesOf-empty-and-undefined.js": {
+      "unsupported": 2
+    },
+    "test/intl402/supportedLocalesOf-locales-arg-coered-to-object.js": {
+      "unsupported": 2
+    },
+    "test/intl402/supportedLocalesOf-locales-arg-empty-array.js": {
+      "unsupported": 2
+    },
+    "test/intl402/supportedLocalesOf-returned-array-elements-are-not-frozen.js": {
+      "unsupported": 2
+    },
+    "test/intl402/supportedLocalesOf-taint-Array-2.js": {
+      "unsupported": 2
+    },
+    "test/intl402/supportedLocalesOf-taint-Array.js": {
+      "unsupported": 2
+    },
+    "test/intl402/supportedLocalesOf-test-option-localeMatcher.js": {
+      "unsupported": 2
+    },
+    "test/intl402/supportedLocalesOf-throws-if-element-not-string-or-object.js": {
+      "unsupported": 2
+    },
+    "test/intl402/supportedLocalesOf-unicode-extensions-ignored.js": {
+      "unsupported": 2
+    },
+    "test/language/arguments-object": {
+      "pass": 434,
+      "semantic_failure": 26
+    },
+    "test/language/asi": {
+      "pass": 204
+    },
+    "test/language/block-scope": {
+      "pass": 272,
+      "semantic_failure": 15
+    },
+    "test/language/comments": {
+      "pass": 72,
+      "semantic_failure": 5,
+      "timeout": 2,
+      "unsupported": 2
+    },
+    "test/language/computed-property-names": {
+      "pass": 96
+    },
+    "test/language/destructuring": {
+      "pass": 30,
+      "unsupported": 1,
+      "semantic_failure": 6
+    },
+    "test/language/directive-prologue": {
+      "pass": 57,
+      "semantic_failure": 5
+    },
+    "test/language/eval-code": {
+      "pass": 370,
+      "semantic_failure": 76,
+      "unsupported": 8
+    },
+    "test/language/export": {
+      "unsupported": 3
+    },
+    "test/language/expressions": {
+      "semantic_failure": 350,
+      "pass": 19469,
+      "unsupported": 1467
+    },
+    "test/language/function-code": {
+      "pass": 277,
+      "semantic_failure": 4
+    },
+    "test/language/future-reserved-words": {
+      "pass": 85
+    },
+    "test/language/global-code": {
+      "pass": 54,
+      "unsupported": 2,
+      "semantic_failure": 19
+    },
+    "test/language/identifier-resolution": {
+      "pass": 15,
+      "unsupported": 5,
+      "semantic_failure": 2
+    },
+    "test/language/identifiers": {
+      "pass": 443,
+      "unsupported": 92
+    },
+    "test/language/import": {
+      "unsupported": 123,
+      "pass": 12
+    },
+    "test/language/keywords": {
+      "pass": 50
+    },
+    "test/language/line-terminators": {
+      "pass": 59,
+      "semantic_failure": 23
+    },
+    "test/language/literals": {
+      "pass": 1009,
+      "semantic_failure": 27,
+      "timeout": 4,
+      "unsupported": 1
+    },
+    "test/language/module-code": {
+      "unsupported": 600,
+      "pass": 2
+    },
+    "test/language/punctuators": {
+      "pass": 22
+    },
+    "test/language/reserved-words": {
+      "unsupported": 1,
+      "pass": 52
+    },
+    "test/language/rest-parameters": {
+      "pass": 22
+    },
+    "test/language/source-text": {
+      "pass": 2
+    },
+    "test/language/statementList": {
+      "pass": 120,
+      "semantic_failure": 40
+    },
+    "test/language/statements": {
+      "pass": 17249,
+      "semantic_failure": 330,
+      "unsupported": 436
+    },
+    "test/language/types": {
+      "pass": 203,
+      "unsupported": 4,
+      "semantic_failure": 4
+    },
+    "test/language/white-space": {
+      "pass": 119,
+      "semantic_failure": 15
+    },
+    "test/staging/Temporal": {
+      "semantic_failure": 4
+    },
+    "test/staging/Uint8Array": {
+      "pass": 2
+    },
+    "test/staging/built-ins": {
+      "pass": 4,
+      "unsupported": 12
+    },
+    "test/staging/decorators": {
+      "pass": 2,
+      "unsupported": 4
+    },
+    "test/staging/explicit-resource-management": {
+      "unsupported": 55,
+      "semantic_failure": 40,
+      "pass": 10
+    },
+    "test/staging/set-is-subset-of-empty-index.js": {
+      "pass": 2
+    },
+    "test/staging/set-is-subset-on-set-like.js": {
+      "pass": 2
+    },
+    "test/staging/set-is-subset-table-receiver-cleared.js": {
+      "pass": 2
+    },
+    "test/staging/set-is-subset-table-transition.js": {
+      "pass": 2
+    },
+    "test/staging/set-methods": {
+      "pass": 6
+    },
+    "test/staging/sm": {
+      "pass": 1898,
+      "semantic_failure": 483,
+      "unsupported": 249,
+      "timeout": 1
+    },
+    "test/staging/source-phase-imports": {
+      "unsupported": 4
+    },
+    "test/staging/top-level-await": {
+      "unsupported": 1
+    }
+  },
+  "failure_groups": [
+    {
+      "status": "semantic_failure",
+      "phase": "runtime",
+      "reason": "runtime failure requires inspection of retained command evidence",
+      "count": 19454,
+      "examples": [
+        {
+          "test": "test/annexB/built-ins/Date/prototype/toGMTString/value.js",
+          "variant": "sloppy"
+        },
+        {
+          "test": "test/annexB/built-ins/Date/prototype/toGMTString/value.js",
+          "variant": "strict"
+        },
+        {
+          "test": "test/annexB/built-ins/Function/createdynfn-html-close-comment-body.js",
+          "variant": "sloppy"
+        },
+        {
+          "test": "test/annexB/built-ins/Function/createdynfn-html-close-comment-body.js",
+          "variant": "strict"
+        },
+        {
+          "test": "test/annexB/built-ins/Function/createdynfn-html-close-comment-params.js",
+          "variant": "sloppy"
+        },
+        {
+          "test": "test/annexB/built-ins/Function/createdynfn-html-close-comment-params.js",
+          "variant": "strict"
+        },
+        {
+          "test": "test/annexB/built-ins/Function/createdynfn-html-open-comment-body.js",
+          "variant": "sloppy"
+        },
+        {
+          "test": "test/annexB/built-ins/Function/createdynfn-html-open-comment-body.js",
+          "variant": "strict"
+        },
+        {
+          "test": "test/annexB/built-ins/Function/createdynfn-html-open-comment-params.js",
+          "variant": "sloppy"
+        },
+        {
+          "test": "test/annexB/built-ins/Function/createdynfn-html-open-comment-params.js",
+          "variant": "strict"
+        }
+      ]
+    },
+    {
+      "status": "unsupported",
+      "phase": "compile",
+      "reason": "compiler diagnostic requires review",
+      "count": 2126,
+      "examples": [
+        {
+          "test": "test/annexB/language/comments/multi-line-html-close.js",
+          "variant": "sloppy"
+        },
+        {
+          "test": "test/annexB/language/comments/multi-line-html-close.js",
+          "variant": "strict"
+        },
+        {
+          "test": "test/annexB/language/comments/single-line-html-close-asi.js",
+          "variant": "sloppy"
+        },
+        {
+          "test": "test/annexB/language/comments/single-line-html-close-asi.js",
+          "variant": "strict"
+        },
+        {
+          "test": "test/annexB/language/comments/single-line-html-close-first-line-1.js",
+          "variant": "sloppy"
+        },
+        {
+          "test": "test/annexB/language/comments/single-line-html-close-first-line-2.js",
+          "variant": "sloppy"
+        },
+        {
+          "test": "test/annexB/language/comments/single-line-html-close-first-line-3.js",
+          "variant": "sloppy"
+        },
+        {
+          "test": "test/annexB/language/comments/single-line-html-close-unicode-separators.js",
+          "variant": "sloppy"
+        },
+        {
+          "test": "test/annexB/language/comments/single-line-html-close-unicode-separators.js",
+          "variant": "strict"
+        },
+        {
+          "test": "test/annexB/language/comments/single-line-html-close.js",
+          "variant": "sloppy"
+        }
+      ]
+    },
+    {
+      "status": "unsupported",
+      "phase": "compile",
+      "reason": "function exceeds 1024 combined root/argument-slot admission limit",
+      "count": 1699,
+      "examples": [
+        {
+          "test": "test/built-ins/Array/prototype/copyWithin/resizable-buffer.js",
+          "variant": "sloppy"
+        },
+        {
+          "test": "test/built-ins/Array/prototype/copyWithin/resizable-buffer.js",
+          "variant": "strict"
+        },
+        {
+          "test": "test/built-ins/Array/prototype/includes/resizable-buffer.js",
+          "variant": "sloppy"
+        },
+        {
+          "test": "test/built-ins/Array/prototype/includes/resizable-buffer.js",
+          "variant": "strict"
+        },
+        {
+          "test": "test/built-ins/Array/prototype/indexOf/resizable-buffer.js",
+          "variant": "sloppy"
+        },
+        {
+          "test": "test/built-ins/Array/prototype/indexOf/resizable-buffer.js",
+          "variant": "strict"
+        },
+        {
+          "test": "test/built-ins/Array/prototype/lastIndexOf/resizable-buffer.js",
+          "variant": "sloppy"
+        },
+        {
+          "test": "test/built-ins/Array/prototype/lastIndexOf/resizable-buffer.js",
+          "variant": "strict"
+        },
+        {
+          "test": "test/built-ins/Array/prototype/sort/stability-2048-elements.js",
+          "variant": "sloppy"
+        },
+        {
+          "test": "test/built-ins/Array/prototype/sort/stability-2048-elements.js",
+          "variant": "strict"
+        }
+      ]
+    },
+    {
+      "status": "unsupported",
+      "phase": "host/preparation",
+      "reason": "module loading/linking/evaluation is not implemented by this runner",
+      "count": 843,
+      "examples": [
+        {
+          "test": "test/built-ins/AbstractModuleSource/length.js",
+          "variant": "module"
+        },
+        {
+          "test": "test/built-ins/AbstractModuleSource/name.js",
+          "variant": "module"
+        },
+        {
+          "test": "test/built-ins/AbstractModuleSource/proto.js",
+          "variant": "module"
+        },
+        {
+          "test": "test/built-ins/AbstractModuleSource/prototype.js",
+          "variant": "module"
+        },
+        {
+          "test": "test/built-ins/AbstractModuleSource/prototype/Symbol.toStringTag.js",
+          "variant": "module"
+        },
+        {
+          "test": "test/built-ins/AbstractModuleSource/prototype/constructor.js",
+          "variant": "module"
+        },
+        {
+          "test": "test/built-ins/AbstractModuleSource/prototype/proto.js",
+          "variant": "module"
+        },
+        {
+          "test": "test/built-ins/AbstractModuleSource/throw-from-constructor.js",
+          "variant": "module"
+        },
+        {
+          "test": "test/built-ins/Proxy/preventExtensions/trap-is-undefined-target-is-proxy.js",
+          "variant": "module"
+        },
+        {
+          "test": "test/built-ins/ShadowRealm/prototype/importValue/import-value.js",
+          "variant": "module"
+        }
+      ]
+    },
+    {
+      "status": "unsupported",
+      "phase": "host/preparation",
+      "reason": "host capability unavailable: Atomics, SharedArrayBuffer",
+      "count": 486,
+      "examples": [
+        {
+          "test": "test/built-ins/Atomics/add/bad-range.js",
+          "variant": "sloppy"
+        },
+        {
+          "test": "test/built-ins/Atomics/add/bad-range.js",
+          "variant": "strict"
+        },
+        {
+          "test": "test/built-ins/Atomics/add/bigint/bad-range.js",
+          "variant": "sloppy"
+        },
+        {
+          "test": "test/built-ins/Atomics/add/bigint/bad-range.js",
+          "variant": "strict"
+        },
+        {
+          "test": "test/built-ins/Atomics/add/bigint/good-views.js",
+          "variant": "sloppy"
+        },
+        {
+          "test": "test/built-ins/Atomics/add/bigint/good-views.js",
+          "variant": "strict"
+        },
+        {
+          "test": "test/built-ins/Atomics/add/expected-return-value.js",
+          "variant": "sloppy"
+        },
+        {
+          "test": "test/built-ins/Atomics/add/expected-return-value.js",
+          "variant": "strict"
+        },
+        {
+          "test": "test/built-ins/Atomics/add/good-views.js",
+          "variant": "sloppy"
+        },
+        {
+          "test": "test/built-ins/Atomics/add/good-views.js",
+          "variant": "strict"
+        }
+      ]
+    },
+    {
+      "status": "unsupported",
+      "phase": "host/preparation",
+      "reason": "host capability unavailable: SharedArrayBuffer",
+      "count": 436,
+      "examples": [
+        {
+          "test": "test/built-ins/ArrayBuffer/prototype/byteLength/this-is-sharedarraybuffer.js",
+          "variant": "sloppy"
+        },
+        {
+          "test": "test/built-ins/ArrayBuffer/prototype/byteLength/this-is-sharedarraybuffer.js",
+          "variant": "strict"
+        },
+        {
+          "test": "test/built-ins/ArrayBuffer/prototype/detached/this-is-sharedarraybuffer-resizable.js",
+          "variant": "sloppy"
+        },
+        {
+          "test": "test/built-ins/ArrayBuffer/prototype/detached/this-is-sharedarraybuffer-resizable.js",
+          "variant": "strict"
+        },
+        {
+          "test": "test/built-ins/ArrayBuffer/prototype/detached/this-is-sharedarraybuffer.js",
+          "variant": "sloppy"
+        },
+        {
+          "test": "test/built-ins/ArrayBuffer/prototype/detached/this-is-sharedarraybuffer.js",
+          "variant": "strict"
+        },
+        {
+          "test": "test/built-ins/ArrayBuffer/prototype/immutable/this-is-sharedarraybuffer.js",
+          "variant": "sloppy"
+        },
+        {
+          "test": "test/built-ins/ArrayBuffer/prototype/immutable/this-is-sharedarraybuffer.js",
+          "variant": "strict"
+        },
+        {
+          "test": "test/built-ins/ArrayBuffer/prototype/maxByteLength/this-is-sharedarraybuffer.js",
+          "variant": "sloppy"
+        },
+        {
+          "test": "test/built-ins/ArrayBuffer/prototype/maxByteLength/this-is-sharedarraybuffer.js",
+          "variant": "strict"
+        }
+      ]
+    },
+    {
+      "status": "unsupported",
+      "phase": "host/preparation",
+      "reason": "host capability unavailable: cross-realm",
+      "count": 390,
+      "examples": [
+        {
+          "test": "test/annexB/built-ins/RegExp/legacy-accessors/index/this-cross-realm-constructor.js",
+          "variant": "sloppy"
+        },
+        {
+          "test": "test/annexB/built-ins/RegExp/legacy-accessors/index/this-cross-realm-constructor.js",
+          "variant": "strict"
+        },
+        {
+          "test": "test/annexB/built-ins/RegExp/legacy-accessors/input/this-cross-realm-constructor.js",
+          "variant": "sloppy"
+        },
+        {
+          "test": "test/annexB/built-ins/RegExp/legacy-accessors/input/this-cross-realm-constructor.js",
+          "variant": "strict"
+        },
+        {
+          "test": "test/annexB/built-ins/RegExp/legacy-accessors/lastMatch/this-cross-realm-constructor.js",
+          "variant": "sloppy"
+        },
+        {
+          "test": "test/annexB/built-ins/RegExp/legacy-accessors/lastMatch/this-cross-realm-constructor.js",
+          "variant": "strict"
+        },
+        {
+          "test": "test/annexB/built-ins/RegExp/legacy-accessors/lastParen/this-cross-realm-constructor.js",
+          "variant": "sloppy"
+        },
+        {
+          "test": "test/annexB/built-ins/RegExp/legacy-accessors/lastParen/this-cross-realm-constructor.js",
+          "variant": "strict"
+        },
+        {
+          "test": "test/annexB/built-ins/RegExp/legacy-accessors/leftContext/this-cross-realm-constructor.js",
+          "variant": "sloppy"
+        },
+        {
+          "test": "test/annexB/built-ins/RegExp/legacy-accessors/leftContext/this-cross-realm-constructor.js",
+          "variant": "strict"
+        }
+      ]
+    },
+    {
+      "status": "unsupported",
+      "phase": "host/preparation",
+      "reason": "host capability unavailable: Atomics",
+      "count": 286,
+      "examples": [
+        {
+          "test": "test/built-ins/Atomics/Symbol.toStringTag.js",
+          "variant": "sloppy"
+        },
+        {
+          "test": "test/built-ins/Atomics/Symbol.toStringTag.js",
+          "variant": "strict"
+        },
+        {
+          "test": "test/built-ins/Atomics/add/bigint/non-shared-bufferdata.js",
+          "variant": "sloppy"
+        },
+        {
+          "test": "test/built-ins/Atomics/add/bigint/non-shared-bufferdata.js",
+          "variant": "strict"
+        },
+        {
+          "test": "test/built-ins/Atomics/add/descriptor.js",
+          "variant": "sloppy"
+        },
+        {
+          "test": "test/built-ins/Atomics/add/descriptor.js",
+          "variant": "strict"
+        },
+        {
+          "test": "test/built-ins/Atomics/add/immutable-buffer.js",
+          "variant": "sloppy"
+        },
+        {
+          "test": "test/built-ins/Atomics/add/immutable-buffer.js",
+          "variant": "strict"
+        },
+        {
+          "test": "test/built-ins/Atomics/add/length.js",
+          "variant": "sloppy"
+        },
+        {
+          "test": "test/built-ins/Atomics/add/length.js",
+          "variant": "strict"
+        }
+      ]
+    },
+    {
+      "status": "unsupported",
+      "phase": "compile",
+      "reason": "unsupported instruction",
+      "count": 218,
+      "examples": [
+        {
+          "test": "test/built-ins/AsyncDisposableStack/prototype/move/returns-new-asyncdisposablestack-that-contains-moved-resources.js",
+          "variant": "sloppy"
+        },
+        {
+          "test": "test/built-ins/AsyncDisposableStack/prototype/move/returns-new-asyncdisposablestack-that-contains-moved-resources.js",
+          "variant": "strict"
+        },
+        {
+          "test": "test/built-ins/AsyncDisposableStack/prototype/use/gets-value-Symbol.dispose-property-after-trying-Symbol.asyncDispose.js",
+          "variant": "sloppy"
+        },
+        {
+          "test": "test/built-ins/AsyncDisposableStack/prototype/use/gets-value-Symbol.dispose-property-after-trying-Symbol.asyncDispose.js",
+          "variant": "strict"
+        },
+        {
+          "test": "test/built-ins/DisposableStack/prototype/move/returns-new-disposablestack-that-contains-moved-resources.js",
+          "variant": "sloppy"
+        },
+        {
+          "test": "test/built-ins/DisposableStack/prototype/move/returns-new-disposablestack-that-contains-moved-resources.js",
+          "variant": "strict"
+        },
+        {
+          "test": "test/built-ins/RegExp/match-indices/indices-array-non-unicode-match.js",
+          "variant": "sloppy"
+        },
+        {
+          "test": "test/built-ins/RegExp/match-indices/indices-array-non-unicode-match.js",
+          "variant": "strict"
+        },
+        {
+          "test": "test/built-ins/RegExp/match-indices/indices-array-unicode-match.js",
+          "variant": "sloppy"
+        },
+        {
+          "test": "test/built-ins/RegExp/match-indices/indices-array-unicode-match.js",
+          "variant": "strict"
+        }
+      ]
+    },
+    {
+      "status": "semantic_failure",
+      "phase": "parse",
+      "reason": "stage failure requires inspection of retained command evidence",
+      "count": 144,
+      "examples": [
+        {
+          "test": "test/language/block-scope/syntax/redeclaration/async-function-name-redeclaration-attempt-with-async-function.js",
+          "variant": "sloppy"
+        },
+        {
+          "test": "test/language/block-scope/syntax/redeclaration/async-function-name-redeclaration-attempt-with-async-generator.js",
+          "variant": "sloppy"
+        },
+        {
+          "test": "test/language/block-scope/syntax/redeclaration/async-function-name-redeclaration-attempt-with-function.js",
+          "variant": "sloppy"
+        },
+        {
+          "test": "test/language/block-scope/syntax/redeclaration/async-function-name-redeclaration-attempt-with-generator.js",
+          "variant": "sloppy"
+        },
+        {
+          "test": "test/language/block-scope/syntax/redeclaration/async-generator-name-redeclaration-attempt-with-async-function.js",
+          "variant": "sloppy"
+        },
+        {
+          "test": "test/language/block-scope/syntax/redeclaration/async-generator-name-redeclaration-attempt-with-async-generator.js",
+          "variant": "sloppy"
+        },
+        {
+          "test": "test/language/block-scope/syntax/redeclaration/async-generator-name-redeclaration-attempt-with-function.js",
+          "variant": "sloppy"
+        },
+        {
+          "test": "test/language/block-scope/syntax/redeclaration/async-generator-name-redeclaration-attempt-with-generator.js",
+          "variant": "sloppy"
+        },
+        {
+          "test": "test/language/block-scope/syntax/redeclaration/function-name-redeclaration-attempt-with-async-function.js",
+          "variant": "sloppy"
+        },
+        {
+          "test": "test/language/block-scope/syntax/redeclaration/function-name-redeclaration-attempt-with-async-generator.js",
+          "variant": "sloppy"
+        }
+      ]
+    },
+    {
+      "status": "unsupported",
+      "phase": "host/preparation",
+      "reason": "host capability unavailable: IsHTMLDDA",
+      "count": 84,
+      "examples": [
+        {
+          "test": "test/annexB/built-ins/Array/from/iterator-method-emulates-undefined.js",
+          "variant": "sloppy"
+        },
+        {
+          "test": "test/annexB/built-ins/Array/from/iterator-method-emulates-undefined.js",
+          "variant": "strict"
+        },
+        {
+          "test": "test/annexB/built-ins/Object/is/emulates-undefined.js",
+          "variant": "sloppy"
+        },
+        {
+          "test": "test/annexB/built-ins/Object/is/emulates-undefined.js",
+          "variant": "strict"
+        },
+        {
+          "test": "test/annexB/built-ins/String/prototype/match/custom-matcher-emulates-undefined.js",
+          "variant": "sloppy"
+        },
+        {
+          "test": "test/annexB/built-ins/String/prototype/match/custom-matcher-emulates-undefined.js",
+          "variant": "strict"
+        },
+        {
+          "test": "test/annexB/built-ins/String/prototype/matchAll/custom-matcher-emulates-undefined.js",
+          "variant": "sloppy"
+        },
+        {
+          "test": "test/annexB/built-ins/String/prototype/matchAll/custom-matcher-emulates-undefined.js",
+          "variant": "strict"
+        },
+        {
+          "test": "test/annexB/built-ins/String/prototype/replace/custom-replacer-emulates-undefined.js",
+          "variant": "sloppy"
+        },
+        {
+          "test": "test/annexB/built-ins/String/prototype/replace/custom-replacer-emulates-undefined.js",
+          "variant": "strict"
+        }
+      ]
+    },
+    {
+      "status": "timeout",
+      "phase": "runtime",
+      "reason": "runtime failure requires inspection of retained command evidence",
+      "count": 9,
+      "examples": [
+        {
+          "test": "test/annexB/built-ins/RegExp/RegExp-leading-escape-BMP.js",
+          "variant": "strict"
+        },
+        {
+          "test": "test/annexB/built-ins/RegExp/RegExp-trailing-escape-BMP.js",
+          "variant": "strict"
+        },
+        {
+          "test": "test/language/comments/S7.4_A5.js",
+          "variant": "strict"
+        },
+        {
+          "test": "test/language/comments/S7.4_A6.js",
+          "variant": "strict"
+        },
+        {
+          "test": "test/language/literals/regexp/S7.8.5_A1.1_T2.js",
+          "variant": "strict"
+        },
+        {
+          "test": "test/language/literals/regexp/S7.8.5_A1.4_T2.js",
+          "variant": "strict"
+        },
+        {
+          "test": "test/language/literals/regexp/S7.8.5_A2.1_T2.js",
+          "variant": "strict"
+        },
+        {
+          "test": "test/language/literals/regexp/S7.8.5_A2.4_T2.js",
+          "variant": "strict"
+        },
+        {
+          "test": "test/staging/sm/regress/regress-610026.js",
+          "variant": "strict"
+        }
+      ]
+    },
+    {
+      "status": "unsupported",
+      "phase": "compile",
+      "reason": "direct eval in a derived constructor is not supported",
+      "count": 8,
+      "examples": [
+        {
+          "test": "test/staging/sm/class/derivedConstructorArrowEvalGetThis.js",
+          "variant": "sloppy"
+        },
+        {
+          "test": "test/staging/sm/class/derivedConstructorArrowEvalGetThis.js",
+          "variant": "strict"
+        },
+        {
+          "test": "test/staging/sm/class/derivedConstructorArrowEvalNestedSuperCall.js",
+          "variant": "sloppy"
+        },
+        {
+          "test": "test/staging/sm/class/derivedConstructorArrowEvalNestedSuperCall.js",
+          "variant": "strict"
+        },
+        {
+          "test": "test/staging/sm/class/derivedConstructorArrowEvalSuperCall.js",
+          "variant": "sloppy"
+        },
+        {
+          "test": "test/staging/sm/class/derivedConstructorArrowEvalSuperCall.js",
+          "variant": "strict"
+        },
+        {
+          "test": "test/staging/sm/class/uninitializedThisError.js",
+          "variant": "sloppy"
+        },
+        {
+          "test": "test/staging/sm/class/uninitializedThisError.js",
+          "variant": "strict"
+        }
+      ]
+    },
+    {
+      "status": "unsupported",
+      "phase": "host/preparation",
+      "reason": "host capability unavailable: SharedArrayBuffer, cross-realm",
+      "count": 8,
+      "examples": [
+        {
+          "test": "test/built-ins/DataView/proto-from-ctor-realm-sab.js",
+          "variant": "sloppy"
+        },
+        {
+          "test": "test/built-ins/DataView/proto-from-ctor-realm-sab.js",
+          "variant": "strict"
+        },
+        {
+          "test": "test/built-ins/SharedArrayBuffer/proto-from-ctor-realm.js",
+          "variant": "sloppy"
+        },
+        {
+          "test": "test/built-ins/SharedArrayBuffer/proto-from-ctor-realm.js",
+          "variant": "strict"
+        },
+        {
+          "test": "test/built-ins/TypedArrayConstructors/ctors-bigint/buffer-arg/proto-from-ctor-realm-sab.js",
+          "variant": "sloppy"
+        },
+        {
+          "test": "test/built-ins/TypedArrayConstructors/ctors-bigint/buffer-arg/proto-from-ctor-realm-sab.js",
+          "variant": "strict"
+        },
+        {
+          "test": "test/built-ins/TypedArrayConstructors/ctors/buffer-arg/proto-from-ctor-realm-sab.js",
+          "variant": "sloppy"
+        },
+        {
+          "test": "test/built-ins/TypedArrayConstructors/ctors/buffer-arg/proto-from-ctor-realm-sab.js",
+          "variant": "strict"
+        }
+      ]
+    }
+  ],
+  "feature_ledger": {
+    "AggregateError": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "pass": 60,
+        "unsupported": 2
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "Array.fromAsync": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "semantic_failure": 186
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "Array.prototype.at": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "semantic_failure": 2,
+        "pass": 22
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "Array.prototype.flat": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "pass": 24,
+        "semantic_failure": 6
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "Array.prototype.flatMap": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "pass": 27,
+        "semantic_failure": 14
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "Array.prototype.includes": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "pass": 70,
+        "semantic_failure": 38,
+        "unsupported": 30
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "Array.prototype.values": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "pass": 8
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "ArrayBuffer": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "semantic_failure": 140,
+        "pass": 196,
+        "unsupported": 220
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "Atomics": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "unsupported": 772
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "Atomics.pause": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "semantic_failure": 10
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "Atomics.waitAsync": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "unsupported": 202
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "BigInt": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "pass": 2098,
+        "semantic_failure": 578,
+        "unsupported": 315
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "DataView": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "pass": 198,
+        "semantic_failure": 76,
+        "unsupported": 112
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "DataView.prototype.getFloat32": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "pass": 14
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "DataView.prototype.getFloat64": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "pass": 10
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "DataView.prototype.getInt16": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "pass": 14
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "DataView.prototype.getInt32": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "pass": 14
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "DataView.prototype.getInt8": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "pass": 10
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "DataView.prototype.getUint16": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "pass": 14
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "DataView.prototype.getUint32": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "pass": 14
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "DataView.prototype.setUint8": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "pass": 112
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "Error.isError": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "pass": 22,
+        "unsupported": 4
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "FinalizationRegistry": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "pass": 96,
+        "unsupported": 2
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "Float16Array": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "pass": 96,
+        "semantic_failure": 6
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "Float32Array": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "unsupported": 8,
+        "pass": 4,
+        "semantic_failure": 2
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "Float64Array": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "unsupported": 8,
+        "pass": 4,
+        "semantic_failure": 2
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "Int16Array": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "pass": 4
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "Int32Array": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "pass": 8
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "Int8Array": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "pass": 56,
+        "semantic_failure": 10,
+        "unsupported": 10
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "Intl-enumeration": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "semantic_failure": 50,
+        "unsupported": 20
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "Intl.DateTimeFormat-datetimestyle": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "semantic_failure": 32
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "Intl.DateTimeFormat-dayPeriod": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "semantic_failure": 22,
+        "unsupported": 2
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "Intl.DateTimeFormat-extend-timezonename": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "semantic_failure": 4
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "Intl.DateTimeFormat-formatRange": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "semantic_failure": 70,
+        "unsupported": 4
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "Intl.DateTimeFormat-fractionalSecondDigits": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "semantic_failure": 18,
+        "unsupported": 2
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "Intl.DisplayNames": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "semantic_failure": 92,
+        "unsupported": 2
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "Intl.DisplayNames-v2": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "semantic_failure": 22,
+        "unsupported": 2
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "Intl.DurationFormat": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "unsupported": 78,
+        "semantic_failure": 144
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "Intl.Era-monthcode": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "semantic_failure": 2203,
+        "unsupported": 929
+      },
+      "pinned_catalog_category": "proposed"
+    },
+    "Intl.ListFormat": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "unsupported": 6,
+        "semantic_failure": 156
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "Intl.Locale": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "semantic_failure": 384,
+        "unsupported": 4
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "Intl.Locale-info": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "semantic_failure": 154
+      },
+      "pinned_catalog_category": "proposed"
+    },
+    "Intl.NumberFormat-unified": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "semantic_failure": 132,
+        "unsupported": 4
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "Intl.NumberFormat-v3": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "semantic_failure": 136,
+        "unsupported": 62
+      },
+      "pinned_catalog_category": "proposed"
+    },
+    "Intl.RelativeTimeFormat": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "unsupported": 8,
+        "semantic_failure": 150
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "Intl.Segmenter": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "unsupported": 8,
+        "semantic_failure": 150
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "IsHTMLDDA": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "unsupported": 84
+      },
+      "pinned_catalog_category": "test-harness"
+    },
+    "Iterator.prototype.join": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "semantic_failure": 32,
+        "pass": 4
+      },
+      "pinned_catalog_category": "proposed"
+    },
+    "Map": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "pass": 80
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "Math.sumPrecise": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "pass": 18,
+        "semantic_failure": 2
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "Object.fromEntries": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "pass": 50
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "Object.hasOwn": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "pass": 124
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "Object.is": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "pass": 4
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "Promise": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "pass": 8
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "Promise.allSettled": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "pass": 204
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "Promise.any": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "pass": 184
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "Promise.prototype.finally": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "pass": 58
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "Proxy": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "pass": 782,
+        "semantic_failure": 51,
+        "unsupported": 100
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "Reflect": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "unsupported": 199,
+        "semantic_failure": 52,
+        "pass": 682
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "Reflect.construct": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "pass": 948,
+        "semantic_failure": 410,
+        "unsupported": 50
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "Reflect.set": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "unsupported": 2,
+        "semantic_failure": 4,
+        "pass": 86
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "Reflect.setPrototypeOf": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "semantic_failure": 6,
+        "pass": 40
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "RegExp.escape": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "unsupported": 4,
+        "pass": 38
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "Set": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "pass": 76
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "ShadowRealm": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "semantic_failure": 114,
+        "unsupported": 10
+      },
+      "pinned_catalog_category": "proposed"
+    },
+    "SharedArrayBuffer": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "unsupported": 930
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "String.fromCodePoint": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "unsupported": 24,
+        "pass": 20
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "String.prototype.at": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "pass": 22
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "String.prototype.endsWith": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "pass": 54
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "String.prototype.includes": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "pass": 52
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "String.prototype.isWellFormed": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "pass": 16
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "String.prototype.matchAll": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "unsupported": 2,
+        "pass": 30
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "String.prototype.replaceAll": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "unsupported": 2,
+        "pass": 80
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "String.prototype.toWellFormed": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "pass": 16
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "String.prototype.trimEnd": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "pass": 48
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "String.prototype.trimStart": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "pass": 46
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "Symbol": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "pass": 1761,
+        "semantic_failure": 846,
+        "unsupported": 345
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "Symbol.asyncIterator": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "semantic_failure": 8,
+        "unsupported": 2,
+        "pass": 1066
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "Symbol.hasInstance": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "pass": 30,
+        "semantic_failure": 2,
+        "unsupported": 2
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "Symbol.isConcatSpreadable": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "pass": 61,
+        "semantic_failure": 4,
+        "unsupported": 2
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "Symbol.iterator": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "unsupported": 24,
+        "pass": 3688,
+        "semantic_failure": 8
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "Symbol.match": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "semantic_failure": 8,
+        "unsupported": 6,
+        "pass": 162
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "Symbol.matchAll": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "unsupported": 6,
+        "pass": 108,
+        "semantic_failure": 12
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "Symbol.prototype.description": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "pass": 16
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "Symbol.replace": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "unsupported": 8,
+        "pass": 180,
+        "semantic_failure": 6
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "Symbol.search": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "unsupported": 8,
+        "pass": 64,
+        "semantic_failure": 2
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "Symbol.species": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "semantic_failure": 416,
+        "unsupported": 42,
+        "pass": 110
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "Symbol.split": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "semantic_failure": 48,
+        "unsupported": 8,
+        "pass": 60
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "Symbol.toPrimitive": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "pass": 380,
+        "semantic_failure": 6,
+        "unsupported": 80
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "Symbol.toStringTag": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "pass": 132,
+        "semantic_failure": 66,
+        "unsupported": 47
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "Symbol.unscopables": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "semantic_failure": 15,
+        "unsupported": 38,
+        "pass": 1
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "Temporal": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "semantic_failure": 12442,
+        "unsupported": 990
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "TypedArray": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "unsupported": 810,
+        "semantic_failure": 524,
+        "pass": 3680
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "TypedArray.prototype.at": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "semantic_failure": 4,
+        "pass": 22
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "Uint16Array": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "unsupported": 8,
+        "pass": 4
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "Uint32Array": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "pass": 4
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "Uint8Array": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "semantic_failure": 4,
+        "unsupported": 8,
+        "pass": 14
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "Uint8ClampedArray": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "unsupported": 8,
+        "pass": 4
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "WeakMap": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "pass": 157
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "WeakRef": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "pass": 68,
+        "unsupported": 6
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "WeakSet": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "pass": 68
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "__getter__": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "pass": 54
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "__proto__": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "semantic_failure": 4,
+        "pass": 36
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "__setter__": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "pass": 54
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "align-detached-buffer-semantics-with-web-reality": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "pass": 238,
+        "unsupported": 28,
+        "semantic_failure": 24
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "arbitrary-module-namespace-names": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "unsupported": 16
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "array-find-from-last": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "semantic_failure": 10,
+        "pass": 196
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "array-grouping": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "pass": 56
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "arraybuffer-transfer": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "pass": 18,
+        "unsupported": 8,
+        "semantic_failure": 92
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "arrow-function": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "pass": 1176,
+        "semantic_failure": 454,
+        "unsupported": 170
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "async-functions": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "pass": 1183,
+        "unsupported": 110,
+        "semantic_failure": 15
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "async-iteration": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "unsupported": 115,
+        "pass": 9537,
+        "semantic_failure": 143
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "await-dictionary": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "pass": 178
+      },
+      "pinned_catalog_category": "proposed"
+    },
+    "caller": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "semantic_failure": 23
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "canonical-tz": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "semantic_failure": 37,
+        "unsupported": 1
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "change-array-by-copy": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "semantic_failure": 86,
+        "pass": 188
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "class": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "semantic_failure": 184,
+        "pass": 9082,
+        "unsupported": 160
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "class-fields-private": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "pass": 2140,
+        "semantic_failure": 43,
+        "unsupported": 65
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "class-fields-private-in": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "pass": 38
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "class-fields-public": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "pass": 4011,
+        "unsupported": 5,
+        "semantic_failure": 83
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "class-methods-private": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "pass": 3377,
+        "semantic_failure": 15,
+        "unsupported": 9
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "class-static-block": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "pass": 128,
+        "unsupported": 2
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "class-static-fields-private": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "pass": 681,
+        "semantic_failure": 3,
+        "unsupported": 2
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "class-static-fields-public": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "pass": 416,
+        "unsupported": 5
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "class-static-methods-private": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "pass": 2997,
+        "semantic_failure": 9,
+        "unsupported": 3
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "coalesce-expression": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "unsupported": 2,
+        "pass": 46,
+        "semantic_failure": 2
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "computed-property-names": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "unsupported": 51,
+        "pass": 895
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "const": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "semantic_failure": 2,
+        "pass": 26,
+        "unsupported": 1
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "cross-realm": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "unsupported": 398
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "decorators": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "unsupported": 42,
+        "pass": 6
+      },
+      "pinned_catalog_category": "proposed"
+    },
+    "default-parameters": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "unsupported": 2,
+        "pass": 4514
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "destructuring-assignment": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "pass": 213,
+        "unsupported": 4
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "destructuring-binding": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "unsupported": 20,
+        "pass": 13107,
+        "semantic_failure": 10
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "dynamic-import": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "unsupported": 1188,
+        "semantic_failure": 80,
+        "pass": 639
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "error-cause": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "pass": 10
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "error-stack-accessor": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "unsupported": 4,
+        "pass": 22,
+        "semantic_failure": 44
+      },
+      "pinned_catalog_category": "proposed"
+    },
+    "explicit-resource-management": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "semantic_failure": 502,
+        "unsupported": 307,
+        "pass": 138
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "exponentiation": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "pass": 194,
+        "semantic_failure": 10,
+        "unsupported": 4
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "export-star-as-namespace-from-module": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "unsupported": 23
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "for-in-order": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "pass": 16,
+        "semantic_failure": 2
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "for-of": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "pass": 10
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "generators": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "semantic_failure": 94,
+        "unsupported": 48,
+        "pass": 7933
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "globalThis": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "pass": 126,
+        "unsupported": 35,
+        "semantic_failure": 4
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "hashbang": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "pass": 31,
+        "semantic_failure": 2,
+        "unsupported": 2
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "host-gc-required": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "pass": 6,
+        "unsupported": 3,
+        "semantic_failure": 19
+      },
+      "pinned_catalog_category": "test-harness"
+    },
+    "immutable-arraybuffer": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "semantic_failure": 92,
+        "unsupported": 33,
+        "pass": 2
+      },
+      "pinned_catalog_category": "proposed"
+    },
+    "import-attributes": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "unsupported": 159,
+        "pass": 1
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "import-bytes": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "unsupported": 5
+      },
+      "pinned_catalog_category": "proposed"
+    },
+    "import-defer": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "unsupported": 216,
+        "pass": 172
+      },
+      "pinned_catalog_category": "proposed"
+    },
+    "import-text": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "unsupported": 7
+      },
+      "pinned_catalog_category": "proposed"
+    },
+    "import.meta": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "unsupported": 18,
+        "pass": 10
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "intl-normative-optional": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "semantic_failure": 16
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "iterator-chunking": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "semantic_failure": 138,
+        "pass": 18
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "iterator-helpers": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "pass": 1090,
+        "unsupported": 10,
+        "semantic_failure": 34
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "iterator-includes": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "semantic_failure": 80,
+        "pass": 8
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "iterator-sequencing": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "pass": 64
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "joint-iteration": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "semantic_failure": 154,
+        "pass": 10
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "json-modules": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "unsupported": 15
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "json-parse-with-source": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "semantic_failure": 44
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "json-superset": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "semantic_failure": 2,
+        "pass": 6
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "legacy-regexp": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "pass": 12,
+        "unsupported": 14,
+        "semantic_failure": 26
+      },
+      "pinned_catalog_category": "proposed"
+    },
+    "let": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "semantic_failure": 7,
+        "pass": 114,
+        "unsupported": 10
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "logical-assignment-operators": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "unsupported": 6,
+        "pass": 186
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "new.target": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "pass": 119,
+        "semantic_failure": 1,
+        "unsupported": 5
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "nonextensible-applies-to-private": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "unsupported": 1,
+        "semantic_failure": 3
+      },
+      "pinned_catalog_category": "proposed"
+    },
+    "numeric-separator-literal": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "pass": 318
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "object-rest": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "pass": 706,
+        "semantic_failure": 6,
+        "unsupported": 1
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "object-spread": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "pass": 238
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "optional-catch-binding": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "pass": 10
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "optional-chaining": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "pass": 106,
+        "unsupported": 4,
+        "semantic_failure": 2
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "promise-try": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "pass": 26,
+        "semantic_failure": 4
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "promise-with-resolvers": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "pass": 12,
+        "unsupported": 4
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "proxy-missing-checks": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "pass": 6
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "regexp-dotall": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "semantic_failure": 2,
+        "pass": 28,
+        "unsupported": 4
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "regexp-duplicate-named-groups": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "semantic_failure": 4,
+        "unsupported": 34
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "regexp-lookbehind": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "pass": 38
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "regexp-match-indices": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "pass": 48,
+        "unsupported": 14
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "regexp-modifiers": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "pass": 460
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "regexp-named-groups": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "pass": 196,
+        "unsupported": 4
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "regexp-unicode-property-escapes": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "pass": 1134,
+        "unsupported": 226,
+        "semantic_failure": 2
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "regexp-v-flag": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "pass": 102,
+        "unsupported": 260,
+        "semantic_failure": 12
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "resizable-arraybuffer": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "semantic_failure": 776,
+        "unsupported": 126,
+        "pass": 40
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "rest-parameters": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "pass": 192
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "set-methods": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "pass": 386
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "source-phase-imports": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "unsupported": 195,
+        "pass": 280
+      },
+      "pinned_catalog_category": "proposed"
+    },
+    "source-phase-imports-module-source": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "pass": 120,
+        "unsupported": 85
+      },
+      "pinned_catalog_category": "proposed"
+    },
+    "stable-array-sort": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "pass": 4,
+        "unsupported": 4
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "stable-typedarray-sort": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "pass": 2
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "string-trimming": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "pass": 108
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "super": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "pass": 36,
+        "semantic_failure": 2
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "symbols-as-weakmap-keys": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "pass": 57
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "tail-call-optimization": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "semantic_failure": 32,
+        "unsupported": 3
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "template": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "unsupported": 2
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "top-level-await": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "unsupported": 277,
+        "pass": 2
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "u180e": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "pass": 46,
+        "semantic_failure": 4
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "uint8array-base64": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "pass": 138,
+        "semantic_failure": 4
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "upsert": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "pass": 142
+      },
+      "pinned_catalog_category": "standard"
+    },
+    "well-formed-json-stringify": {
+      "edition_membership": "unreviewed",
+      "counts": {
+        "pass": 2
+      },
+      "pinned_catalog_category": "standard"
+    }
+  },
+  "edition_note": "Feature labels alone do not establish edition membership; all entries require review.",
+  "feature_catalog_sha256": "2f8dfa3d3ba98ae4618692c30f7c365069fb55d5899add707f50749f648ba039",
+  "host_reference_candidates": {
+    "AbstractModuleSource": {
+      "count": 13,
+      "examples": [
+        {
+          "test": "test/built-ins/AbstractModuleSource/length.js",
+          "variant": "module",
+          "status": "unsupported"
+        },
+        {
+          "test": "test/built-ins/AbstractModuleSource/name.js",
+          "variant": "module",
+          "status": "unsupported"
+        },
+        {
+          "test": "test/built-ins/AbstractModuleSource/proto.js",
+          "variant": "module",
+          "status": "unsupported"
+        },
+        {
+          "test": "test/built-ins/AbstractModuleSource/prototype.js",
+          "variant": "module",
+          "status": "unsupported"
+        },
+        {
+          "test": "test/built-ins/AbstractModuleSource/prototype/Symbol.toStringTag.js",
+          "variant": "module",
+          "status": "unsupported"
+        },
+        {
+          "test": "test/built-ins/AbstractModuleSource/prototype/constructor.js",
+          "variant": "module",
+          "status": "unsupported"
+        },
+        {
+          "test": "test/built-ins/AbstractModuleSource/prototype/proto.js",
+          "variant": "module",
+          "status": "unsupported"
+        },
+        {
+          "test": "test/built-ins/AbstractModuleSource/throw-from-constructor.js",
+          "variant": "module",
+          "status": "unsupported"
+        },
+        {
+          "test": "test/language/module-code/ambiguous-export-bindings/namespace-unambiguous-if-import-source-and-export.js",
+          "variant": "module",
+          "status": "unsupported"
+        },
+        {
+          "test": "test/language/module-code/source-phase-import/reexport-source-binding-named-import.js",
+          "variant": "module",
+          "status": "unsupported"
+        }
+      ]
+    },
+    "IsHTMLDDA": {
+      "count": 84,
+      "examples": [
+        {
+          "test": "test/annexB/built-ins/Array/from/iterator-method-emulates-undefined.js",
+          "variant": "sloppy",
+          "status": "unsupported"
+        },
+        {
+          "test": "test/annexB/built-ins/Array/from/iterator-method-emulates-undefined.js",
+          "variant": "strict",
+          "status": "unsupported"
+        },
+        {
+          "test": "test/annexB/built-ins/Object/is/emulates-undefined.js",
+          "variant": "sloppy",
+          "status": "unsupported"
+        },
+        {
+          "test": "test/annexB/built-ins/Object/is/emulates-undefined.js",
+          "variant": "strict",
+          "status": "unsupported"
+        },
+        {
+          "test": "test/annexB/built-ins/String/prototype/match/custom-matcher-emulates-undefined.js",
+          "variant": "sloppy",
+          "status": "unsupported"
+        },
+        {
+          "test": "test/annexB/built-ins/String/prototype/match/custom-matcher-emulates-undefined.js",
+          "variant": "strict",
+          "status": "unsupported"
+        },
+        {
+          "test": "test/annexB/built-ins/String/prototype/matchAll/custom-matcher-emulates-undefined.js",
+          "variant": "sloppy",
+          "status": "unsupported"
+        },
+        {
+          "test": "test/annexB/built-ins/String/prototype/matchAll/custom-matcher-emulates-undefined.js",
+          "variant": "strict",
+          "status": "unsupported"
+        },
+        {
+          "test": "test/annexB/built-ins/String/prototype/replace/custom-replacer-emulates-undefined.js",
+          "variant": "sloppy",
+          "status": "unsupported"
+        },
+        {
+          "test": "test/annexB/built-ins/String/prototype/replace/custom-replacer-emulates-undefined.js",
+          "variant": "strict",
+          "status": "unsupported"
+        }
+      ]
+    },
+    "agent": {
+      "count": 224,
+      "examples": [
+        {
+          "test": "test/built-ins/Atomics/notify/bigint/notify-all-on-loc.js",
+          "variant": "sloppy",
+          "status": "unsupported"
+        },
+        {
+          "test": "test/built-ins/Atomics/notify/bigint/notify-all-on-loc.js",
+          "variant": "strict",
+          "status": "unsupported"
+        },
+        {
+          "test": "test/built-ins/Atomics/notify/count-defaults-to-infinity-missing.js",
+          "variant": "sloppy",
+          "status": "unsupported"
+        },
+        {
+          "test": "test/built-ins/Atomics/notify/count-defaults-to-infinity-missing.js",
+          "variant": "strict",
+          "status": "unsupported"
+        },
+        {
+          "test": "test/built-ins/Atomics/notify/count-defaults-to-infinity-undefined.js",
+          "variant": "sloppy",
+          "status": "unsupported"
+        },
+        {
+          "test": "test/built-ins/Atomics/notify/count-defaults-to-infinity-undefined.js",
+          "variant": "strict",
+          "status": "unsupported"
+        },
+        {
+          "test": "test/built-ins/Atomics/notify/negative-count.js",
+          "variant": "sloppy",
+          "status": "unsupported"
+        },
+        {
+          "test": "test/built-ins/Atomics/notify/negative-count.js",
+          "variant": "strict",
+          "status": "unsupported"
+        },
+        {
+          "test": "test/built-ins/Atomics/notify/notify-all-on-loc.js",
+          "variant": "sloppy",
+          "status": "unsupported"
+        },
+        {
+          "test": "test/built-ins/Atomics/notify/notify-all-on-loc.js",
+          "variant": "strict",
+          "status": "unsupported"
+        }
+      ]
+    },
+    "createRealm": {
+      "count": 551,
+      "examples": [
+        {
+          "test": "test/annexB/built-ins/RegExp/legacy-accessors/index/this-cross-realm-constructor.js",
+          "variant": "sloppy",
+          "status": "unsupported"
+        },
+        {
+          "test": "test/annexB/built-ins/RegExp/legacy-accessors/index/this-cross-realm-constructor.js",
+          "variant": "strict",
+          "status": "unsupported"
+        },
+        {
+          "test": "test/annexB/built-ins/RegExp/legacy-accessors/input/this-cross-realm-constructor.js",
+          "variant": "sloppy",
+          "status": "unsupported"
+        },
+        {
+          "test": "test/annexB/built-ins/RegExp/legacy-accessors/input/this-cross-realm-constructor.js",
+          "variant": "strict",
+          "status": "unsupported"
+        },
+        {
+          "test": "test/annexB/built-ins/RegExp/legacy-accessors/lastMatch/this-cross-realm-constructor.js",
+          "variant": "sloppy",
+          "status": "unsupported"
+        },
+        {
+          "test": "test/annexB/built-ins/RegExp/legacy-accessors/lastMatch/this-cross-realm-constructor.js",
+          "variant": "strict",
+          "status": "unsupported"
+        },
+        {
+          "test": "test/annexB/built-ins/RegExp/legacy-accessors/lastParen/this-cross-realm-constructor.js",
+          "variant": "sloppy",
+          "status": "unsupported"
+        },
+        {
+          "test": "test/annexB/built-ins/RegExp/legacy-accessors/lastParen/this-cross-realm-constructor.js",
+          "variant": "strict",
+          "status": "unsupported"
+        },
+        {
+          "test": "test/annexB/built-ins/RegExp/legacy-accessors/leftContext/this-cross-realm-constructor.js",
+          "variant": "sloppy",
+          "status": "unsupported"
+        },
+        {
+          "test": "test/annexB/built-ins/RegExp/legacy-accessors/leftContext/this-cross-realm-constructor.js",
+          "variant": "strict",
+          "status": "unsupported"
+        }
+      ]
+    },
+    "detachArrayBuffer": {
+      "count": 70,
+      "examples": [
+        {
+          "test": "test/built-ins/ArrayBuffer/prototype/immutable/return-immutable.js",
+          "variant": "sloppy",
+          "status": "semantic_failure"
+        },
+        {
+          "test": "test/built-ins/ArrayBuffer/prototype/immutable/return-immutable.js",
+          "variant": "strict",
+          "status": "semantic_failure"
+        },
+        {
+          "test": "test/built-ins/ArrayBuffer/prototype/maxByteLength/detached-buffer.js",
+          "variant": "sloppy",
+          "status": "semantic_failure"
+        },
+        {
+          "test": "test/built-ins/ArrayBuffer/prototype/maxByteLength/detached-buffer.js",
+          "variant": "strict",
+          "status": "semantic_failure"
+        },
+        {
+          "test": "test/built-ins/ArrayBuffer/prototype/resizable/detached-buffer.js",
+          "variant": "sloppy",
+          "status": "semantic_failure"
+        },
+        {
+          "test": "test/built-ins/ArrayBuffer/prototype/resizable/detached-buffer.js",
+          "variant": "strict",
+          "status": "semantic_failure"
+        },
+        {
+          "test": "test/built-ins/ArrayBuffer/prototype/resize/coerced-new-length-detach.js",
+          "variant": "sloppy",
+          "status": "semantic_failure"
+        },
+        {
+          "test": "test/built-ins/ArrayBuffer/prototype/resize/coerced-new-length-detach.js",
+          "variant": "strict",
+          "status": "semantic_failure"
+        },
+        {
+          "test": "test/built-ins/ArrayBuffer/prototype/resize/this-is-detached.js",
+          "variant": "sloppy",
+          "status": "semantic_failure"
+        },
+        {
+          "test": "test/built-ins/ArrayBuffer/prototype/resize/this-is-detached.js",
+          "variant": "strict",
+          "status": "semantic_failure"
+        }
+      ]
+    },
+    "evalScript": {
+      "count": 28,
+      "examples": [
+        {
+          "test": "test/annexB/language/eval-code/direct/script-decl-lex-no-collision.js",
+          "variant": "sloppy",
+          "status": "semantic_failure"
+        },
+        {
+          "test": "test/annexB/language/eval-code/direct/script-decl-lex-no-collision.js",
+          "variant": "strict",
+          "status": "semantic_failure"
+        },
+        {
+          "test": "test/annexB/language/global-code/block-decl-global-existing-non-enumerable-global-init.js",
+          "variant": "sloppy",
+          "status": "semantic_failure"
+        },
+        {
+          "test": "test/annexB/language/global-code/if-decl-else-decl-a-global-existing-non-enumerable-global-init.js",
+          "variant": "sloppy",
+          "status": "semantic_failure"
+        },
+        {
+          "test": "test/annexB/language/global-code/if-decl-else-decl-b-global-existing-non-enumerable-global-init.js",
+          "variant": "sloppy",
+          "status": "semantic_failure"
+        },
+        {
+          "test": "test/annexB/language/global-code/if-decl-else-stmt-global-existing-non-enumerable-global-init.js",
+          "variant": "sloppy",
+          "status": "semantic_failure"
+        },
+        {
+          "test": "test/annexB/language/global-code/if-decl-no-else-global-existing-non-enumerable-global-init.js",
+          "variant": "sloppy",
+          "status": "semantic_failure"
+        },
+        {
+          "test": "test/annexB/language/global-code/if-stmt-else-decl-global-existing-non-enumerable-global-init.js",
+          "variant": "sloppy",
+          "status": "semantic_failure"
+        },
+        {
+          "test": "test/annexB/language/global-code/script-decl-lex-collision.js",
+          "variant": "sloppy",
+          "status": "semantic_failure"
+        },
+        {
+          "test": "test/annexB/language/global-code/switch-case-global-existing-non-enumerable-global-init.js",
+          "variant": "sloppy",
+          "status": "semantic_failure"
+        }
+      ]
+    },
+    "gc": {
+      "count": 22,
+      "examples": [
+        {
+          "test": "test/staging/sm/extensions/dataview.js",
+          "variant": "sloppy",
+          "status": "unsupported"
+        },
+        {
+          "test": "test/staging/sm/extensions/dataview.js",
+          "variant": "strict",
+          "status": "unsupported"
+        },
+        {
+          "test": "test/staging/sm/extensions/recursion.js",
+          "variant": "sloppy",
+          "status": "semantic_failure"
+        },
+        {
+          "test": "test/staging/sm/extensions/regress-650753.js",
+          "variant": "sloppy",
+          "status": "semantic_failure"
+        },
+        {
+          "test": "test/staging/sm/extensions/regress-650753.js",
+          "variant": "strict",
+          "status": "semantic_failure"
+        },
+        {
+          "test": "test/staging/sm/extensions/typedarray-set-detach.js",
+          "variant": "sloppy",
+          "status": "semantic_failure"
+        },
+        {
+          "test": "test/staging/sm/extensions/typedarray-set-detach.js",
+          "variant": "strict",
+          "status": "semantic_failure"
+        },
+        {
+          "test": "test/staging/sm/extensions/weakmap.js",
+          "variant": "sloppy",
+          "status": "semantic_failure"
+        },
+        {
+          "test": "test/staging/sm/extensions/weakmap.js",
+          "variant": "strict",
+          "status": "semantic_failure"
+        },
+        {
+          "test": "test/staging/sm/generators/gen-with-call-obj.js",
+          "variant": "sloppy",
+          "status": "semantic_failure"
+        }
+      ]
+    }
+  },
+  "host_reference_note": "Textual references in failing source or harness are triage candidates, not proof of invocation or automatic result reclassification.",
+  "experiment": {
+    "complete": true,
+    "scope": "explicit selection; not full ECMAScript conformance",
+    "suite_revision": "0b4e0812022b18236b5276d2804948fdd9f71603",
+    "specification": "https://tc39.es/ecma262/2026/multipage/",
+    "selection": [
+      "test"
+    ],
+    "hermes_opt": "O0",
+    "llvm_opt": "0",
+    "partition": {
+      "count": 1,
+      "index": 0,
+      "selected_files_before_partition": 53909,
+      "selected_files": 53909
+    },
+    "execution": {
+      "jobs": 16,
+      "checkpoint_every": 2000,
+      "compact": true
+    },
+    "planned_variants": 102992,
+    "counts": {
+      "unsupported": 6584,
+      "pass": 76801,
+      "semantic_failure": 19598,
+      "timeout": 9
+    },
+    "changed_inputs": [],
+    "suite_dirty_after": false,
+    "host_limitations": [
+      "modules",
+      "cross-realm",
+      "agents/shared memory",
+      "asynchronous uncaught exceptions lack structured identity"
+    ],
+    "raw_report_sha256": "ecdc48aa52b238b27d9976ef8e36114e966d50a6c0bf40fe57e6b21596f780e9",
+    "local_archive": "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/conformance/llvm-ecma-002-full.json.gz",
+    "local_archive_sha256": "f119a23b7752eed4b65f5678a6d7c898156776e9280bf8d57b6b21da74a2ff48",
+    "publisher_sha256": "63fe173d86ce9da3a038b579660ef2a2a487b2268492b1efb7cec8dc19ab6556",
+    "summarizer_sha256": "63997845ed384a014c1c1239cbe48ec25d0fd7493d5adfdb0839cdffa48369b5",
+    "runtime_source_commit": "20fd0f6",
+    "runner_source_commit": "fd08c16"
+  }
+}

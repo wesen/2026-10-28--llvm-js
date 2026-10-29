@@ -305,3 +305,117 @@ Read the probe and its JSON receipt, then the Observed indirect-eval defects sec
 
 ### Technical details
 The native command uses --no-runtime-build, preserving the immutable build used by the broad run. Its outputs and the source digest are recorded in reference/evidence/global-eval-probe.json.
+
+## Step 8: Prepare non-string eval support in derived constructor contexts
+
+The LLVM emitter currently rejects derived-constructor DirectEval instructions before the runtime can apply non-string passthrough. Prepared a narrow change that carries the context as a caller flag and rejects strings only after the runtime has returned non-string inputs. The broad baseline still runs the unchanged 20fd0f6 binaries; this source patch is deliberately not built until that experiment finishes.
+
+### Prompt Context
+See Step 1. This is another bounded dynamic-evaluation increment, not general derived-constructor string support.
+
+### What I did
+Added named caller flags, moved the derived-context guard from LLVM emission to runtime string admission, and added a positive fixture for missing arguments, primitives, object identity, captured arrows, collection, and argument exceptions before super. Migrated the two existing string boundary fixtures from compile-error contracts to runtime-rejection contracts.
+
+### Why
+Non-string eval arguments do not require source compilation or constructor syntax context. Rejecting the whole instruction prevents valid passthrough behavior and can also reject code whose unsupported string path never executes.
+
+### What worked
+The independent Node oracle prints derived-eval-non-string-ok. Source review confirms the IR generator already loads the captured this cell without a TDZ read check in derived contexts. Native validation is pending the completed baseline.
+
+### What didn't work
+No native success is claimed yet. String evaluation in derived constructors remains unsupported and retains an explicit runtime diagnostic.
+
+### What I learned
+The admission point matters: source-context restrictions can be applied after the language's non-string return rule. The ABI already carries caller flags, so the context does not need a second value or a new environment layout.
+
+### What was tricky to build
+A pre-super eval call must not accidentally read this. The existing captured-cell load is retained; the runtime returns non-string inputs before inspecting or compiling caller source context. Escaped arrows must preserve the same behavior after the constructor returns.
+
+### What warrants a second pair of eyes
+Review the migration of two rejection contracts and the order of the runtime guard. Ensure no source conversion or this-read is introduced before non-string passthrough.
+
+### What should be done in the future
+After broad execution and fingerprint verification, rebuild and run the focused constructor contracts plus the affected regression gate. Record results before committing the semantic change.
+
+### Code review instructions
+Read emitEval, SHLLVMEvalCallerFlags, and evaluate together with eval_derived_non_string.js and both migrated boundary fixtures.
+
+### Technical details
+The measured broad-build source commit remains 20fd0f6. Only source/test files have changed at this checkpoint; compiler/runtime artifacts used by the baseline have not been rebuilt.
+
+## Step 9: Preserve UTF-16 code units in runtime source strings
+
+A source probe found that runtime string compilation replaces lone surrogate code units with U+FFFD. Prepared a dedicated source conversion and parser mode that preserves those units while combining valid surrogate pairs for Unicode identifier classification. The broad experiment still uses its original binaries; native validation follows its completion.
+
+### Prompt Context
+See Step 1. The user subsequently wrote, "finish first, sorry", deferring the separate report/module follow-up until this work is finished.
+
+### What I did
+Added scripts/04-eval-utf16-probe.js and eval_utf16_source.js. Introduced convertUTF16ToUTF8PreservingSurrogates and an explicit allowSurrogatesInSource parser/compilation flag. Enabled the flag only for runtime source compilation and updated native direct eval, VM direct eval, and ordinary runtime eval conversion paths.
+
+### Why
+ECMAScript strings contain UTF-16 code units. Converting an unpaired surrogate to a replacement character changes the evaluated source and resulting literal value. Ordinary source-file decoding should continue to reject invalid UTF-8 scalar values.
+
+### What worked
+Node executes the new fixture and prints eval-utf16-source-ok. The fixture covers direct/indirect eval, Function, templates, raw templates, RegExp, an astral identifier, bytecode callers, and a nested escaping eval closure after GC.
+
+### What didn't work
+Running scripts/04-eval-utf16-probe.js through the frozen native driver produced `55296 65533` and `56320 65533`, where the Node script oracle produced `55296 55296` and `56320 56320`. ASCII 65 remained 65 in both. Native validation of the repair is pending; these observations establish the defect rather than proving the patch.
+
+### What I learned
+The existing single-surrogate encoder is also unsuitable: it encodes a valid pair as two separate source characters. An astral identifier must be reconstructed as one Unicode code point during lexing, while lone surrogates remain individual code units inside strings and other permitted lexical contexts.
+
+### What was tricky to build
+The lexer has consuming and peeking decoder paths. All must use the same mode. Runtime compilation disables lazy parsing for this encoding mode so a later parser cannot accidentally lose the setting. The mode is installed before the first token is read.
+
+### What warrants a second pair of eyes
+Review decoder error handling, surrogate pair advancement, and propagation through both native-context compileEvalModule and ordinary BCProviderFromSrc creation. Check that static source retains its original UTF-8 rejection behavior.
+
+### What should be done in the future
+After the baseline, run the native fixture at all optimization combinations, a malformed-static-source rejection probe, and the full regression gates. Recheck baseline timeouts on the original build before changing binaries so timing and semantic differences remain distinguishable.
+
+### Code review instructions
+Start with UTF8.cpp, JSLexer.h and CompileFlags. Follow the runtime conversion callers and parser creation sites. Read eval_utf16_source.js for the observable contract and the source probe for the original mismatch.
+
+### Technical details
+The source encoding uses four-byte UTF-8 for a valid surrogate pair and three-byte extended UTF-8 for an individual surrogate. Lexer decoding admits the latter only with allowSurrogatesInSource. This does not change JavaScript string storage, the LLVM value ABI, or the source-file default.
+
+## Step 10: Complete and publish the full pinned-suite baseline
+
+The full selection completed: 76,801 passes, 19,598 semantic failures, 6,584 unsupported variants, and nine timeouts, totaling 102,992 variants. All 53,968 fingerprints stayed unchanged and the Test262 checkout stayed clean. Published the complete compact inventory, fingerprints, fixture list, failure samples, and summary; retained the full raw report as a digested compressed local build artifact.
+
+### Prompt Context
+See Step 1 and the user's finish-first instruction recorded in Step 9.
+
+### What I did
+Executed scripts/02-publish-baseline-evidence.py against /tmp/llvm-002-full.json. Reconciled 53,909 selected files as 53,615 source files plus 294 fixtures. Filled the analysis document with final counts, stage-based failure attribution, largest families, and limitations. Started scripts/05-recheck-baseline-timeouts.py against the same frozen build with one worker and a 120-second runtime limit.
+
+### Why
+A completed inventory is necessary for future regressions and prioritization. Broad-suite counts must be reproducible and distinguish host admission, engine behavior, harness limits, and edition provenance.
+
+### What worked
+The publisher accepted the report after completeness, partition coverage, source hash, and clean checkout validation. The raw report SHA-256 is ecdc48aa52b238b27d9976ef8e36114e966d50a6c0bf40fe57e6b21596f780e9. No crash or infrastructure-error category was recorded.
+
+### What didn't work
+19,598 semantic mismatches, 6,584 unsupported records, and nine timeouts remain. The process exit status is 1 as expected for a completed run with failures. A diagnostic script initially assumed a partial checkpoint had a final counts field and raised KeyError: counts; the partial schema intentionally omits that final summary, so the diagnostic was changed to count its available records. No baseline data was changed.
+
+### What I learned
+The largest groups include missing Temporal/Intl capabilities, module-host admission, and 1,699 root-slot limit rejections. A root-slot rejection does not test the eventual target operation. Pinned catalog labels cannot establish edition membership, so the ledger explicitly leaves that audit open.
+
+### What was tricky to build
+The baseline had to retain its original compiler/runtime identity while later source fixes were prepared. The receipt records runtime source 20fd0f6 and runner source fd08c16 independently of the publication commit. The aborted earlier partial run was not merged into this experiment.
+
+### What warrants a second pair of eyes
+Review the distinction between complete execution and conformance, and the unsupported category's mixed host/compiler causes. Review summary-to-inventory consistency before citing counts externally.
+
+### What should be done in the future
+Complete the original-build timeout recheck, then rebuild and validate the pending eval changes. Edition qualification, general sloppy binding storage, global lexical integration, and richer source contexts remain open.
+
+### Code review instructions
+Read the analysis first, then full-baseline-summary.json and representative samples. Use scripts/02-publish-baseline-evidence.py to regenerate publication from the retained raw report, preserving its original artifact identity.
+
+### Technical details
+The broad profile is frontend O0 / LLVM O0, 16 workers, 60-second compilation and 10-second runtime stage limits. The local full raw archive is hermes/build-llvm/conformance/llvm-ecma-002-full.json.gz. Compact per-variant evidence is tracked; build artifacts are not staged.
+
+### Step 10 validation follow-up
+The original-build timeout recheck completed with unchanged inputs: 18 variants, three passes and 15 semantic failures, no timeouts. The runner expands each selected source into both strict/sloppy variants; among the nine originally timed-out strict variants, three pass and six fail semantically. Preserved the complete rerun in reference/evidence/timeouts-before.json. Only after this finished was the pending source rebuilt.
