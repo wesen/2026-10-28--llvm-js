@@ -6,7 +6,7 @@ import unittest
 from unittest.mock import patch
 
 from test_shllvm_test262 import (classify, metadata, variants, prepare_source,
-                                 unsupported_reason, invoke)
+                                 unsupported_reason, invoke, shard_paths, protect_output, bounded_results)
 
 
 def record(code=0, stdout='', stderr='', **extra):
@@ -99,6 +99,64 @@ class PreparationTests(unittest.TestCase):
         self.assertIn('module', unsupported_reason({'flags':['module']}))
         self.assertIn('cross-realm', unsupported_reason({'features':['cross-realm']}))
         self.assertIsNone(unsupported_reason({'features':['Symbol.species']}))
+
+
+class SchedulingTests(unittest.TestCase):
+    def test_shards_disjoint_complete_and_order_independent(self):
+        root = Path('/suite')
+        paths = [root / f'test/{n}.js' for n in range(41)]
+        groups = [shard_paths(paths, root, 7, i) for i in range(7)]
+        self.assertEqual(sorted(p for group in groups for p in group), sorted(paths))
+        for i, group in enumerate(groups):
+            self.assertEqual(group, shard_paths(list(reversed(paths)), root, 7, i))
+        with self.assertRaises(ValueError):
+            shard_paths(paths, root, 7, 7)
+        self.assertEqual(shard_paths([], root, 1, 0), [])
+
+    def test_bounded_workers_preserve_every_result(self):
+        import threading
+        import time
+        lock = threading.Lock()
+        active = peak = 0
+        def task(value):
+            nonlocal active, peak
+            with lock:
+                active += 1
+                peak = max(peak, active)
+            time.sleep(.003)
+            with lock:
+                active -= 1
+            return value * value
+        self.assertEqual(sorted(bounded_results(task, range(17), 3)), [v*v for v in range(17)])
+        self.assertLessEqual(peak, 3)
+        self.assertGreater(peak, 1)
+        self.assertEqual(list(bounded_results(task, [], 3)), [])
+
+    def test_worker_failure_propagates(self):
+        def fail(_):
+            raise RuntimeError('worker failed')
+        with self.assertRaisesRegex(RuntimeError, 'worker failed'):
+            list(bounded_results(fail, [1], 2))
+
+    def test_outputs_cannot_replace_inputs_or_aliases(self):
+        import os
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            source = root / 'source'
+            source.write_text('input bytes')
+            hardlink = root / 'hardlink'
+            os.link(source, hardlink)
+            symlink = root / 'symlink'
+            symlink.symlink_to(source)
+            for output in (source, hardlink, symlink):
+                with self.assertRaises(ValueError):
+                    protect_output(output, {source})
+            destination = root / 'report.json'
+            destination.with_suffix('.json.tmp').symlink_to(source)
+            with self.assertRaises(ValueError):
+                protect_output(destination, {source})
+            protect_output(root / 'safe.json', {source})
+            self.assertEqual(source.read_text(), 'input bytes')
 
 
 if __name__ == '__main__':

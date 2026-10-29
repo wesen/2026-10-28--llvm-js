@@ -97,3 +97,18 @@ partitioning, structured asynchronous exceptions, complete inventories, and
 cross-configuration qualification remain tracked in ticket LLVM-ECMA-001.
 The initial variable/await baseline is intended to identify the next source
 changes rather than suppress failures with an inherited skip list.
+
+## Bounded execution and partitions
+
+Use `--jobs N` to run independent native processes concurrently. The coordinator
+keeps at most N variants in flight and sorts final results by test and variant.
+`--shard-count N --shard-index I` assigns source paths by SHA-256 modulo N;
+all variants of one source stay together. Reports retain the full selection
+fingerprints and record partition counts. Empty partitions are valid completed
+measurements. Do not add overlapping or incompatible partitions together.
+
+`--checkpoint-every N` publishes an atomic partial report after every N completed
+variants (default 1000). An interrupted run remains incomplete; there is no
+resume support yet. `--compact` omits command records only for passing variants,
+retaining their source, harness and artifact identities. Failures keep commands.
+Output and temporary publication paths cannot replace fingerprinted inputs.

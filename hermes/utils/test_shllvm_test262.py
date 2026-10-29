@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import argparse
 from collections import Counter
+from concurrent.futures import ThreadPoolExecutor, wait, FIRST_COMPLETED
 import hashlib
 import json
 import os
@@ -216,6 +217,41 @@ def write_report(path, report):
     temporary.replace(path)
 
 
+def shard_paths(paths, suite, count, index):
+    """Stable source assignment; all variants of a file stay together."""
+    if count < 1 or not 0 <= index < count:
+        raise ValueError('shard index must be in [0, shard count)')
+    return [p for p in sorted(paths) if
+            int(hashlib.sha256(p.relative_to(suite).as_posix().encode()).hexdigest(), 16) % count == index]
+
+
+def protect_output(output, inputs):
+    destinations = [output.resolve(), output.with_suffix(output.suffix + '.tmp').resolve()]
+    for destination in destinations:
+        if any(destination == p.resolve() or
+               (destination.exists() and p.exists() and destination.samefile(p)) for p in inputs):
+            raise ValueError('report output would overwrite an experiment input')
+
+
+def bounded_results(function, tasks, jobs):
+    """Keep at most jobs tasks in flight; only the coordinator writes reports."""
+    iterator = iter(tasks)
+    with ThreadPoolExecutor(max_workers=jobs) as executor:
+        pending = set()
+        exhausted = False
+        while pending or not exhausted:
+            while len(pending) < jobs and not exhausted:
+                try:
+                    pending.add(executor.submit(function, next(iterator)))
+                except StopIteration:
+                    exhausted = True
+            if not pending:
+                break
+            completed, pending = wait(pending, return_when=FIRST_COMPLETED)
+            for future in completed:
+                yield future.result()
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--suite', type=Path, required=True)
@@ -224,12 +260,19 @@ def main():
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--hermes-opt', choices=['O0', 'O'], default='O0')
     parser.add_argument('--llvm-opt', choices=['0', '2'], default='0')
+    parser.add_argument('--jobs', type=int, default=1)
+    parser.add_argument('--shard-count', type=int, default=1)
+    parser.add_argument('--shard-index', type=int, default=0)
+    parser.add_argument('--checkpoint-every', type=int, default=1000)
+    parser.add_argument('--compact', action='store_true', help='omit command records for passing variants')
     parser.add_argument('--compile-timeout', type=float, default=60)
     parser.add_argument('--run-timeout', type=float, default=10)
     parser.add_argument('paths', nargs='+', help='suite-relative files or directories; explicit selection required')
     args = parser.parse_args()
     if min(args.compile_timeout, args.run_timeout) <= 0:
         parser.error('timeouts must be positive')
+    if args.jobs < 1 or args.checkpoint_every < 1 or args.shard_count < 1 or not 0 <= args.shard_index < args.shard_count:
+        parser.error('jobs/checkpoint/shard count must be positive and shard index in range')
     suite = args.suite.resolve()
     lock = json.loads(LOCK.read_text())
     if digest(suite / 'INTERPRETING.md') != lock['interpretation_sha256']:
@@ -261,15 +304,24 @@ def main():
         build / 'CMakeCache.txt', build / 'lib/config/libhermesvm-config.h',
         build / 'bin/shermes', build / 'lib/libshllvm_runtime.a',
         build / 'lib/libhermesvm.so', build / 'tools/shermes/libshermes_console.so'}
+    try:
+        protect_output(args.output, inputs)
+    except ValueError as exc:
+        parser.error(str(exc))
     fingerprints = {str(p): digest(p) for p in sorted(inputs)}
+    selected = shard_paths(files, suite, args.shard_count, args.shard_index)
     report = {'complete': False, 'scope': 'explicit selection; not full ECMAScript conformance',
               'suite_revision': revision, 'specification': lock['specification'],
               'selection': args.paths, 'hermes_opt': args.hermes_opt, 'llvm_opt': args.llvm_opt,
               'fingerprints': fingerprints, 'results': [], 'fixtures': [],
+              'partition': {'count': args.shard_count, 'index': args.shard_index,
+                            'selected_files_before_partition': len(files), 'selected_files': len(selected)},
+              'execution': {'jobs': args.jobs, 'checkpoint_every': args.checkpoint_every, 'compact': args.compact},
               'host_limitations': ['modules', 'cross-realm', 'agents/shared memory',
                                    'asynchronous uncaught exceptions lack structured identity']}
     write_report(args.output, report)
-    for path in sorted(files):
+    tasks = []
+    for path in selected:
         if '_FIXTURE' in path.name:
             report['fixtures'].append(str(path.relative_to(suite)))
             continue
@@ -279,19 +331,31 @@ def main():
             report['results'].append({'test': str(path.relative_to(suite)),
                                       'status': 'harness_error', 'reason': str(exc)})
             continue
-        for variant in variants(meta):
-            with tempfile.TemporaryDirectory(prefix='shllvm-test262-') as tmp:
-                result = execute_variant(path, meta, variant, suite, args, context, Path(tmp))
-            report['results'].append(result)
-            print(result['status'], result['test'], variant, flush=True)
+        tasks.extend((path, meta, variant) for variant in variants(meta))
+    report['planned_variants'] = len(tasks)
+    write_report(args.output, report)
+
+    def execute(task):
+        path, meta, variant = task
+        with tempfile.TemporaryDirectory(prefix='shllvm-test262-') as tmp:
+            result = execute_variant(path, meta, variant, suite, args, context, Path(tmp))
+        if args.compact and result['status'] == 'pass':
+            result.pop('commands', None)
+        return result
+
+    for index, result in enumerate(bounded_results(execute, tasks, args.jobs), 1):
+        report['results'].append(result)
+        print(result['status'], result['test'], result['variant'], flush=True)
+        if index % args.checkpoint_every == 0:
             write_report(args.output, report)
+    report['results'].sort(key=lambda r: (r['test'], r.get('variant', '')))
     report['changed_inputs'] = [str(p) for p in inputs if not p.is_file() or digest(p) != fingerprints[str(p)]]
     report['counts'] = dict(Counter(r['status'] for r in report['results']))
     report['suite_dirty_after'] = bool(subprocess.check_output(
         ['git', '-C', str(suite), 'status', '--porcelain'], text=True).strip())
     report['complete'] = not report['changed_inputs'] and not report['suite_dirty_after']
     write_report(args.output, report)
-    return 0 if report['complete'] and set(report['counts']) == {'pass'} else 1
+    return 0 if report['complete'] and set(report['counts']).issubset({'pass'}) else 1
 
 
 if __name__ == '__main__':
