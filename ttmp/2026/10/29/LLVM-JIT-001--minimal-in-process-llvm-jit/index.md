@@ -1,7 +1,7 @@
 ---
 Title: Minimal in-process LLVM JIT
 Ticket: LLVM-JIT-001
-Status: active
+Status: complete
 Topics:
     - llvm
     - javascript
@@ -11,14 +11,14 @@ Owners: []
 RelatedFiles: []
 ExternalSources: []
 Summary: ""
-LastUpdated: 2026-10-29T09:32:28.913562973-04:00
+LastUpdated: 2026-10-29T10:27:50.293399773-04:00
 WhatFor: ""
 WhenToUse: ""
 ---
 
 # LLVM-JIT-001
 
-Implement a persistent in-process baseline LLVM JIT in two checkpoints: emitted-IR execution, then reusable source compilation. The design exists; neither checkpoint has been implemented by this ticket.
+Implemented a persistent in-process baseline LLVM JIT with verified IR loading and reusable source compilation. Both checkpoints are qualified within the documented practical profile.
 
 ## Documents
 
@@ -34,7 +34,7 @@ Implement a persistent in-process baseline LLVM JIT in two checkpoints: emitted-
 
 ## Current state
 
-Planning artifacts are complete. Execution tasks remain open; no engine or follow-up feature is claimed implemented by this documentation change.
+Implemented the persistent source/IR JIT in 999c830. Focused qualification passes 48/48; existing core and extension gates pass 22/22 and 66/66. See hermes/docs/llvm/JIT.md for commands, API, and practical limits.
 
 ## Related tickets
 

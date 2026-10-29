@@ -18,7 +18,7 @@ WhenToUse: ""
 
 # LLVM-ENGINE-001
 
-Define a practical AOT and baseline JIT engine: one runtime, one owner thread, runtime-lifetime native code, and explicit supported-language boundaries. Architecture design is written; runtime linkage and frontend extraction still need implementation probes.
+Validated the practical native-engine architecture: one runtime, one owner thread, runtime-lifetime code, request-scoped frontend compilation, and explicit supported-language boundaries. Decisions and probe evidence are complete.
 
 ## Documents
 
@@ -34,7 +34,7 @@ Define a practical AOT and baseline JIT engine: one runtime, one owner thread, r
 
 ## Current state
 
-Planning artifacts are complete. Execution tasks remain open; no engine or follow-up feature is claimed implemented by this documentation change.
+Architecture decisions validated by a two-unit LLJIT probe and committed as 5932980. Shared runtime linkage, lifetime ordering, frontend boundary, and completion contracts are recorded; implementation is delivered by LLVM-JIT-001.
 
 ## Related tickets
 

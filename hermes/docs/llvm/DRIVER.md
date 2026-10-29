@@ -162,3 +162,7 @@ implementation and validation.
 Use `--module` to compile a closed module graph with live bindings, cyclic
 evaluation, dynamic import and top-level await. See [MODULES.md](MODULES.md)
 for installation, resolution policy, manifests, commands and explicit limits.
+
+For persistent source compilation and execution inside one host process, see
+[JIT.md](JIT.md). The optional `shllvm-jit` engine is distinct from this driver's
+existing external lli action.

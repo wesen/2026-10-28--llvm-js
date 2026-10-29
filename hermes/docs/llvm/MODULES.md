@@ -156,3 +156,8 @@ under `ttmp/2026/10/28/LLVM-MODULES-001--ecmascript-module-host-resolution-linki
 The graph, Test262, and extension receipts report unchanged inputs. The broad
 102,992-variant historical baseline was not rerun. These results qualify the
 selected host profile; they do not establish complete language conformance.
+
+The optional in-process engine supports explicit module-entry completion through
+`compiler.cjs --host-completion`; see [JIT.md](JIT.md). This solves pending-entry
+reporting for that instrumented embedding path. The original standalone/lli
+path and bundles without instrumentation retain the lifecycle limit above.

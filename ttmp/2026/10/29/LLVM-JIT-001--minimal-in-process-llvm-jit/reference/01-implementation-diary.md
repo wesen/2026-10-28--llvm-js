@@ -130,3 +130,40 @@ Run shllvm-jit-test and utils/test_shllvm_jit.py. Review the initial/final gate 
 
 ### Technical details
 Installed LLVM 18.1.3; Linux x86-64 host64. -O changes the Hermes frontend optimization profile; LLJIT uses its default native code-generation configuration. This build is not sanitizer-enabled. The optional-off check is a configuration check; the ordinary native gates run against the rebuilt enabled configuration.
+
+## Step 4: Publish the operational contract and final qualification
+
+Implementation checkpoint **999c830** is qualified. Added an explicit collection immediately after unit-table growth and reran the 48-contract gate: all pass with unchanged recorded inputs. Archived the final receipt, initial 32-contract checkpoint, existing core/extension receipts, optional-off configuration, illustrative measurements, and receipt hashes. Added `hermes/docs/llvm/JIT.md` and linked it from the existing driver/module guides.
+
+### Prompt Context
+See Step 2. This is the documentation and qualification completion of the requested bounded engine and JIT work.
+
+### What I did
+Documented build commands, the private source/IR API, source versus LLVM optimization settings, owner-thread use, exception reporting, growable root storage, code lifetime, trusted module notifications, and remaining limits. Verified the CLI creator-only IR mode and recorded the partial M01 module-backlog improvement without closing unrelated module work.
+
+### Why
+Users need a reproducible entry point and a precise distinction between the new source JIT and the existing external lli driver. Explicit limits prevent the completed milestone from being mistaken for full conformance, an incremental ESM loader, or an unbounded long-running compilation service.
+
+### What worked
+Final JIT qualification: 48/48. Core: 22/22. Extensions: 66/66. Module compiler unit tests: 8/8. The execution trace contains one execve for the host and no compiler/lli subprocess. Repeated-increment smoke runs report median compile/materialize times of about 4.23 ms (one increment), 2.69 ms (20), and 2.63 ms (100), with final process peak RSS of 66,772, 67,200, and 68,436 KiB respectively. These measurements include compiler/runtime state and are not a performance comparison or leak proof.
+
+### What didn't work
+No new failures occurred during final documentation qualification. Sanitizer instrumentation was not enabled, and optional-off verification was configuration-only; neither is represented as a completed runtime test. The historical broad Test262 inventory was not rerun.
+
+### What I learned
+Source compilation can remain a small request-scoped operation while the managed runtime and native code persist. The bounded design has useful explicit limits: compilation-unit globals communicate through the runtime, independently bundled module graphs do not merge, and code lives until engine destruction.
+
+### What was tricky to build
+The final evidence must distinguish entry completion from initializer completion and distinguish the native unit-count table from the unrelated 1,024 root/argument-slot admission limit. Documentation preserves both distinctions.
+
+### What warrants a second pair of eyes
+Review lifecycle invariants before embedding in a long-running service, especially global unit-index high-water storage, pending work at explicit close, and the private completion protocol's trusted-code assumption.
+
+### What should be done in the future
+Use the engine on a representative application before expanding its profile. Keep LLVM-MODULES-002 open for remaining module dispositions. Index recycling, richer host value handles, native dynamic eval, package loading, and speculative tiers are deferred.
+
+### Code review instructions
+Read JIT.md, the implementation commit, test/LLVMJIT/engine.cpp, and reference/evidence/final-48-contracts.json. Verify receipt-hashes.json against archived bytes. No generated binaries or node_modules are committed.
+
+### Technical details
+Engine architecture commit: 5932980. Implementation commit: 999c830. The final checkpoint adds documentation/evidence and the explicit post-growth GC assertion. Source compilation uses the existing Hermes backend and system LLVM 18.1.3 in one process; dynamic eval still uses the existing bytecode path.

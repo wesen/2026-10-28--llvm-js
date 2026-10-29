@@ -150,3 +150,9 @@ The first coordinated action is M01 during engine lifecycle work. M02 is a small
 Read `hermes/docs/llvm/MODULES.md`, `hermes/utils/module-host/compiler.cjs`, `hermes/utils/module-host/runtime.js`, `hermes/utils/shllvm.py`, and `hermes/utils/test_shllvm_test262.py`. The original module ticket provides the detailed design, diary, initial/final evidence, and oversized probe. LLVM-ENGINE-001 defines engine ownership; LLVM-JIT-001 implements the shared runtime lifecycle. LLVM-ECMA-002 contains the separate dynamic-evaluation designs.
 
 The vault report is `Projects/2026/10/29/PROJ - Direct LLVM JavaScript - ECMAScript Module Host Implementation.md` in `/home/manuel/code/wesen/go-go-golems/go-go-parc`. It provides the narrative explanation and measured checkpoint. This ticket owns future disposition, not historical result totals.
+
+## 13. Follow-up from LLVM-JIT-001
+
+M01 is partially implemented in commit 999c830: the new engine supplies private per-entry notifications, compiler.cjs --host-completion instruments bundles, and Engine::drain returns Pending rather than completed when an entry remains unresolved. CLI shllvm-jit exits 2 with a pending diagnostic in that case. Fulfillment and rejection are exercised separately. This does not change the original shllvm.py standalone/lli paths, and uninstrumented bundles have no entry-completion tracking; M01 therefore remains open for its broader CLI disposition.
+
+The engine accepts multiple units but separate bundles retain separate module registries (M11). No script import, module eval, runtime source loader, attribute, or phase support was added. The shared native-unit registration table now grows beyond eight entries; that capacity change is distinct from M08's unchanged 1,024 root/argument-slot limit.

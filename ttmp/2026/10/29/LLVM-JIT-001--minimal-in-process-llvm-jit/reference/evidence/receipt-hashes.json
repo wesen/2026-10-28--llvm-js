@@ -1,0 +1,9 @@
+{
+  "build-failures.txt": "10414b9196691ed8edd16abb090c7cd9242c788cabab6e1e871c6cf12982182c",
+  "core-final.json": "a102964a584793035b7a17c3947f4a630a2d2548f2749a81046a92598cc450da",
+  "extensions-final.json": "f5389b50ed4166285836e59cf44af0b158c0257c3781990bc4b8f68771fd4413",
+  "final-48-contracts.json": "7a569c2706b182ced28a239d76550710ddec611c4de48ef53be64d7ec53e3e4c",
+  "initial-32-contracts.json": "b50c971c507ccd4c12463b215948e910fc469f4cef9ed211d7d1240a9365328d",
+  "measurements.json": "d18b4c1c2cd25d876dba0312a2e13681f50aaf3b6bb17e37ba31c3b830013be7",
+  "optional-off-configuration.txt": "89147205f4b2bb97a8b4500fa3ebe27845213e9c7d292974ec2058c7c1ea878c"
+}

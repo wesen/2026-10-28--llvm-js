@@ -24,6 +24,7 @@ int main() {
     require(e->collect().ok, "GC after throw");
     require(run(*e, "if(escaped()!==2)throw Error('escaped');").ok, "escaped after failure");
     for (int i=0;i!=12;++i) require(run(*e,"shared.n++;",i%2).ok,"many units");
+    require(e->collect().ok, "GC after unit-table growth");
     require(run(*e, "if(shared.n!==14)throw Error('many');").ok, "unit table growth");
     require(run(*e, "globalThis.jobs=0;Promise.resolve().then(()=>jobs++);setTimeout(()=>jobs++,1);").ok,"schedule");
     require(e->drain().ok, "drain");

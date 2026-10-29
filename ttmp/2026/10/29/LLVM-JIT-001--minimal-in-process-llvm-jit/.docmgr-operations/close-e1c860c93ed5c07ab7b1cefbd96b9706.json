@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "digest": "07760d62755660831510da22c744ea0f98b7ade93f868fa5c89dd646f0e3e9f4",
+  "request": {
+    "ticket": "LLVM-JIT-001",
+    "status": "complete",
+    "intent": "",
+    "entry": "Implemented and qualified persistent in-process source/IR JIT (999c830): 48/48 focused contracts, core 22/22, extensions 66/66, explicit pending module completion, operational guide, detailed diary and evidence."
+  },
+  "receipt": {
+    "sequence": 1,
+    "operation_id": "close-e1c860c93ed5c07ab7b1cefbd96b9706",
+    "state": "committed",
+    "created_at": "2026-10-29T14:27:50.293446631Z",
+    "changed_paths": [
+      "changelog.md",
+      "index.md"
+    ],
+    "before": {
+      "changelog.md": "0d03768c689b2b2f81575b5db399ee1402eff1cd36c735a6d272e6b8677dddb9",
+      "index.md": "622f908ec5c65b7bf410e2cb6ac645a95f4ff4c5aca702ec6b64bd054f0bfde5"
+    },
+    "after": {
+      "changelog.md": "e808301ef52026f250e97c360015938c2ca811ff0d65def9ba65d6b6032a52d4",
+      "index.md": "73a10ef39b6baf49c0acbe80ff749550e54a55a35ca3846c9e0492983f471d32"
+    }
+  },
+  "changes": [
+    {
+      "path": "changelog.md",
+      "before": "0d03768c689b2b2f81575b5db399ee1402eff1cd36c735a6d272e6b8677dddb9",
+      "after": "IyBDaGFuZ2Vsb2cKCiMjIDIwMjYtMTAtMjkKCi0gSW5pdGlhbCB3b3Jrc3BhY2UgY3JlYXRlZAoKIyMgMjAyNi0xMC0yOQoKQ3JlYXRlZCBzb3VyY2UtZ3JvdW5kZWQgZGVzaWduIGFuZCBvcGVuIHRhc2sgaW52ZW50b3J5IGZvciB0aGUgcHJhY3RpY2FsIGNvbXBpbGVyL0pJVCBzY29wZTsgbm8gaW1wbGVtZW50YXRpb24gb3IgZnVsbC1jb25mb3JtYW5jZSBjbGFpbS4KCiMjIyBSZWxhdGVkIEZpbGVzCgotIC9ob21lL21hbnVlbC9jb2RlL3dlc2VuLzIwMjYtMTAtMjgtLWxsdm0tanMvdHRtcC8yMDI2LzEwLzI5L0xMVk0tSklULTAwMS0tbWluaW1hbC1pbi1wcm9jZXNzLWxsdm0taml0L2Rlc2lnbi1kb2MvMDEtYmFzZWxpbmUtaW4tcHJvY2Vzcy1qaXQtaW1wbGVtZW50YXRpb24tYW5kLXF1YWxpZmljYXRpb24ubWQg4oCUIEFyY2hpdGVjdHVyZSBhbmQgYWNjZXB0YW5jZSBjb250cmFjdHMKCiMjIDIwMjYtMTAtMjkKCkltcGxlbWVudGVkIGFuZCBxdWFsaWZpZWQgcGVyc2lzdGVudCBpbi1wcm9jZXNzIHNvdXJjZS9JUiBKSVQgKDk5OWM4MzApOiA0OC80OCBmb2N1c2VkIGNvbnRyYWN0cywgY29yZSAyMi8yMiwgZXh0ZW5zaW9ucyA2Ni82NiwgZXhwbGljaXQgcGVuZGluZyBtb2R1bGUgY29tcGxldGlvbiwgb3BlcmF0aW9uYWwgZ3VpZGUsIGRldGFpbGVkIGRpYXJ5IGFuZCBldmlkZW5jZS4K"
+    },
+    {
+      "path": "index.md",
+      "before": "622f908ec5c65b7bf410e2cb6ac645a95f4ff4c5aca702ec6b64bd054f0bfde5",
+      "after": "LS0tClRpdGxlOiBNaW5pbWFsIGluLXByb2Nlc3MgTExWTSBKSVQKVGlja2V0OiBMTFZNLUpJVC0wMDEKU3RhdHVzOiBjb21wbGV0ZQpUb3BpY3M6CiAgICAtIGxsdm0KICAgIC0gamF2YXNjcmlwdApEb2NUeXBlOiBpbmRleApJbnRlbnQ6IGxvbmctdGVybQpPd25lcnM6IFtdClJlbGF0ZWRGaWxlczogW10KRXh0ZXJuYWxTb3VyY2VzOiBbXQpTdW1tYXJ5OiAiIgpMYXN0VXBkYXRlZDogMjAyNi0xMC0yOVQxMDoyNzo1MC4yOTMzOTk3NzMtMDQ6MDAKV2hhdEZvcjogIiIKV2hlblRvVXNlOiAiIgotLS0KCiMgTExWTS1KSVQtMDAxCgpJbXBsZW1lbnRlZCBhIHBlcnNpc3RlbnQgaW4tcHJvY2VzcyBiYXNlbGluZSBMTFZNIEpJVCB3aXRoIHZlcmlmaWVkIElSIGxvYWRpbmcgYW5kIHJldXNhYmxlIHNvdXJjZSBjb21waWxhdGlvbi4gQm90aCBjaGVja3BvaW50cyBhcmUgcXVhbGlmaWVkIHdpdGhpbiB0aGUgZG9jdW1lbnRlZCBwcmFjdGljYWwgcHJvZmlsZS4KCiMjIERvY3VtZW50cwoKLSBbRGVzaWduXShkZXNpZ24tZG9jLzAxLWJhc2VsaW5lLWluLXByb2Nlc3Mtaml0LWltcGxlbWVudGF0aW9uLWFuZC1xdWFsaWZpY2F0aW9uLm1kKQotIFtEaWFyeV0ocmVmZXJlbmNlLzAxLWltcGxlbWVudGF0aW9uLWRpYXJ5Lm1kKQotIFtUYXNrc10odGFza3MubWQpCgojIyBEZXBlbmRlbmNpZXMgYW5kIHNjb3BlCgotIExMVk0tRU5HSU5FLTAwMSBvd25zIHRoZSBhcmNoaXRlY3R1cmUgYW5kIGxpZmV0aW1lIGNvbnRyYWN0LgotIENvb3JkaW5hdGUgcGVuZGluZyBhc3luYyBjb21wbGV0aW9uIHdpdGggTTAxIGluIExMVk0tTU9EVUxFUy0wMDIuCi0gRXhpc3RpbmcgTExWTS1NT0RVTEVTLTAwMSBncmFwaHMgcHJvdmlkZSBidW5kbGVkLW1vZHVsZSByZWdyZXNzaW9uIGZpeHR1cmVzLgoKIyMgQ3VycmVudCBzdGF0ZQoKSW1wbGVtZW50ZWQgdGhlIHBlcnNpc3RlbnQgc291cmNlL0lSIEpJVCBpbiA5OTljODMwLiBGb2N1c2VkIHF1YWxpZmljYXRpb24gcGFzc2VzIDQ4LzQ4OyBleGlzdGluZyBjb3JlIGFuZCBleHRlbnNpb24gZ2F0ZXMgcGFzcyAyMi8yMiBhbmQgNjYvNjYuIFNlZSBoZXJtZXMvZG9jcy9sbHZtL0pJVC5tZCBmb3IgY29tbWFuZHMsIEFQSSwgYW5kIHByYWN0aWNhbCBsaW1pdHMuCgojIyBSZWxhdGVkIHRpY2tldHMKCi0gW0xMVk0tTU9EVUxFUy0wMDJdKC4uL0xMVk0tTU9EVUxFUy0wMDItLW1vZHVsZS1ob3N0LWZvbGxvdy11cC1iYWNrbG9nLWFuZC1ib3VuZGVkLWltcHJvdmVtZW50cy9pbmRleC5tZCkKLSBbTExWTS1FTkdJTkUtMDAxXSguLi9MTFZNLUVOR0lORS0wMDEtLXByYWN0aWNhbC1uYXRpdmUtZW5naW5lLWFuZC1qaXQtYXJjaGl0ZWN0dXJlL2luZGV4Lm1kKQo="
+    }
+  ]
+}

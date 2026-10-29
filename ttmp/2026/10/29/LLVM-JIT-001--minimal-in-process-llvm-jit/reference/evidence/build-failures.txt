@@ -1,0 +1,6 @@
+Observed build integration failures and corrections:
+1. LLVM CMake version check rejected 18.1.3 for requested 18; removing version exposed target collisions (FileCheck, count, not). Use llvm-config-18 discovery without importing tool targets.
+2. JITHost.cpp: reference to hermes is ambiguous. Qualified ::hermes::vm.
+3. Context constructor expects rvalue CodeGenerationSettings. Move request settings.
+4. Undefined typeinfo for llvh::FoldingSetBase and llvh::MemoryBuffer. Apply hermes_update_cxx_flags to match compiler RTTI settings.
+Final build: shllvm-jit, shllvm-jit-test, shermes, shllvm_runtime all completed successfully.

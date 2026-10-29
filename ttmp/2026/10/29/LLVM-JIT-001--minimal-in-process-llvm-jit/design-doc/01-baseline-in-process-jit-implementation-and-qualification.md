@@ -17,6 +17,14 @@ RelatedFiles:
       Note: Current runtime bridge build/link targets
     - Path: repo://hermes/lib/BCGen/SH/LLVMNative/LLVMBackend.cpp
       Note: Creator-only output and internal unit metadata
+    - Path: repo://hermes/lib/LLVMJIT/Engine.cpp
+      Note: Implemented persistent LLJIT ownership and execution
+    - Path: repo://hermes/lib/LLVMJIT/Frontend.cpp
+      Note: Request-scoped source compiler
+    - Path: repo://hermes/lib/VM/StaticHUnit.cpp
+      Note: Growable native unit registration
+    - Path: repo://hermes/tools/shermes/JITHost.cpp
+      Note: Runtime lifecycle and module entry status
     - Path: repo://hermes/utils/shllvm.py
       Note: Current external lli execution path
 ExternalSources: []
@@ -156,3 +164,11 @@ Ticket completion requires both checkpoints, a documented build/run entry point,
 The highest risks are duplicate runtime linkage, incorrect SHUnit lifetime assumptions, unrooted exception values, mutable unit indices shared across engines, and frontend state leaking between requests. A failure in one of these areas should stop feature expansion until the invariant is understood. Avoid introducing generic compatibility adapters to conceal a mismatch.
 
 Review `LLVMBackend.cpp::ModuleEmitter::generate`, `runtime.c::shllvm_run`, `static_h.h`, `shermes.cpp`, and `hermes/lib/BCGen/SH/CMakeLists.txt` first. Installed `/usr/lib/llvm-18/include/llvm/ExecutionEngine/Orc/LLJIT.h` provides `addIRModule`, `lookup`, `getDataLayout`, and ownership signatures. The [LLVM 18 ORC reference](https://releases.llvm.org/18.1.8/docs/ORCv2.html) explains the relevant library model. Follow exact installed headers for implementation, rather than copying a tutorial from another release.
+
+## 11. Implemented checkpoint
+
+Implementation commit 999c830 delivers both checkpoints. Source compilation uses request-scoped Hermes parser/semantic/IR/optimization objects and the existing textual LLVM emitter. The persistent LLJIT engine and runtime bridge are in lib/LLVMJIT, include/hermes/LLVMJIT, and tools/shermes/JITHost.cpp. The CLI is build-llvm/bin/shllvm-jit. Operational commands and exact API/lifetime limits are in hermes/docs/llvm/JIT.md.
+
+The actual job API is drain(), explicitly blocking for console timers. Module completion is opt-in through compiler.cjs --host-completion and per-entry host notifications. Separate bundles retain separate registries. Dynamic strings continue through the existing bytecode runtime. Runtime native-unit storage grows beyond the discovered eight-slot bound; globally unique indices retain a documented high-water memory cost. There is no per-unit unloading.
+
+The focused qualification is 48/48, with existing core 22/22 and extensions 66/66. The receipt includes unchanged input fingerprints, explicit pending/rejection tests, two preserved module oracle qualifications, and source filenames in parse diagnostics. The build is not sanitizer-enabled; the broad Test262 baseline was not rerun. Optional-off configuration was checked separately, not built end-to-end. Measurement and execve evidence are retained under reference/evidence.
