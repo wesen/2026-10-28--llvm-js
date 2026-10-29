@@ -277,8 +277,15 @@ function compileGraph(entryPath, options = {}) {
   // Factories are argument expressions, outside the runtime's lexical scope.
   const expression = '(' + runtime.replace(/;?\s*$/, '') + ')([' + emitted.join(',\n') + '],JSON.parse(' + JSON.stringify(JSON.stringify(aliases)) + '))';
   const completion = options.completion ? 'function(){print(' + JSON.stringify(options.completion) + ');}' : 'undefined';
-  const source = expression + '.run(' + JSON.stringify(entryId) + ',' + completion +
+  let source = expression + '.run(' + JSON.stringify(entryId) + ',' + completion +
     ',function(error) { setTimeout(function() { throw error; }, 0); });\n';
+  if (options.hostCompletion) {
+    source = '(function(){const token=__shllvmModuleBegin();try{' + expression +
+      '.run(' + JSON.stringify(entryId) +
+      ',function(){__shllvmModuleEnd(token,true);},' +
+      'function(error){__shllvmModuleEnd(token,false);setTimeout(function(){throw error;},0);});' +
+      '}catch(error){__shllvmModuleEnd(token,false);throw error;}})();\n';
+  }
   function check() {
     const seen = new Set();
     function errors(id) {
@@ -312,7 +319,8 @@ function main(argv) {
   let entry, output, manifest, checkOutput, prelude;
   for (let i = 0; i < argv.length; i++) {
     const argument = argv[i];
-    if (argument === '--completion') options.completion = argv[++i];
+    if (argument === '--host-completion') options.hostCompletion = true;
+    else if (argument === '--completion') options.completion = argv[++i];
     else if (argument === '--check-output') checkOutput = argv[++i];
     else if (argument === '--prelude') prelude = argv[++i];
     else if (argument === '--root') options.root = argv[++i];

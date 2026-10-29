@@ -94,12 +94,27 @@ extern "C" SHLegacyValue _sh_unit_init(
     std::lock_guard<std::mutex> lock(idxMtx);
     // If this unit does not have an index yet, assign one.
     if (!*unit->index) {
-      if (nextIndex == std::size(runtime.units)) {
+      if (nextIndex == UINT32_MAX) {
         fprintf(stderr, "Too many SH units registered\n");
         abort();
       }
       *unit->index = nextIndex++;
     }
+  }
+
+  // Native code retains globally unique indices; each runtime grows its
+  // zero-initialized root table to cover the indices it actually encounters.
+  if (*unit->index >= runtime.unitCapacity) {
+    uint64_t capacity = std::max<uint64_t>(
+        uint64_t(*unit->index) + 1, uint64_t(runtime.unitCapacity) * 2);
+    capacity = std::max<uint64_t>(capacity, 16);
+    if (capacity > UINT32_MAX) capacity = UINT32_MAX;
+    auto **table = static_cast<SHUnit **>(
+        realloc(runtime.units, capacity * sizeof(SHUnit *)));
+    if (!table) hermes_fatal("Cannot grow native unit root table");
+    std::fill(table + runtime.unitCapacity, table + capacity, nullptr);
+    runtime.units = table;
+    runtime.unitCapacity = static_cast<uint32_t>(capacity);
   }
 
   // If the unit has already been initialized, discard the new copy.

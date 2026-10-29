@@ -243,6 +243,10 @@ ExecutionStatus Runtime::putNamedThrowOnError(
       .getStatus();
 }
 
+RuntimeBase::~RuntimeBase() {
+  free(units);
+}
+
 RuntimeBase::RuntimeBase() {
 #if defined(HERMESVM_COMPRESSED_POINTERS) && !defined(HERMESVM_CONTIGUOUS_HEAP)
   // Initialize the 0 entry in the segment map to be nullptr.
@@ -250,7 +254,8 @@ RuntimeBase::RuntimeBase() {
 #endif
 
   // Zero-initialize the unit pointers.
-  std::fill(std::begin(units), std::end(units), nullptr);
+  units = nullptr;
+  unitCapacity = 0;
 
   shCurJmpBuf = nullptr;
   stackPointer = nullptr;
@@ -533,7 +538,7 @@ Runtime::~Runtime() {
       !formattingStackTrace_ &&
       "Runtime is being destroyed while exception is being formatted");
 
-  for (auto *unit : units)
+  for (auto *unit : llvh::ArrayRef<SHUnit *>(units, unitCapacity))
     if (unit)
       sh_unit_done(*this, unit);
 
@@ -643,7 +648,7 @@ void Runtime::markRoots(RootAcceptorWithNames &acceptor, bool markLongLived) {
   {
     MarkRootsPhaseTimer timer(*this, RootAcceptor::Section::SHUnits);
     acceptor.beginRootSection(RootAcceptor::Section::SHUnits);
-    for (auto *unit : units)
+    for (auto *unit : llvh::ArrayRef<SHUnit *>(units, unitCapacity))
       if (unit)
         sh_unit_mark_roots(unit, acceptor, markLongLived);
     acceptor.endRootSection();
@@ -788,7 +793,7 @@ void Runtime::markWeakRoots(WeakRootAcceptor &acceptor, bool markLongLived) {
   }
   for (auto &rm : runtimeModuleList_)
     rm.markWeakRoots(acceptor, markLongLived);
-  for (SHUnit *unit : units)
+  for (SHUnit *unit : llvh::ArrayRef<SHUnit *>(units, unitCapacity))
     if (unit)
       sh_unit_mark_weak_roots(unit, acceptor, markLongLived);
   for (auto &fn : customMarkWeakRootFuncs_)
@@ -1039,8 +1044,8 @@ const void *Runtime::getStringForSymbol(SymbolID id) {
 #endif
 
 size_t Runtime::mallocSize() const {
-  size_t shSize = 0;
-  for (const SHUnit *unit : units)
+  size_t shSize = unitCapacity * sizeof(SHUnit *);
+  for (const SHUnit *unit : llvh::ArrayRef<SHUnit *>(units, unitCapacity))
     if (unit)
       shSize += sh_unit_additional_memory_size(unit);
 

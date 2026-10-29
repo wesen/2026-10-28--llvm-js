@@ -58,7 +58,7 @@ uint64_t shllvm_frame_size(uint32_t count) {
   return offsetof(SHLocals, locals) + (uint64_t)count * sizeof(SHLegacyValue);
 }
 void *shllvm_get_unit(void *shr, uint32_t index) {
-  if (!index || index >= sizeof(R(shr)->units)/sizeof(R(shr)->units[0]) ||
+  if (!index || index >= R(shr)->unitCapacity ||
       !R(shr)->units[index]) bad("unregistered unit");
   return R(shr)->units[index];
 }

@@ -88,3 +88,34 @@ export(TARGETS shermes APPEND FILE ${CMAKE_BINARY_DIR}/ImportHostCompilers.cmake
 # compiler, so this is not the default for shermes.
 add_custom_target(shermes-dep)
 add_dependencies(shermes-dep shermes hermesvm_a hermesvmlean_a hermesvm hermesvmlean shermes_console shermes_console_a)
+
+# AOT emission stays independent of installed LLVM development libraries.
+option(HERMES_BUILD_LLVM_JIT "Build the in-process baseline LLVM JIT" OFF)
+if(HERMES_BUILD_LLVM_JIT)
+  # LLVMConfig imports tools named FileCheck/count/not, colliding with llvh.
+  # Discover only the installed shared library and headers through llvm-config.
+  find_program(SHLLVM_CONFIG NAMES llvm-config-18 REQUIRED)
+  execute_process(COMMAND ${SHLLVM_CONFIG} --version OUTPUT_VARIABLE SHLLVM_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE COMMAND_ERROR_IS_FATAL ANY)
+  if(NOT SHLLVM_VERSION MATCHES "^18\\.")
+    message(FATAL_ERROR "The baseline JIT requires LLVM 18")
+  endif()
+  execute_process(COMMAND ${SHLLVM_CONFIG} --includedir OUTPUT_VARIABLE SHLLVM_INCLUDE OUTPUT_STRIP_TRAILING_WHITESPACE COMMAND_ERROR_IS_FATAL ANY)
+  execute_process(COMMAND ${SHLLVM_CONFIG} --libdir OUTPUT_VARIABLE SHLLVM_LIBDIR OUTPUT_STRIP_TRAILING_WHITESPACE COMMAND_ERROR_IS_FATAL ANY)
+  find_library(SHLLVM_LIBRARY NAMES LLVM-18 HINTS ${SHLLVM_LIBDIR} REQUIRED NO_DEFAULT_PATH)
+  target_sources(shermes_console PRIVATE JITHost.cpp)
+  add_library(shllvm_engine STATIC
+    ../../lib/LLVMJIT/Engine.cpp
+    ../../lib/LLVMJIT/Frontend.cpp
+    ParseJSFile.cpp)
+  hermes_update_cxx_flags(shllvm_engine)
+  target_include_directories(shllvm_engine PRIVATE ${SHLLVM_INCLUDE} ${CMAKE_CURRENT_SOURCE_DIR})
+  target_link_libraries(shllvm_engine PUBLIC hermescompiler shllvm_runtime_shared shermes_console ${SHLLVM_LIBRARY} dl)
+  add_executable(shllvm-jit ../shllvm-jit/main.cpp)
+  target_link_libraries(shllvm-jit PRIVATE shllvm_engine)
+  set_target_properties(shllvm-jit PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/bin")
+endif()
+if(HERMES_BUILD_LLVM_JIT)
+  add_executable(shllvm-jit-test ../../test/LLVMJIT/engine.cpp)
+  target_link_libraries(shllvm-jit-test PRIVATE shllvm_engine)
+  set_target_properties(shllvm-jit-test PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/bin")
+endif()

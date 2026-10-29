@@ -74,7 +74,8 @@ typedef struct SHRuntime {
 #endif
 
   /// The active SHUnits in this runtime.
-  SHUnit *units[8];
+  SHUnit **units;
+  uint32_t unitCapacity;
 
   /// The current top of the exception handler stack.
   SHJmpBuf *shCurJmpBuf;

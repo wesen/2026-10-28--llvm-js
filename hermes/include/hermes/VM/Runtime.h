@@ -227,6 +227,7 @@ using CrashTrace = CrashTraceNoop;
 class RuntimeBase : public SHRuntime {
  protected:
   RuntimeBase();
+  ~RuntimeBase();
 
  public:
   /// See documentation on \c GCBase::GCCallbacks.
