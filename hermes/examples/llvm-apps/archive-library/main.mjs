@@ -29,4 +29,5 @@ let rejected=false;try{unzipSync(new Uint8Array([1,2,3]));}catch(error){rejected
 if(!rejected)throw Error('corrupt archive accepted');
 let checksum=0;for(const byte of archive)checksum=(Math.imul(checksum,31)+byte)>>>0;
 print(JSON.stringify({application:'archive-library',version:'fflate@0.8.2',files:names,
-  inputBytes,archiveBytes:archive.length,checksum,streamBytes:length,corruptRejected:rejected}));
+  inputBytes,archiveBytes:archive.length,checksum,streamBytes:length,corruptRejected:rejected,zipBytes:Array.from(archive),
+  gzipBytes:Array.from(gzipSync(strToU8(documents.map(x=>x.text).join('')),{mtime:0}))}));

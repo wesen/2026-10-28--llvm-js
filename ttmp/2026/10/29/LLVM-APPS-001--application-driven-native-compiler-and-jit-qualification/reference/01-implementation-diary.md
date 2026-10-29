@@ -99,3 +99,41 @@ Read the design, tasks, and examples README first. Inspect the retained raw arch
 
 ### Technical details
 Engine source baseline d0037da. The library remains pinned to fflate 0.8.2. The report's completed 48/48 JIT, 22/22 core, and 66/66 extension figures are historical validated receipts, not new runs during this documentation checkpoint. Current changes do not modify compiler or runtime behavior.
+
+## Step 3: Implement all four runnable applications and the first comparison matrix
+
+Implemented the application runner and persistent native host, then ran the complete small-input matrix. Sixteen executions passed; two unoptimized fflate compilation attempts hit the already documented admission boundary. These two cases are explicitly classified as boundaries and are not included in the passing count.
+
+### Prompt Context
+**User prompt (verbatim):** "Implement, commit at appropriate intervals and keep a detailed diary as you work (using the diary format from the skill)"
+**Assistant interpretation:** Implement LLVM-APPS-001 with all four workloads and retain meaningful evidence and intermediate commits.
+
+### What I did
+Added `hermes/utils/qualify_shllvm_apps.py`, a C++ persistent manifest host, its CMake target, and independent Node corpus replay. The data and queue fixtures have Python-computed expectations. Archive output includes actual ZIP/gzip bytes, decoded independently using Python standard-library readers. Added timeout process-group cleanup and source/binary/fixture fingerprints to the runner after the initial run.
+
+### Why
+The application algorithms must execute in JavaScript while result comparison remains independent. A persistent host must reuse one engine and recover after errors, so repeatedly invoking the CLI is insufficient. Independent binary decoding strengthens same-library round-trip checks.
+
+### What worked
+`python3 hermes/utils/qualify_shllvm_apps.py --sizes small --repeat 1 --output /tmp/llvm-app-small.json` completed with 16 passes and 2 known admission boundaries. Data and queue ran under Node and both frontend profiles in JIT and AOT modes. The persistent corpus ran in Node and both native profiles, publishing closures, forcing GC after each admitted submission, recovering from parse/initializer errors, and draining delayed callbacks. Optimized archive execution matched Node and passed independent Python ZIP/gzip decoding.
+
+### What didn't work
+The initial sandboxed tmux command returned `error connecting to /tmp/tmux-1000/default (Operation not permitted)`; the authorized escalated command built successfully. Both unoptimized archive modes reported `function exceeds 1024 combined root/argument-slot admission limit`. Added root/argument counts to the compiler diagnostic; rebuilding those targets is the next checkpoint. No cap change or library trimming was introduced.
+
+### What I learned
+The existing engine supports a useful persistent plugin application without a new host value API. The small matrix found no new semantic mismatch. Archive compilation pressure remains a profile-specific admission limit, while optimized output is usable.
+
+### What was tricky to build
+Asynchronous module completion must be checked separately from an exit status. Node/AOT require the explicit marker; JIT uses host completion tokens. The persistent final report runs in a delayed callback after previously registered timers. Native GC occurs before callbacks run, exercising captured state retention.
+
+### What warrants a second pair of eyes
+Review independent fixture expectations, the distinction between intentional failures and arbitrary failures, timeout cleanup of child processes, and whether binary-format oracle comparisons inspect actual bytes. The persistent corpus must retain pre-throw side effects rather than assuming transactional initialization.
+
+### What should be done in the future
+Finish diagnostic rebuild, run larger and repeated inputs, strengthen harness failure checks where needed, and publish exact results and limitations.
+
+### Code review instructions
+Start at qualify_shllvm_apps.py and persistent-host/main.cpp. Replay the small command above; run shllvm-jit-test after the compiler diagnostic rebuild. Initial receipts are archived as small-initial.json.gz.
+
+### Technical details
+The initial campaign ran against the pre-diagnostic binaries. The runner was subsequently improved, so its archived fingerprint identifies that earlier revision. AOT uses LLVM O2 and both Hermes O0/O profiles; JIT uses LLJIT defaults and both Hermes profiles. fflate remains unmodified and pinned to 0.8.2.
