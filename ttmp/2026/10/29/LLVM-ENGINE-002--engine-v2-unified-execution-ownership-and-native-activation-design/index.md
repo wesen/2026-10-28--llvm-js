@@ -24,6 +24,8 @@ Design a parallel engine-v2 integration with shared Hermes language/runtime sema
 
 Read [the intern implementation guide](design-doc/01-engine-v2-architecture-and-intern-implementation-guide.md) and [the investigation diary](reference/01-design-investigation-diary.md). The current engine remains runnable as a reference; no directory has been moved or archived.
 
+The second design, [Composable compiler language](design-doc/02-composable-compiler-language-grammar-effects-ownership-and-hermes-llvm-integration.md), defines the grammar, effect and ownership contracts, IR levels, provider composition, and concrete integration. It refines implementation order: establish the small core grammar before the activation/emitter vertical slice.
+
 ## Key Links
 
 - **Related Files**: See frontmatter RelatedFiles field

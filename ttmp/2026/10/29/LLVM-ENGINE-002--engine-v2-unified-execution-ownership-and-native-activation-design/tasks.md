@@ -8,3 +8,5 @@
 - [ ] Phase 3: implement engine-owned module registry and shared incremental identity <!-- t:2ept -->
 - [ ] Phase 4: implement explicit job pumping and bounded host value ownership <!-- t:y5nt -->
 - [ ] Phase 5: qualify applications and long sessions; decide default switch and old-path deletion <!-- t:rnwn -->
+- [x] Deliver second compiler-language design guide and reMarkable copy <!-- t:weer -->
+- [ ] Before phase 1: implement canonical CFG grammar verifier and five core examples from design 02 <!-- t:u56r -->

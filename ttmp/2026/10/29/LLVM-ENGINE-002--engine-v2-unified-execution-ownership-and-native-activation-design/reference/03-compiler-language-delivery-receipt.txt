@@ -1,0 +1,4 @@
+Final document: design-doc/02-composable-compiler-language-grammar-effects-ownership-and-hermes-llvm-integration.md
+OK: uploaded LLVM-ENGINE-002 Composable Compiler Language Guide Revised.pdf -> /ai/2026/10/29/LLVM-ENGINE-002
+Use the Revised document. The earlier same-titled copy without Revised contains one incorrect source-directory shorthand and was preserved rather than overwritten.
+Cloud upload confirmed; physical device synchronization not independently checked.

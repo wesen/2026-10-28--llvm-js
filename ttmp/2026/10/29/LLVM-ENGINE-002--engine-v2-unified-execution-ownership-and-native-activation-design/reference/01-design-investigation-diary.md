@@ -68,3 +68,51 @@ The 5,208-word substantive guide passed ticket hygiene, metadata/code-fence chec
 - **Validation:** docmgr doctor passed; all existing source paths in the reading table resolve. Proposed files and APIs are explicitly marked. Text diagrams require no Mermaid rendering dependency.
 - **Limitations:** Cloud upload is confirmed; physical device sync was not checked. No runtime implementation or v2 correctness claim is made.
 - **Next:** Implementation starts with isolation and the activation/GC/unwind prototype. Those tasks remain open.
+
+## Step 3: Specify the composable compiler language
+
+Added the second design document to the existing ticket. It defines a small typed CFG language and the contracts connecting semantic operations, runtime representations, root plans, and native artifacts. It is a design deliverable, not an implemented grammar or a new backend.
+
+### Prompt Context
+**User prompt (verbatim):** "Ok, write a second detailed design document that is entirely about this new approach, and tries to cover as much ground as possible based on what we built so far, and how it would concretely integrate into this framework, and how things can be expanded in the future. Create  a detailed analysis / design / implementation guide that is for a new intern, explaining all the parts of the system needed to understand what it is, with prose paragraphs and bullet point sand pseudocode and diagrams and api references and file references. It should be very clear and technical. Store in the ticket and the nupload to remarkable."
+
+### What I did
+Applied the grammar-builder, ticket-research, and reMarkable delivery guidance. Wrote the grammar table, effect model, block-parameter control flow, IR levels, pass/analysis contracts, liveness algorithm, root and ownership verification, provider composition, integration map, feature inventory, staging/cache policy, inspection API, defaults, experimentation model, 26 example subjects, implementation slices, and decision records.
+
+### Why
+The first guide establishes execution ownership; the new guide makes the compiler's meaning and decisions explicit. A canonical graph permits JS authoring and direct C++ frontend integration without embedding a second configuration process in every compile request. Effects and runtime obligations must be separate to preserve both JS semantics and GC safety.
+
+### What worked
+The design maps to existing source boundaries: request-scoped frontend, emitter root allocation and phi transfers, runtime helper calls, exception restoration, code registration, module evaluation, and independent application tests. The initial five examples exercise the small core before broader features are added.
+
+### What didn't work
+No implementation or dynamic validation occurred. Proposed effects, provider contracts, verifiers, and reference interpreter remain unimplemented. Property-test laws are not presented as universal correctness proofs. Current application passes remain historical v1 evidence.
+
+### What I learned
+A single generic backend interface would obscure complementary roles of Hermes and LLVM. A graph whose unknown calls appear pure would permit invalid rewrites; a graph whose runtime lowering introduces untracked safepoints would produce incorrect roots. Explicit phase contracts prevent both mistakes.
+
+### What was tricky to build
+The guide distinguishes effect-summary join laws from operation reordering, floating-point semantics from real-number algebra, exceptional post-effect state from rollback, and live runtime admission from serializable compiler IR. Loops use a finite-lattice fixed point rather than an arbitrary capped approximation.
+
+### What warrants a second pair of eyes
+Review edge-specific liveness with block parameters, normal/exception state-token use, runtime helper safepoint classification, alias-like storage, return rooting, and cache identity for customized passes. Review the selected Hermes import boundary before assuming all original semantic information survives lowering.
+
+### What should be done in the future
+Implement the canonical graph/verifier and the first five examples before porting the full emitter. Integrate the arena/exception experiment from the first guide next. Keep implementation tasks open and add providers only with concrete capability and correctness evidence.
+
+### Code review instructions
+Read the source-to-execution example, grammar table, effects, IR levels, and integration map first. Then review ownership/exception details and the phased plan. Existing source references are concrete; all future g APIs and examples are labeled proposed.
+
+### Technical details
+The document uses renderer-independent text diagrams for PDF delivery. It preserves current exact BigInt, UTF-16 dynamic source, promise ordering, private-field, typed-array, and lexical-eval requirements rather than replacing them with numeric toy semantics. No compatibility wrapper or runtime implementation was added.
+
+## Step 4: Correct a reference and deliver the second guide
+
+Delivered the roughly 7,400-word compiler-language guide with a two-level table of contents. The authoritative cloud copy is **LLVM-ENGINE-002 Composable Compiler Language Guide Revised.pdf** in `/ai/2026/10/29/LLVM-ENGINE-002`.
+
+- **Prompt context:** Step 3.
+- **Failure and correction:** The source-reference check raised `AssertionError: hermes/IR`; the concrete header directory is `hermes/include/hermes/IR`. The initial shell invocation continued to upload after the failed check. Corrected the path and reran validation in a separate successful command before uploading a new Revised copy. Did not overwrite either existing guide or remove annotations.
+- **Validation:** docmgr doctor passed. Frontmatter, code fences, and all explicit existing Hermes path references passed checks after correction. Proposed APIs remain labeled and unimplemented.
+- **Delivery result:** `OK: uploaded LLVM-ENGINE-002 Composable Compiler Language Guide Revised.pdf -> /ai/2026/10/29/LLVM-ENGINE-002`.
+- **Evidence limit:** Successful cloud delivery; no physical device-sync claim. The old non-Revised copy remains, with the receipt identifying the corrected version.
+- **Next:** Implement the canonical CFG, verifier, and five core examples before the runtime integration phase. No implementation task was marked complete by this document delivery.
