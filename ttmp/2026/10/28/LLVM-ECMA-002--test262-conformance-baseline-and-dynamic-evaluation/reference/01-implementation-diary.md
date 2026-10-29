@@ -460,3 +460,12 @@ Start with the analysis's Subsequent eval input corrections section. Follow conv
 
 ### Technical details
 Native optimization coverage remains frontend O0/O by LLVM O0/O2, with real lli at frontend O / LLVM O2. The source-file rejection receipt identifies the rebuilt compiler by SHA-256. The historical full baseline remains tied to 20fd0f6. Evidence and documentation publication commit: b21f8b5.
+
+## Step 12: Commit the qualified changes and deliver the updated guide
+
+Implementation and evidence are committed as `fb560e2` (Preserve runtime eval UTF-16 source and derived non-string passthrough); the complete broad baseline is committed as `b21f8b5`. Uploaded the intern guide plus completed analysis with a new document name, preserving earlier documents and annotations.
+
+- Command: `remarquee upload bundle` with design-doc/01 and analysis/01, name LLVM-ECMA-002-Intern-Guide-and-Baseline-Revision-3, destination /ai/2026/10/28/LLVM-ECMA-002, toc-depth 2, non-interactive.
+- Result: `OK: uploaded LLVM-ECMA-002-Intern-Guide-and-Baseline-Revision-3.pdf -> /ai/2026/10/28/LLVM-ECMA-002`.
+- Evidence: reference/evidence/guide-revision-3-upload.json records uploaded input hashes and the delivery output. This proves cloud delivery; device synchronization was not independently checked.
+- Remaining work: the ticket stays active for general sloppy declaration storage, global environment semantics, private/super/derived string contexts, and edition qualification. The separate vault report and module-host request remain deferred under the user's finish-first instruction.
