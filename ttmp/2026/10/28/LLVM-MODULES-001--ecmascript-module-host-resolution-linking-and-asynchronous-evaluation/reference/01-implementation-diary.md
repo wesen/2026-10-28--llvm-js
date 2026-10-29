@@ -190,3 +190,11 @@ Start with MODULES.md and the design guide's implemented checkpoint. Compare ini
 
 ### Technical details
 Build command: `cmake --build hermes/build-llvm --target shermes shllvm_runtime shllvm_runtime_shared --parallel 4`. Compiler checks: `pnpm --dir hermes/utils/module-host test`. Module matrix: `python3 hermes/utils/test_shllvm_modules.py --output /tmp/llvm-module-matrix-qualified.json`. Test262 command and exact profile are in MODULES.md; suite revision is 0b4e0812022b18236b5276d2804948fdd9f71603. Large evidence JSON is losslessly gzip-compressed with deterministic timestamp zero; receipt-hashes.json records uncompressed identity. Parsing uses Babel and link-only validation uses the host in Node; executable module bodies run as LLVM native code. Prior implementation checkpoint is 8b88615; the final code commit is recorded in the next milestone.
+
+## Step 5: Commit the qualified checkpoint
+
+Committed the final implementation, tests, operational guide, and retained evidence as **185923d** (`Qualify module semantics and fix shared Promise and Proxy behavior`). Earlier checkpoints are **98aac5f** (design) and **8b88615** (initial host implementation). All four ticket tasks are complete; docmgr doctor reports all checks passed.
+
+The requested textbook project report was published before module implementation in go-go-parc as **4ec9372** (`Document LLVM conformance baseline and dynamic eval implementation`). Local main and origin/main report zero commits of divergence. The note is `Projects/2026/10/28/PROJ - Direct LLVM JavaScript - Conformance Baseline and Dynamic Evaluation.md`. Unrelated vault edits were not included.
+
+Validation is the unchanged-code evidence recorded in Step 4; no additional broad run was needed for this bookkeeping entry. Review remaining host boundaries in MODULES.md before using the selected suite totals as a broader conformance claim.
