@@ -231,3 +231,40 @@ Read annotate_suite and its adversarial test. Verify that counts remain those of
 
 ### Technical details
 `pinned_catalog_category` is independent of `edition_membership`. The summary records feature-catalog and summarizer SHA-256 digests. The full run had processed more than 16,000 variants at this checkpoint and was still incomplete.
+
+## Step 6: Compare the final eval build against the original selection
+
+The final eval-family run completed against the same immutable runtime build used by the broad experiment. It improves nine previously failing variants without regressing any previously passing variant. The nested-arrow regression is covered separately by the complete extension suite.
+
+### Prompt Context
+See Step 1. This checkpoint records a semantic result while the broad profile continues.
+
+### What I did
+Re-ran `test/language/eval-code test/built-ins/eval` at frontend O0 / LLVM O0 with two workers and compact passing records. Compared exact test/variant key sets and statuses against the pre-change report, asserting identical coverage and no pass-to-nonpass transitions.
+
+### Why
+The earlier post-change measurement preceded the semantic strictness fix. A final same-selection comparison is needed to characterize the delivered build rather than combining intermediate results.
+
+### What worked
+The run completed with unchanged inputs and a clean suite: 390 pass, 76 semantic failure, 8 unsupported, totaling 474 variants. Before the change there were 381 pass, 85 semantic failure, and 8 unsupported. Nine failures became passes and no previously passing variant regressed.
+
+### What didn't work
+Seventy-six semantic failures and eight unsupported cases remain in this family. This is a qualified strict-source increment, not completion of general dynamic evaluation.
+
+### What I learned
+The measured improvements include strict-source declaration environments, lexical contexts, strictness override, and receiver behavior. General non-strict declaration injection requires the separate storage/compiler design already recorded in the ticket.
+
+### What was tricky to build
+Comparison must use exact test/variant identities. Equal totals alone could hide changed selection or an improvement offset by a regression.
+
+### What warrants a second pair of eyes
+Review the nine changed identities in eval-comparison.json and the retained failure commands in eval-final.json. The Node and optimization-matrix regression evidence remains separate from this pinned O0 profile.
+
+### What should be done in the future
+Finish and attribute the full pinned-suite result. Continue general dynamic binding and caller-context implementation under separate validated increments.
+
+### Code review instructions
+Open reference/evidence/eval-comparison.json first, then eval-final.json. The implementing source commit is 20fd0f6; report/triage changes are in subsequent commits.
+
+### Technical details
+Exact coverage: 474 variants. The final command used `--jobs 2 --compact`; worker count changes scheduling but not variant identity. Both reports preserve their build/input fingerprints.

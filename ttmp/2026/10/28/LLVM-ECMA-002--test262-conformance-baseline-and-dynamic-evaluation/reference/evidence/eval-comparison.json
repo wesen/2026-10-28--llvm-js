@@ -1,0 +1,71 @@
+{
+  "before": {
+    "pass": 381,
+    "semantic_failure": 85,
+    "unsupported": 8
+  },
+  "after": {
+    "pass": 390,
+    "semantic_failure": 76,
+    "unsupported": 8
+  },
+  "changes": [
+    {
+      "test": "test/language/eval-code/direct/block-decl-eval-source-is-strict-nostrict.js",
+      "variant": "sloppy",
+      "before": "semantic_failure",
+      "after": "pass"
+    },
+    {
+      "test": "test/language/eval-code/direct/strictness-override.js",
+      "variant": "sloppy",
+      "before": "semantic_failure",
+      "after": "pass"
+    },
+    {
+      "test": "test/language/eval-code/direct/switch-case-decl-eval-source-is-strict-nostrict.js",
+      "variant": "sloppy",
+      "before": "semantic_failure",
+      "after": "pass"
+    },
+    {
+      "test": "test/language/eval-code/direct/switch-dflt-decl-eval-source-is-strict-nostrict.js",
+      "variant": "sloppy",
+      "before": "semantic_failure",
+      "after": "pass"
+    },
+    {
+      "test": "test/language/eval-code/direct/this-value-func-strict-source.js",
+      "variant": "sloppy",
+      "before": "semantic_failure",
+      "after": "pass"
+    },
+    {
+      "test": "test/language/eval-code/direct/var-env-func-strict-source.js",
+      "variant": "sloppy",
+      "before": "semantic_failure",
+      "after": "pass"
+    },
+    {
+      "test": "test/language/eval-code/direct/var-env-global-lex-strict-source.js",
+      "variant": "sloppy",
+      "before": "semantic_failure",
+      "after": "pass"
+    },
+    {
+      "test": "test/language/eval-code/direct/var-env-lower-lex-strict-source.js",
+      "variant": "sloppy",
+      "before": "semantic_failure",
+      "after": "pass"
+    },
+    {
+      "test": "test/language/eval-code/direct/var-env-var-strict-source.js",
+      "variant": "sloppy",
+      "before": "semantic_failure",
+      "after": "pass"
+    }
+  ],
+  "regressions": [],
+  "baseline_source_commit": "fd08c16",
+  "semantic_source_commit": "20fd0f6"
+}
