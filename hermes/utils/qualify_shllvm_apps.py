@@ -182,7 +182,8 @@ class Campaign:
         directory = self.work / f'{app}-{size}'
         directory.mkdir(exist_ok=True)
         setup = directory / 'input.js'
-        setup.write_text('globalThis.APP_INPUT=' + json.dumps(data, ensure_ascii=True) + ';\n')
+        # Input data must not consume compiler slots as a giant object-literal AST.
+        setup.write_text('globalThis.APP_INPUT=JSON.parse(' + json.dumps(json.dumps(data, ensure_ascii=True)) + ');\n')
         entry = APPS / app / 'main.mjs'
         launcher = directory / 'node.mjs'
         launcher.write_text(f"globalThis.print=console.log;\nawait import({json.dumps(setup.as_uri())});\nawait import({json.dumps(entry.as_uri())});\nconsole.log('{MARKER}');\n")

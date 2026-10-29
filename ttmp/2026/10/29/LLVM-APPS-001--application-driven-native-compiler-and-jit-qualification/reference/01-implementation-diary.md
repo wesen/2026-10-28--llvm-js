@@ -137,3 +137,40 @@ Start at qualify_shllvm_apps.py and persistent-host/main.cpp. Replay the small c
 
 ### Technical details
 The initial campaign ran against the pre-diagnostic binaries. The runner was subsequently improved, so its archived fingerprint identifies that earlier revision. AOT uses LLVM O2 and both Hermes O0/O profiles; JIT uses LLJIT defaults and both Hermes profiles. fflate remains unmodified and pinned to 0.8.2.
+
+## Step 4: Diagnose scaled admission failures and correct fixture loading
+
+The first repeated three-size campaign produced 92 successful executions, nine known fflate admission boundaries, and three unexpected large-queue failures. The queue failure occurred in generated input setup, not queue logic. Changed fixture setup to parse JSON data instead of compiling large JavaScript object literals. A complete corrected campaign is running.
+
+### Prompt Context
+See Step 3 for the implementation request. Code checkpoint **dc4ca9d** implements all four applications and the first matrix.
+
+### What I did
+Added root and argument counts to the admission diagnostic without changing the limit. Ran the existing native lifecycle suite and driver publication checks. Added six harness rejection checks for wrong results, missing completion, duplicate output, process failure, and timeouts. Archived the initial scaled receipt and regression output. Replaced generated `APP_INPUT` object literals with `JSON.parse` of a serialized input string.
+
+### Why
+A large fixture should exercise runtime application allocation rather than consume thousands of compiler root slots solely to construct input data. The JSON loader is the same for Node, AOT, and JIT; it does not rewrite the application or third-party library. More precise diagnostics separate this harness issue from the genuine unoptimized module-factory limit.
+
+### What worked
+All data sizes and both queue sizes below the largest passed. All persistent sizes passed, including 240 plugins with expected parse/initializer failures, forced collections, and later callback execution. Optimized fflate passed all sizes in Node/AOT/JIT, including independent binary decoding. Fingerprinted inputs remained unchanged in the scaled receipt. `shllvm-jit-test` reports engine-lifecycle-ok; driver publication checks pass 6/6; harness rejection checks pass 6/6.
+
+### What didn't work
+`shllvm-jit /tmp/llvm-app-full-artifacts/async-queue-large/input.js` rejected at `1:1` with `function exceeds 1024 combined root/argument-slot admission limit (roots=2329, arguments=1)`. The library bundle separately rejects at `428:2482` with `(roots=1084, arguments=3)`, the generated module factory source location. The latter remains a documented admitted-profile boundary; optimized library execution works. No broad conformance or unoptimized library success is claimed.
+
+### What I learned
+The queue application itself was not the cause of its initial large-input rejection. Data transport can accidentally become a compiler stress test if JSON objects are emitted as source expressions. Exact input loading must therefore be included in qualification evidence.
+
+### What was tricky to build
+AOT compilation is once per scenario/profile and execution repeats; JIT recompiles each fresh process. Consequently a failed AOT compilation creates one boundary record while two JIT attempts create two. Reports must distinguish execution counts from source contracts. A zero campaign exit means no unexpected outcomes, not that known-boundary cases executed successfully.
+
+### What warrants a second pair of eyes
+Review that the JSON fixture loader preserves identical input values and that the known-boundary classifier matches only the documented fflate O0 admission diagnostic. Review the unchanged 1,024-slot policy separately from the application results; increasing it requires stack/root lifetime reasoning.
+
+### What should be done in the future
+Finish the corrected campaign and publish the results table, commands, limitations, and root-slot follow-up disposition. Do not add speculative allocator or stack changes solely to erase a recorded boundary.
+
+### Code review instructions
+Compare first-scaled-campaign.json.gz with the final receipt once available. Start at the setup writer in qualify_shllvm_apps.py, then LLVMBackend.cpp's admission diagnostic. Run `python3 hermes/utils/test_shllvm_apps.py` and the documented qualification command.
+
+### Technical details
+Three sizes: 32/2048/16384 order rows, 12/96/256 jobs, and 12/80/240 plugins. Two repetitions. The fflate dataset scale is 10/400/4000, including empty, Unicode, JSON, and patterned-text documents. No runtime semantic implementation changed in this step.

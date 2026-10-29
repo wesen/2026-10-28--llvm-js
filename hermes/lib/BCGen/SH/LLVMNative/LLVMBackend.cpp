@@ -953,7 +953,9 @@ bool FunctionEmitter::generate() {
   // over that gap before the next check. This is an admission limit, not a total
   // memory bound (LLVM spills and runtime/recursive frames also consume stack).
   if (slots_.size() + 2 + std::max(1u, maxArgs_) > 1024) {
-    fail(nullptr, "function exceeds 1024 combined root/argument-slot admission limit");
+    fail(nullptr, "function exceeds 1024 combined root/argument-slot admission limit (roots=" +
+        std::to_string(slots_.size() + 2) + ", arguments=" +
+        std::to_string(std::max(1u, maxArgs_)) + ")");
     return false;
   }
   os_ << "define internal i64 " << module_.functionName(&function_)
