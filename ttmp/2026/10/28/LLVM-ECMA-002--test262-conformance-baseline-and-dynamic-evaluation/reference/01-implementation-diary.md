@@ -157,3 +157,40 @@ The initial full selection used six workers and processed roughly 2,800 variants
 The corrected complete extension gate passes 63/63 source contracts with unchanged inputs; the core gate passes 22/22. This includes the strict-source positive fixture at all four native optimization combinations and real lli, and all six directive-lookalike rejection contracts. Receipts are `reference/evidence/strict-eval-extensions.json` and `strict-eval-core.json`. General non-strict eval remains unsupported. The first post-change eval-family run (before the nested strictness resolver correction) improved from 381 to 390 passes without a previously passing variant regressing; final full-profile evidence will supersede that intermediate measurement.
 
 A source-path audit corrected the guide's Environment declaration reference from a nonexistent standalone header to `hermes/include/hermes/VM/Callable.h`. All literal repository file references then resolved. Uploaded the corrected guide under a new name, preserving any annotations on the first upload: `OK: uploaded LLVM-ECMA-002-Intern-Guide-Revision-2.pdf -> /ai/2026/10/28/LLVM-ECMA-002`. This is cloud-delivery evidence.
+
+## Step 4: Validate report aggregation and document the remaining storage change
+
+The strict-source runtime milestone was committed as `20fd0f6`. Added a checked report summarizer while the full pinned-suite run executes against that unchanged build. Inspected the actual Environment allocation, tracing, native mirror, and disabled semantic unresolver hook to make the remaining general-eval design concrete.
+
+### Prompt Context
+See Step 1. The later vault/module request remains deferred until this work reaches its requested checkpoint.
+
+### What I did
+Implemented report identity, partition, count, variant, fixture, and source-inventory checks. Added failure triage and an explicitly unreviewed edition-feature ledger. Ran adversarial aggregator tests and a real two-shard eval-builtin experiment. Added a detailed proposed storage/compiler integration design with source references and a reproducible broad-baseline script.
+
+### Why
+A sum of unrelated successful reports is not a baseline. Missing partitions or mixed builds must be rejected. General sloppy eval also needs semantic scope information beyond the current nearest-visible physical-slot descriptors.
+
+### What worked
+All three aggregator tests passed, including multiple invalid-report subcases. The two real partitions reconcile to 20 passing eval-builtin variants. All 16 runner tests still pass. The new design identifies Environment tracing and native layout assertions that any storage implementation must update together.
+
+### What didn't work
+The broad run is not yet complete and cannot be summarized as a final result. Early results include semantic failures and timeouts; these remain part of the experiment. Edition membership is unreviewed rather than inferred from feature tags.
+
+### What I learned
+Environment has fixed trailing storage and an explicit C layout mirror. The existing eval descriptor chain is physical and filters shadowed declarations; general declaration-conflict checking needs additional semantic scope metadata. The disabled unresolver hook alone cannot implement dynamic binding lookup.
+
+### What was tricky to build
+Aggregation must treat empty partitions, fixtures, and metadata failures consistently while rejecting duplicate variant identities. Failure categories remain triage hints; compiler diagnostics are not automatically sanctioned unsupported language contexts.
+
+### What warrants a second pair of eyes
+Review aggregate coverage checks and the proposed static-slot versus dynamic-cell binding representation. Do not mistake the additional design document for an implemented environment ABI change.
+
+### What should be done in the future
+Finish the broad run, preserve its report identity and ranked failures, and then use those findings to prioritize general eval storage and caller-context work.
+
+### Code review instructions
+Start with summarize_shllvm_test262.aggregate and its tests. Read the new general-eval design against Callable.h, sh_mirror.h, Callable.cpp, and genCallEvalExpr.
+
+### Technical details
+The broad run selects all of `test`, uses sixteen workers, frontend O0 / LLVM O0, compact passing records, and a checkpoint every 2,000 variants. Its raw report is `/tmp/llvm-002-full.json`; only a final `complete: true` with unchanged inputs can qualify it. The reusable invocation is in `scripts/01-run-broad-baseline.sh`.

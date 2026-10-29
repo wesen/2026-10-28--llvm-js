@@ -112,3 +112,15 @@ variants (default 1000). An interrupted run remains incomplete; there is no
 resume support yet. `--compact` omits command records only for passing variants,
 retaining their source, harness and artifact identities. Failures keep commands.
 Output and temporary publication paths cannot replace fingerprinted inputs.
+
+Validate and summarize completed reports with:
+
+```sh
+python3 utils/summarize_shllvm_test262.py --output summary.json shard-*.json
+```
+
+The summarizer requires every partition, matching build and selection identities,
+consistent result counts, unique test/variant records, and complete source/fixture
+coverage. It rejects partial reports. Failure groups are triage categories rather
+than normative judgments. The feature ledger marks edition membership unreviewed;
+a feature tag alone does not establish membership in a particular edition.
