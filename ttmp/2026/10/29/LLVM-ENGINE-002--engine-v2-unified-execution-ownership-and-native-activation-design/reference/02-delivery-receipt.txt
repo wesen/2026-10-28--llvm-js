@@ -1,0 +1,3 @@
+Command: remarquee upload bundle design-doc/01-engine-v2-architecture-and-intern-implementation-guide.md --name "LLVM-ENGINE-002 Engine V2 Intern Design Guide" --remote-dir "/ai/2026/10/29/LLVM-ENGINE-002" --toc-depth 2 --non-interactive
+Result: OK: uploaded LLVM-ENGINE-002 Engine V2 Intern Design Guide.pdf -> /ai/2026/10/29/LLVM-ENGINE-002
+Evidence level: successful cloud upload; physical device synchronization not independently checked.
