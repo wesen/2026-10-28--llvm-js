@@ -360,7 +360,7 @@ typedef struct SHConsoleContext SHConsoleContext;
 extern SHConsoleContext *init_console_bindings(SHRuntime *,int,const char *const *);
 extern void release_console_bindings(SHConsoleContext *);
 extern void free_console_context(SHConsoleContext *);
-extern bool run_event_loop(SHRuntime *,SHConsoleContext *);
+extern bool run_event_loop(SHRuntime *,SHConsoleContext *,bool);
 extern void shllvm_test262_exception(SHRuntime *, const SHLegacyValue *);
 int32_t shllvm_run(int32_t argc, void *argv_raw, void *creator) {
   _SH_MODEL();
@@ -397,7 +397,7 @@ int32_t shllvm_run(int32_t argc, void *argv_raw, void *creator) {
   } else {
     success = _sh_initialize_units(shr,1,(SHUnitCreator)creator);
   }
-  success = success && run_event_loop(shr,console);
+  success = success && run_event_loop(shr,console,test262);
   release_console_bindings(console);
   _sh_done(shr);
   free_console_context(console);

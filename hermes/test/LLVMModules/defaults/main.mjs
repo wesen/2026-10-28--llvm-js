@@ -1,3 +1,5 @@
+import Own from './static-name.mjs';
+if(Own.name()!=='own')throw Error('own static name');
 import f from './function.mjs';
 import C from './class.mjs';
 import a from './arrow.mjs';

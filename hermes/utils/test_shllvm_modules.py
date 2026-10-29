@@ -36,7 +36,7 @@ def main():
         sources = [p for p in sources if p.parent.name in args.case]
     if not sources:
         parser.error('no selected module graphs')
-    fingerprint_paths = [*CASES.rglob('*.mjs'), ROOT / 'utils/shllvm.py', Path(__file__).resolve(),
+    fingerprint_paths = [*CASES.rglob('*.mjs'), *CASES.rglob('oracle.json'), ROOT / 'utils/shllvm.py', Path(__file__).resolve(),
         * (ROOT / 'utils/module-host').glob('*.js'), * (ROOT / 'utils/module-host').glob('*.cjs'),
         ROOT / 'utils/module-host/pnpm-lock.yaml', args.build_dir / 'bin/shermes',
         args.build_dir / 'lib/libshllvm_runtime.a', args.build_dir / 'lib/libshllvm_runtime.so',
@@ -50,8 +50,11 @@ def main():
             includes = sorted(source.parent.glob('*.mjs')) if case == 'errors' else []
             node = invoke(['node', '--input-type=module', '-e',
                           'globalThis.print=console.log; await import(' + json.dumps(source.as_uri()) + ');'])
-            item = {'case': case, 'oracle': node, 'runs': []}
-            item['passed'] = node['exit'] == 0 and bool(node['stdout'])
+            qualification_path = source.parent / 'oracle.json'
+            qualification = json.loads(qualification_path.read_text()) if qualification_path.exists() else None
+            expected_stdout = qualification['expected_stdout'] if qualification else node['stdout']
+            item = {'case': case, 'oracle': node, 'oracle_qualification': qualification, 'runs': []}
+            item['passed'] = bool(expected_stdout) and (bool(qualification) or node['exit'] == 0)
             profiles = [('O', '2')] if args.quick else [('O0','0'), ('O0','2'), ('O','0'), ('O','2')]
             for action, hermes, llvm in [('run', h, l) for h,l in profiles] + [('jit','O','2')]:
                 command = [sys.executable, ROOT / 'utils/shllvm.py', action, '--module',
@@ -62,7 +65,7 @@ def main():
                 command += [source, '-o', Path(temporary) / (case + '-' + action + '-' + hermes + '-' + llvm)]
                 result = invoke(command)
                 result.update(action=action, hermes=hermes, llvm=llvm)
-                result['passed'] = result['exit'] == 0 and result['stdout'] == node['stdout']
+                result['passed'] = result['exit'] == 0 and result['stdout'] == expected_stdout
                 item['passed'] = item['passed'] and result['passed']
                 item['runs'].append(result)
             results.append(item)

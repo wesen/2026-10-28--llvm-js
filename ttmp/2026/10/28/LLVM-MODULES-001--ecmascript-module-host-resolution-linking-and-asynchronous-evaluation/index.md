@@ -1,7 +1,7 @@
 ---
 Title: ECMAScript module host resolution linking and asynchronous evaluation
 Ticket: LLVM-MODULES-001
-Status: active
+Status: complete
 Topics:
     - llvm
     - javascript
@@ -15,7 +15,7 @@ RelatedFiles:
       Note: Driver integration point
 ExternalSources: []
 Summary: ""
-LastUpdated: 2026-10-28T21:47:56.215875237-04:00
+LastUpdated: 2026-10-28T22:53:01.229504205-04:00
 WhatFor: ""
 WhenToUse: ""
 ---
@@ -24,7 +24,7 @@ WhenToUse: ""
 
 ## Overview
 
-<!-- Provide a brief overview of the ticket, its goals, and current status -->
+Implemented a closed filesystem module host compiled through Hermes and LLVM: lexical live bindings, export resolution, cyclic linking/evaluation, namespaces, dynamic imports, and top-level await. See the [implementation guide](design-doc/01-module-host-architecture-and-implementation-guide.md), [diary](reference/01-implementation-diary.md), and [operational contract](../../../../../hermes/docs/llvm/MODULES.md). Explicit unsupported contracts and qualification counts are recorded with retained evidence.
 
 ## Key Links
 

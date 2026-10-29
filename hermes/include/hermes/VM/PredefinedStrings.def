@@ -492,6 +492,7 @@ STR(enablePromiseRejectionTracker, "enablePromiseRejectionTracker")
 STR(spawnAsync, "spawnAsync") /* NOLINT */
 STR(makeAsyncIterator, "makeAsyncIterator") /* NOLINT */
 STR(awaitAsyncGenerator, "awaitAsyncGenerator") /* NOLINT */
+STR(moduleThen, "moduleThen") /* NOLINT */
 
 STR(SHBuiltin, "$SHBuiltin")
 

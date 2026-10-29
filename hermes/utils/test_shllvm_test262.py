@@ -84,7 +84,7 @@ def classify(record, phase, expected=None, asynchronous=False):
         if re.search(r'^.+:\d+:\d+: error:', record['stderr'], re.M):
             error = 'SyntaxError'
     elif phase == 'runtime' and record['exit_code'] == 1:
-        match = re.search(r'^SHLLVM_TEST262_EXCEPTION:([A-Za-z]+Error)$', record['stderr'], re.M)
+        match = re.search(r'^SHLLVM_TEST262_EXCEPTION:([A-Za-z][A-Za-z0-9]*Error)$', record['stderr'], re.M)
         if match:
             error = match.group(1)
     if asynchronous:
@@ -146,10 +146,10 @@ def prepare_source(source, meta, variant, suite):
     return prefix + ''.join(p.read_text() + '\n' for p in paths) + source, paths
 
 
-def unsupported_reason(meta):
+def unsupported_reason(meta, modules=False):
     flags = set(meta.get('flags', []))
     features = set(meta.get('features', []))
-    if 'module' in flags:
+    if 'module' in flags and not modules:
         return 'module loading/linking/evaluation is not implemented by this runner'
     missing = features.intersection({'cross-realm', 'SharedArrayBuffer', 'Atomics', 'IsHTMLDDA'})
     if missing:
@@ -163,16 +163,38 @@ def execute_variant(path, meta, variant, suite, args, context, directory):
     result = {'test': str(path.relative_to(suite)), 'source_sha256': digest(path),
               'variant': variant, 'features': meta.get('features', []),
               'expected': meta.get('negative'), 'commands': []}
-    reason = unsupported_reason(meta)
+    reason = unsupported_reason(meta, args.modules)
     if reason:
         return dict(result, status='unsupported', reason=reason)
     try:
-        source, includes = prepare_source(path.read_bytes().decode('utf-8'), meta, variant, suite)
+        source, includes = prepare_source('' if variant == 'module' else path.read_bytes().decode('utf-8'), meta, variant, suite)
     except (OSError, ValueError) as exc:
         return dict(result, status='harness_error', reason=str(exc))
     result['includes'] = {str(p.relative_to(suite)): digest(p) for p in includes}
     generated = directory / 'test.js'
     generated.write_bytes(source.encode('utf-8'))
+    if variant == 'module':
+        prelude = directory / 'harness.js'
+        prelude.write_text(source)
+        graph, check = directory / 'modules.json', directory / 'check.json'
+        record = invoke([shllvm.find_tool('node'), ROOT / 'utils/module-host/compiler.cjs', path,
+                         '--root', suite, '--prelude', prelude, '--output', generated,
+                         '--manifest', graph, '--check-output', check,
+                         '--completion', 'SHLLVM_MODULE_COMPLETE'], args.compile_timeout, directory)
+        result['commands'].append(record)
+        if record['exit_code'] != 0:
+            return dict(result, status=process_failure(record) or 'infrastructure_error', observed_phase='module-prepare')
+        validation = json.loads(check.read_text())
+        result['module_validation'] = validation
+        result['module_graph'] = json.loads(graph.read_text())
+        result['validation_engine'] = 'Babel module parser and shared host link-only execution in Node; bodies execute through LLVM'
+        expected = meta.get('negative')
+        phase = validation['phase']
+        if phase != 'ready':
+            matched = expected == {'phase': phase, 'type': validation['type']}
+            return dict(result, status='unsupported' if phase == 'unsupported' else 'pass' if matched else 'semantic_failure', observed_phase=phase)
+        if expected and expected['phase'] in ('parse', 'resolution'):
+            return dict(result, status='semantic_failure', observed_phase=expected['phase'])
     result['prepared_sha256'] = digest(generated)
     build, settings, tools, compiler, runtime, asan, ubsan = context
     frontend = [compiler, f'-{args.hermes_opt}', '-test262', '-fno-static-builtins',
@@ -207,6 +229,8 @@ def execute_variant(path, meta, variant, suite, args, context, directory):
                      '-Xmicrotask-queue'], args.run_timeout, directory)
     result['commands'].append(record)
     result['artifacts'] = {p.name: digest(p) for p in (raw, bitcode, optimized, executable)}
+    if variant == 'module' and not expected and record['stdout'].splitlines().count('SHLLVM_MODULE_COMPLETE') != 1:
+        return dict(result, status=process_failure(record) or 'semantic_failure', observed_phase='runtime')
     return dict(result, status=classify(record, 'runtime', expected,
                                        'async' in meta.get('flags', [])), observed_phase='runtime')
 
@@ -264,6 +288,7 @@ def main():
     parser.add_argument('--shard-count', type=int, default=1)
     parser.add_argument('--shard-index', type=int, default=0)
     parser.add_argument('--checkpoint-every', type=int, default=1000)
+    parser.add_argument('--modules', action='store_true', help='enable the closed source-text module host')
     parser.add_argument('--compact', action='store_true', help='omit command records for passing variants')
     parser.add_argument('--compile-timeout', type=float, default=60)
     parser.add_argument('--run-timeout', type=float, default=10)
@@ -304,6 +329,10 @@ def main():
         build / 'CMakeCache.txt', build / 'lib/config/libhermesvm-config.h',
         build / 'bin/shermes', build / 'lib/libshllvm_runtime.a',
         build / 'lib/libhermesvm.so', build / 'tools/shermes/libshermes_console.so'}
+    if args.modules:
+        inputs |= set((suite / 'test').rglob('*.js'))
+        inputs |= set((ROOT / 'utils/module-host').rglob('*.js')) | set((ROOT / 'utils/module-host').rglob('*.cjs'))
+        inputs |= {ROOT / 'utils/module-host/pnpm-lock.yaml', ROOT / 'utils/module-host/package.json', shllvm.find_tool('node')}
     try:
         protect_output(args.output, inputs)
     except ValueError as exc:
@@ -317,8 +346,9 @@ def main():
               'partition': {'count': args.shard_count, 'index': args.shard_index,
                             'selected_files_before_partition': len(files), 'selected_files': len(selected)},
               'execution': {'jobs': args.jobs, 'checkpoint_every': args.checkpoint_every, 'compact': args.compact},
-              'host_limitations': ['modules', 'cross-realm', 'agents/shared memory',
-                                   'asynchronous uncaught exceptions lack structured identity']}
+              'module_host': args.modules,
+              'host_limitations': ([] if args.modules else ['modules']) + ['cross-realm', 'agents/shared memory',
+                                   'closed filesystem modules; direct eval and import attributes/options unavailable' if args.modules else 'script mode has no module host']}
     write_report(args.output, report)
     tasks = []
     for path in selected:

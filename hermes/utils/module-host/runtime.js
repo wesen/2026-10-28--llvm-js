@@ -10,6 +10,9 @@ function createModuleHost(definitions, aliases) {
   const resolvePromise = Promise.resolve.bind(Promise);
   const apply = Reflect.apply;
   const own = (object, key) => Object.prototype.hasOwnProperty.call(object, key);
+  function then(promise, fulfilled, rejected) {
+    return $SHBuiltin.moduleThen(promise, fulfilled, rejected);
+  }
   function capability() {
     let resolve, reject;
     const promise = new PromiseCtor((yes, no) => { resolve = yes; reject = no; });
@@ -18,7 +21,7 @@ function createModuleHost(definitions, aliases) {
   for (const definition of definitions) {
     records[definition.id] = {
       definition, id: definition.id, state: 'new', cells: Object.create(null),
-      namespace: null, iterator: null, error: undefined, failed: false,
+      namespace: null, namespaceCell: null, iterator: null, error: undefined, failed: false,
       ancestor: 0, root: null, order: null, pending: 0, parents: [], completion: null,
       meta: Object.assign(Object.create(null), {url: definition.url})
     };
@@ -58,8 +61,8 @@ function createModuleHost(definitions, aliases) {
       if (entry.local !== undefined) return module.cells[entry.local];
       const target = record(entry.from);
       if (entry.name === '*') {
-        if (!entry.cell) entry.cell = {read: () => namespace(target)};
-        return entry.cell;
+        if (!target.namespaceCell) target.namespaceCell = {read: () => namespace(target)};
+        return target.namespaceCell;
       }
       return exportCell(target, entry.name, next);
     }
@@ -124,9 +127,42 @@ function createModuleHost(definitions, aliases) {
     });
     return module.namespace;
   }
+  function iteratorResult(value) {
+    if (value === null || (typeof value !== 'object' && typeof value !== 'function'))
+      throw new TypeError('Iterator result is not an object');
+    return value;
+  }
+  function asyncIterator(value) {
+    const asyncMethod = value[Symbol.asyncIterator];
+    const synchronous = asyncMethod == null;
+    const method = synchronous ? value[Symbol.iterator] : asyncMethod;
+    const iterator = iteratorResult(apply(method, value, []));
+    const next = iterator.next;
+    function continuation(result) {
+      iteratorResult(result);
+      const done = !!result.done;
+      return then(resolvePromise(result.value), value => ({value, done}));
+    }
+    return {
+      next() {
+        const result = apply(next, iterator, []);
+        return synchronous ? continuation(result) : result;
+      },
+      close() {
+        const method = iterator.return;
+        if (method == null) return synchronous ? () => resolvePromise({value: undefined, done: true}) : null;
+        return () => {
+          const result = apply(method, iterator, []);
+          return synchronous ? continuation(result) : result;
+        };
+      }
+    };
+  }
   function context(module) {
     return {
       instantiated: marker,
+      iterator: asyncIterator,
+      result: iteratorResult,
       bind(name, read) { module.cells[name] = {read}; },
       defaultName(value) { Object.defineProperty(value, 'name', {value: 'default', configurable: true}); return value; },
       target(id, name) {
@@ -142,14 +178,28 @@ function createModuleHost(definitions, aliases) {
           // Conversion belongs to import evaluation, but errors reject its Promise.
           let id;
           try {
-            if (options !== undefined) throw new TypeError('Import options are not supported by this module host');
             id = resolveRequest(request);
+            if (options !== undefined) {
+              if (options === null || (typeof options !== 'object' && typeof options !== 'function'))
+                throw new TypeError('Import options must be an object');
+              const attributes = options.with;
+              if (attributes !== undefined) {
+                if (attributes === null || (typeof attributes !== 'object' && typeof attributes !== 'function'))
+                  throw new TypeError('Import attributes must be an object');
+                const keys = Object.keys(attributes);
+                for (const key of keys)
+                  if (typeof attributes[key] !== 'string') throw new TypeError('Import attribute values must be strings');
+                if (keys.length) throw new TypeError('Import attributes are not supported by this module host');
+              }
+            }
           } catch (error) { reject(error); return; }
-          resolvePromise().then(() => {
-            const target = record(id);
-            link(target);
-            return evaluate(target);
-          }).then(() => fulfill(namespace(record(id))), reject);
+          then(resolvePromise(), () => {
+            try {
+              const target = record(id);
+              link(target);
+              then(evaluate(target), () => fulfill(namespace(target)), reject);
+            } catch (error) { reject(error); }
+          }, reject);
         });
         function resolveRequest(request) { return resolve(module.id, request); }
       },
@@ -208,16 +258,16 @@ function createModuleHost(definitions, aliases) {
       try { result = module.iterator[method](value); }
       catch (error) { done.reject(error); return; }
       if (result.done) { done.resolve(); return; }
-      resolvePromise(result.value).then(value => resume('next', value), error => resume('throw', error));
+      then(resolvePromise(result.value), value => resume('next', value), error => resume('throw', error));
     }
     resume('next', undefined);
-    done.promise.then(() => fulfilled(module), error => rejected(module, error));
+    then(done.promise, () => fulfilled(module), error => rejected(module, error));
   }
   function rejected(module, error) {
     if (module.failed) return;
     module.failed = true; module.error = error; module.state = 'evaluated';
-    for (const parent of module.parents) rejected(parent, error);
     if (module.completion) module.completion.reject(error);
+    for (const parent of module.parents) rejected(parent, error);
   }
   function gather(module, ready) {
     for (const parent of module.parents) {
@@ -301,10 +351,11 @@ function createModuleHost(definitions, aliases) {
     return entry.completion.promise;
   }
   return {
-    start(id) {
+    check(id) { link(record(id)); },
+    run(id, onComplete, onError) {
       const entry = record(id);
       link(entry);
-      return evaluate(entry);
+      then(evaluate(entry), onComplete, onError);
     }
   };
 }

@@ -177,6 +177,7 @@ JS_BUILTIN(spawnAsync)
 MARK_FIRST_JS_BUILTIN(spawnAsync)
 JS_BUILTIN(makeAsyncIterator)
 JS_BUILTIN(awaitAsyncGenerator)
+JS_BUILTIN(moduleThen)
 
 #undef NORMAL_OBJECT
 #undef NORMAL_METHOD

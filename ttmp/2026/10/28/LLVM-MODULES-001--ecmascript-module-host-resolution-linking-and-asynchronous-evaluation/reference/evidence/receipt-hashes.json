@@ -1,0 +1,26 @@
+{
+  "test262-module-code-final.json.gz": {
+    "uncompressed_sha256": "51ecacc3505402a688021b5e964f83bb3c0893a57eb68cff51188a105077c7b5",
+    "uncompressed_bytes": 47078884
+  },
+  "test262-module-code-initial.json.gz": {
+    "uncompressed_sha256": "6344cbcfce16fb5d5a9350fb8134bdd48250935e25f3f864960c4daf7af17b9b",
+    "uncompressed_bytes": 10915986
+  },
+  "fourteen-graph-matrix.json": {
+    "uncompressed_sha256": "db8d2973ce9c91a1b6976d76520978ac749011484301f908d266e8a1145c9e3a",
+    "uncompressed_bytes": 93571
+  },
+  "core-final.json": {
+    "uncompressed_sha256": "21cdb44bfe22ecc2ff258f77e164063dcd9cc9db8615809730fea1a35699ad0d",
+    "uncompressed_bytes": 165340
+  },
+  "extensions-final.json": {
+    "uncompressed_sha256": "450813ca9d7d5cc0f13f5c70db18796bc118d420f4bf9aedd929149e7791f4b1",
+    "uncompressed_bytes": 1025362
+  },
+  "exception-probes-final.json": {
+    "uncompressed_sha256": "0aa9c3abb6486af812c47a15632b7f8057360e44608bd89ecd5caabb547cd8cc",
+    "uncompressed_bytes": 72312
+  }
+}

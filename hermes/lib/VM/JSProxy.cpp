@@ -1474,6 +1474,17 @@ CallResult<PseudoHandle<JSArray>> JSProxy::ownPropertyKeys(
   for (uint32_t i = 0, len = JSArray::getLength(*targetKeys, runtime); i < len;
        ++i) {
     marker.flush();
+    // Indexed ordinary-object keys can use internal numeric storage. The
+    // Proxy invariant comparison operates on String/Symbol property keys.
+    auto key = runtime.makeHandle(targetKeys->at(runtime, i).unboxToHV(runtime));
+    if (key->isNumber()) {
+      auto string = toString_RJS(runtime, key);
+      if (string == ExecutionStatus::EXCEPTION)
+        return ExecutionStatus::EXCEPTION;
+      if (JSArray::setElementAt(targetKeys, runtime, i,
+              runtime.makeHandle(std::move(*string))) == ExecutionStatus::EXCEPTION)
+        return ExecutionStatus::EXCEPTION;
+    }
     //   a. Let desc be ? target.[[GetOwnProperty]](key).
     ComputedPropertyDescriptor desc;
     CallResult<bool> descRes = JSObject::getOwnComputedDescriptor(

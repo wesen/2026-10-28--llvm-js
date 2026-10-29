@@ -32,7 +32,7 @@ extern "C" SHERMES_EXPORT void shllvm_test262_exception(
         if (view.length() <= 128) {
           for (size_t i = 0; i < view.length(); ++i) {
             auto c = view[i];
-            if (!((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z'))) {
+            if (!((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || (c >= '0' && c <= '9'))) {
               name.clear();
               break;
             }

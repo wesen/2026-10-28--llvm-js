@@ -134,15 +134,22 @@ def emit_and_verify(args, ll_path, context, log, output):
         if args.module:
             compilation_source = temp / "modules.js"
             graph_manifest = temp / "modules.json"
+            module_check = temp / "module-check.json"
             node = find_tool("node")
             module_command = [node, ROOT / "utils/module-host/compiler.cjs", source,
-                              "--output", compilation_source, "--manifest", graph_manifest]
+                              "--output", compilation_source, "--manifest", graph_manifest,
+                              "--check-output", module_check]
             if args.module_root:
                 module_command += ["--root", Path(args.module_root).resolve()]
             for included in args.module_include:
                 module_command += ["--include", Path(included).resolve()]
             command(module_command, capture=True, log=log)
+            validation = json.loads(module_check.read_text())
+            if validation["phase"] != "ready":
+                raise BuildError("Module " + validation["phase"] + ": " + validation["message"])
             module_manifest = json.loads(graph_manifest.read_text())
+            module_manifest["link_validation"] = validation
+            module_manifest["node_executable_sha256"] = sha256(node)
             module_manifest["bundle_sha256"] = sha256(compilation_source)
             # Protect every graph input, including aliases and hardlinks, from
             # every published artifact, not just the entry/executable pair.

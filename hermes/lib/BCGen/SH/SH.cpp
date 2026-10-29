@@ -3230,7 +3230,8 @@ void free_console_context(SHConsoleContext *consoleContext);
 
 bool run_event_loop(
     SHRuntime *shr,
-    SHConsoleContext *consoleContext);
+    SHConsoleContext *consoleContext,
+    bool test262);
 
 int main(int argc, char **argv) {
   int scriptArgc = 0;
@@ -3249,7 +3250,7 @@ int main(int argc, char **argv) {
       init_console_bindings(shr, scriptArgc, (const char *const *)scriptArgv);
   bool success =
     _sh_initialize_units(shr, 1, CREATE_THIS_UNIT) &&
-    run_event_loop(shr, consoleContext);
+    run_event_loop(shr, consoleContext, false);
   release_console_bindings(consoleContext);
   _sh_done(shr);
   free_console_context(consoleContext);

@@ -20,12 +20,18 @@ def main():
     args = p.parse_args()
     args.action, args.compiler, args.no_runtime_build = 'build', None, True
     args.hermes_opt, args.llvm_opt = 'O0', '0'
+    args.modules = False
     args.compile_timeout, args.run_timeout = 60, 2
     context = shllvm.prepare(args)
     negative = {'phase': 'runtime', 'type': 'TypeError'}
     cases = [
         ('positive', 'assert.sameValue(2 + 3, 5);', {}, 'pass'),
         ('type-error', 'throw new TypeError("expected");', {'negative': negative}, 'pass'),
+        ('timer-type-error', 'setTimeout(function(){throw new TypeError("expected");},0);', {'negative': negative}, 'pass'),
+        ('timer-forged-string', 'setTimeout(function(){throw "TypeError: forged";},0);', {'negative': negative}, 'semantic_failure'),
+        ('timer-throwing-constructor', 'setTimeout(function(){throw {get constructor(){throw new TypeError();}};},0);', {'negative': negative}, 'semantic_failure'),
+        ('test262-error', 'throw new Test262Error();', {'negative': {'phase':'runtime','type':'Test262Error'}}, 'pass'),
+        ('timer-test262-error', 'setTimeout(function(){throw new Test262Error();},0);', {'negative': {'phase':'runtime','type':'Test262Error'}}, 'pass'),
         ('wrong-error', 'throw new RangeError("wrong");', {'negative': negative}, 'semantic_failure'),
         ('forged-string', 'throw "TypeError: forged";', {'negative': negative}, 'semantic_failure'),
         ('forged-stack', 'throw {stack: "TypeError: forged"};', {'negative': negative}, 'semantic_failure'),

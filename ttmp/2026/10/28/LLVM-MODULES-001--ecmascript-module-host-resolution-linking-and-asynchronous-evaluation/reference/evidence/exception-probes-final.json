@@ -1,0 +1,1924 @@
+{
+  "synthetic_probes": [
+    {
+      "test": "positive.js",
+      "source_sha256": "78131f3ed9912f1f52b90614d3a10322bcd6d754381f0d172bb77e8ec797af8b",
+      "variant": "sloppy",
+      "features": [],
+      "expected": null,
+      "commands": [
+        {
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/bin/shermes",
+            "-O0",
+            "-test262",
+            "-fno-static-builtins",
+            "-Xes6-block-scoping",
+            "-Xenable-tdz",
+            "-Xasync-generators",
+            "-emit-llvm",
+            "/tmp/shllvm-native-probes-bm_ylbl1/positive/test.js",
+            "-o",
+            "/tmp/shllvm-native-probes-bm_ylbl1/positive/test.ll"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "",
+          "seconds": 0.00812
+        },
+        {
+          "command": [
+            "/usr/lib/llvm-18/bin/llvm-as",
+            "/tmp/shllvm-native-probes-bm_ylbl1/positive/test.ll",
+            "-o",
+            "/tmp/shllvm-native-probes-bm_ylbl1/positive/test.bc"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "",
+          "seconds": 0.018708
+        },
+        {
+          "command": [
+            "/usr/lib/llvm-18/bin/opt",
+            "-passes=verify",
+            "/tmp/shllvm-native-probes-bm_ylbl1/positive/test.bc",
+            "-o",
+            "/tmp/shllvm-native-probes-bm_ylbl1/positive/opt.bc"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "",
+          "seconds": 0.01593
+        },
+        {
+          "command": [
+            "/usr/lib/llvm-18/bin/clang",
+            "/tmp/shllvm-native-probes-bm_ylbl1/positive/opt.bc",
+            "-O0",
+            "-Wno-override-module",
+            "-L/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/lib",
+            "-Wl,-rpath,/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/lib",
+            "-L/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/tools/shermes",
+            "-Wl,-rpath,/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/tools/shermes",
+            "-L/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/jsi",
+            "-Wl,-rpath,/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/jsi",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/lib/libshllvm_runtime.a",
+            "-lshermes_console",
+            "-lhermesvm",
+            "-lm",
+            "-o",
+            "/tmp/shllvm-native-probes-bm_ylbl1/positive/program"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "",
+          "seconds": 0.165448
+        },
+        {
+          "command": [
+            "/tmp/shllvm-native-probes-bm_ylbl1/positive/program",
+            "--shllvm-test262",
+            "-Xhermes-internal-test-methods",
+            "-Xes6-proxy",
+            "-Xmicrotask-queue"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "",
+          "seconds": 0.008314
+        }
+      ],
+      "includes": {
+        "harness/sta.js": "1930c54af79455c484799f43e9a28e2b2f15c40d0917c9941ca54e26db243f35",
+        "harness/assert.js": "206e274ca325eb8a652e3911c3fbd090e2480d11ed7579dc17a5d17a2360ed48"
+      },
+      "prepared_sha256": "a78b83af03c6807b00a2a751240a5ff05a3f2a399717f621ef7191752d2e883f",
+      "artifacts": {
+        "test.ll": "4b1b659ddf2906349b3ec4cf184e71d49a2249ba6c715603a312382e680b93df",
+        "test.bc": "318c2a7123f38e288373fc0a280cf598fe32eedf32d2bde545183bd911e7cd5e",
+        "opt.bc": "bde1c62433dae99d2df152f9df5c81fdb6caa5c7d791b2e873987b1537856320",
+        "program": "955e5efa4f5582b6b73240c46278c545151de2a8aff46eabe7d8909b497cf293"
+      },
+      "status": "pass",
+      "observed_phase": "runtime",
+      "probe": "positive",
+      "expected_status": "pass",
+      "matched": true
+    },
+    {
+      "test": "type-error.js",
+      "source_sha256": "3673e86b6aab24b1ba6513f299f8305c7cfcf978a0185df864ed07710868f3a6",
+      "variant": "sloppy",
+      "features": [],
+      "expected": {
+        "phase": "runtime",
+        "type": "TypeError"
+      },
+      "commands": [
+        {
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/bin/shermes",
+            "-O0",
+            "-test262",
+            "-fno-static-builtins",
+            "-Xes6-block-scoping",
+            "-Xenable-tdz",
+            "-Xasync-generators",
+            "-emit-llvm",
+            "/tmp/shllvm-native-probes-bm_ylbl1/type-error/test.js",
+            "-o",
+            "/tmp/shllvm-native-probes-bm_ylbl1/type-error/test.ll"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "",
+          "seconds": 0.010865
+        },
+        {
+          "command": [
+            "/usr/lib/llvm-18/bin/llvm-as",
+            "/tmp/shllvm-native-probes-bm_ylbl1/type-error/test.ll",
+            "-o",
+            "/tmp/shllvm-native-probes-bm_ylbl1/type-error/test.bc"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "",
+          "seconds": 0.032136
+        },
+        {
+          "command": [
+            "/usr/lib/llvm-18/bin/opt",
+            "-passes=verify",
+            "/tmp/shllvm-native-probes-bm_ylbl1/type-error/test.bc",
+            "-o",
+            "/tmp/shllvm-native-probes-bm_ylbl1/type-error/opt.bc"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "",
+          "seconds": 0.019947
+        },
+        {
+          "command": [
+            "/usr/lib/llvm-18/bin/clang",
+            "/tmp/shllvm-native-probes-bm_ylbl1/type-error/opt.bc",
+            "-O0",
+            "-Wno-override-module",
+            "-L/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/lib",
+            "-Wl,-rpath,/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/lib",
+            "-L/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/tools/shermes",
+            "-Wl,-rpath,/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/tools/shermes",
+            "-L/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/jsi",
+            "-Wl,-rpath,/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/jsi",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/lib/libshllvm_runtime.a",
+            "-lshermes_console",
+            "-lhermesvm",
+            "-lm",
+            "-o",
+            "/tmp/shllvm-native-probes-bm_ylbl1/type-error/program"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "",
+          "seconds": 0.115171
+        },
+        {
+          "command": [
+            "/tmp/shllvm-native-probes-bm_ylbl1/type-error/program",
+            "--shllvm-test262",
+            "-Xhermes-internal-test-methods",
+            "-Xes6-proxy",
+            "-Xmicrotask-queue"
+          ],
+          "exit_code": 1,
+          "stdout": "",
+          "stderr": "SHLLVM_TEST262_EXCEPTION:TypeError\n",
+          "seconds": 0.007727
+        }
+      ],
+      "includes": {
+        "harness/sta.js": "1930c54af79455c484799f43e9a28e2b2f15c40d0917c9941ca54e26db243f35",
+        "harness/assert.js": "206e274ca325eb8a652e3911c3fbd090e2480d11ed7579dc17a5d17a2360ed48"
+      },
+      "prepared_sha256": "b1e8bae030b3b9ecf232adfd5adde74c789d09cfc7103f19ef8dfc8af6118104",
+      "artifacts": {
+        "test.ll": "2b0f733652fd8a4cfffd39a7c8ee7c40b45a7b2d22adfd979be4fa265cb0da6e",
+        "test.bc": "b4ac47bbbeba869d135b181a25a2ec5bd0e7fae7a70f85253613d87a9bd76f74",
+        "opt.bc": "b90bb42be01ef114be0c1fc2039e7188bc787221752dc7208c9f10951f8c22f4",
+        "program": "feb822b142b93f0b5945e1b5bb53f114ea6ef2cd5a61393b226ef140e91fd463"
+      },
+      "status": "pass",
+      "observed_phase": "runtime",
+      "probe": "type-error",
+      "expected_status": "pass",
+      "matched": true
+    },
+    {
+      "test": "timer-type-error.js",
+      "source_sha256": "cd4abe83d21bc65ae13ab56eead444e71ad77495d722e47e2fba6649aee92dd6",
+      "variant": "sloppy",
+      "features": [],
+      "expected": {
+        "phase": "runtime",
+        "type": "TypeError"
+      },
+      "commands": [
+        {
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/bin/shermes",
+            "-O0",
+            "-test262",
+            "-fno-static-builtins",
+            "-Xes6-block-scoping",
+            "-Xenable-tdz",
+            "-Xasync-generators",
+            "-emit-llvm",
+            "/tmp/shllvm-native-probes-bm_ylbl1/timer-type-error/test.js",
+            "-o",
+            "/tmp/shllvm-native-probes-bm_ylbl1/timer-type-error/test.ll"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "",
+          "seconds": 0.003573
+        },
+        {
+          "command": [
+            "/usr/lib/llvm-18/bin/llvm-as",
+            "/tmp/shllvm-native-probes-bm_ylbl1/timer-type-error/test.ll",
+            "-o",
+            "/tmp/shllvm-native-probes-bm_ylbl1/timer-type-error/test.bc"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "",
+          "seconds": 0.032926
+        },
+        {
+          "command": [
+            "/usr/lib/llvm-18/bin/opt",
+            "-passes=verify",
+            "/tmp/shllvm-native-probes-bm_ylbl1/timer-type-error/test.bc",
+            "-o",
+            "/tmp/shllvm-native-probes-bm_ylbl1/timer-type-error/opt.bc"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "",
+          "seconds": 0.032054
+        },
+        {
+          "command": [
+            "/usr/lib/llvm-18/bin/clang",
+            "/tmp/shllvm-native-probes-bm_ylbl1/timer-type-error/opt.bc",
+            "-O0",
+            "-Wno-override-module",
+            "-L/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/lib",
+            "-Wl,-rpath,/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/lib",
+            "-L/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/tools/shermes",
+            "-Wl,-rpath,/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/tools/shermes",
+            "-L/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/jsi",
+            "-Wl,-rpath,/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/jsi",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/lib/libshllvm_runtime.a",
+            "-lshermes_console",
+            "-lhermesvm",
+            "-lm",
+            "-o",
+            "/tmp/shllvm-native-probes-bm_ylbl1/timer-type-error/program"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "",
+          "seconds": 0.114099
+        },
+        {
+          "command": [
+            "/tmp/shllvm-native-probes-bm_ylbl1/timer-type-error/program",
+            "--shllvm-test262",
+            "-Xhermes-internal-test-methods",
+            "-Xes6-proxy",
+            "-Xmicrotask-queue"
+          ],
+          "exit_code": 1,
+          "stdout": "",
+          "stderr": "SHLLVM_TEST262_EXCEPTION:TypeError\n",
+          "seconds": 0.003622
+        }
+      ],
+      "includes": {
+        "harness/sta.js": "1930c54af79455c484799f43e9a28e2b2f15c40d0917c9941ca54e26db243f35",
+        "harness/assert.js": "206e274ca325eb8a652e3911c3fbd090e2480d11ed7579dc17a5d17a2360ed48"
+      },
+      "prepared_sha256": "ca7f157e752d8c94aad7a5a2d0d8a3f7ffd58a413251f10f4731d10f15060d8d",
+      "artifacts": {
+        "test.ll": "b1b519b9f227e16d13d51bc886eac0818cf5ca2cf0f6f19638fec0c41e1f691e",
+        "test.bc": "0f45bef2dfac7705b6b227935ee3d657cd78ee9d338543ea2c462c9890460b06",
+        "opt.bc": "2006dbbee48f9490cd8e094fa647c50c5bc29de751f25de8aae237b0478cc0f0",
+        "program": "59b58dd76f38d9e3c17392f92ee81802f1b76ac7fb1f448841695ae7aefef96f"
+      },
+      "status": "pass",
+      "observed_phase": "runtime",
+      "probe": "timer-type-error",
+      "expected_status": "pass",
+      "matched": true
+    },
+    {
+      "test": "timer-forged-string.js",
+      "source_sha256": "d144d95dbad4983534be22c554a7aec74b4bd446cf0099a6c10abc9a7b9415e7",
+      "variant": "sloppy",
+      "features": [],
+      "expected": {
+        "phase": "runtime",
+        "type": "TypeError"
+      },
+      "commands": [
+        {
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/bin/shermes",
+            "-O0",
+            "-test262",
+            "-fno-static-builtins",
+            "-Xes6-block-scoping",
+            "-Xenable-tdz",
+            "-Xasync-generators",
+            "-emit-llvm",
+            "/tmp/shllvm-native-probes-bm_ylbl1/timer-forged-string/test.js",
+            "-o",
+            "/tmp/shllvm-native-probes-bm_ylbl1/timer-forged-string/test.ll"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "",
+          "seconds": 0.003514
+        },
+        {
+          "command": [
+            "/usr/lib/llvm-18/bin/llvm-as",
+            "/tmp/shllvm-native-probes-bm_ylbl1/timer-forged-string/test.ll",
+            "-o",
+            "/tmp/shllvm-native-probes-bm_ylbl1/timer-forged-string/test.bc"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "",
+          "seconds": 0.015675
+        },
+        {
+          "command": [
+            "/usr/lib/llvm-18/bin/opt",
+            "-passes=verify",
+            "/tmp/shllvm-native-probes-bm_ylbl1/timer-forged-string/test.bc",
+            "-o",
+            "/tmp/shllvm-native-probes-bm_ylbl1/timer-forged-string/opt.bc"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "",
+          "seconds": 0.031836
+        },
+        {
+          "command": [
+            "/usr/lib/llvm-18/bin/clang",
+            "/tmp/shllvm-native-probes-bm_ylbl1/timer-forged-string/opt.bc",
+            "-O0",
+            "-Wno-override-module",
+            "-L/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/lib",
+            "-Wl,-rpath,/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/lib",
+            "-L/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/tools/shermes",
+            "-Wl,-rpath,/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/tools/shermes",
+            "-L/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/jsi",
+            "-Wl,-rpath,/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/jsi",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/lib/libshllvm_runtime.a",
+            "-lshermes_console",
+            "-lhermesvm",
+            "-lm",
+            "-o",
+            "/tmp/shllvm-native-probes-bm_ylbl1/timer-forged-string/program"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "",
+          "seconds": 0.114171
+        },
+        {
+          "command": [
+            "/tmp/shllvm-native-probes-bm_ylbl1/timer-forged-string/program",
+            "--shllvm-test262",
+            "-Xhermes-internal-test-methods",
+            "-Xes6-proxy",
+            "-Xmicrotask-queue"
+          ],
+          "exit_code": 1,
+          "stdout": "",
+          "stderr": "SHLLVM_TEST262_EXCEPTION:INVALID\n",
+          "seconds": 0.003542
+        }
+      ],
+      "includes": {
+        "harness/sta.js": "1930c54af79455c484799f43e9a28e2b2f15c40d0917c9941ca54e26db243f35",
+        "harness/assert.js": "206e274ca325eb8a652e3911c3fbd090e2480d11ed7579dc17a5d17a2360ed48"
+      },
+      "prepared_sha256": "8ee3ccaca0891d04b8e014ef2c5170c82741c152856a7b31ac0391cea6f67fcd",
+      "artifacts": {
+        "test.ll": "5500539c5d043771f7313e1be2c200d0cb1e813eb60506a29fc2186ff1148f2c",
+        "test.bc": "d5b36374238ff8963fdc99640430e580ec5ef0f51a69adde219934e8ff9d4ab2",
+        "opt.bc": "f673287573d46650a09ee93c64891b400beaa125c992cbe0ccf9a094876a1a21",
+        "program": "a398333b41ef6dcdfbb2e56602b0b8182f9f09b85446cfd0a8ae6030d82a78c7"
+      },
+      "status": "semantic_failure",
+      "observed_phase": "runtime",
+      "probe": "timer-forged-string",
+      "expected_status": "semantic_failure",
+      "matched": true
+    },
+    {
+      "test": "timer-throwing-constructor.js",
+      "source_sha256": "ca4bcd414047b1fda8bc6d3fe5cbbc0f2156d4f25e5f5836d69dce5c0bb215e1",
+      "variant": "sloppy",
+      "features": [],
+      "expected": {
+        "phase": "runtime",
+        "type": "TypeError"
+      },
+      "commands": [
+        {
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/bin/shermes",
+            "-O0",
+            "-test262",
+            "-fno-static-builtins",
+            "-Xes6-block-scoping",
+            "-Xenable-tdz",
+            "-Xasync-generators",
+            "-emit-llvm",
+            "/tmp/shllvm-native-probes-bm_ylbl1/timer-throwing-constructor/test.js",
+            "-o",
+            "/tmp/shllvm-native-probes-bm_ylbl1/timer-throwing-constructor/test.ll"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "",
+          "seconds": 0.003496
+        },
+        {
+          "command": [
+            "/usr/lib/llvm-18/bin/llvm-as",
+            "/tmp/shllvm-native-probes-bm_ylbl1/timer-throwing-constructor/test.ll",
+            "-o",
+            "/tmp/shllvm-native-probes-bm_ylbl1/timer-throwing-constructor/test.bc"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "",
+          "seconds": 0.015709
+        },
+        {
+          "command": [
+            "/usr/lib/llvm-18/bin/opt",
+            "-passes=verify",
+            "/tmp/shllvm-native-probes-bm_ylbl1/timer-throwing-constructor/test.bc",
+            "-o",
+            "/tmp/shllvm-native-probes-bm_ylbl1/timer-throwing-constructor/opt.bc"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "",
+          "seconds": 0.015798
+        },
+        {
+          "command": [
+            "/usr/lib/llvm-18/bin/clang",
+            "/tmp/shllvm-native-probes-bm_ylbl1/timer-throwing-constructor/opt.bc",
+            "-O0",
+            "-Wno-override-module",
+            "-L/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/lib",
+            "-Wl,-rpath,/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/lib",
+            "-L/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/tools/shermes",
+            "-Wl,-rpath,/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/tools/shermes",
+            "-L/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/jsi",
+            "-Wl,-rpath,/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/jsi",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/lib/libshllvm_runtime.a",
+            "-lshermes_console",
+            "-lhermesvm",
+            "-lm",
+            "-o",
+            "/tmp/shllvm-native-probes-bm_ylbl1/timer-throwing-constructor/program"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "",
+          "seconds": 0.114143
+        },
+        {
+          "command": [
+            "/tmp/shllvm-native-probes-bm_ylbl1/timer-throwing-constructor/program",
+            "--shllvm-test262",
+            "-Xhermes-internal-test-methods",
+            "-Xes6-proxy",
+            "-Xmicrotask-queue"
+          ],
+          "exit_code": 1,
+          "stdout": "",
+          "stderr": "SHLLVM_TEST262_EXCEPTION:INVALID\n",
+          "seconds": 0.003529
+        }
+      ],
+      "includes": {
+        "harness/sta.js": "1930c54af79455c484799f43e9a28e2b2f15c40d0917c9941ca54e26db243f35",
+        "harness/assert.js": "206e274ca325eb8a652e3911c3fbd090e2480d11ed7579dc17a5d17a2360ed48"
+      },
+      "prepared_sha256": "2fc18201bbe95dc398d7af3937e7b8db2ad5ededba04cdca78ed968fdd2f4c10",
+      "artifacts": {
+        "test.ll": "2efc5ca893b5b2412cb914095b9101f6f5f7cc31678cb3c2d43a29e0f36b0b71",
+        "test.bc": "922c09587db8559bee100ec963d7798ce793bd48fca80f408014d086cee443ae",
+        "opt.bc": "ff892fd029fc2cb8bb72b6402db232792a3c1134629f3700a0a46543e047cef5",
+        "program": "8191f1d231f5da2c218e6a8c5bd9621806c7e64300c75f74236e25e900cd4a1d"
+      },
+      "status": "semantic_failure",
+      "observed_phase": "runtime",
+      "probe": "timer-throwing-constructor",
+      "expected_status": "semantic_failure",
+      "matched": true
+    },
+    {
+      "test": "test262-error.js",
+      "source_sha256": "35cb627c4ec7148f6e4ff0fd6f908ee819fd4bda7906debc6cbb7fe52ccc5fcc",
+      "variant": "sloppy",
+      "features": [],
+      "expected": {
+        "phase": "runtime",
+        "type": "Test262Error"
+      },
+      "commands": [
+        {
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/bin/shermes",
+            "-O0",
+            "-test262",
+            "-fno-static-builtins",
+            "-Xes6-block-scoping",
+            "-Xenable-tdz",
+            "-Xasync-generators",
+            "-emit-llvm",
+            "/tmp/shllvm-native-probes-bm_ylbl1/test262-error/test.js",
+            "-o",
+            "/tmp/shllvm-native-probes-bm_ylbl1/test262-error/test.ll"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "",
+          "seconds": 0.003478
+        },
+        {
+          "command": [
+            "/usr/lib/llvm-18/bin/llvm-as",
+            "/tmp/shllvm-native-probes-bm_ylbl1/test262-error/test.ll",
+            "-o",
+            "/tmp/shllvm-native-probes-bm_ylbl1/test262-error/test.bc"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "",
+          "seconds": 0.015715
+        },
+        {
+          "command": [
+            "/usr/lib/llvm-18/bin/opt",
+            "-passes=verify",
+            "/tmp/shllvm-native-probes-bm_ylbl1/test262-error/test.bc",
+            "-o",
+            "/tmp/shllvm-native-probes-bm_ylbl1/test262-error/opt.bc"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "",
+          "seconds": 0.015798
+        },
+        {
+          "command": [
+            "/usr/lib/llvm-18/bin/clang",
+            "/tmp/shllvm-native-probes-bm_ylbl1/test262-error/opt.bc",
+            "-O0",
+            "-Wno-override-module",
+            "-L/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/lib",
+            "-Wl,-rpath,/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/lib",
+            "-L/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/tools/shermes",
+            "-Wl,-rpath,/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/tools/shermes",
+            "-L/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/jsi",
+            "-Wl,-rpath,/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/jsi",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/lib/libshllvm_runtime.a",
+            "-lshermes_console",
+            "-lhermesvm",
+            "-lm",
+            "-o",
+            "/tmp/shllvm-native-probes-bm_ylbl1/test262-error/program"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "",
+          "seconds": 0.114102
+        },
+        {
+          "command": [
+            "/tmp/shllvm-native-probes-bm_ylbl1/test262-error/program",
+            "--shllvm-test262",
+            "-Xhermes-internal-test-methods",
+            "-Xes6-proxy",
+            "-Xmicrotask-queue"
+          ],
+          "exit_code": 1,
+          "stdout": "",
+          "stderr": "SHLLVM_TEST262_EXCEPTION:Test262Error\n",
+          "seconds": 0.003552
+        }
+      ],
+      "includes": {
+        "harness/sta.js": "1930c54af79455c484799f43e9a28e2b2f15c40d0917c9941ca54e26db243f35",
+        "harness/assert.js": "206e274ca325eb8a652e3911c3fbd090e2480d11ed7579dc17a5d17a2360ed48"
+      },
+      "prepared_sha256": "5bae33b8c55fbdb991fe6468261717ea72789f3a6d051e87f848c839e605dc70",
+      "artifacts": {
+        "test.ll": "7b834ec7ec0fe5ac47cf3559e80a0157adade66eff8a2d6ad64c9124a7b78925",
+        "test.bc": "7e7135e6fcc4c675c17727ab4f8e8bff098d7e40522dd83269ad4535be556456",
+        "opt.bc": "c85c26dc89342ef809621a1c974dd6c98671ed9226cb24a50ca42aa542e677f1",
+        "program": "e19e905ad738f26292ac41bcd433877008043fb016c10c12c99dd85938d7a132"
+      },
+      "status": "pass",
+      "observed_phase": "runtime",
+      "probe": "test262-error",
+      "expected_status": "pass",
+      "matched": true
+    },
+    {
+      "test": "timer-test262-error.js",
+      "source_sha256": "ead62d4db8b2dd38cb39a63ca645c0fe5675f624f7265a59f76c790bc9906a44",
+      "variant": "sloppy",
+      "features": [],
+      "expected": {
+        "phase": "runtime",
+        "type": "Test262Error"
+      },
+      "commands": [
+        {
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/bin/shermes",
+            "-O0",
+            "-test262",
+            "-fno-static-builtins",
+            "-Xes6-block-scoping",
+            "-Xenable-tdz",
+            "-Xasync-generators",
+            "-emit-llvm",
+            "/tmp/shllvm-native-probes-bm_ylbl1/timer-test262-error/test.js",
+            "-o",
+            "/tmp/shllvm-native-probes-bm_ylbl1/timer-test262-error/test.ll"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "",
+          "seconds": 0.003454
+        },
+        {
+          "command": [
+            "/usr/lib/llvm-18/bin/llvm-as",
+            "/tmp/shllvm-native-probes-bm_ylbl1/timer-test262-error/test.ll",
+            "-o",
+            "/tmp/shllvm-native-probes-bm_ylbl1/timer-test262-error/test.bc"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "",
+          "seconds": 0.015609
+        },
+        {
+          "command": [
+            "/usr/lib/llvm-18/bin/opt",
+            "-passes=verify",
+            "/tmp/shllvm-native-probes-bm_ylbl1/timer-test262-error/test.bc",
+            "-o",
+            "/tmp/shllvm-native-probes-bm_ylbl1/timer-test262-error/opt.bc"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "",
+          "seconds": 0.015712
+        },
+        {
+          "command": [
+            "/usr/lib/llvm-18/bin/clang",
+            "/tmp/shllvm-native-probes-bm_ylbl1/timer-test262-error/opt.bc",
+            "-O0",
+            "-Wno-override-module",
+            "-L/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/lib",
+            "-Wl,-rpath,/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/lib",
+            "-L/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/tools/shermes",
+            "-Wl,-rpath,/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/tools/shermes",
+            "-L/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/jsi",
+            "-Wl,-rpath,/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/jsi",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/lib/libshllvm_runtime.a",
+            "-lshermes_console",
+            "-lhermesvm",
+            "-lm",
+            "-o",
+            "/tmp/shllvm-native-probes-bm_ylbl1/timer-test262-error/program"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "",
+          "seconds": 0.114199
+        },
+        {
+          "command": [
+            "/tmp/shllvm-native-probes-bm_ylbl1/timer-test262-error/program",
+            "--shllvm-test262",
+            "-Xhermes-internal-test-methods",
+            "-Xes6-proxy",
+            "-Xmicrotask-queue"
+          ],
+          "exit_code": 1,
+          "stdout": "",
+          "stderr": "SHLLVM_TEST262_EXCEPTION:Test262Error\n",
+          "seconds": 0.00765
+        }
+      ],
+      "includes": {
+        "harness/sta.js": "1930c54af79455c484799f43e9a28e2b2f15c40d0917c9941ca54e26db243f35",
+        "harness/assert.js": "206e274ca325eb8a652e3911c3fbd090e2480d11ed7579dc17a5d17a2360ed48"
+      },
+      "prepared_sha256": "f0a108687c7d14b8994e07c5a6e6894f84d4025e0200ff42c03c2c129f7524bc",
+      "artifacts": {
+        "test.ll": "4e39b42f18ce315f1fe8ab2bc94e26201613e4bfa586cc52346e06c2c693885b",
+        "test.bc": "bf6bde71b2cdfc157dd1c27dce0d94357e66bc9834db1e2d263e174e170be74f",
+        "opt.bc": "8d655cd572d1be16e28b3fecdfe16cbc574919e36c7fe1ae9fc37794dc38d5a6",
+        "program": "ced90cbf1ffbc24ef1cba6fb7ce297e1a120cf9621abcd7cced21c418359168d"
+      },
+      "status": "pass",
+      "observed_phase": "runtime",
+      "probe": "timer-test262-error",
+      "expected_status": "pass",
+      "matched": true
+    },
+    {
+      "test": "wrong-error.js",
+      "source_sha256": "0bd4e8c6749d56b121e16311c33148d5dbda8ad02b5f0390964c69ab0d0f64cc",
+      "variant": "sloppy",
+      "features": [],
+      "expected": {
+        "phase": "runtime",
+        "type": "TypeError"
+      },
+      "commands": [
+        {
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/bin/shermes",
+            "-O0",
+            "-test262",
+            "-fno-static-builtins",
+            "-Xes6-block-scoping",
+            "-Xenable-tdz",
+            "-Xasync-generators",
+            "-emit-llvm",
+            "/tmp/shllvm-native-probes-bm_ylbl1/wrong-error/test.js",
+            "-o",
+            "/tmp/shllvm-native-probes-bm_ylbl1/wrong-error/test.ll"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "",
+          "seconds": 0.003529
+        },
+        {
+          "command": [
+            "/usr/lib/llvm-18/bin/llvm-as",
+            "/tmp/shllvm-native-probes-bm_ylbl1/wrong-error/test.ll",
+            "-o",
+            "/tmp/shllvm-native-probes-bm_ylbl1/wrong-error/test.bc"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "",
+          "seconds": 0.015773
+        },
+        {
+          "command": [
+            "/usr/lib/llvm-18/bin/opt",
+            "-passes=verify",
+            "/tmp/shllvm-native-probes-bm_ylbl1/wrong-error/test.bc",
+            "-o",
+            "/tmp/shllvm-native-probes-bm_ylbl1/wrong-error/opt.bc"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "",
+          "seconds": 0.015684
+        },
+        {
+          "command": [
+            "/usr/lib/llvm-18/bin/clang",
+            "/tmp/shllvm-native-probes-bm_ylbl1/wrong-error/opt.bc",
+            "-O0",
+            "-Wno-override-module",
+            "-L/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/lib",
+            "-Wl,-rpath,/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/lib",
+            "-L/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/tools/shermes",
+            "-Wl,-rpath,/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/tools/shermes",
+            "-L/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/jsi",
+            "-Wl,-rpath,/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/jsi",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/lib/libshllvm_runtime.a",
+            "-lshermes_console",
+            "-lhermesvm",
+            "-lm",
+            "-o",
+            "/tmp/shllvm-native-probes-bm_ylbl1/wrong-error/program"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "",
+          "seconds": 0.114023
+        },
+        {
+          "command": [
+            "/tmp/shllvm-native-probes-bm_ylbl1/wrong-error/program",
+            "--shllvm-test262",
+            "-Xhermes-internal-test-methods",
+            "-Xes6-proxy",
+            "-Xmicrotask-queue"
+          ],
+          "exit_code": 1,
+          "stdout": "",
+          "stderr": "SHLLVM_TEST262_EXCEPTION:RangeError\n",
+          "seconds": 0.007708
+        }
+      ],
+      "includes": {
+        "harness/sta.js": "1930c54af79455c484799f43e9a28e2b2f15c40d0917c9941ca54e26db243f35",
+        "harness/assert.js": "206e274ca325eb8a652e3911c3fbd090e2480d11ed7579dc17a5d17a2360ed48"
+      },
+      "prepared_sha256": "d9ab2e55a9a9de37b08af5751b18167eb2deee4d2d9576928fdbd44367163b33",
+      "artifacts": {
+        "test.ll": "d7d11280c249701cebbc04ab435932946f5d26b51a5590f5ae401194834cf833",
+        "test.bc": "23522cc225a910d17ef04ab6e378e6244e7d304a98de0229d62b1e211acd8888",
+        "opt.bc": "675e96dc4ad3cb60bbaf3feb1a770829504202d7227eee353099c23b9ae81135",
+        "program": "b53f054dc23a76e3fc769718999d83b44e11b0262f4904791674ca43f247567b"
+      },
+      "status": "semantic_failure",
+      "observed_phase": "runtime",
+      "probe": "wrong-error",
+      "expected_status": "semantic_failure",
+      "matched": true
+    },
+    {
+      "test": "forged-string.js",
+      "source_sha256": "5944f4c4baef0ce48dd88417721101b40fe4897e722d10cc16854a8e4a7bba6c",
+      "variant": "sloppy",
+      "features": [],
+      "expected": {
+        "phase": "runtime",
+        "type": "TypeError"
+      },
+      "commands": [
+        {
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/bin/shermes",
+            "-O0",
+            "-test262",
+            "-fno-static-builtins",
+            "-Xes6-block-scoping",
+            "-Xenable-tdz",
+            "-Xasync-generators",
+            "-emit-llvm",
+            "/tmp/shllvm-native-probes-bm_ylbl1/forged-string/test.js",
+            "-o",
+            "/tmp/shllvm-native-probes-bm_ylbl1/forged-string/test.ll"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "",
+          "seconds": 0.003552
+        },
+        {
+          "command": [
+            "/usr/lib/llvm-18/bin/llvm-as",
+            "/tmp/shllvm-native-probes-bm_ylbl1/forged-string/test.ll",
+            "-o",
+            "/tmp/shllvm-native-probes-bm_ylbl1/forged-string/test.bc"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "",
+          "seconds": 0.015654
+        },
+        {
+          "command": [
+            "/usr/lib/llvm-18/bin/opt",
+            "-passes=verify",
+            "/tmp/shllvm-native-probes-bm_ylbl1/forged-string/test.bc",
+            "-o",
+            "/tmp/shllvm-native-probes-bm_ylbl1/forged-string/opt.bc"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "",
+          "seconds": 0.015845
+        },
+        {
+          "command": [
+            "/usr/lib/llvm-18/bin/clang",
+            "/tmp/shllvm-native-probes-bm_ylbl1/forged-string/opt.bc",
+            "-O0",
+            "-Wno-override-module",
+            "-L/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/lib",
+            "-Wl,-rpath,/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/lib",
+            "-L/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/tools/shermes",
+            "-Wl,-rpath,/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/tools/shermes",
+            "-L/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/jsi",
+            "-Wl,-rpath,/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/jsi",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/lib/libshllvm_runtime.a",
+            "-lshermes_console",
+            "-lhermesvm",
+            "-lm",
+            "-o",
+            "/tmp/shllvm-native-probes-bm_ylbl1/forged-string/program"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "",
+          "seconds": 0.114065
+        },
+        {
+          "command": [
+            "/tmp/shllvm-native-probes-bm_ylbl1/forged-string/program",
+            "--shllvm-test262",
+            "-Xhermes-internal-test-methods",
+            "-Xes6-proxy",
+            "-Xmicrotask-queue"
+          ],
+          "exit_code": 1,
+          "stdout": "",
+          "stderr": "SHLLVM_TEST262_EXCEPTION:INVALID\n",
+          "seconds": 0.003575
+        }
+      ],
+      "includes": {
+        "harness/sta.js": "1930c54af79455c484799f43e9a28e2b2f15c40d0917c9941ca54e26db243f35",
+        "harness/assert.js": "206e274ca325eb8a652e3911c3fbd090e2480d11ed7579dc17a5d17a2360ed48"
+      },
+      "prepared_sha256": "d62ec863ac165414e4f8f6cbe1cf432f9c7a3ca4d4a5d5287b2ae644ed078c34",
+      "artifacts": {
+        "test.ll": "8e0ff6d3af72f95cb71ebaa70e3c47b23099d0a6b7b76cc65866d3ed9e4dc127",
+        "test.bc": "07a4a9acf9b1d5bf5d188871f9230714808aa6d5c65f956653584479e7acc76d",
+        "opt.bc": "3c4122e2e7461eb4dad171c2ca4b96b3c2ec8860720d93b94a114f76345821c1",
+        "program": "f9dc7834e62b1e2d09c8e38bd9c10fcc74e6ad8a86f6116381f6007459b9cda7"
+      },
+      "status": "semantic_failure",
+      "observed_phase": "runtime",
+      "probe": "forged-string",
+      "expected_status": "semantic_failure",
+      "matched": true
+    },
+    {
+      "test": "forged-stack.js",
+      "source_sha256": "e44099d7d0ac8d235c5cbe2905c8a1102fdd7f785a17b64db4a3f708d9807061",
+      "variant": "sloppy",
+      "features": [],
+      "expected": {
+        "phase": "runtime",
+        "type": "TypeError"
+      },
+      "commands": [
+        {
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/bin/shermes",
+            "-O0",
+            "-test262",
+            "-fno-static-builtins",
+            "-Xes6-block-scoping",
+            "-Xenable-tdz",
+            "-Xasync-generators",
+            "-emit-llvm",
+            "/tmp/shllvm-native-probes-bm_ylbl1/forged-stack/test.js",
+            "-o",
+            "/tmp/shllvm-native-probes-bm_ylbl1/forged-stack/test.ll"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "",
+          "seconds": 0.003446
+        },
+        {
+          "command": [
+            "/usr/lib/llvm-18/bin/llvm-as",
+            "/tmp/shllvm-native-probes-bm_ylbl1/forged-stack/test.ll",
+            "-o",
+            "/tmp/shllvm-native-probes-bm_ylbl1/forged-stack/test.bc"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "",
+          "seconds": 0.015646
+        },
+        {
+          "command": [
+            "/usr/lib/llvm-18/bin/opt",
+            "-passes=verify",
+            "/tmp/shllvm-native-probes-bm_ylbl1/forged-stack/test.bc",
+            "-o",
+            "/tmp/shllvm-native-probes-bm_ylbl1/forged-stack/opt.bc"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "",
+          "seconds": 0.015787
+        },
+        {
+          "command": [
+            "/usr/lib/llvm-18/bin/clang",
+            "/tmp/shllvm-native-probes-bm_ylbl1/forged-stack/opt.bc",
+            "-O0",
+            "-Wno-override-module",
+            "-L/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/lib",
+            "-Wl,-rpath,/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/lib",
+            "-L/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/tools/shermes",
+            "-Wl,-rpath,/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/tools/shermes",
+            "-L/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/jsi",
+            "-Wl,-rpath,/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/jsi",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/lib/libshllvm_runtime.a",
+            "-lshermes_console",
+            "-lhermesvm",
+            "-lm",
+            "-o",
+            "/tmp/shllvm-native-probes-bm_ylbl1/forged-stack/program"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "",
+          "seconds": 0.11407
+        },
+        {
+          "command": [
+            "/tmp/shllvm-native-probes-bm_ylbl1/forged-stack/program",
+            "--shllvm-test262",
+            "-Xhermes-internal-test-methods",
+            "-Xes6-proxy",
+            "-Xmicrotask-queue"
+          ],
+          "exit_code": 1,
+          "stdout": "",
+          "stderr": "SHLLVM_TEST262_EXCEPTION:Object\n",
+          "seconds": 0.003461
+        }
+      ],
+      "includes": {
+        "harness/sta.js": "1930c54af79455c484799f43e9a28e2b2f15c40d0917c9941ca54e26db243f35",
+        "harness/assert.js": "206e274ca325eb8a652e3911c3fbd090e2480d11ed7579dc17a5d17a2360ed48"
+      },
+      "prepared_sha256": "2ce60970d075716390844375f5747b59f72cf785010004bfa6799e7463850c0b",
+      "artifacts": {
+        "test.ll": "cec4300a1830e40a61cde7dad63d618fa1beb74433a11352116fbca612e4aa06",
+        "test.bc": "a994dbd9c307d972f018fd6fb707d9dbc3e0daec8b9950f9573e61749e6136b0",
+        "opt.bc": "0159694d33cbdfeccad6b43e161a84b8e517e52de2fb8b32ce541294f2e7622d",
+        "program": "1410222da8d57947ddbd3325b52fd76d649c61313e3e269d678f36c4f51e6102"
+      },
+      "status": "semantic_failure",
+      "observed_phase": "runtime",
+      "probe": "forged-stack",
+      "expected_status": "semantic_failure",
+      "matched": true
+    },
+    {
+      "test": "throwing-constructor.js",
+      "source_sha256": "58317fc84aecaf822005f57ee03bc04c709fc92cdaf98ac349223bdb12f6f87f",
+      "variant": "sloppy",
+      "features": [],
+      "expected": {
+        "phase": "runtime",
+        "type": "TypeError"
+      },
+      "commands": [
+        {
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/bin/shermes",
+            "-O0",
+            "-test262",
+            "-fno-static-builtins",
+            "-Xes6-block-scoping",
+            "-Xenable-tdz",
+            "-Xasync-generators",
+            "-emit-llvm",
+            "/tmp/shllvm-native-probes-bm_ylbl1/throwing-constructor/test.js",
+            "-o",
+            "/tmp/shllvm-native-probes-bm_ylbl1/throwing-constructor/test.ll"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "",
+          "seconds": 0.003409
+        },
+        {
+          "command": [
+            "/usr/lib/llvm-18/bin/llvm-as",
+            "/tmp/shllvm-native-probes-bm_ylbl1/throwing-constructor/test.ll",
+            "-o",
+            "/tmp/shllvm-native-probes-bm_ylbl1/throwing-constructor/test.bc"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "",
+          "seconds": 0.015733
+        },
+        {
+          "command": [
+            "/usr/lib/llvm-18/bin/opt",
+            "-passes=verify",
+            "/tmp/shllvm-native-probes-bm_ylbl1/throwing-constructor/test.bc",
+            "-o",
+            "/tmp/shllvm-native-probes-bm_ylbl1/throwing-constructor/opt.bc"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "",
+          "seconds": 0.015745
+        },
+        {
+          "command": [
+            "/usr/lib/llvm-18/bin/clang",
+            "/tmp/shllvm-native-probes-bm_ylbl1/throwing-constructor/opt.bc",
+            "-O0",
+            "-Wno-override-module",
+            "-L/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/lib",
+            "-Wl,-rpath,/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/lib",
+            "-L/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/tools/shermes",
+            "-Wl,-rpath,/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/tools/shermes",
+            "-L/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/jsi",
+            "-Wl,-rpath,/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/jsi",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/lib/libshllvm_runtime.a",
+            "-lshermes_console",
+            "-lhermesvm",
+            "-lm",
+            "-o",
+            "/tmp/shllvm-native-probes-bm_ylbl1/throwing-constructor/program"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "",
+          "seconds": 0.11415
+        },
+        {
+          "command": [
+            "/tmp/shllvm-native-probes-bm_ylbl1/throwing-constructor/program",
+            "--shllvm-test262",
+            "-Xhermes-internal-test-methods",
+            "-Xes6-proxy",
+            "-Xmicrotask-queue"
+          ],
+          "exit_code": 1,
+          "stdout": "",
+          "stderr": "SHLLVM_TEST262_EXCEPTION:INVALID\n",
+          "seconds": 0.003681
+        }
+      ],
+      "includes": {
+        "harness/sta.js": "1930c54af79455c484799f43e9a28e2b2f15c40d0917c9941ca54e26db243f35",
+        "harness/assert.js": "206e274ca325eb8a652e3911c3fbd090e2480d11ed7579dc17a5d17a2360ed48"
+      },
+      "prepared_sha256": "b9cc3c6f48070a29fc7cc95cca3362df375b51787d0c1ebaabcf92226c6dd9d1",
+      "artifacts": {
+        "test.ll": "f19e255ccff27a28058f05e26dc337bdafd466d9488b171e5d78de740752bf05",
+        "test.bc": "9c343432a10ce594d504354290f44384018c1bb3a324a73616a4c0246b2462f1",
+        "opt.bc": "edad6aaa85f4f1b5ff02bed8f57799c858e12fa3e685bde76ddd9065c17903bc",
+        "program": "21eb4e5af5c4e96bb88f32dc31c52bf513ddcc016ddf38946b0b7223c14f04f0"
+      },
+      "status": "semantic_failure",
+      "observed_phase": "runtime",
+      "probe": "throwing-constructor",
+      "expected_status": "semantic_failure",
+      "matched": true
+    },
+    {
+      "test": "const-runtime.js",
+      "source_sha256": "3cc233bc560f0e1e063f5bb92e74f79f58cae4adbb1a75bde555c8fb15fce3ac",
+      "variant": "sloppy",
+      "features": [],
+      "expected": {
+        "phase": "runtime",
+        "type": "TypeError"
+      },
+      "commands": [
+        {
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/bin/shermes",
+            "-O0",
+            "-test262",
+            "-fno-static-builtins",
+            "-Xes6-block-scoping",
+            "-Xenable-tdz",
+            "-Xasync-generators",
+            "-emit-llvm",
+            "/tmp/shllvm-native-probes-bm_ylbl1/const-runtime/test.js",
+            "-o",
+            "/tmp/shllvm-native-probes-bm_ylbl1/const-runtime/test.ll"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "",
+          "seconds": 0.003542
+        },
+        {
+          "command": [
+            "/usr/lib/llvm-18/bin/llvm-as",
+            "/tmp/shllvm-native-probes-bm_ylbl1/const-runtime/test.ll",
+            "-o",
+            "/tmp/shllvm-native-probes-bm_ylbl1/const-runtime/test.bc"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "",
+          "seconds": 0.015731
+        },
+        {
+          "command": [
+            "/usr/lib/llvm-18/bin/opt",
+            "-passes=verify",
+            "/tmp/shllvm-native-probes-bm_ylbl1/const-runtime/test.bc",
+            "-o",
+            "/tmp/shllvm-native-probes-bm_ylbl1/const-runtime/opt.bc"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "",
+          "seconds": 0.015703
+        },
+        {
+          "command": [
+            "/usr/lib/llvm-18/bin/clang",
+            "/tmp/shllvm-native-probes-bm_ylbl1/const-runtime/opt.bc",
+            "-O0",
+            "-Wno-override-module",
+            "-L/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/lib",
+            "-Wl,-rpath,/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/lib",
+            "-L/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/tools/shermes",
+            "-Wl,-rpath,/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/tools/shermes",
+            "-L/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/jsi",
+            "-Wl,-rpath,/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/jsi",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/lib/libshllvm_runtime.a",
+            "-lshermes_console",
+            "-lhermesvm",
+            "-lm",
+            "-o",
+            "/tmp/shllvm-native-probes-bm_ylbl1/const-runtime/program"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "",
+          "seconds": 0.114038
+        },
+        {
+          "command": [
+            "/tmp/shllvm-native-probes-bm_ylbl1/const-runtime/program",
+            "--shllvm-test262",
+            "-Xhermes-internal-test-methods",
+            "-Xes6-proxy",
+            "-Xmicrotask-queue"
+          ],
+          "exit_code": 1,
+          "stdout": "",
+          "stderr": "SHLLVM_TEST262_EXCEPTION:TypeError\n",
+          "seconds": 0.003495
+        }
+      ],
+      "includes": {
+        "harness/sta.js": "1930c54af79455c484799f43e9a28e2b2f15c40d0917c9941ca54e26db243f35",
+        "harness/assert.js": "206e274ca325eb8a652e3911c3fbd090e2480d11ed7579dc17a5d17a2360ed48"
+      },
+      "prepared_sha256": "29fb7c75396ab55eb0fa7c2a82a920d3c61513443ee8c2823f63db4a2ad1ba46",
+      "artifacts": {
+        "test.ll": "6eb2a6df10731396d294430c6baf6b59d4a6a4275da7f92ddc56739e46d10449",
+        "test.bc": "8a4b32cc42b2f3946103592c48deb2d22ca0d711fa71516300830403f00ee91c",
+        "opt.bc": "6d5de440b08df8aa334f12abeb72a851ab5dd8bfd1f4abb69f85fbb780c02758",
+        "program": "b79264c48bb832fc236dd48bb6d7845f61689c1ea9c1abaa37cdc2fe2a622b9a"
+      },
+      "status": "pass",
+      "observed_phase": "runtime",
+      "probe": "const-runtime",
+      "expected_status": "pass",
+      "matched": true
+    },
+    {
+      "test": "async-missing.js",
+      "source_sha256": "a75243914b3c5c65baeddbd83eace12d1b2e643d0800e224bed63c3b3581c160",
+      "variant": "sloppy",
+      "features": [],
+      "expected": null,
+      "commands": [
+        {
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/bin/shermes",
+            "-O0",
+            "-test262",
+            "-fno-static-builtins",
+            "-Xes6-block-scoping",
+            "-Xenable-tdz",
+            "-Xasync-generators",
+            "-emit-llvm",
+            "/tmp/shllvm-native-probes-bm_ylbl1/async-missing/test.js",
+            "-o",
+            "/tmp/shllvm-native-probes-bm_ylbl1/async-missing/test.ll"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "",
+          "seconds": 0.00338
+        },
+        {
+          "command": [
+            "/usr/lib/llvm-18/bin/llvm-as",
+            "/tmp/shllvm-native-probes-bm_ylbl1/async-missing/test.ll",
+            "-o",
+            "/tmp/shllvm-native-probes-bm_ylbl1/async-missing/test.bc"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "",
+          "seconds": 0.015619
+        },
+        {
+          "command": [
+            "/usr/lib/llvm-18/bin/opt",
+            "-passes=verify",
+            "/tmp/shllvm-native-probes-bm_ylbl1/async-missing/test.bc",
+            "-o",
+            "/tmp/shllvm-native-probes-bm_ylbl1/async-missing/opt.bc"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "",
+          "seconds": 0.015905
+        },
+        {
+          "command": [
+            "/usr/lib/llvm-18/bin/clang",
+            "/tmp/shllvm-native-probes-bm_ylbl1/async-missing/opt.bc",
+            "-O0",
+            "-Wno-override-module",
+            "-L/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/lib",
+            "-Wl,-rpath,/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/lib",
+            "-L/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/tools/shermes",
+            "-Wl,-rpath,/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/tools/shermes",
+            "-L/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/jsi",
+            "-Wl,-rpath,/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/jsi",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/lib/libshllvm_runtime.a",
+            "-lshermes_console",
+            "-lhermesvm",
+            "-lm",
+            "-o",
+            "/tmp/shllvm-native-probes-bm_ylbl1/async-missing/program"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "",
+          "seconds": 0.114171
+        },
+        {
+          "command": [
+            "/tmp/shllvm-native-probes-bm_ylbl1/async-missing/program",
+            "--shllvm-test262",
+            "-Xhermes-internal-test-methods",
+            "-Xes6-proxy",
+            "-Xmicrotask-queue"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "",
+          "seconds": 0.003541
+        }
+      ],
+      "includes": {
+        "harness/sta.js": "1930c54af79455c484799f43e9a28e2b2f15c40d0917c9941ca54e26db243f35",
+        "harness/assert.js": "206e274ca325eb8a652e3911c3fbd090e2480d11ed7579dc17a5d17a2360ed48",
+        "harness/doneprintHandle.js": "01282de15feb05d865dfc2cdfc68f59d8e760eb7d81a14ade3bc08cbc8520add"
+      },
+      "prepared_sha256": "9f4f97cc8e786a543528c4a2f12f05a0b02e97d250d6353d6a6d948066c5fa84",
+      "artifacts": {
+        "test.ll": "204ccf3139120b139926470ae7b560bb77ef1b9317dd1aff251d4711631ebfc7",
+        "test.bc": "3e5cdec993f3c94fd821402cbe06003da9a0fbaee24b28cab5b999a4491e4a06",
+        "opt.bc": "590ef81959627de2203bb5c10b2742faf631332c83cbc3727ae6b6411bfab9f8",
+        "program": "5cc7643adda9e899d3cf3115222cf8cb9de4be5e2bf24f203a736d99397c7b32"
+      },
+      "status": "semantic_failure",
+      "observed_phase": "runtime",
+      "probe": "async-missing",
+      "expected_status": "semantic_failure",
+      "matched": true
+    },
+    {
+      "test": "async-complete.js",
+      "source_sha256": "39591e46918c5bf9f22f82283e96c8927488d6625426fe50b334cbe1726bd6c1",
+      "variant": "sloppy",
+      "features": [],
+      "expected": null,
+      "commands": [
+        {
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/bin/shermes",
+            "-O0",
+            "-test262",
+            "-fno-static-builtins",
+            "-Xes6-block-scoping",
+            "-Xenable-tdz",
+            "-Xasync-generators",
+            "-emit-llvm",
+            "/tmp/shllvm-native-probes-bm_ylbl1/async-complete/test.js",
+            "-o",
+            "/tmp/shllvm-native-probes-bm_ylbl1/async-complete/test.ll"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "",
+          "seconds": 0.003396
+        },
+        {
+          "command": [
+            "/usr/lib/llvm-18/bin/llvm-as",
+            "/tmp/shllvm-native-probes-bm_ylbl1/async-complete/test.ll",
+            "-o",
+            "/tmp/shllvm-native-probes-bm_ylbl1/async-complete/test.bc"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "",
+          "seconds": 0.015711
+        },
+        {
+          "command": [
+            "/usr/lib/llvm-18/bin/opt",
+            "-passes=verify",
+            "/tmp/shllvm-native-probes-bm_ylbl1/async-complete/test.bc",
+            "-o",
+            "/tmp/shllvm-native-probes-bm_ylbl1/async-complete/opt.bc"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "",
+          "seconds": 0.015652
+        },
+        {
+          "command": [
+            "/usr/lib/llvm-18/bin/clang",
+            "/tmp/shllvm-native-probes-bm_ylbl1/async-complete/opt.bc",
+            "-O0",
+            "-Wno-override-module",
+            "-L/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/lib",
+            "-Wl,-rpath,/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/lib",
+            "-L/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/tools/shermes",
+            "-Wl,-rpath,/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/tools/shermes",
+            "-L/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/jsi",
+            "-Wl,-rpath,/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/jsi",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/lib/libshllvm_runtime.a",
+            "-lshermes_console",
+            "-lhermesvm",
+            "-lm",
+            "-o",
+            "/tmp/shllvm-native-probes-bm_ylbl1/async-complete/program"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "",
+          "seconds": 0.114025
+        },
+        {
+          "command": [
+            "/tmp/shllvm-native-probes-bm_ylbl1/async-complete/program",
+            "--shllvm-test262",
+            "-Xhermes-internal-test-methods",
+            "-Xes6-proxy",
+            "-Xmicrotask-queue"
+          ],
+          "exit_code": 0,
+          "stdout": "Test262:AsyncTestComplete\n",
+          "stderr": "",
+          "seconds": 0.003624
+        }
+      ],
+      "includes": {
+        "harness/sta.js": "1930c54af79455c484799f43e9a28e2b2f15c40d0917c9941ca54e26db243f35",
+        "harness/assert.js": "206e274ca325eb8a652e3911c3fbd090e2480d11ed7579dc17a5d17a2360ed48",
+        "harness/doneprintHandle.js": "01282de15feb05d865dfc2cdfc68f59d8e760eb7d81a14ade3bc08cbc8520add"
+      },
+      "prepared_sha256": "eac1be53e4b20e3b00fad98e3c571240920e091457769b4f914e000308bc2bf4",
+      "artifacts": {
+        "test.ll": "30828a4991da6ae82904df65a2f1baa84cae9a5f78f8bd398fd2acd037b7f10a",
+        "test.bc": "546256ee9dc1e2d8bd278182055226c7122bb54ff4c53ceb7e8906577f7b48b9",
+        "opt.bc": "8385cb626a943396f4006b431e0f7d3c2ec92573bb0970680e6e3912111803ea",
+        "program": "140d4abd6a893cfe1937f10cb992e6e8a397000e748ca1dfa3ac8eee80009ff1"
+      },
+      "status": "pass",
+      "observed_phase": "runtime",
+      "probe": "async-complete",
+      "expected_status": "pass",
+      "matched": true
+    },
+    {
+      "test": "async-duplicate.js",
+      "source_sha256": "70e2eddc690ae250595c73bd52ae50bc45c0e59eeeaf913dd4381964a98f786a",
+      "variant": "sloppy",
+      "features": [],
+      "expected": null,
+      "commands": [
+        {
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/bin/shermes",
+            "-O0",
+            "-test262",
+            "-fno-static-builtins",
+            "-Xes6-block-scoping",
+            "-Xenable-tdz",
+            "-Xasync-generators",
+            "-emit-llvm",
+            "/tmp/shllvm-native-probes-bm_ylbl1/async-duplicate/test.js",
+            "-o",
+            "/tmp/shllvm-native-probes-bm_ylbl1/async-duplicate/test.ll"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "",
+          "seconds": 0.003494
+        },
+        {
+          "command": [
+            "/usr/lib/llvm-18/bin/llvm-as",
+            "/tmp/shllvm-native-probes-bm_ylbl1/async-duplicate/test.ll",
+            "-o",
+            "/tmp/shllvm-native-probes-bm_ylbl1/async-duplicate/test.bc"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "",
+          "seconds": 0.015757
+        },
+        {
+          "command": [
+            "/usr/lib/llvm-18/bin/opt",
+            "-passes=verify",
+            "/tmp/shllvm-native-probes-bm_ylbl1/async-duplicate/test.bc",
+            "-o",
+            "/tmp/shllvm-native-probes-bm_ylbl1/async-duplicate/opt.bc"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "",
+          "seconds": 0.015902
+        },
+        {
+          "command": [
+            "/usr/lib/llvm-18/bin/clang",
+            "/tmp/shllvm-native-probes-bm_ylbl1/async-duplicate/opt.bc",
+            "-O0",
+            "-Wno-override-module",
+            "-L/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/lib",
+            "-Wl,-rpath,/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/lib",
+            "-L/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/tools/shermes",
+            "-Wl,-rpath,/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/tools/shermes",
+            "-L/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/jsi",
+            "-Wl,-rpath,/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/jsi",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/lib/libshllvm_runtime.a",
+            "-lshermes_console",
+            "-lhermesvm",
+            "-lm",
+            "-o",
+            "/tmp/shllvm-native-probes-bm_ylbl1/async-duplicate/program"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "",
+          "seconds": 0.114201
+        },
+        {
+          "command": [
+            "/tmp/shllvm-native-probes-bm_ylbl1/async-duplicate/program",
+            "--shllvm-test262",
+            "-Xhermes-internal-test-methods",
+            "-Xes6-proxy",
+            "-Xmicrotask-queue"
+          ],
+          "exit_code": 0,
+          "stdout": "Test262:AsyncTestComplete\nTest262:AsyncTestComplete\n",
+          "stderr": "",
+          "seconds": 0.003597
+        }
+      ],
+      "includes": {
+        "harness/sta.js": "1930c54af79455c484799f43e9a28e2b2f15c40d0917c9941ca54e26db243f35",
+        "harness/assert.js": "206e274ca325eb8a652e3911c3fbd090e2480d11ed7579dc17a5d17a2360ed48",
+        "harness/doneprintHandle.js": "01282de15feb05d865dfc2cdfc68f59d8e760eb7d81a14ade3bc08cbc8520add"
+      },
+      "prepared_sha256": "61986ae1a5644b47ec750099edeece39acb992161bfa42beaab458afd8eb071c",
+      "artifacts": {
+        "test.ll": "135d4d2f2c3d458501afe12ca0ff0d540ce9dde7c27fa98b77fd8a18dd6f4340",
+        "test.bc": "651754261a144e4ec2c9ab77ce9b76974c6fe34c30441da9eb9b00f224902252",
+        "opt.bc": "c502f35a2551c2295f7b6b41577514843b506c491354f0d2c6ab2fc651e5fb0c",
+        "program": "1ec0ffe0708515d72387122fdeb046af7a4116c296b5b9cacef1b88ec4e0900a"
+      },
+      "status": "semantic_failure",
+      "observed_phase": "runtime",
+      "probe": "async-duplicate",
+      "expected_status": "semantic_failure",
+      "matched": true
+    },
+    {
+      "test": "async-failed.js",
+      "source_sha256": "6f0c0898709796ccd8d5c0cfff9f1ce278333dcdad9d02c819a3e244917ae284",
+      "variant": "sloppy",
+      "features": [],
+      "expected": null,
+      "commands": [
+        {
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/bin/shermes",
+            "-O0",
+            "-test262",
+            "-fno-static-builtins",
+            "-Xes6-block-scoping",
+            "-Xenable-tdz",
+            "-Xasync-generators",
+            "-emit-llvm",
+            "/tmp/shllvm-native-probes-bm_ylbl1/async-failed/test.js",
+            "-o",
+            "/tmp/shllvm-native-probes-bm_ylbl1/async-failed/test.ll"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "",
+          "seconds": 0.00347
+        },
+        {
+          "command": [
+            "/usr/lib/llvm-18/bin/llvm-as",
+            "/tmp/shllvm-native-probes-bm_ylbl1/async-failed/test.ll",
+            "-o",
+            "/tmp/shllvm-native-probes-bm_ylbl1/async-failed/test.bc"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "",
+          "seconds": 0.01564
+        },
+        {
+          "command": [
+            "/usr/lib/llvm-18/bin/opt",
+            "-passes=verify",
+            "/tmp/shllvm-native-probes-bm_ylbl1/async-failed/test.bc",
+            "-o",
+            "/tmp/shllvm-native-probes-bm_ylbl1/async-failed/opt.bc"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "",
+          "seconds": 0.015837
+        },
+        {
+          "command": [
+            "/usr/lib/llvm-18/bin/clang",
+            "/tmp/shllvm-native-probes-bm_ylbl1/async-failed/opt.bc",
+            "-O0",
+            "-Wno-override-module",
+            "-L/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/lib",
+            "-Wl,-rpath,/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/lib",
+            "-L/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/tools/shermes",
+            "-Wl,-rpath,/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/tools/shermes",
+            "-L/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/jsi",
+            "-Wl,-rpath,/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/jsi",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/lib/libshllvm_runtime.a",
+            "-lshermes_console",
+            "-lhermesvm",
+            "-lm",
+            "-o",
+            "/tmp/shllvm-native-probes-bm_ylbl1/async-failed/program"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "",
+          "seconds": 0.114124
+        },
+        {
+          "command": [
+            "/tmp/shllvm-native-probes-bm_ylbl1/async-failed/program",
+            "--shllvm-test262",
+            "-Xhermes-internal-test-methods",
+            "-Xes6-proxy",
+            "-Xmicrotask-queue"
+          ],
+          "exit_code": 0,
+          "stdout": "Test262:AsyncTestFailure:Error: failed\n",
+          "stderr": "",
+          "seconds": 0.003735
+        }
+      ],
+      "includes": {
+        "harness/sta.js": "1930c54af79455c484799f43e9a28e2b2f15c40d0917c9941ca54e26db243f35",
+        "harness/assert.js": "206e274ca325eb8a652e3911c3fbd090e2480d11ed7579dc17a5d17a2360ed48",
+        "harness/doneprintHandle.js": "01282de15feb05d865dfc2cdfc68f59d8e760eb7d81a14ade3bc08cbc8520add"
+      },
+      "prepared_sha256": "f9654f08f5974db15f2e47ef68d9aca1c8ce323f1ae3c55c4e0c323bcc1ac27a",
+      "artifacts": {
+        "test.ll": "c0c10853cfff283097ddc428757156a9dc07975b1f34e29a76481cd89c4d58a8",
+        "test.bc": "007d5ee9e66c1abda94a90881e90ece45d5e7028b8497fb975acc065552b9c89",
+        "opt.bc": "efbf0f53a8645a91a88340dda780561e2b4a54dd71163df2f248e36a4abd15e1",
+        "program": "6fceb951c755c2eeab47748399cb1d9bb52cfe8ae92c29d52a7c47d383e7456c"
+      },
+      "status": "semantic_failure",
+      "observed_phase": "runtime",
+      "probe": "async-failed",
+      "expected_status": "semantic_failure",
+      "matched": true
+    },
+    {
+      "test": "parse-error.js",
+      "source_sha256": "8d6f10b73cdc7d7d9fb4a892b4fb1d030ef2a8510f9fcfa354a4c57980b3d213",
+      "variant": "sloppy",
+      "features": [],
+      "expected": {
+        "phase": "parse",
+        "type": "SyntaxError"
+      },
+      "commands": [
+        {
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/bin/shermes",
+            "-O0",
+            "-test262",
+            "-fno-static-builtins",
+            "-Xes6-block-scoping",
+            "-Xenable-tdz",
+            "-Xasync-generators",
+            "-dump-transformed-ast",
+            "/tmp/shllvm-native-probes-bm_ylbl1/parse-error/test.js"
+          ],
+          "exit_code": 1,
+          "stdout": "",
+          "stderr": "/tmp/shllvm-native-probes-bm_ylbl1/parse-error/test.js:215:5: error: 'identifier' expected in declaration\nvar = ;\n~~~~^\nEmitted 1 errors. exiting.\n",
+          "seconds": 0.003547
+        }
+      ],
+      "includes": {
+        "harness/sta.js": "1930c54af79455c484799f43e9a28e2b2f15c40d0917c9941ca54e26db243f35",
+        "harness/assert.js": "206e274ca325eb8a652e3911c3fbd090e2480d11ed7579dc17a5d17a2360ed48"
+      },
+      "prepared_sha256": "d3425158f79c96ff7a4d96ae1e6933233f25f92c16b761511481107da9fa9bb1",
+      "status": "pass",
+      "observed_phase": "parse",
+      "probe": "parse-error",
+      "expected_status": "pass",
+      "matched": true
+    },
+    {
+      "test": "wrong-phase.js",
+      "source_sha256": "8d6f10b73cdc7d7d9fb4a892b4fb1d030ef2a8510f9fcfa354a4c57980b3d213",
+      "variant": "sloppy",
+      "features": [],
+      "expected": {
+        "phase": "runtime",
+        "type": "TypeError"
+      },
+      "commands": [
+        {
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/bin/shermes",
+            "-O0",
+            "-test262",
+            "-fno-static-builtins",
+            "-Xes6-block-scoping",
+            "-Xenable-tdz",
+            "-Xasync-generators",
+            "-emit-llvm",
+            "/tmp/shllvm-native-probes-bm_ylbl1/wrong-phase/test.js",
+            "-o",
+            "/tmp/shllvm-native-probes-bm_ylbl1/wrong-phase/test.ll"
+          ],
+          "exit_code": 1,
+          "stdout": "",
+          "stderr": "/tmp/shllvm-native-probes-bm_ylbl1/wrong-phase/test.js:215:5: error: 'identifier' expected in declaration\nvar = ;\n~~~~^\nEmitted 1 errors. exiting.\n",
+          "seconds": 0.003502
+        }
+      ],
+      "includes": {
+        "harness/sta.js": "1930c54af79455c484799f43e9a28e2b2f15c40d0917c9941ca54e26db243f35",
+        "harness/assert.js": "206e274ca325eb8a652e3911c3fbd090e2480d11ed7579dc17a5d17a2360ed48"
+      },
+      "prepared_sha256": "d3425158f79c96ff7a4d96ae1e6933233f25f92c16b761511481107da9fa9bb1",
+      "status": "unsupported",
+      "observed_phase": "compile",
+      "probe": "wrong-phase",
+      "expected_status": "unsupported",
+      "matched": true
+    },
+    {
+      "test": "timeout.js",
+      "source_sha256": "dd6fd499a6e4b561d738acf6fafb5ad37174a49ffaa95aeac17486fcb9271293",
+      "variant": "sloppy",
+      "features": [],
+      "expected": null,
+      "commands": [
+        {
+          "command": [
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/bin/shermes",
+            "-O0",
+            "-test262",
+            "-fno-static-builtins",
+            "-Xes6-block-scoping",
+            "-Xenable-tdz",
+            "-Xasync-generators",
+            "-emit-llvm",
+            "/tmp/shllvm-native-probes-bm_ylbl1/timeout/test.js",
+            "-o",
+            "/tmp/shllvm-native-probes-bm_ylbl1/timeout/test.ll"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "",
+          "seconds": 0.003551
+        },
+        {
+          "command": [
+            "/usr/lib/llvm-18/bin/llvm-as",
+            "/tmp/shllvm-native-probes-bm_ylbl1/timeout/test.ll",
+            "-o",
+            "/tmp/shllvm-native-probes-bm_ylbl1/timeout/test.bc"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "",
+          "seconds": 0.015697
+        },
+        {
+          "command": [
+            "/usr/lib/llvm-18/bin/opt",
+            "-passes=verify",
+            "/tmp/shllvm-native-probes-bm_ylbl1/timeout/test.bc",
+            "-o",
+            "/tmp/shllvm-native-probes-bm_ylbl1/timeout/opt.bc"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "",
+          "seconds": 0.015875
+        },
+        {
+          "command": [
+            "/usr/lib/llvm-18/bin/clang",
+            "/tmp/shllvm-native-probes-bm_ylbl1/timeout/opt.bc",
+            "-O0",
+            "-Wno-override-module",
+            "-L/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/lib",
+            "-Wl,-rpath,/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/lib",
+            "-L/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/tools/shermes",
+            "-Wl,-rpath,/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/tools/shermes",
+            "-L/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/jsi",
+            "-Wl,-rpath,/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/jsi",
+            "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm/lib/libshllvm_runtime.a",
+            "-lshermes_console",
+            "-lhermesvm",
+            "-lm",
+            "-o",
+            "/tmp/shllvm-native-probes-bm_ylbl1/timeout/program"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "",
+          "seconds": 0.114134
+        },
+        {
+          "command": [
+            "/tmp/shllvm-native-probes-bm_ylbl1/timeout/program",
+            "--shllvm-test262",
+            "-Xhermes-internal-test-methods",
+            "-Xes6-proxy",
+            "-Xmicrotask-queue"
+          ],
+          "exit_code": null,
+          "stdout": "",
+          "stderr": "",
+          "failure": "timeout",
+          "seconds": 2.000998
+        }
+      ],
+      "includes": {
+        "harness/sta.js": "1930c54af79455c484799f43e9a28e2b2f15c40d0917c9941ca54e26db243f35",
+        "harness/assert.js": "206e274ca325eb8a652e3911c3fbd090e2480d11ed7579dc17a5d17a2360ed48"
+      },
+      "prepared_sha256": "44098611af6fe290500729ab44dadd45c1858aa4273d7dcdd02a9c026f5550d8",
+      "artifacts": {
+        "test.ll": "5a950713006bc116047217ac5463b7b6324679cfb58b469f5ee2291ba9d02c39",
+        "test.bc": "d7c5397c4b15646e0fe1cdb6413e933dd01c1a07b16e7245bd514fbb58d9a67f",
+        "opt.bc": "137f1d8d89129b561109fe12d39979e8244981a8468630a397c23a7ef1db2b99",
+        "program": "fab76ef3e3d5ac8074e89d5d51fb98b6bb590fe65f00c42eee5ae81df47452ef"
+      },
+      "status": "timeout",
+      "observed_phase": "runtime",
+      "probe": "timeout",
+      "expected_status": "timeout",
+      "matched": true
+    }
+  ]
+}

@@ -836,6 +836,34 @@ CallResult<HermesValue> objectIs(void *, Runtime &runtime) {
       isSameValue(args.getArg(0), args.getArg(1)));
 }
 
+static CallResult<HermesValue> testProxyIntegrityLevel(
+    Handle<JSObject> object, Runtime &runtime, bool frozen) {
+  GCScope gcScope{runtime};
+  auto extensible = JSObject::isExtensible(object, runtime);
+  if (extensible == ExecutionStatus::EXCEPTION)
+    return ExecutionStatus::EXCEPTION;
+  if (*extensible) return HermesValue::encodeBoolValue(false);
+  auto keysResult = JSObject::getOwnPropertyKeys(
+      object, runtime,
+      OwnKeysFlags().plusIncludeNonSymbols().plusIncludeSymbols().plusIncludeNonEnumerable());
+  if (keysResult == ExecutionStatus::EXCEPTION)
+    return ExecutionStatus::EXCEPTION;
+  auto keys = *keysResult;
+  struct : public Locals { PinnedValue<> key; } lv;
+  LocalsRAII locals{runtime, &lv};
+  for (uint32_t i = 0, end = JSArray::getLength(*keys, runtime); i < end; ++i) {
+    lv.key = keys->at(runtime, i).unboxToHV(runtime);
+    ComputedPropertyDescriptor descriptor;
+    auto found = JSObject::getOwnComputedDescriptor(object, runtime, lv.key, descriptor);
+    if (found == ExecutionStatus::EXCEPTION)
+      return ExecutionStatus::EXCEPTION;
+    if (*found && (descriptor.flags.configurable ||
+                  (frozen && !descriptor.flags.accessor && descriptor.flags.writable)))
+      return HermesValue::encodeBoolValue(false);
+  }
+  return HermesValue::encodeBoolValue(true);
+}
+
 CallResult<HermesValue> objectIsSealed(void *, Runtime &runtime) {
   NativeArgs args = runtime.getCurrentFrame().getNativeArgs();
   auto objHandle = args.dyncastArg<JSObject>(0);
@@ -845,6 +873,8 @@ CallResult<HermesValue> objectIsSealed(void *, Runtime &runtime) {
     return HermesValue::encodeBoolValue(true);
   }
 
+  if (objHandle->isProxyObject(runtime))
+    return testProxyIntegrityLevel(objHandle, runtime, false);
   return HermesValue::encodeBoolValue(JSObject::isSealed(objHandle, runtime));
 }
 
@@ -857,6 +887,8 @@ CallResult<HermesValue> objectIsFrozen(void *, Runtime &runtime) {
     return HermesValue::encodeBoolValue(true);
   }
 
+  if (objHandle->isProxyObject(runtime))
+    return testProxyIntegrityLevel(objHandle, runtime, true);
   return HermesValue::encodeBoolValue(JSObject::isFrozen(objHandle, runtime));
 }
 

@@ -711,6 +711,29 @@ Value *ESTreeIRGen::genSHBuiltin(
   if (builtin->_name == kw_.identCall) {
     return genSHBuiltinCall(call);
   }
+  // Private host operation: attach an intrinsic Promise reaction without
+  // reading user-visible then/constructor/@@species properties.
+  if (builtin->_name->str() == "moduleThen") {
+    if (call->_arguments.size() != 3) {
+      Mod->getContext().getSourceErrorManager().error(
+          call->getSourceRange(), "moduleThen requires exactly three arguments");
+      return Builder.getLiteralUndefined();
+    }
+    llvh::SmallVector<Value *, 3> arguments;
+    for (auto &argument : call->_arguments) {
+      if (llvh::isa<ESTree::SpreadElementNode>(&argument)) {
+        Mod->getContext().getSourceErrorManager().error(
+            call->getSourceRange(), "moduleThen does not accept spread arguments");
+        return Builder.getLiteralUndefined();
+      }
+      arguments.push_back(genExpression(&argument));
+    }
+    auto *closure = Builder.createGetBuiltinClosureInst(
+        BuiltinMethod::HermesBuiltin_moduleThen);
+    return Builder.createCallInst(
+        closure, Builder.getLiteralUndefined(), Builder.getLiteralUndefined(), arguments);
+  }
+
   if (builtin->_name == kw_.identCNull) {
     return Builder.getLiteralPositiveZero();
   }

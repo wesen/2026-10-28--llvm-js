@@ -1,0 +1,5 @@
+{
+  "expected_stdout": "special-names-ok\n",
+  "reason": "The pinned ModuleNamespaceCreate and [[OwnPropertyKeys]] algorithms preserve lexicographic code-unit export order (10 before 2). Node 24.18.0 enumerates these numeric-looking exports in index order (2 before 10). The Node mismatch is retained separately.",
+  "reference": "https://tc39.es/ecma262/2026/multipage/ordinary-and-exotic-objects-behaviours.html#sec-modulenamespacecreate"
+}

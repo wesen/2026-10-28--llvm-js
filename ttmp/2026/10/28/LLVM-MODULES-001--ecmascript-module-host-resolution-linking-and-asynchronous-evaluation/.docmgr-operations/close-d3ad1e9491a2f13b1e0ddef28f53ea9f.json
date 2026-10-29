@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "digest": "7509f922fa40716f0a972ac91725cad1eff71f7c289e5f0f7b2f28a9c2664ad2",
+  "request": {
+    "ticket": "LLVM-MODULES-001",
+    "status": "complete",
+    "intent": "",
+    "entry": "Implemented and qualified the closed-graph module host: 14 graph contracts, 585 Test262 passes and 17 explicit unsupported variants, core 22/22 and extensions 66/66. Preserved initial failures, final evidence, design, and detailed diary."
+  },
+  "receipt": {
+    "sequence": 1,
+    "operation_id": "close-d3ad1e9491a2f13b1e0ddef28f53ea9f",
+    "state": "committed",
+    "created_at": "2026-10-29T02:53:01.229564198Z",
+    "changed_paths": [
+      "changelog.md",
+      "index.md"
+    ],
+    "before": {
+      "changelog.md": "fc028df15ae31a12ec21c9940ac859fc94aa7478ae7fc2de357543d26061dc54",
+      "index.md": "88b78990db71da5776e983c8760a604e0315cf929668c72218c9d3181e958b99"
+    },
+    "after": {
+      "changelog.md": "3f73dd10dfa99ffcaeea0c18c76fefcd21dd80542ed772f17b43e6dc6f966078",
+      "index.md": "2ea61e465bd0955a5c12ed9882023f9f2fce94c36d76d125e38de33cb7d9edf4"
+    }
+  },
+  "changes": [
+    {
+      "path": "changelog.md",
+      "before": "fc028df15ae31a12ec21c9940ac859fc94aa7478ae7fc2de357543d26061dc54",
+      "after": "IyBDaGFuZ2Vsb2cKCiMjIDIwMjYtMTAtMjgKCi0gSW5pdGlhbCB3b3Jrc3BhY2UgY3JlYXRlZAoKIyMgMjAyNi0xMC0yOAoKSW1wbGVtZW50ZWQgYW5kIHF1YWxpZmllZCB0aGUgY2xvc2VkLWdyYXBoIG1vZHVsZSBob3N0OiAxNCBncmFwaCBjb250cmFjdHMsIDU4NSBUZXN0MjYyIHBhc3NlcyBhbmQgMTcgZXhwbGljaXQgdW5zdXBwb3J0ZWQgdmFyaWFudHMsIGNvcmUgMjIvMjIgYW5kIGV4dGVuc2lvbnMgNjYvNjYuIFByZXNlcnZlZCBpbml0aWFsIGZhaWx1cmVzLCBmaW5hbCBldmlkZW5jZSwgZGVzaWduLCBhbmQgZGV0YWlsZWQgZGlhcnkuCg=="
+    },
+    {
+      "path": "index.md",
+      "before": "88b78990db71da5776e983c8760a604e0315cf929668c72218c9d3181e958b99",
+      "after": "LS0tClRpdGxlOiBFQ01BU2NyaXB0IG1vZHVsZSBob3N0IHJlc29sdXRpb24gbGlua2luZyBhbmQgYXN5bmNocm9ub3VzIGV2YWx1YXRpb24KVGlja2V0OiBMTFZNLU1PRFVMRVMtMDAxClN0YXR1czogY29tcGxldGUKVG9waWNzOgogICAgLSBsbHZtCiAgICAtIGphdmFzY3JpcHQKRG9jVHlwZTogaW5kZXgKSW50ZW50OiBsb25nLXRlcm0KT3duZXJzOiBbXQpSZWxhdGVkRmlsZXM6CiAgICAtIFBhdGg6IHJlcG86Ly9oZXJtZXMvbGliL0lSR2VuL0VTVHJlZUlSR2VuLXN0bXQuY3BwCiAgICAgIE5vdGU6IEV4aXN0aW5nIENvbW1vbkpTIGxvd2VyaW5nIGFuZCBpdHMgbGl2ZS1iaW5kaW5nIGxpbWl0YXRpb24KICAgIC0gUGF0aDogcmVwbzovL2hlcm1lcy91dGlscy9zaGxsdm0ucHkKICAgICAgTm90ZTogRHJpdmVyIGludGVncmF0aW9uIHBvaW50CkV4dGVybmFsU291cmNlczogW10KU3VtbWFyeTogIiIKTGFzdFVwZGF0ZWQ6IDIwMjYtMTAtMjhUMjI6NTM6MDEuMjI5NTA0MjA1LTA0OjAwCldoYXRGb3I6ICIiCldoZW5Ub1VzZTogIiIKLS0tCgojIEVDTUFTY3JpcHQgbW9kdWxlIGhvc3QgcmVzb2x1dGlvbiBsaW5raW5nIGFuZCBhc3luY2hyb25vdXMgZXZhbHVhdGlvbgoKIyMgT3ZlcnZpZXcKCkltcGxlbWVudGVkIGEgY2xvc2VkIGZpbGVzeXN0ZW0gbW9kdWxlIGhvc3QgY29tcGlsZWQgdGhyb3VnaCBIZXJtZXMgYW5kIExMVk06IGxleGljYWwgbGl2ZSBiaW5kaW5ncywgZXhwb3J0IHJlc29sdXRpb24sIGN5Y2xpYyBsaW5raW5nL2V2YWx1YXRpb24sIG5hbWVzcGFjZXMsIGR5bmFtaWMgaW1wb3J0cywgYW5kIHRvcC1sZXZlbCBhd2FpdC4gU2VlIHRoZSBbaW1wbGVtZW50YXRpb24gZ3VpZGVdKGRlc2lnbi1kb2MvMDEtbW9kdWxlLWhvc3QtYXJjaGl0ZWN0dXJlLWFuZC1pbXBsZW1lbnRhdGlvbi1ndWlkZS5tZCksIFtkaWFyeV0ocmVmZXJlbmNlLzAxLWltcGxlbWVudGF0aW9uLWRpYXJ5Lm1kKSwgYW5kIFtvcGVyYXRpb25hbCBjb250cmFjdF0oLi4vLi4vLi4vLi4vLi4vaGVybWVzL2RvY3MvbGx2bS9NT0RVTEVTLm1kKS4gRXhwbGljaXQgdW5zdXBwb3J0ZWQgY29udHJhY3RzIGFuZCBxdWFsaWZpY2F0aW9uIGNvdW50cyBhcmUgcmVjb3JkZWQgd2l0aCByZXRhaW5lZCBldmlkZW5jZS4KCiMjIEtleSBMaW5rcwoKLSAqKlJlbGF0ZWQgRmlsZXMqKjogU2VlIGZyb250bWF0dGVyIFJlbGF0ZWRGaWxlcyBmaWVsZAotICoqRXh0ZXJuYWwgU291cmNlcyoqOiBTZWUgZnJvbnRtYXR0ZXIgRXh0ZXJuYWxTb3VyY2VzIGZpZWxkCgojIyBTdGF0dXMKCkN1cnJlbnQgc3RhdHVzOiAqKmFjdGl2ZSoqCgojIyBUb3BpY3MKCi0gbGx2bQotIGphdmFzY3JpcHQKCiMjIFRhc2tzCgpTZWUgW3Rhc2tzLm1kXSguL3Rhc2tzLm1kKSBmb3IgdGhlIGN1cnJlbnQgdGFzayBsaXN0LgoKIyMgQ2hhbmdlbG9nCgpTZWUgW2NoYW5nZWxvZy5tZF0oLi9jaGFuZ2Vsb2cubWQpIGZvciByZWNlbnQgY2hhbmdlcyBhbmQgZGVjaXNpb25zLgoKIyMgU3RydWN0dXJlCgotIGRlc2lnbi8gLSBBcmNoaXRlY3R1cmUgYW5kIGRlc2lnbiBkb2N1bWVudHMKLSByZWZlcmVuY2UvIC0gUHJvbXB0IHBhY2tzLCBBUEkgY29udHJhY3RzLCBjb250ZXh0IHN1bW1hcmllcwotIHBsYXlib29rcy8gLSBDb21tYW5kIHNlcXVlbmNlcyBhbmQgdGVzdCBwcm9jZWR1cmVzCi0gc2NyaXB0cy8gLSBUZW1wb3JhcnkgY29kZSBhbmQgdG9vbGluZwotIHZhcmlvdXMvIC0gV29ya2luZyBub3RlcyBhbmQgcmVzZWFyY2gKLSBhcmNoaXZlLyAtIERlcHJlY2F0ZWQgb3IgcmVmZXJlbmNlLW9ubHkgYXJ0aWZhY3RzCg=="
+    }
+  ]
+}

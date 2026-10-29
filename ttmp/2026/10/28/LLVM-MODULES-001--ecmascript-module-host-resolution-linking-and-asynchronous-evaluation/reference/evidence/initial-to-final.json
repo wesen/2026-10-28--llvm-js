@@ -1,0 +1,158 @@
+{
+  "same_variants_and_source_hashes": true,
+  "before": {
+    "pass": 564,
+    "semantic_failure": 24,
+    "unsupported": 14
+  },
+  "after": {
+    "pass": 585,
+    "unsupported": 17
+  },
+  "changes": [
+    {
+      "test": "test/language/module-code/ambiguous-export-bindings/namespace-unambiguous-if-export-star-as-from-and-import-star-as-and-export.js",
+      "variant": "module",
+      "before": "semantic_failure",
+      "after": "pass"
+    },
+    {
+      "test": "test/language/module-code/ambiguous-export-bindings/namespace-unambiguous-if-export-star-as-from.js",
+      "variant": "module",
+      "before": "semantic_failure",
+      "after": "pass"
+    },
+    {
+      "test": "test/language/module-code/ambiguous-export-bindings/namespace-unambiguous-if-import-source-and-export.js",
+      "variant": "module",
+      "before": "semantic_failure",
+      "after": "unsupported"
+    },
+    {
+      "test": "test/language/module-code/ambiguous-export-bindings/namespace-unambiguous-if-import-star-as-and-export.js",
+      "variant": "module",
+      "before": "semantic_failure",
+      "after": "pass"
+    },
+    {
+      "test": "test/language/module-code/eval-export-dflt-cls-name-meth.js",
+      "variant": "module",
+      "before": "semantic_failure",
+      "after": "pass"
+    },
+    {
+      "test": "test/language/module-code/eval-export-dflt-expr-cls-name-meth.js",
+      "variant": "module",
+      "before": "semantic_failure",
+      "after": "pass"
+    },
+    {
+      "test": "test/language/module-code/eval-export-dflt-expr-err-eval.js",
+      "variant": "module",
+      "before": "semantic_failure",
+      "after": "pass"
+    },
+    {
+      "test": "test/language/module-code/eval-export-dflt-expr-err-get-value.js",
+      "variant": "module",
+      "before": "semantic_failure",
+      "after": "pass"
+    },
+    {
+      "test": "test/language/module-code/eval-rqstd-abrupt.js",
+      "variant": "module",
+      "before": "semantic_failure",
+      "after": "pass"
+    },
+    {
+      "test": "test/language/module-code/eval-self-abrupt.js",
+      "variant": "module",
+      "before": "semantic_failure",
+      "after": "pass"
+    },
+    {
+      "test": "test/language/module-code/instn-resolve-empty-export.js",
+      "variant": "module",
+      "before": "semantic_failure",
+      "after": "pass"
+    },
+    {
+      "test": "test/language/module-code/instn-resolve-empty-import.js",
+      "variant": "module",
+      "before": "semantic_failure",
+      "after": "pass"
+    },
+    {
+      "test": "test/language/module-code/instn-resolve-err-syntax-1.js",
+      "variant": "module",
+      "before": "semantic_failure",
+      "after": "pass"
+    },
+    {
+      "test": "test/language/module-code/instn-resolve-err-syntax-2.js",
+      "variant": "module",
+      "before": "semantic_failure",
+      "after": "pass"
+    },
+    {
+      "test": "test/language/module-code/instn-resolve-order-depth.js",
+      "variant": "module",
+      "before": "semantic_failure",
+      "after": "pass"
+    },
+    {
+      "test": "test/language/module-code/instn-resolve-order-src.js",
+      "variant": "module",
+      "before": "semantic_failure",
+      "after": "pass"
+    },
+    {
+      "test": "test/language/module-code/namespace/internals/define-own-property.js",
+      "variant": "module",
+      "before": "semantic_failure",
+      "after": "pass"
+    },
+    {
+      "test": "test/language/module-code/source-phase-import/reexport-source-binding-named-import.js",
+      "variant": "module",
+      "before": "semantic_failure",
+      "after": "unsupported"
+    },
+    {
+      "test": "test/language/module-code/source-phase-import/reexport-source-binding-namespace-get.js",
+      "variant": "module",
+      "before": "semantic_failure",
+      "after": "unsupported"
+    },
+    {
+      "test": "test/language/module-code/top-level-await/await-dynamic-import-rejection.js",
+      "variant": "module",
+      "before": "semantic_failure",
+      "after": "pass"
+    },
+    {
+      "test": "test/language/module-code/top-level-await/module-import-rejection-body.js",
+      "variant": "module",
+      "before": "semantic_failure",
+      "after": "pass"
+    },
+    {
+      "test": "test/language/module-code/top-level-await/module-import-rejection-tick.js",
+      "variant": "module",
+      "before": "semantic_failure",
+      "after": "pass"
+    },
+    {
+      "test": "test/language/module-code/top-level-await/module-import-rejection.js",
+      "variant": "module",
+      "before": "semantic_failure",
+      "after": "pass"
+    },
+    {
+      "test": "test/language/module-code/top-level-await/rejection-order.js",
+      "variant": "module",
+      "before": "semantic_failure",
+      "after": "pass"
+    }
+  ]
+}

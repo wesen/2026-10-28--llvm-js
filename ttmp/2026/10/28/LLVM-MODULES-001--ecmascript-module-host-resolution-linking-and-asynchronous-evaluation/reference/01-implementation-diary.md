@@ -105,3 +105,88 @@ Start at compileGraph, then runtime link/exportCell/inner/fulfilled. Follow gene
 
 ### Technical details
 Build-only dependencies are installed with pnpm --dir hermes/utils/module-host install --ignore-scripts. node_modules is ignored. Runtime modules do not execute in Node; the generated host and factories pass through the existing shermes/LLVM pipeline. Direct eval, import attributes/options, and top-level for-await currently have explicit host boundaries.
+
+## Step 3: Expand to for-await and measure the pinned module-code selection
+
+The eleven-graph matrix passed at all four native optimization combinations and real lli. The first full module-code selection completed with 564 passes, 24 semantic failures, and 14 unsupported records across 602 variants, with unchanged inputs. Its failure evidence exposed both host corrections and shared-runtime defects; repairs are now being built and are not yet qualified.
+
+### Prompt Context
+See Step 1. The implementation continues across all requested module lifecycle areas rather than stopping at the first passing graph.
+
+### What I did
+Implemented top-level for-await lowering with async-from-sync iteration, iterator closing, exception precedence, labels and per-iteration bindings. Added explicit --modules mode to the pinned Test262 runner, including module completion markers and separate parser/link validation attribution. Preserved initial Test262 and matrix reports. Added compiler tests for deterministic graphs, deferred errors, identity, boundaries and hardlink output protection.
+
+### Why
+A module implementation must preserve control transfers through suspended loops and distinguish completed evaluation from a process that exits while a Promise remains pending. Syntax and linking expectations also need correct phase attribution for imported source failures.
+
+### What worked
+The split for-await graph passes Node, native and lli. Eight build-tool tests pass. The initial full graph matrix passes 11/11 with 44 native and 11 lli executions. The pinned module-code experiment records 564/602 passes; its source phase, runtime phase and host boundary categories remain separate.
+
+### What didn't work
+The first for-await probe retained stale AST nodes and failed compilation with `error: '(' expected after 'for'`. Moving declarations into their final AST before binding traversal fixed it. The combined six-loop probe then exceeded the existing 1024 combined root/argument-slot limit even at O. Preserved that source as scripts/01-oversized-for-await-probe.mjs and split independent contracts into distinct module frames. The root-slot limit is unchanged.
+
+The pinned suite found three namespace-alias failures, two default class-name failures, dependency parse phase mismatches, a Proxy freeze defect, and runtime error classification gaps. Object.freeze incorrectly changed the Proxy object's HiddenClass without invoking its target/traps. The pending repair invokes actual internal methods for seal/freeze and integrity queries. Async errors also lacked the guarded exception marker; the event loop now has an explicit Test262 reporting flag, with all C/LLVM callers updated.
+
+The first build of an internal module Promise reaction builtin failed with `no member named 'moduleThen' in namespace 'hermes::vm::Predefined'`. Added the matching predefined string and restarted the build. This was an incomplete registration, not a runtime success.
+
+### What I learned
+Namespace reexports must share one cell per target namespace, or equal exports appear spuriously ambiguous. Default class naming must respect an existing static name property. Errors parsing dependencies are externally resolution failures, while an entry parse error remains a parse failure. Module jobs need internal Promise reactions rather than public then/species behavior.
+
+### What was tricky to build
+For-await closure and cleanup rules require precise placement of the close-needed flag: a failing next operation must not close, while a body abrupt completion must. A thrown body completion takes precedence over a closing error. Module completion signaling must not turn an unresolved TLA into a false pass.
+
+### What warrants a second pair of eyes
+Review the new Promise builtin registration, shared Proxy integrity algorithms, event-loop thrown-value inspection, namespace cell identity, and leaf-to-root async rejection order. Review retained failures before accepting the subsequent counts.
+
+### What should be done in the future
+Finish the rebuilt-runtime checks, rerun the affected module selection and full matrix, qualify hostile exception probes and the full core/extension gates, then document remaining admission boundaries and publish the final ticket state.
+
+### Code review instructions
+Read the initial receipt and failed variant list, then review compiler.cjs transformations and runtime.js scheduling. Inspect JSObject::seal/freeze, objectIsSealed/objectIsFrozen, ConsoleBindings.cpp, Builtins.def, and the Promise moduleThen implementation.
+
+### Technical details
+Initial implementation commit: 8b88615. The selected Test262 profile is frontend O / LLVM O2 with eight workers. Early parse checks use Babel; link-only validation uses the same host in Node without executing source bodies; executable contracts run through LLVM. This distinction is included in each module result.
+
+### Step 3 follow-up: builtin lowering and independent oracle limits
+The rebuilt compiler rejected `$SHBuiltin.moduleThen` with `unknown SH builtin call`; registering the runtime builtin does not automatically add source-level IR generation. Added explicit three-argument lowering to GetBuiltinClosure plus ordinary call, with spread rejection. The next focused gate passed default names, intrinsic jobs, namespace identity, live bindings, and reexports.
+
+Two expanded oracle assumptions needed qualification. Node 24.18.0 treats duplicate routes to the same namespace as ambiguous, unlike the pinned specification's namespace-binding rule; this now has a separate specification-directed fixture with the Node result retained. Mutating public Promise.then during Node dynamic import also failed inside Node's loader. The intrinsic-jobs fixture now checks mutation during await, restores then, and separately checks dynamic import; no Node failure is counted as a matching result.
+
+The special-names fixture exposed `ownKeys target key is non-configurable but not present in trap result`. Hermes stores ordinary indexed keys numerically internally but compared them directly with the Proxy trap's string keys. Normalizing target snapshot keys before invariant comparison fixes the representation mismatch; a standalone Proxy regression accompanies the module numeric-export case. The patch is being rebuilt before qualification.
+
+## Step 4: Qualify the complete module host and shared runtime corrections
+
+The final graph matrix passes 14/14 contracts across 56 native executions and 14 real lli executions. The pinned module-code selection improves from 564 passes, 24 semantic failures, and 14 unsupported variants to 585 passes and 17 unsupported variants, with no semantic failures or timeouts. The same variant identities and source hashes were compared; no previously passing variant regressed.
+
+### Prompt Context
+See Step 1 for the original request. This checkpoint completes the requested module-host implementation, evidence, and documentation within the explicitly documented filesystem host policy.
+
+### What I did
+Completed intrinsic Promise reaction lowering, namespace identity and default-name corrections, Proxy integrity operations, numeric ownKeys invariant normalization, and actual-thrown-value reporting for asynchronous Test262 exceptions. Ran the selected module suite, the full graph matrix, core and extension gates, exception probes, and compiler tests. Added the operational MODULES.md guide and retained compressed full Test262 receipts with uncompressed SHA-256 hashes.
+
+### Why
+The initial suite showed that source transformation alone was insufficient: namespace operations depend on correct underlying Proxy internal methods, and async evaluation depends on intrinsic reaction scheduling. Negative tests also require reliable phase/type attribution rather than matching user-controlled diagnostic text.
+
+### What worked
+The final Test262 receipt contains 396 runtime passes, 166 parse passes, and 23 resolution passes. All 602 planned variants were classified. The graph and Test262 receipts report no changed inputs; the extension receipt also confirms unchanged inputs. Core passes 22/22 and extensions 66/66. Nineteen hostile/ordinary exception probes have their expected outcomes, and eight compiler tests pass. The selected Test262 result retains 17 unsupported records, so its aggregate command exits nonzero intentionally; that exit is not hidden or relabeled as a complete-conformance success.
+
+### What didn't work
+After the numeric-key runtime fix, the special-names fixture disagreed with Node 24.18.0: Node enumerated numeric export names as 2,10, while the pinned ModuleNamespaceCreate algorithm requires lexicographic order 10,2. All five LLVM executions already matched that specification expectation. Preserved numeric-key-oracle-mismatch.json, added an explicit oracle.json qualification, and reran the complete graph matrix. Together with duplicate namespace reexport identity, there are two specification-directed cases and twelve Node-matched cases. Neither mismatch counts as independent Node agreement.
+
+### What I learned
+A host may complete its task queue while an entry evaluation remains pending on an unresolved Promise. The inherited console loop does not implement Node's exit-code-13 convention. Documented this lifecycle policy and retained explicit completion assertions in conformance tests. ECMAScript module evaluation state and operating-system process success are distinct observations.
+
+### What was tricky to build
+Shared-runtime repairs affect ordinary scripts as well as module wrappers. Their separate Proxy regression and complete extension gate were needed to check that internal-method dispatch changes did not break the existing execution path. Metadata keys such as __proto__ and numeric export names also require preserving ordinary string identity at every stage, from JSON emission to Proxy invariant checks.
+
+### What warrants a second pair of eyes
+Review the shared Proxy GC handles and trap order, moduleThen's private input contract, async dependency fulfillment/rejection ordering, and compiler scope rebuilding before imported-binding rewriting. Read both Node qualifications against the pinned specification before treating the matrix as cross-engine agreement.
+
+### What should be done in the future
+Expand to import attributes/source phases, module lexical eval, script-mode dynamic imports, and larger root frames as separate work. Define an embedding-specific pending-entry shutdown policy if deployment requires a nonzero process exit for unresolved TLA. The historical 102,992-variant broad baseline was not rerun; this checkpoint qualifies the selected module profile and existing gates only.
+
+### Code review instructions
+Start with MODULES.md and the design guide's implemented checkpoint. Compare initial-to-final.json, then inspect the full compressed receipts as needed. Read compiler.test.cjs and the fourteen graph directories, especially the two oracle.json files. Review JSObject.cpp, JSLib/Object.cpp, JSProxy.cpp, ConsoleBindings.cpp, and the private builtin registration together with the host changes.
+
+### Technical details
+Build command: `cmake --build hermes/build-llvm --target shermes shllvm_runtime shllvm_runtime_shared --parallel 4`. Compiler checks: `pnpm --dir hermes/utils/module-host test`. Module matrix: `python3 hermes/utils/test_shllvm_modules.py --output /tmp/llvm-module-matrix-qualified.json`. Test262 command and exact profile are in MODULES.md; suite revision is 0b4e0812022b18236b5276d2804948fdd9f71603. Large evidence JSON is losslessly gzip-compressed with deterministic timestamp zero; receipt-hashes.json records uncompressed identity. Parsing uses Babel and link-only validation uses the host in Node; executable module bodies run as LLVM native code. Prior implementation checkpoint is 8b88615; the final code commit is recorded in the next milestone.

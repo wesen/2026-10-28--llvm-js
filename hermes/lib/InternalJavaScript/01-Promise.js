@@ -1062,6 +1062,14 @@
   // Note: keys not declared in Builtins.def are ignored by the
   // JS-builtins registration loop, so this is safe to attach here.
   internalBytecodeResult.performInternalThen = handle;
+  // Module jobs use PerformPromiseThen, not the user-mutable public then
+  // method or SpeciesConstructor. Inputs are intrinsic promises owned by the
+  // module host; return an intrinsic result promise for internal chaining.
+  internalBytecodeResult.moduleThen = function (promise, onFulfilled, onRejected) {
+    var result = new Promise(noop);
+    handle(promise, new Handler(onFulfilled, onRejected, result));
+    return result;
+  };
   // A reaction with no result Promise, reusable for every await of one
   // async function invocation. `errorPromise` is rejected if a callback
   // throws, and is required: nothing else can report that failure.

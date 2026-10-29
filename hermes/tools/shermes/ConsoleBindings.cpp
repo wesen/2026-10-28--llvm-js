@@ -406,7 +406,8 @@ extern "C" SHERMES_EXPORT void free_console_context(
 /// \return true on success, false on error.
 extern "C" SHERMES_EXPORT bool run_event_loop(
     SHRuntime *shr,
-    SHConsoleContext *consoleContext) {
+    SHConsoleContext *consoleContext,
+    bool test262) {
   using namespace facebook;
   auto &hrt = *_sh_get_hermes_runtime(shr);
 
@@ -450,8 +451,28 @@ extern "C" SHERMES_EXPORT bool run_event_loop(
     // Run all tasks queued in the event loop.
     consoleContext->eventLoopControl.drainTasks();
   } catch (jsi::JSError &e) {
-    // Handle JS exceptions here.
-    fprintf(stderr, "JS Exception: %s\n", e.what());
+    // Inspect the actual thrown value rather than parsing an arbitrary stack.
+    if (test262) {
+      std::string name;
+      try {
+        if (e.value().isObject()) {
+          auto object = e.value().asObject(hrt);
+          auto constructor = object.getProperty(hrt, "constructor");
+          if (constructor.isObject()) {
+            auto value = constructor.asObject(hrt).getProperty(hrt, "name");
+            if (value.isString()) name = value.asString(hrt).utf8(hrt);
+          }
+        }
+      } catch (...) {
+        name.clear();
+      }
+      if (name.empty() || name.size() > 128 ||
+          name.find_first_not_of("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789") != std::string::npos)
+        name = "INVALID";
+      fprintf(stderr, "SHLLVM_TEST262_EXCEPTION:%s\n", name.c_str());
+    } else {
+      fprintf(stderr, "JS Exception: %s\n", e.what());
+    }
     return false;
   } catch (jsi::JSIException &e) {
     // Handle JSI exceptions here.

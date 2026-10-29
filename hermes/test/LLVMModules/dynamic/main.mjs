@@ -18,3 +18,7 @@ let missingRejected = false;
 try { await import('./absent.mjs'); } catch(error) {missingRejected = true;}
 if(!missingRejected) throw Error('missing');
 print('dynamic-ok');
+if((await import('./counter.mjs',{}))!==a)throw Error('empty options');
+if((await import('./counter.mjs',{with:{}}))!==a)throw Error('empty attributes');
+let badOptions=false;try{await import('./counter.mjs',1);}catch(e){badOptions=e instanceof TypeError;}
+if(!badOptions)throw Error('invalid options');

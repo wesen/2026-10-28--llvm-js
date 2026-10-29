@@ -3023,17 +3023,51 @@ CallResult<bool> JSObject::preventExtensions(
   return true;
 }
 
-ExecutionStatus JSObject::seal(Handle<JSObject> selfHandle, Runtime &runtime) {
-  if (LLVM_UNLIKELY(selfHandle->isProxyObject(runtime))) {
-    CallResult<bool> statusRes = JSProxy::preventExtensions(
-        selfHandle, runtime, PropOpFlags().plusThrowOnError());
-    if (LLVM_UNLIKELY(statusRes == ExecutionStatus::EXCEPTION)) {
-      return ExecutionStatus::EXCEPTION;
+// SetIntegrityLevel must invoke Proxy internal methods. Updating the proxy's
+// own HiddenClass bypasses defineProperty traps and does not seal its target.
+static ExecutionStatus setProxyIntegrityLevel(
+    Handle<JSObject> object, Runtime &runtime, bool frozen) {
+  GCScope gcScope{runtime};
+  auto prevented = JSObject::preventExtensions(
+      object, runtime, PropOpFlags().plusThrowOnError());
+  if (prevented == ExecutionStatus::EXCEPTION)
+    return ExecutionStatus::EXCEPTION;
+  auto keysResult = JSObject::getOwnPropertyKeys(
+      object, runtime,
+      OwnKeysFlags().plusIncludeNonSymbols().plusIncludeSymbols().plusIncludeNonEnumerable());
+  if (keysResult == ExecutionStatus::EXCEPTION)
+    return ExecutionStatus::EXCEPTION;
+  auto keys = *keysResult;
+  struct : public Locals { PinnedValue<> key; } lv;
+  LocalsRAII locals{runtime, &lv};
+  for (uint32_t i = 0, end = JSArray::getLength(*keys, runtime); i < end; ++i) {
+    lv.key = keys->at(runtime, i).unboxToHV(runtime);
+    DefinePropertyFlags flags{};
+    flags.setConfigurable = 1;
+    flags.configurable = 0;
+    if (frozen) {
+      ComputedPropertyDescriptor descriptor;
+      auto found = JSObject::getOwnComputedDescriptor(object, runtime, lv.key, descriptor);
+      if (found == ExecutionStatus::EXCEPTION)
+        return ExecutionStatus::EXCEPTION;
+      if (!*found) continue;
+      if (!descriptor.flags.accessor) {
+        flags.setWritable = 1;
+        flags.writable = 0;
+      }
     }
-    assert(
-        *statusRes &&
-        "seal preventExtensions with ThrowOnError returned false");
+    auto defined = JSObject::defineOwnComputed(
+        object, runtime, lv.key, flags, Runtime::getUndefinedValue(),
+        PropOpFlags().plusThrowOnError());
+    if (defined == ExecutionStatus::EXCEPTION)
+      return ExecutionStatus::EXCEPTION;
   }
+  return ExecutionStatus::RETURNED;
+}
+
+ExecutionStatus JSObject::seal(Handle<JSObject> selfHandle, Runtime &runtime) {
+  if (LLVM_UNLIKELY(selfHandle->isProxyObject(runtime)))
+    return setProxyIntegrityLevel(selfHandle, runtime, false);
 
   if (LLVM_UNLIKELY(selfHandle->isLazy(runtime)))
     initializeLazyObject(runtime, selfHandle);
@@ -3058,14 +3092,8 @@ ExecutionStatus JSObject::seal(Handle<JSObject> selfHandle, Runtime &runtime) {
 ExecutionStatus JSObject::freeze(
     Handle<JSObject> selfHandle,
     Runtime &runtime) {
-  if (LLVM_UNLIKELY(selfHandle->isProxyObject(runtime))) {
-    CallResult<bool> statusRes = JSProxy::preventExtensions(
-        selfHandle, runtime, PropOpFlags().plusThrowOnError());
-    if (LLVM_UNLIKELY(statusRes == ExecutionStatus::EXCEPTION)) {
-      return ExecutionStatus::EXCEPTION;
-    }
-    assert(*statusRes && "preventExtensions with ThrowOnError returned false");
-  }
+  if (LLVM_UNLIKELY(selfHandle->isProxyObject(runtime)))
+    return setProxyIntegrityLevel(selfHandle, runtime, true);
 
   if (LLVM_UNLIKELY(selfHandle->isLazy(runtime)))
     initializeLazyObject(runtime, selfHandle);

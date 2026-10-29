@@ -8,7 +8,15 @@ Topics:
 DocType: design-doc
 Intent: long-term
 Owners: []
-RelatedFiles: []
+RelatedFiles:
+    - Path: repo://hermes/lib/VM/JSProxy.cpp
+      Note: Namespace numeric-key invariant correction
+    - Path: repo://hermes/tools/shermes/ConsoleBindings.cpp
+      Note: Async exception evidence protocol
+    - Path: repo://hermes/utils/module-host/compiler.cjs
+      Note: Graph discovery and lexical source transformation
+    - Path: repo://hermes/utils/module-host/runtime.js
+      Note: Linking namespaces cyclic and asynchronous evaluation
 ExternalSources: []
 Summary: ""
 LastUpdated: 2026-10-28T21:47:56.294132829-04:00
@@ -136,7 +144,7 @@ finish strongly connected component when ancestor index closes
 
 On asynchronous fulfillment, decrement affected parents' pending counts, gather newly runnable ancestors, and execute them in async evaluation order. On rejection, propagate the same error through async parents and reject any waiting top-level capabilities. A cyclic graph awaiting its own dynamic import may remain pending; the host must not invent a successful completion or an artificial language error.
 
-Top-level `for await` also requires lowering that preserves iterator cleanup and awaiting rules. It must receive explicit implementation or an honest admission rejection, with a test preventing silent miscompilation. The first implementation should isolate this transformation from ordinary nested async functions.
+Top-level `for await` also requires lowering that preserves iterator cleanup and awaiting rules. It must receive explicit implementation or an honest admission rejection, with a test preventing silent miscompilation. The implemented lowering isolates this transformation from ordinary nested async functions and preserves iterator closing, async-from-sync values, labels, and abrupt-completion precedence.
 
 ## 9. Dynamic import and job ordering
 
@@ -165,3 +173,36 @@ After targeted qualification, run a selected pinned Test262 module subset throug
 The architecture follows the [ECMAScript scripts and modules specification](https://tc39.es/ecma262/2026/multipage/ecmascript-language-scripts-and-modules.html), particularly Source Text Module Records, ResolveExport, InnerModuleEvaluation, and asynchronous completion handling. Namespace operations are defined in the specification's ordinary and exotic objects chapter. [Babel parser documentation](https://babeljs.io/docs/babel-parser) defines module parsing and syntax flags; binding traversal must use actual scope identities rather than identifier text substitution.
 
 Acceptance requires runnable native graphs in all requested areas, retained evidence for the tested semantics, documented filesystem and syntax boundaries, a clean script-regression gate, and commits with a chronological diary. It does not establish all ECMAScript conformance, a network loader, package compatibility, runtime native compilation, or physical PicoCalc execution.
+
+## 13. Implemented checkpoint and evidence
+
+The implementation resides in `hermes/utils/module-host/compiler.cjs` and
+`runtime.js`, with CLI integration in `hermes/utils/shllvm.py`. The operational
+contract and exact validation totals are maintained in
+`hermes/docs/llvm/MODULES.md`. Read that contract before extending resolver policy.
+The ticket's `reference/evidence/` directory retains both the initial failed
+selection and the final qualification; large JSON receipts use deterministic gzip.
+`receipt-hashes.json` identifies their uncompressed bytes, and
+`initial-to-final.json` compares the same variants and source hashes.
+
+The runtime adds an intrinsic `moduleThen` reaction operation in
+`lib/InternalJavaScript/01-Promise.js`, registered through Builtins.def,
+PredefinedStrings.def, and `ESTreeIRGen::genSHBuiltin`. This prevents module
+scheduling from invoking user-visible Promise.then or species construction.
+Proxy integrity operations in JSObject.cpp and JSLib/Object.cpp now invoke the
+Proxy internal methods, and JSProxy.cpp normalizes numeric target keys before
+ownKeys invariant comparisons. These shared changes have a standalone script
+regression in `test/LLVMNativeExtensions/proxy_integrity.js`.
+
+The public host entry is `run(id, onComplete, onError)`; `check(id)` performs
+link-only validation. An unresolved await retains incomplete evaluation state.
+The inherited console loop may terminate when it has no queued tasks even if
+that state remains pending. No Node-style exit-code-13 policy is implemented.
+Consequently the conformance runner requires an explicit completion marker;
+a successful operating-system exit alone is not an evaluation assertion. A
+future embedding should connect onComplete/onError to its lifecycle policy.
+
+Remaining boundaries are direct eval in transformed modules, non-empty import
+attributes, source/deferred phases, runtime loading outside the compiled graph,
+script-mode dynamic imports, and the existing combined root/argument-slot limit.
+These are explicit limits, not inferred successful conformance results.

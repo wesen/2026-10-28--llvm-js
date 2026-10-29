@@ -16,3 +16,6 @@ if (Reflect.defineProperty(ns, 'count', {value: 3}) !== false) throw Error('new 
 function shadow(count) { return count; }
 if (shadow(17) !== 17 || this !== undefined || (() => this)() !== undefined) throw Error('scope');
 print('live-ok');
+if(!Object.isSealed(ns)||Object.isFrozen(ns))throw Error('namespace integrity');
+for(let i=0;i<3;i++){let threw=false;try{Object.freeze(ns);}catch(e){threw=e instanceof TypeError;}if(!threw)throw Error('freeze rejection');}
+if(Object.isFrozen(ns))throw Error('failed freeze state');

@@ -156,3 +156,9 @@ Unloading an old code generation while closures still refer to it is not
 supported. Device integration, an RV32 runtime ABI, capability confinement,
 transactional OS state updates and generation-based hot reload need their own
 implementation and validation.
+
+## Source-text module mode
+
+Use `--module` to compile a closed module graph with live bindings, cyclic
+evaluation, dynamic import and top-level await. See [MODULES.md](MODULES.md)
+for installation, resolution policy, manifests, commands and explicit limits.
