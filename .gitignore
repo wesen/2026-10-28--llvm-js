@@ -6,3 +6,5 @@
 __pycache__/
 *.pyc
 .DS_Store
+
+/hermes/utils/module-host/node_modules/

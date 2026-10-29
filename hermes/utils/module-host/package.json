@@ -1,0 +1,13 @@
+{
+  "name": "shllvm-module-compiler",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Build-time source module compiler for the direct LLVM host",
+  "scripts": {"test": "node --test compiler.test.cjs"},
+  "dependencies": {
+    "@babel/generator": "7.28.5",
+    "@babel/parser": "7.28.5",
+    "@babel/traverse": "7.28.5",
+    "@babel/types": "7.28.5"
+  }
+}

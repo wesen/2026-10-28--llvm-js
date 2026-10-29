@@ -24,12 +24,12 @@ Published a new 3,355-word textbook-style project report in the go-go-parc vault
 
 ### Prompt Context
 **User prompt (verbatim):**
-> write a detailed project report for the obsidian vault as a deep dive technical analysis blog post using a textbook writing style (no analogies, see skill).      
-> Commit and push the bsidian vault when done (go-go-parc vault).   
+> write a detailed project report for the obsidian vault as a deep dive technical analysis blog post using a textbook writing style (no analogies, see skill).
+> Commit and push the bsidian vault when done (go-go-parc vault).
 >
 > Then, creat a new docmgr ticket and create a design doc for:
 >
-> --- 
+> ---
 >
 > |  |  |
 > |---|---|
@@ -68,3 +68,40 @@ Read the design before code. Compare genImportDeclaration in ESTreeIRGen-stmt.cp
 
 ### Technical details
 Vault note: Projects/2026/10/28/PROJ - Direct LLVM JavaScript - Conformance Baseline and Dynamic Evaluation.md. Prior runtime commit fb560e2; repository checkpoint 04777c3. The new module host uses a closed filesystem graph with explicit inclusion for computed dynamic imports.
+
+## Step 2: Implement graph compilation, lexical linking, and evaluation
+
+Implemented a pinned Babel-based build compiler and a JavaScript host that itself compiles through LLVM. The first ten graph contracts pass under Node ESM, optimized native execution, and real lli. Added explicit driver mode, graph hashes, and input overwrite protection. This is an initial integration checkpoint; the full optimization matrix and expanded cases follow.
+
+### Prompt Context
+See Step 1. The module areas requested by the user determine the implementation and test scope.
+
+### What I did
+Added module-host/compiler.cjs and runtime.js, pinned Babel 7.28.5 dependencies and lock, and --module/--module-root/--module-include driver flags. Implemented lexical generator instantiation, export resolution and star ambiguity, live namespace accessors, runtime import assignment errors, DFS cycle roots, async dependency scheduling, dynamic imports and import.meta. Added ten multi-file oracle fixtures and test_shllvm_modules.py.
+
+### Why
+The module's generator frame supplies actual lexical storage across instantiation and evaluation. The host tracks lifecycle state separately from source execution. Binding-aware transformations preserve shadowing and imported call receivers; copying values would not.
+
+### What worked
+The first live-binding program printed live-ok in generated Node execution and native LLVM at both O and O0. The ten-graph quick gate passes all cases under Node ESM, native O/O2, and lli O/O2, with unchanged fingerprints. Cases cover cycles, async diamonds/cycles, dynamic identity, cached failures, namespaces, reexports, default names, import assignment, and meta/context.
+
+### What didn't work
+The first gate was 7/8. Its error fixture incorrectly required repeated parse errors to be the same object. Node failed with `Error: cached error: ./syntax.mjs`; linking and evaluation errors did preserve identity. Corrected only the parse-error expectation. Source review also found that marking every partially linked dependency failed would poison valid modules, so linking rollback now resets unfinished dependency environments and caches the importing root's failure. Added a valid-dependency-after-failure assertion.
+
+### What I learned
+Imported binding assignment is a runtime TypeError, not an early syntax rejection. The initial design stated otherwise and has been corrected. A generated accessor reference preserves RHS effects and read-before-write behavior for compound/update operations. Anonymous default function/class/arrow exports also need the externally observable default name preserved.
+
+### What was tricky to build
+Import assignment targets include destructuring and loop targets, while referenced identifiers include normal calls. They require distinct lowering. Namespace descriptor values change while their non-configurable keys remain stable; the Proxy target uses writable data descriptors so live values satisfy invariants.
+
+### What warrants a second pair of eyes
+Review DFS async parent bookkeeping, link rollback, default function initialization, and the generated wrapper's top-level this/arguments handling. Review filesystem identity and artifact protection before expanding loader policies.
+
+### What should be done in the future
+Implement top-level for-await cleanup, expand scheduling/error/order tests, test computed-only inclusion and resolver aliases, add build-tool safety tests, and run the complete optimization matrix and unchanged script gates. Integrate a selected Test262 module experiment without rewriting historical results.
+
+### Code review instructions
+Start at compileGraph, then runtime link/exportCell/inner/fulfilled. Follow generated factory code for the live and import-writes fixtures. The initial gate receipt is reference/evidence/initial-ten-graphs.json.
+
+### Technical details
+Build-only dependencies are installed with pnpm --dir hermes/utils/module-host install --ignore-scripts. node_modules is ignored. Runtime modules do not execute in Node; the generated host and factories pass through the existing shermes/LLVM pipeline. Direct eval, import attributes/options, and top-level for-await currently have explicit host boundaries.

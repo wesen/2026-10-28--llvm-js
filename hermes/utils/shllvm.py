@@ -119,7 +119,7 @@ def prepare(args, *, need_runtime=True, log=None):
     return build, settings, tools, compiler, runtime, asan, ubsan
 
 
-def emit_and_verify(args, ll_path, context, log):
+def emit_and_verify(args, ll_path, context, log, output):
     build, settings, tools, compiler, runtime, asan, ubsan = context
     source = Path(args.source).resolve()
     if not source.is_file():
@@ -129,11 +129,34 @@ def emit_and_verify(args, ll_path, context, log):
     # verifier error leaves an existing user output untouched.
     with tempfile.TemporaryDirectory(prefix="shllvm-", dir=ll_path.parent) as td:
         temp = Path(td)
+        compilation_source = source
+        module_manifest = None
+        if args.module:
+            compilation_source = temp / "modules.js"
+            graph_manifest = temp / "modules.json"
+            node = find_tool("node")
+            module_command = [node, ROOT / "utils/module-host/compiler.cjs", source,
+                              "--output", compilation_source, "--manifest", graph_manifest]
+            if args.module_root:
+                module_command += ["--root", Path(args.module_root).resolve()]
+            for included in args.module_include:
+                module_command += ["--include", Path(included).resolve()]
+            command(module_command, capture=True, log=log)
+            module_manifest = json.loads(graph_manifest.read_text())
+            module_manifest["bundle_sha256"] = sha256(compilation_source)
+            # Protect every graph input, including aliases and hardlinks, from
+            # every published artifact, not just the entry/executable pair.
+            for target in (output, ll_path, ll_path.with_suffix(".bc"),
+                           ll_path.with_suffix(".build.json")):
+                for input_name in module_manifest["inputs"]:
+                    input_path = Path(input_name)
+                    if target.resolve() == input_path or (target.exists() and target.samefile(input_path)):
+                        raise BuildError("Output must not overwrite a module graph input: " + str(target))
         raw = temp / "program.ll"
         bc = temp / "program.bc"
         optimized = temp / "optimized.bc"
         command([compiler, f"-{args.hermes_opt}", "-Xes6-block-scoping", "-Xenable-tdz",
-                 *args.hermes_arg, "-emit-llvm", source, "-o", raw],
+                 *args.hermes_arg, "-emit-llvm", compilation_source, "-o", raw],
                 capture=True, log=log)
         command([tools["llvm-as"], raw, "-o", bc], capture=True, log=log)
         command([tools["opt"], "-passes=verify", "-disable-output", bc], capture=True, log=log)
@@ -142,7 +165,7 @@ def emit_and_verify(args, ll_path, context, log):
         # Rename within one filesystem to keep each output replacement atomic.
         os.replace(raw, ll_path)
         os.replace(optimized, ll_path.with_suffix(".bc"))
-    return source
+    return module_manifest
 
 
 def execute(args):
@@ -157,7 +180,7 @@ def execute(args):
     ll_path = output if args.action == "emit" else output.with_name(output.name + ".ll")
     if args.action == "emit" and ll_path.suffix != ".ll":
         ll_path = ll_path.with_suffix(".ll")
-    emit_and_verify(args, ll_path, context, log)
+    module_manifest = emit_and_verify(args, ll_path, context, log, output)
     manifest = {"source": str(source), "source_sha256": sha256(source),
                 "llvm_ir": str(ll_path), "llvm_ir_sha256": sha256(ll_path),
                 "hermes_optimization": args.hermes_opt,
@@ -175,6 +198,9 @@ def execute(args):
                 "runtime_address_sanitizer": asan,
                 "runtime_undefined_behavior_sanitizer": ubsan,
                 "commands": log}
+    if module_manifest is not None:
+        manifest["modules"] = module_manifest
+        manifest["pipeline"] = "Source modules -> binding-aware module factories -> Hermes SSA -> LLVM IR -> LLVM"
     sanitizer_flags = []
     if asan:
         sanitizer_flags += ["-fsanitize=address"]
@@ -230,6 +256,10 @@ def parser():
         q.add_argument("--build-dir", default=os.environ.get("HERMES_BUILD_DIR", str(ROOT / "build-llvm")))
         q.add_argument("--llvm-bin", default=os.environ.get("LLVM_BIN"))
         q.add_argument("--compiler")
+        q.add_argument("--module", action="store_true", help="compile a source-text module graph")
+        q.add_argument("--module-root", help="module graph filesystem root (default: entry directory)")
+        q.add_argument("--module-include", action="append", default=[],
+                       help="include an additional module root for computed dynamic imports")
         q.add_argument("--hermes-opt", choices=("O0", "O"), default="O")
         q.add_argument("--hermes-arg", action="append", type=frontend_argument, default=[],
                        help="extra frontend -X option; repeat as --hermes-arg=-Xname")
@@ -250,6 +280,8 @@ def main():
         compiler_args, forwarded = argv, []
     args = parser().parse_args(compiler_args)
     args.arguments = forwarded
+    if not args.module and (args.module_root or args.module_include):
+        parser().error("--module-root and --module-include require --module")
     try:
         return execute(args)
     except (BuildError, subprocess.TimeoutExpired) as exc:
