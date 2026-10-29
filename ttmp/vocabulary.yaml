@@ -9,6 +9,8 @@ topics:
       description: LLVM compiler and runtime architecture
     - slug: javascript
       description: JavaScript and ECMAScript semantics
+    - slug: application-qualification
+      description: Real application workloads comparing native AOT and persistent JIT behavior
 docTypes:
     - slug: design-doc
       description: Structured rationale and architecture notes

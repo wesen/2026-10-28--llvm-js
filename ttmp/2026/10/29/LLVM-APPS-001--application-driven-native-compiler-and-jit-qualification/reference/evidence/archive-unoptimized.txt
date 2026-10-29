@@ -1,0 +1,2 @@
+stats /tmp/app-input.js compile_ms=13.5343 execute_ms=0.05063 peak_rss_kib=66432 retained_units=1
+backend: /tmp/archive-app.js: 424:2482:direct LLVM backend: function exceeds 1024 combined root/argument-slot admission limit

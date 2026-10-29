@@ -1,0 +1,6 @@
+{
+  "hermes/examples/llvm-apps/archive-library/main.mjs": "176dc957024c2f3aea4c61f4771f1bb036e19ef904d3cb0c91eb53457d512995",
+  "hermes/examples/llvm-apps/pnpm-lock.yaml": "fbd8724400be459116beca5fc833ce97023e4f5538439117e224b3a5877819a8",
+  "hermes/examples/llvm-apps/node_modules/fflate/esm/browser.js": "8cc1f687e0159e977addb6b85e274dbd11e622cf151f4fcb7b85d49622ea43e7",
+  "hermes/build-llvm/bin/shllvm-jit": "02f1f5d28753b365d692b4da5374972dfaaf4036a143228e8605baa39670b25a"
+}

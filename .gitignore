@@ -8,3 +8,5 @@ __pycache__/
 .DS_Store
 
 /hermes/utils/module-host/node_modules/
+
+/hermes/examples/llvm-apps/node_modules/
