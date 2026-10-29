@@ -1,0 +1,19 @@
+{
+  "scope": "diagnostic probe; not an added Test262 result",
+  "source": "ttmp/2026/10/28/LLVM-ECMA-002--test262-conformance-baseline-and-dynamic-evaluation/scripts/03-eval-global-environment-probe.js",
+  "source_sha256": "f40daf7389d81eea8d69830a87a7c2e56b18bc6b0b84296e9ccb5e9b228437de",
+  "runtime_source_commit": "20fd0f6",
+  "node_output": "configurable true\nlexical outside\nstrict-var-visible undefined\n",
+  "native_output": "configurable false\nlexical-error ReferenceError\nstrict-var-visible number\n",
+  "native_command": [
+    "python3",
+    "hermes/utils/shllvm.py",
+    "run",
+    "--build-dir",
+    "hermes/build-llvm",
+    "--llvm-bin",
+    "/usr/lib/llvm-18/bin",
+    "--no-runtime-build",
+    "ttmp/2026/10/28/LLVM-ECMA-002--test262-conformance-baseline-and-dynamic-evaluation/scripts/03-eval-global-environment-probe.js"
+  ]
+}

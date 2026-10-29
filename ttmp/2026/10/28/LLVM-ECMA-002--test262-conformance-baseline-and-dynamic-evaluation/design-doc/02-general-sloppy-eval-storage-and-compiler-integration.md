@@ -148,3 +148,17 @@ Run these first as narrow fixtures, then through the unchanged pinned eval famil
 General sloppy eval is not complete until dynamic declaration injection, runtime lookup, nested bytecode use, declaration conflicts, and garbage-collection lifetime all pass their tests. Private names, super, and derived-constructor state remain separate context extensions. The baseline can identify their failures before they are implemented.
 
 Before coding the representation, resolve the binding-table cell type, exact semantic scope serialization, and reference IR operations. Review the memory cost on the intended embedded target. The current work does not provide evidence that an unconditional environment-header expansion is acceptable on that target.
+
+## Observed indirect-eval defects
+
+The diagnostic source `scripts/03-eval-global-environment-probe.js` reproduces three additional defects on the unchanged 20fd0f6 runtime. Its receipt is `reference/evidence/global-eval-probe.json`. These are diagnostic observations, not extra conformance cases added to the baseline totals.
+
+| Observation | Node result | Native result |
+|---|---|---|
+| Configurability of a new var introduced by indirect eval | true | false |
+| Indirect eval reading a top-level lexical binding | outside | ReferenceError |
+| Visibility of a var declared inside strict indirect eval | undefined | number |
+
+The first result has a direct implementation connection: `Interpreter::declareGlobalVarImpl` in `Interpreter-slowpaths.cpp` unconditionally clears the configurable flag. Script declaration and eval declaration policy need separate representation. The second requires global lexical binding integration across the native and dynamic compilation paths. The third shows that strict indirect evaluation does not yet isolate its var declarations correctly. These problems are separate from admitting strict source in an existing caller environment.
+
+The corresponding pinned test sources include `test/language/eval-code/indirect/var-env-var-init-global-new.js`, `lex-env-heritage.js`, and `var-env-var-strict.js`. A future change must preserve script-global declaration attributes while correcting eval-specific behavior; changing the unconditional flag globally would break ordinary script declarations. Global lexical storage also needs a runtime owner that survives individual compilations and is distinct from ordinary global object properties.

@@ -268,3 +268,40 @@ Open reference/evidence/eval-comparison.json first, then eval-final.json. The im
 
 ### Technical details
 Exact coverage: 474 variants. The final command used `--jobs 2 --compact`; worker count changes scheduling but not variant identity. Both reports preserve their build/input fingerprints.
+
+## Step 7: Reproduce the remaining global-eval distinctions
+
+The final eval comparison was committed as `fd03426`. While the broad run continued, inspected remaining indirect-eval cases and wrote a diagnostic probe that distinguishes global property attributes, global lexical visibility, and strict eval-local declarations.
+
+### Prompt Context
+See Step 1. This investigation supports dynamic-evaluation failure attribution without changing the measured build.
+
+### What I did
+Ran scripts/03-eval-global-environment-probe.js through Node's script context and the ordinary LLVM driver with the existing build. Read the corresponding Test262 sources and Interpreter::declareGlobalVarImpl. Added the observations and implementation constraints to the general-eval design.
+
+### Why
+The remaining failures are not all explained by the sloppy direct-eval guard. Generalizing that guard would not repair global lexical visibility or eval declaration attributes.
+
+### What worked
+The probe completed on both engines and produced three concrete differences: configurable true versus false; lexical value outside versus ReferenceError; and strict eval var visibility undefined versus number. The runtime declaration helper explicitly sets configurable to zero, providing a source connection for the first result.
+
+### What didn't work
+All three observed behaviors remain incorrect in this build. No fix or conformance pass is claimed. The probe is intentionally excluded from Test262 totals.
+
+### What I learned
+Script and eval declaration policies must be represented separately. Flipping the existing global property flag unconditionally would fix one eval case while breaking ordinary script declaration semantics. Global lexical bindings also need shared runtime ownership across compilation units.
+
+### What was tricky to build
+The probe must run as a script rather than Node's CommonJS wrapper; otherwise its top-level lexical environment would not match the intended experiment. The recorded source uses independent names for each observation.
+
+### What warrants a second pair of eyes
+Review global lexical environment lifetime and the distinction between strict evaluated var storage and script-global property declaration. These are prerequisites for reliable cross-unit evaluation.
+
+### What should be done in the future
+Use the measured distinctions to implement separate declaration policies and shared global lexical storage, retaining the ordinary script contracts.
+
+### Code review instructions
+Read the probe and its JSON receipt, then the Observed indirect-eval defects section of the general-eval design and declareGlobalVarImpl.
+
+### Technical details
+The native command uses --no-runtime-build, preserving the immutable build used by the broad run. Its outputs and the source digest are recorded in reference/evidence/global-eval-probe.json.
