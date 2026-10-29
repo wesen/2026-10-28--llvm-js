@@ -1,7 +1,7 @@
 ---
 Title: Application driven native compiler and JIT qualification
 Ticket: LLVM-APPS-001
-Status: active
+Status: complete
 Topics:
     - llvm
     - javascript
@@ -12,7 +12,7 @@ Owners: []
 RelatedFiles: []
 ExternalSources: []
 Summary: ""
-LastUpdated: 2026-10-29T10:50:34.674248064-04:00
+LastUpdated: 2026-10-29T11:33:00.904555912-04:00
 WhatFor: ""
 WhenToUse: ""
 ---
@@ -21,9 +21,9 @@ WhenToUse: ""
 
 ## Overview
 
-Design the next application-driven qualification campaign: data processing, asynchronous queue, persistent embedding, and a pinned third-party compression library. The ticket and design are ready; full implementation remains open. Three exploratory sources and a two-profile fflate probe are retained, with no claim that all applications are qualified.
+Implemented four application workloads: data processing, an asynchronous queue, a persistent C++ embedding host, and pinned fflate compression. Final qualification: **96 successful executions, nine known unoptimized library admission boundaries, zero unexpected failures**. Input/build fingerprints stayed unchanged. The root-slot boundary remains assigned to LLVM-MODULES-002 M08.
 
-Read [the design](design-doc/01-four-application-workloads-and-results-driven-qualification.md) and [the diary](reference/01-implementation-diary.md).
+Read [the results](analysis/01-application-qualification-results-and-remaining-boundaries.md), [the design](design-doc/01-four-application-workloads-and-results-driven-qualification.md), and [the detailed diary](reference/01-implementation-diary.md). Run the command documented in `hermes/examples/llvm-apps/README.md` to reproduce the campaign.
 
 ## Key Links
 
@@ -32,7 +32,7 @@ Read [the design](design-doc/01-four-application-workloads-and-results-driven-qu
 
 ## Status
 
-Current status: **active**
+Current status: **complete** (bounded application campaign; M08 remains open in LLVM-MODULES-002).
 
 ## Topics
 

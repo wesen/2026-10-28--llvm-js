@@ -174,3 +174,40 @@ Compare first-scaled-campaign.json.gz with the final receipt once available. Sta
 
 ### Technical details
 Three sizes: 32/2048/16384 order rows, 12/96/256 jobs, and 12/80/240 plugins. Two repetitions. The fflate dataset scale is 10/400/4000, including empty, Unicode, JSON, and patterned-text documents. No runtime semantic implementation changed in this step.
+
+## Step 5: Complete the repeated application campaign and disposition boundaries
+
+The corrected campaign finished with 96 successful executions, nine known unoptimized fflate admission boundaries, and no unexpected failures. All 19 recorded source/build identities stayed unchanged. The final evidence and analysis now distinguish execution coverage, expected failures within the persistent corpus, and rejected compilation profiles.
+
+### Prompt Context
+See Step 3. Code checkpoint **0e3a448** fixes input loading and adds counted diagnostics; **dc4ca9d** contains the application implementation.
+
+### What I did
+Ran `python3 hermes/utils/qualify_shllvm_apps.py --output /tmp/llvm-app-final.json` with all applications, all three sizes, both frontend profiles, and two repetitions. Archived its complete receipt with deterministic gzip and hashes. Wrote the results analysis with measured tables, commands, source contracts, and limits. Added the fflate factory reproducer and exact slot counts to LLVM-MODULES-002 M08 without closing that follow-up.
+
+### Why
+The final milestone requires repeated real application outcomes and a clear disposition of every failure. Keeping the unoptimized library boundary explicit permits a useful completed campaign without misrepresenting unsupported compilation as successful execution.
+
+### What worked
+All data, queue, and persistent cases pass. Optimized archive runs match Node and Python binary-format readers. The largest persistent corpus contains 240 plugins, 344 submissions, 310 admitted units, 34 intentional parse errors, and 34 intentional initializer errors. The largest archive has 238,191 input bytes and a 24,877-byte ZIP. Lifecycle checks and six driver publication contracts passed; six harness rejection tests passed.
+
+### What didn't work
+Nine unoptimized archive attempts remain rejected at 1,084 roots plus three argument slots. No new unexpected failure occurred after JSON fixture loading. These rejections remain distinct from the 96 passing executions. This run does not qualify browser Workers, unlimited engine lifetime, sanitizer behavior, or full language conformance.
+
+### What I learned
+The implemented native engine handles these application interactions without a new scheduling, loader, or host-value abstraction. The major observed issue is compiler storage admission, while an input-generation artifact accounted for the initial queue failures.
+
+### What was tricky to build
+Qualification totals combine repeated execution and one-time AOT build failures. The result report explicitly states those units. Process times include different preparation costs in JIT versus AOT, so the measurement table cannot support a direct speedup claim.
+
+### What warrants a second pair of eyes
+Review result parsing and independent archive decoding, the unchanged fingerprint assertion, expected-failure recovery, and the M08 disposition. Inspect raw evidence when using measurements for future architecture decisions.
+
+### What should be done in the future
+Investigate M08 using the real fflate factory before changing frame allocation. Extend application scale or host capabilities only for a concrete next workload. The application ticket's planned implementation and qualification work is complete.
+
+### Code review instructions
+Start with analysis/01-application-qualification-results-and-remaining-boundaries.md and the examples README. Reproduce the small campaign, inspect the full receipt summary, and compare the initial scaled failure with the final corrected result. No node_modules, build outputs, or generated executables are committed.
+
+### Technical details
+Final command exit 0; summary pass=96, known-admission-boundary=9. Recorded source/build identities=19; generated fixture identities=536. Node v24.18.0, Python 3.13.2, LLVM 18.1.3. Receipt compression uses mtime=0 for deterministic bytes. Code remains local commits; no repository push or vault rewrite is part of this implementation request.

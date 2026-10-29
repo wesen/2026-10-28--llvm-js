@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "digest": "cc2b789de91524e405b1bc7925e41497e2f4e63c603f8feb41cf511270a97853",
+  "request": {
+    "ticket": "LLVM-APPS-001",
+    "status": "complete",
+    "intent": "",
+    "entry": "Ticket closed"
+  },
+  "receipt": {
+    "sequence": 1,
+    "operation_id": "close-4552412732c8afdd242579d1c4f717ed",
+    "state": "committed",
+    "created_at": "2026-10-29T15:33:00.904673788Z",
+    "changed_paths": [
+      "changelog.md",
+      "index.md"
+    ],
+    "before": {
+      "changelog.md": "cf52cf0ab138e0ef59503f0d98c50541b95b3f794fdb6e1b10e12debf0fb4892",
+      "index.md": "c836de91dd09da77815a29e77bd478d8f9d7094d58a98ff5ca93923aade65d39"
+    },
+    "after": {
+      "changelog.md": "b10ea7f45a9aff45d5df6944b84d7f3e9b87d05594c61c9382be12c98a5bb880",
+      "index.md": "826b075e79f0a8ca4345a891df84bca14dab469d029b9bc19964d0e4cfecd355"
+    }
+  },
+  "changes": [
+    {
+      "path": "changelog.md",
+      "before": "cf52cf0ab138e0ef59503f0d98c50541b95b3f794fdb6e1b10e12debf0fb4892",
+      "after": "IyBDaGFuZ2Vsb2cKCiMjIDIwMjYtMTAtMjkKCi0gSW5pdGlhbCB3b3Jrc3BhY2UgY3JlYXRlZAoKIyMgMjAyNi0xMC0yOQoKUHJlcGFyZWQgZGV0YWlsZWQgZm91ci1hcHBsaWNhdGlvbiBkZXNpZ24gYW5kIGJhY2tsb2c7IHJldGFpbmVkIGV4cGxvcmF0b3J5IGZmbGF0ZSBzdWNjZXNzIGFuZCB1bm9wdGltaXplZCBhZG1pc3Npb24gZmFpbHVyZTsgYXBwbGljYXRpb24gaW1wbGVtZW50YXRpb24gcmVtYWlucyBvcGVuLgoKIyMgMjAyNi0xMC0yOQoKSW1wbGVtZW50ZWQgYWxsIGZvdXIgYXBwbGljYXRpb25zIChkYzRjYTlkKTsgZmlyc3Qgc2NhbGVkIGNhbXBhaWduIGV4cG9zZWQgaW5wdXQtbGl0ZXJhbCBzbG90IHByZXNzdXJlLCBjb3JyZWN0ZWQgd2l0aCB1bmlmb3JtIEpTT04gbG9hZGluZzsgcmV0YWluZWQgZmZsYXRlIE8wIGJvdW5kYXJ5IGFuZCBhZGRlZCBleGFjdCBzbG90IGNvdW50cy4KCiMjIDIwMjYtMTAtMjkKClRpY2tldCBjbG9zZWQK"
+    },
+    {
+      "path": "index.md",
+      "before": "c836de91dd09da77815a29e77bd478d8f9d7094d58a98ff5ca93923aade65d39",
+      "after": "LS0tClRpdGxlOiBBcHBsaWNhdGlvbiBkcml2ZW4gbmF0aXZlIGNvbXBpbGVyIGFuZCBKSVQgcXVhbGlmaWNhdGlvbgpUaWNrZXQ6IExMVk0tQVBQUy0wMDEKU3RhdHVzOiBjb21wbGV0ZQpUb3BpY3M6CiAgICAtIGxsdm0KICAgIC0gamF2YXNjcmlwdAogICAgLSBhcHBsaWNhdGlvbi1xdWFsaWZpY2F0aW9uCkRvY1R5cGU6IGluZGV4CkludGVudDogbG9uZy10ZXJtCk93bmVyczogW10KUmVsYXRlZEZpbGVzOiBbXQpFeHRlcm5hbFNvdXJjZXM6IFtdClN1bW1hcnk6ICIiCkxhc3RVcGRhdGVkOiAyMDI2LTEwLTI5VDExOjMzOjAwLjkwNDU1NTkxMi0wNDowMApXaGF0Rm9yOiAiIgpXaGVuVG9Vc2U6ICIiCi0tLQoKIyBBcHBsaWNhdGlvbiBkcml2ZW4gbmF0aXZlIGNvbXBpbGVyIGFuZCBKSVQgcXVhbGlmaWNhdGlvbgoKIyMgT3ZlcnZpZXcKCkltcGxlbWVudGVkIGZvdXIgYXBwbGljYXRpb24gd29ya2xvYWRzOiBkYXRhIHByb2Nlc3NpbmcsIGFuIGFzeW5jaHJvbm91cyBxdWV1ZSwgYSBwZXJzaXN0ZW50IEMrKyBlbWJlZGRpbmcgaG9zdCwgYW5kIHBpbm5lZCBmZmxhdGUgY29tcHJlc3Npb24uIEZpbmFsIHF1YWxpZmljYXRpb246ICoqOTYgc3VjY2Vzc2Z1bCBleGVjdXRpb25zLCBuaW5lIGtub3duIHVub3B0aW1pemVkIGxpYnJhcnkgYWRtaXNzaW9uIGJvdW5kYXJpZXMsIHplcm8gdW5leHBlY3RlZCBmYWlsdXJlcyoqLiBJbnB1dC9idWlsZCBmaW5nZXJwcmludHMgc3RheWVkIHVuY2hhbmdlZC4gVGhlIHJvb3Qtc2xvdCBib3VuZGFyeSByZW1haW5zIGFzc2lnbmVkIHRvIExMVk0tTU9EVUxFUy0wMDIgTTA4LgoKUmVhZCBbdGhlIHJlc3VsdHNdKGFuYWx5c2lzLzAxLWFwcGxpY2F0aW9uLXF1YWxpZmljYXRpb24tcmVzdWx0cy1hbmQtcmVtYWluaW5nLWJvdW5kYXJpZXMubWQpLCBbdGhlIGRlc2lnbl0oZGVzaWduLWRvYy8wMS1mb3VyLWFwcGxpY2F0aW9uLXdvcmtsb2Fkcy1hbmQtcmVzdWx0cy1kcml2ZW4tcXVhbGlmaWNhdGlvbi5tZCksIGFuZCBbdGhlIGRldGFpbGVkIGRpYXJ5XShyZWZlcmVuY2UvMDEtaW1wbGVtZW50YXRpb24tZGlhcnkubWQpLiBSdW4gdGhlIGNvbW1hbmQgZG9jdW1lbnRlZCBpbiBgaGVybWVzL2V4YW1wbGVzL2xsdm0tYXBwcy9SRUFETUUubWRgIHRvIHJlcHJvZHVjZSB0aGUgY2FtcGFpZ24uCgojIyBLZXkgTGlua3MKCi0gKipSZWxhdGVkIEZpbGVzKio6IFNlZSBmcm9udG1hdHRlciBSZWxhdGVkRmlsZXMgZmllbGQKLSAqKkV4dGVybmFsIFNvdXJjZXMqKjogU2VlIGZyb250bWF0dGVyIEV4dGVybmFsU291cmNlcyBmaWVsZAoKIyMgU3RhdHVzCgpDdXJyZW50IHN0YXR1czogKiphY3RpdmUqKgoKIyMgVG9waWNzCgotIGxsdm0KLSBqYXZhc2NyaXB0Ci0gYXBwbGljYXRpb24tcXVhbGlmaWNhdGlvbgoKIyMgVGFza3MKClNlZSBbdGFza3MubWRdKC4vdGFza3MubWQpIGZvciB0aGUgY3VycmVudCB0YXNrIGxpc3QuCgojIyBDaGFuZ2Vsb2cKClNlZSBbY2hhbmdlbG9nLm1kXSguL2NoYW5nZWxvZy5tZCkgZm9yIHJlY2VudCBjaGFuZ2VzIGFuZCBkZWNpc2lvbnMuCgojIyBTdHJ1Y3R1cmUKCi0gZGVzaWduLyAtIEFyY2hpdGVjdHVyZSBhbmQgZGVzaWduIGRvY3VtZW50cwotIHJlZmVyZW5jZS8gLSBQcm9tcHQgcGFja3MsIEFQSSBjb250cmFjdHMsIGNvbnRleHQgc3VtbWFyaWVzCi0gcGxheWJvb2tzLyAtIENvbW1hbmQgc2VxdWVuY2VzIGFuZCB0ZXN0IHByb2NlZHVyZXMKLSBzY3JpcHRzLyAtIFRlbXBvcmFyeSBjb2RlIGFuZCB0b29saW5nCi0gdmFyaW91cy8gLSBXb3JraW5nIG5vdGVzIGFuZCByZXNlYXJjaAotIGFyY2hpdmUvIC0gRGVwcmVjYXRlZCBvciByZWZlcmVuY2Utb25seSBhcnRpZmFjdHMK"
+    }
+  ]
+}

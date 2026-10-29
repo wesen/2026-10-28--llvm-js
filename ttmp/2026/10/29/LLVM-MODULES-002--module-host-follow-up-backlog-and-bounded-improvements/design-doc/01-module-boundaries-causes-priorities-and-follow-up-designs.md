@@ -156,3 +156,12 @@ The vault report is `Projects/2026/10/29/PROJ - Direct LLVM JavaScript - ECMAScr
 M01 is partially implemented in commit 999c830: the new engine supplies private per-entry notifications, compiler.cjs --host-completion instruments bundles, and Engine::drain returns Pending rather than completed when an entry remains unresolved. CLI shllvm-jit exits 2 with a pending diagnostic in that case. Fulfillment and rejection are exercised separately. This does not change the original shllvm.py standalone/lli paths, and uninstrumented bundles have no entry-completion tracking; M01 therefore remains open for its broader CLI disposition.
 
 The engine accepts multiple units but separate bundles retain separate module registries (M11). No script import, module eval, runtime source loader, attribute, or phase support was added. The shared native-unit registration table now grows beyond eight entries; that capacity change is distinct from M08's unchanged 1,024 root/argument-slot limit.
+
+
+## Application evidence for M08 (LLVM-APPS-001)
+
+The pinned unmodified fflate 0.8.2 browser ESM distribution supplies a concrete workload. Its generated unoptimized module factory requires 1,084 root slots and three argument slots, exceeding the unchanged combined bound of 1,024. Both AOT and in-process JIT reject it. The optimized frontend admits the same library, and the application exercises gzip, ZIP, streaming callbacks, Unicode, and malformed-input rejection. This is a code-size/profile boundary, not an absent compression host API. No library trimming, patching, or frame-cap increase was used.
+
+The reproducer is the LLVM-APPS-001 application runner (`--apps archive-library --sizes small --repeat 1`). The older `scripts/01-archive-probe.sh` in that ticket also preserves the original small input. Review its raw receipts before selecting liveness-based slot reuse or another storage policy. The new compiler diagnostic prints roots and arguments independently.
+
+An initial 256-job queue fixture also exceeded the bound with 2,329 roots and one argument slot because the harness emitted a large object literal. Uniform JSON parsing corrected that data-loading artifact; it is not a backend fix and does not close M08. Retain the fflate factory as the primary new workload for this follow-up.

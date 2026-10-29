@@ -29,6 +29,8 @@ WhenToUse: ""
 
 # Four application workloads and qualification
 
+**Implementation checkpoint:** all four applications and the runner are implemented. The final campaign records 96 successful executions and nine explicitly dispositioned fflate O0 admission boundaries. See [the results analysis](../analysis/01-application-qualification-results-and-remaining-boundaries.md). Statements below about proposed commands and incomplete sources describe the original planning checkpoint.
+
 ## Objective
 
 Use complete applications to expose practical compiler, runtime, and embedding defects quickly. Implement all four workloads and compare observable results rather than making broad conformance or speculative hardening prerequisites. Fix blockers at their source and preserve small regressions when a real defect is found.
@@ -62,7 +64,7 @@ The current deliverable is this ticket/design and a vault report about the compl
 
 Engine.h and lib/LLVMJIT implement the private persistent API. utils/module-host/compiler.cjs packages static module graphs. utils/shllvm.py supplies the AOT command. The source-distributed fflate library is documented at https://github.com/101arrowz/fflate; only the pinned local dependency contents define this experiment. Existing native/JIT receipts remain historical and are not relabeled as application qualification.
 
-## Current state and evidence boundary
+## Initial planning state and evidence boundary
 
 The engine implementation is complete within the scope recorded by LLVM-ENGINE-001 and LLVM-JIT-001. The application campaign is designed, not qualified. Three exploratory application sources exist under `hermes/examples/llvm-apps`; there is no persistent application host or common campaign runner yet. Preserve that distinction when reviewing tasks or interpreting the report.
 

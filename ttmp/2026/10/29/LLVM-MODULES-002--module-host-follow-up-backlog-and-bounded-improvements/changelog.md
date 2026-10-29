@@ -15,3 +15,7 @@ Created source-grounded design and open task inventory for the practical compile
 ## 2026-10-29
 
 M01 partially addressed by LLVM-JIT-001 host-completion notifications and explicit Pending result. Original standalone/lli behavior and uninstrumented bundles remain open; no other backlog item is claimed implemented.
+
+## 2026-10-29
+
+M08 now has a real fflate module-factory reproducer from LLVM-APPS-001: O0 needs 1084 roots plus 3 arguments; optimized compilation works. Kept capacity work open and distinguished input-literal harness pressure.
