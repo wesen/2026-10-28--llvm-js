@@ -1,0 +1,14 @@
+{
+  "archive": "LLVM-ENGINE-002-design-seminar-handoff.zip",
+  "bytes": 47198798,
+  "sha256": "6f8328df3817d5c4b91345fb5291474ff2f8a33e1fb254f0a25b0aca6c07c6d6",
+  "source_commit": "87d4658c4ed27aee42ddf4e023f9e9666ef3a2a1",
+  "source_files": 13494,
+  "payload_files": 13,
+  "checks": [
+    "git inventory equality",
+    "ZIP CRC",
+    "payload SHA-256",
+    "safe source paths"
+  ]
+}

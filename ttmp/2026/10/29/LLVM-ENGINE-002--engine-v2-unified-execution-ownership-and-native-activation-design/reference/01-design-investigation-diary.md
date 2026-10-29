@@ -116,3 +116,57 @@ Delivered the roughly 7,400-word compiler-language guide with a two-level table 
 - **Delivery result:** `OK: uploaded LLVM-ENGINE-002 Composable Compiler Language Guide Revised.pdf -> /ai/2026/10/29/LLVM-ENGINE-002`.
 - **Evidence limit:** Successful cloud delivery; no physical device-sync claim. The old non-Revised copy remains, with the receipt identifying the corrected version.
 - **Next:** Implement the canonical CFG, verifier, and five core examples before the runtime integration phase. No implementation task was marked complete by this document delivery.
+
+## Step 5: Reframe the architecture as a graduate design research assignment
+
+Prepared a research-informed critique and a self-contained handoff containing the pinned implementation, the two prior proposals, a new seminar brief, and review templates. The assignment explicitly permits substantial redesign and postpones implementation decisions. It also asks the researcher to derive the foundations, describe a path to a custom system, and design reusable components with concrete independent consumers.
+
+### Prompt Context
+**User prompt (verbatim):** "so now that you are looking at these, and maybe read them, what would you potentially address / improve in our design? Can you maybe make a little package for an intern with our new design doc, our current code, and a detailed document on what to research and study, to hand it off to get like, a grad seminar work / project back?"
+
+**User clarification (verbatim):** "(not implementing, but refining or updating or really recreating our design / parts of our design)"
+
+**User addition (verbatim):** "also ask them to study and expose the fundamental underpinnings in case we want to not only build with what we have but potentially work our way up to a full custom system, and also idedntify more self contained subsystems that can be reused across different projects, for certain passes and other things"
+
+**Assistant interpretation:** Produce a critical design-research assignment and source package. Do not implement the proposed compiler or require the intern to implement it.
+
+### What I did
+Wrote design document 03, approximately 5,200 words, with a semantic contract, transformation-permission distinctions, infrastructure comparison, root-policy comparison, worked throwing-getter example, foundational study sequence, dependency replacement stages, reusable subsystem catalog, source-reading map, annotated reading ledger, and eight-week return plan. Added templates for decisions, subsystem contracts, claims/evidence, and the final paper. Added a package builder and standalone verifier. Updated the ticket overview and marked earlier implementation tasks deferred pending the research gate.
+
+### Why
+The earlier designs selected substantial infrastructure before sufficiently comparing alternatives. The current root-slot failure supports investigating root allocation, but does not prove an arena is the right choice. A compositional builder does not by itself establish semantic preservation or type safety. The revised assignment gives the researcher permission and criteria to remove or replace proposed abstractions.
+
+### What worked
+Source inspection connects the questions to actual emitter admission, engine ownership, runtime exception restoration, module preparation, and application evidence. Selected primary documentation clarifies structural conversion legality, speculation versus memory effects, and the limits of framework-provided non-local control modeling. The first package verification covered 13,494 tracked source files, ZIP CRC checks, all payload hashes, and source archive paths. A final rebuild follows metadata corrections; its authoritative digest is in deliverables/package-receipt.json.
+
+### What didn't work
+The Appel author PDF endpoint returned HTTP 403 during research. The brief identifies that access limit and assigns full reading through the publication record rather than claiming to have studied the paper. The initial package was built before final frontmatter and entry-point corrections; it was regenerated. The first `docmgr doctor --ticket LLVM-ENGINE-002 --stale-after 30` reported four `invalid_frontmatter` errors: `frontmatter delimiters '---' not found` in START-HERE and the three Markdown templates. Added ticket reference frontmatter to each. The next check reported four missing numeric-prefix warnings; numbered the local Markdown files and preserved conventional packet names in the builder. Reran the check before final packaging. No engine tests were run because the compiler and runtime were not changed.
+
+### What I learned
+MLIR's current effects rationale explicitly leaves a gap for full non-local control-flow modeling. Adopting MLIR would not eliminate our exception/GC obligations. Reuse also needs a boundary between generic algorithms and language policy: SCC decomposition can be shared, whereas live bindings and asynchronous module evaluation require additional semantics.
+
+### What was tricky to build
+The assignment must allow a custom system without turning an eight-week seminar into a full JavaScript runtime implementation. The brief separates a small formal core, production integration requirements, and staged future replacement. It asks for design pseudocode and derivations, with execution results labeled separately. Packaging uses a pinned git archive for all tracked source and separately versioned current documents, avoiding a circular archive of itself or accidental inclusion of local build products.
+
+### What warrants a second pair of eyes
+Review observation equivalence, exceptional post-effect state, edge-specific liveness, collector relocation assumptions, and whether the proposed reusable subsystem interfaces are sufficiently independent. Check that the reading coverage ledger does not imply papers were read in full. Evaluate the realism of two candidate subsystem designs and their proposed consumers.
+
+### What should be done in the future
+The researcher should return the revised design, six decision records, two reusable subsystem API designs, semantic examples and counterexamples, foundational exposition, and a custom-system roadmap. Implementation requires a later decision; the earlier phase list is not the current assignment.
+
+### Code review instructions
+Start with design document 03 and handoff/01-START-HERE.md. Review scripts/01-build-seminar-package.py and handoff/VERIFY.py for source completeness and verification behavior. Run the builder from the repository root and docmgr doctor for LLVM-ENGINE-002. Compare the source inventory to the pinned baseline, not to a later handoff-only commit.
+
+### Technical details
+Source baseline: 87d4658c4ed27aee42ddf4e023f9e9666ef3a2a1. Git archive preserves tracked source and licenses without the git database or untracked products. The outer ZIP has fixed timestamps; the inner gzip uses mtime zero. The manifest hashes every payload except itself; an adjacent SHA-256 covers the complete archive. Generated ZIPs are ignored, while the builder, documents, templates, and bounded receipt are tracked. No reMarkable upload or external message was requested for this handoff.
+
+## Step 6: Validate and deliver the research package
+
+Final package validation passed: 13,494 tracked source files, ZIP CRC, payload SHA-256 verification, source path checks, and byte-for-byte matching of the final guides/templates with the archive. Docmgr doctor passes after the metadata corrections described in Step 5.
+
+- **Prompt context:** Step 5.
+- **Artifact:** `deliverables/LLVM-ENGINE-002-design-seminar-handoff.zip` (47,198,798 bytes).
+- **SHA-256:** `6f8328df3817d5c4b91345fb5291474ff2f8a33e1fb254f0a25b0aca6c07c6d6`.
+- **Source revision:** `87d4658c4ed27aee42ddf4e023f9e9666ef3a2a1`.
+- **Validation limits:** Archive/document validation only; no new compiler execution claims or full-paper review claims.
+- **Next:** External design research; earlier engine implementation proposals remain deferred.
