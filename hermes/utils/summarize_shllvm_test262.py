@@ -8,6 +8,8 @@ import argparse
 from collections import Counter, defaultdict
 import hashlib
 import json
+import re
+import subprocess
 from pathlib import Path
 
 
@@ -105,8 +107,59 @@ def summarize(results, fixtures):
         'edition_note': 'Feature labels alone do not establish edition membership; all entries require review.'}
 
 
+def annotate_suite(summary, results, suite, revision):
+    """Add source-reference candidates without reclassifying runtime results."""
+    actual = subprocess.check_output(['git', '-C', str(suite), 'rev-parse', 'HEAD'], text=True).strip()
+    if actual != revision:
+        raise ValueError('annotation suite revision differs from reports')
+    if subprocess.check_output(['git', '-C', str(suite), 'status', '--porcelain'], text=True).strip():
+        raise ValueError('annotation suite checkout must be clean')
+    catalog = suite / 'features.txt'
+    sections = {'## Proposed language features': 'proposed',
+                '## Standard language features': 'standard',
+                '## Test-Harness Features': 'test-harness'}
+    section = 'unknown'
+    labels = {}
+    for line in catalog.read_text().splitlines():
+        if line in sections:
+            section = sections[line]
+        label = line.split('#', 1)[0].strip()
+        if label:
+            labels[label] = section
+    summary['feature_catalog_sha256'] = hashlib.sha256(catalog.read_bytes()).hexdigest()
+    for label, entry in summary['feature_ledger'].items():
+        entry['pinned_catalog_category'] = labels.get(label, 'unlisted')
+    cache = {}
+    def read(relative, expected):
+        path = (suite / relative).resolve()
+        if not path.is_relative_to(suite):
+            raise ValueError('source reference escapes suite')
+        if relative not in cache:
+            data = path.read_bytes()
+            cache[relative] = (hashlib.sha256(data).hexdigest(), data.decode('utf-8'))
+        digest, text = cache[relative]
+        if digest != expected:
+            raise ValueError('annotation source differs from executed input: ' + relative)
+        return text
+    candidates = defaultdict(list)
+    for result in results:
+        if result['status'] == 'pass':
+            continue
+        text = read(result['test'], result['source_sha256']) if 'source_sha256' in result else ''
+        for relative, expected in result.get('includes', {}).items():
+            text += '\n' + read(relative, expected)
+        for helper in sorted(set(re.findall(r'\$262\.([A-Za-z_$][A-Za-z0-9_$]*)', text))):
+            candidates[helper].append({'test': result['test'], 'variant': result.get('variant'),
+                                       'status': result['status']})
+    summary['host_reference_candidates'] = {name: {'count': len(values), 'examples': values[:10]}
+                                             for name, values in sorted(candidates.items())}
+    summary['host_reference_note'] = ('Textual references in failing source or harness are triage candidates, '
+                                      'not proof of invocation or automatic result reclassification.')
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--suite', type=Path, help='pinned checkout for source/harness and feature-catalog annotation')
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('reports', type=Path, nargs='+')
     args = parser.parse_args()
@@ -119,6 +172,11 @@ def main():
     except (ValueError, KeyError, OSError) as exc:
         parser.error(str(exc))
     summary = summarize(results, fixtures)
+    if args.suite:
+        try:
+            annotate_suite(summary, results, args.suite.resolve(), reports[0]['suite_revision'])
+        except (ValueError, KeyError, OSError, subprocess.CalledProcessError) as exc:
+            parser.error(str(exc))
     summary['summarizer_sha256'] = hashlib.sha256(Path(__file__).read_bytes()).hexdigest()
     summary['profile'] = {key: reports[0][key] for key in
                           ('suite_revision', 'specification', 'selection', 'hermes_opt', 'llvm_opt')}

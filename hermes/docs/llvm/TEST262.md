@@ -124,3 +124,12 @@ consistent result counts, unique test/variant records, and complete source/fixtu
 coverage. It rejects partial reports. Failure groups are triage categories rather
 than normative judgments. The feature ledger marks edition membership unreviewed;
 a feature tag alone does not establish membership in a particular edition.
+
+Pass `--suite /path/to/pinned/test262` to the summarizer to annotate feature
+labels using that checkout's `features.txt` and list textual `$262` helper
+references in failing sources/harnesses. The checkout must be clean at the
+reported revision, and examined source/harness bytes must match recorded hashes.
+These references are candidates for investigation, including references in
+comments or strings; they do not automatically reclassify a failure. The pinned
+catalog's standard/proposed/harness categories are separate from reviewed
+membership in a particular specification edition.

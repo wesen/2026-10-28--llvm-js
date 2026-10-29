@@ -1,6 +1,10 @@
 #!/usr/bin/env python3
 import unittest
-from summarize_shllvm_test262 import aggregate, summarize
+import tempfile
+import hashlib
+from pathlib import Path
+from unittest.mock import patch
+from summarize_shllvm_test262 import aggregate, summarize, annotate_suite
 
 
 def report(index=0):
@@ -49,6 +53,29 @@ class SummaryTests(unittest.TestCase):
         results, fixtures = aggregate([a,b])
         self.assertEqual(results, [])
         self.assertEqual(fixtures, ['test/fixture_FIXTURE.js'])
+
+    def test_annotations_verify_source_and_keep_categories_distinct(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            (root / 'test').mkdir()
+            (root / 'features.txt').write_text('## Proposed language features\nproposal-x\n')
+            source = root / 'test/probe.js'
+            source.write_text('// $262.createRealm reference candidate\n')
+            result = dict(test='test/probe.js', variant='sloppy', status='semantic_failure',
+                          source_sha256=hashlib.sha256(source.read_bytes()).hexdigest(),
+                          features=['proposal-x'])
+            summary = summarize([result], [])
+            with patch('summarize_shllvm_test262.subprocess.check_output', side_effect=['pin', '']):
+                annotate_suite(summary, [result], root, 'pin')
+            self.assertEqual(summary['feature_ledger']['proposal-x']['pinned_catalog_category'], 'proposed')
+            self.assertEqual(summary['feature_ledger']['proposal-x']['edition_membership'], 'unreviewed')
+            self.assertEqual(summary['host_reference_candidates']['createRealm']['count'], 1)
+            self.assertEqual(summary['counts'], {'semantic_failure':1})
+            source.write_text('changed')
+            with patch('summarize_shllvm_test262.subprocess.check_output', side_effect=['pin', '']), self.assertRaisesRegex(ValueError, 'differs'):
+                annotate_suite(summary, [result], root, 'pin')
+            with patch('summarize_shllvm_test262.subprocess.check_output', side_effect=['pin', ' M features.txt']), self.assertRaisesRegex(ValueError, 'clean'):
+                annotate_suite(summary, [result], root, 'pin')
 
 
 if __name__ == '__main__':

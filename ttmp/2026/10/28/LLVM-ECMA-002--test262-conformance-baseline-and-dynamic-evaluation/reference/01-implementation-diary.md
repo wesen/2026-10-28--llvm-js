@@ -194,3 +194,40 @@ Start with summarize_shllvm_test262.aggregate and its tests. Read the new genera
 
 ### Technical details
 The broad run selects all of `test`, uses sixteen workers, frontend O0 / LLVM O0, compact passing records, and a checkpoint every 2,000 variants. Its raw report is `/tmp/llvm-002-full.json`; only a final `complete: true` with unchanged inputs can qualify it. The reusable invocation is in `scripts/01-run-broad-baseline.sh`.
+
+## Step 5: Separate host requirements and feature provenance from conformance results
+
+Report aggregation was committed as `b1e0bae`. Extended the summarizer to annotate the pinned feature catalog and identify textual host-helper references in failing source and harness files. These annotations preserve original execution classifications and expose uncertainty rather than manufacturing a cleaner conformance score.
+
+### Prompt Context
+See Step 1. This is failure-attribution work while the broad immutable-build experiment runs.
+
+### What I did
+Added optional `--suite` annotation with clean-checkout/revision checks and per-file source/harness hash verification. Recorded proposed/standard/test-harness catalog categories separately from unreviewed edition membership. Added source-reference candidates for $262 helpers. Added tests for source changes, dirty catalogs, category separation, and unchanged status counts.
+
+### Why
+The initial host does not implement the full $262 API. Some runtime failures can therefore involve missing test-host services rather than the language operation under investigation. Textual references are useful triage evidence but cannot prove invocation, so they do not replace the actual result. A catalog label also cannot establish membership in the pinned edition artifact.
+
+### What worked
+All four aggregator tests pass, including hash and cleanliness rejection cases. Annotated the completed pre-change eval report successfully without changing its totals. Inspected the pinned catalog's three sections and the specification artifact's algorithm anchors.
+
+### What didn't work
+No new test failure occurred. Edition membership remains unreviewed; the current annotations are not an edition-qualified pass rate. The full run is still incomplete.
+
+### What I learned
+The catalog contains features whose status must be checked against the particular artifact, rather than against a current proposal status. A scan of runtime-negative test sources found no direct $262 reference in that small set, but this is not a general proof of host completeness.
+
+### What was tricky to build
+Source annotations must refer to the actual executed bytes. Reading a newer checkout would give persuasive but unrelated diagnostics. The summarizer therefore validates both revision and examined file identities and records its own source digest.
+
+### What warrants a second pair of eyes
+Review the distinction between a textual helper reference and an executed missing-host operation. Do not reclassify all matching tests as unsupported automatically.
+
+### What should be done in the future
+Use the final broad results to review large failure groups and record concrete edition membership decisions with normative references.
+
+### Code review instructions
+Read annotate_suite and its adversarial test. Verify that counts remain those of the original reports and that annotations cannot silently accept changed source or harness bytes.
+
+### Technical details
+`pinned_catalog_category` is independent of `edition_membership`. The summary records feature-catalog and summarizer SHA-256 digests. The full run had processed more than 16,000 variants at this checkpoint and was still incomplete.
