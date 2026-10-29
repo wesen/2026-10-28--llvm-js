@@ -1,0 +1,6 @@
+Initial compiler invocation: fatal error: cstdint file not found
+Correction: use configured --gcc-install-dir=/usr/lib/gcc/x86_64-linux-gnu/13
+two-units-ok
+linkage-lifetime-ok
+exit=0
+LLVM version: 18.1.3

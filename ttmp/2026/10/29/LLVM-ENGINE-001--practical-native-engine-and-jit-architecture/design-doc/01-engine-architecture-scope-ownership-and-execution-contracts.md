@@ -138,3 +138,15 @@ LLVM-ECMA-002 retains the deep eval designs and tests; this ticket does not sile
 Read `hermes/include/hermes/VM/static_h.h` for SHUnit ownership and guarded initialization, `hermes/lib/BCGen/SH/LLVMNative/runtime.c::shllvm_run` for current lifecycle, `LLVMBackend.cpp::ModuleEmitter::generate` for creator generation, and `hermes/tools/shermes/shermes.cpp::compileFromCommandLineOptions` for the frontend extraction boundary.
 
 LLVM's [ORC design documentation for LLVM 18](https://releases.llvm.org/18.1.8/docs/ORCv2.html) provides the supporting JIT concepts. LLJIT provides IR compilation and symbol lookup; resource removal is available but does not determine language-runtime lifetime. Installed LLVM 18 headers must determine exact API spellings when implementation starts. The documentation patch version is a reference, not evidence that the installed toolchain is 18.1.8.
+
+## 11. Architecture decisions after the executable probe
+
+The two-unit LLJIT probe passes with the shared bridge loaded once, sharing an object and closure in one Hermes runtime and destroying that runtime before LLJIT. Select shared-runtime linkage for the engine; keep Hermes compiler libraries on the host side and avoid static VM linkage. Installed LLVM is 18.1.3. The standalone Clang probe needs the configured GCC 13 include-directory flag.
+
+Source inspection found a previously undocumented blocker: SHRuntime has only eight unit slots, and registration uses a process-global increasing index. LLVM-JIT-001 must replace the fixed table with growable storage, update collector iteration and bridge checks, and test more than eight registrations and repeated engine lifetimes. Preserve the established global identity scheme for now; document its high-water memory cost rather than introducing index recycling and code unloading together.
+
+Use the guarded unit initialization boundary through a runtime-side helper that prints/copies diagnostics while values are correctly rooted; no raw exception value escapes into the host API. Keep initialized code after any source exception because globals may already contain its closures. Native allocation failure retains the underlying runtime's fatal policy; ordinary compiler/materialization/JS errors are recoverable.
+
+Use explicit RuntimeConfig construction for the persistent host, avoiding _sh_init(argc,argv)'s process-global CLI parser reset. The frontend can be extracted as a request-scoped untyped script compiler using existing parseJSFile, AST transformation, resolveAST, generateIRFromESTree, optimization pipelines, and generateLLVM. Retain textual IR as the boundary between llvh and LLVM. Jobs use an explicitly blocking drain operation because the existing console loop waits for timers.
+
+Module completion will use a private embedding notification installed only by the engine host and opt-in generated bundle instrumentation. Track pending/fulfilled/rejected entries separately from unit initialization. This is trusted-code bookkeeping, not a security boundary. The source JIT need not implement runtime module discovery or integrate Babel in-process.

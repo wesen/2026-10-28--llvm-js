@@ -1,7 +1,7 @@
 ---
 Title: Practical native engine and JIT architecture
 Ticket: LLVM-ENGINE-001
-Status: active
+Status: complete
 Topics:
     - llvm
     - javascript
@@ -11,7 +11,7 @@ Owners: []
 RelatedFiles: []
 ExternalSources: []
 Summary: ""
-LastUpdated: 2026-10-29T09:32:28.68485189-04:00
+LastUpdated: 2026-10-29T10:02:50.368917451-04:00
 WhatFor: ""
 WhenToUse: ""
 ---

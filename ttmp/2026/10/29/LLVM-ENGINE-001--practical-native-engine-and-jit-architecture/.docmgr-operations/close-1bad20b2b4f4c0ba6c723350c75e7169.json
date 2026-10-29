@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "digest": "e21f6e2a75a33876f5a1e7b8dd32a069622b3f2d5a9924c0bf8c39e1c30e7f91",
+  "request": {
+    "ticket": "LLVM-ENGINE-001",
+    "status": "complete",
+    "intent": "",
+    "entry": "Validated two-unit LLJIT shared-runtime probe and recorded ownership, frontend, completion, and growable-unit-table decisions for implementation."
+  },
+  "receipt": {
+    "sequence": 1,
+    "operation_id": "close-1bad20b2b4f4c0ba6c723350c75e7169",
+    "state": "committed",
+    "created_at": "2026-10-29T14:02:50.368966754Z",
+    "changed_paths": [
+      "changelog.md",
+      "index.md"
+    ],
+    "before": {
+      "changelog.md": "6462c791df1bb54202abf7a065397cd84b170acccea3ae6ed12b87587177be17",
+      "index.md": "2974768f634763b2e85ed1a572bfeab1902aed6ffa3915be9e1a9d4582e4c7a1"
+    },
+    "after": {
+      "changelog.md": "b76c223bca4b86b9b09b90be9a77c655f248725a70bef3189614ac31ffd2d249",
+      "index.md": "f767da9cb03357b4c925f178712dcc24f9e3003408e244e5efdbc95b5717a8be"
+    }
+  },
+  "changes": [
+    {
+      "path": "changelog.md",
+      "before": "6462c791df1bb54202abf7a065397cd84b170acccea3ae6ed12b87587177be17",
+      "after": "IyBDaGFuZ2Vsb2cKCiMjIDIwMjYtMTAtMjkKCi0gSW5pdGlhbCB3b3Jrc3BhY2UgY3JlYXRlZAoKIyMgMjAyNi0xMC0yOQoKQ3JlYXRlZCBzb3VyY2UtZ3JvdW5kZWQgZGVzaWduIGFuZCBvcGVuIHRhc2sgaW52ZW50b3J5IGZvciB0aGUgcHJhY3RpY2FsIGNvbXBpbGVyL0pJVCBzY29wZTsgbm8gaW1wbGVtZW50YXRpb24gb3IgZnVsbC1jb25mb3JtYW5jZSBjbGFpbS4KCiMjIyBSZWxhdGVkIEZpbGVzCgotIC9ob21lL21hbnVlbC9jb2RlL3dlc2VuLzIwMjYtMTAtMjgtLWxsdm0tanMvdHRtcC8yMDI2LzEwLzI5L0xMVk0tRU5HSU5FLTAwMS0tcHJhY3RpY2FsLW5hdGl2ZS1lbmdpbmUtYW5kLWppdC1hcmNoaXRlY3R1cmUvZGVzaWduLWRvYy8wMS1lbmdpbmUtYXJjaGl0ZWN0dXJlLXNjb3BlLW93bmVyc2hpcC1hbmQtZXhlY3V0aW9uLWNvbnRyYWN0cy5tZCDigJQgQXJjaGl0ZWN0dXJlIGFuZCBhY2NlcHRhbmNlIGNvbnRyYWN0cwoKIyMgMjAyNi0xMC0yOQoKVmFsaWRhdGVkIHR3by11bml0IExMSklUIHNoYXJlZC1ydW50aW1lIHByb2JlIGFuZCByZWNvcmRlZCBvd25lcnNoaXAsIGZyb250ZW5kLCBjb21wbGV0aW9uLCBhbmQgZ3Jvd2FibGUtdW5pdC10YWJsZSBkZWNpc2lvbnMgZm9yIGltcGxlbWVudGF0aW9uLgo="
+    },
+    {
+      "path": "index.md",
+      "before": "2974768f634763b2e85ed1a572bfeab1902aed6ffa3915be9e1a9d4582e4c7a1",
+      "after": "LS0tClRpdGxlOiBQcmFjdGljYWwgbmF0aXZlIGVuZ2luZSBhbmQgSklUIGFyY2hpdGVjdHVyZQpUaWNrZXQ6IExMVk0tRU5HSU5FLTAwMQpTdGF0dXM6IGNvbXBsZXRlClRvcGljczoKICAgIC0gbGx2bQogICAgLSBqYXZhc2NyaXB0CkRvY1R5cGU6IGluZGV4CkludGVudDogbG9uZy10ZXJtCk93bmVyczogW10KUmVsYXRlZEZpbGVzOiBbXQpFeHRlcm5hbFNvdXJjZXM6IFtdClN1bW1hcnk6ICIiCkxhc3RVcGRhdGVkOiAyMDI2LTEwLTI5VDEwOjAyOjUwLjM2ODkxNzQ1MS0wNDowMApXaGF0Rm9yOiAiIgpXaGVuVG9Vc2U6ICIiCi0tLQoKIyBMTFZNLUVOR0lORS0wMDEKCkRlZmluZSBhIHByYWN0aWNhbCBBT1QgYW5kIGJhc2VsaW5lIEpJVCBlbmdpbmU6IG9uZSBydW50aW1lLCBvbmUgb3duZXIgdGhyZWFkLCBydW50aW1lLWxpZmV0aW1lIG5hdGl2ZSBjb2RlLCBhbmQgZXhwbGljaXQgc3VwcG9ydGVkLWxhbmd1YWdlIGJvdW5kYXJpZXMuIEFyY2hpdGVjdHVyZSBkZXNpZ24gaXMgd3JpdHRlbjsgcnVudGltZSBsaW5rYWdlIGFuZCBmcm9udGVuZCBleHRyYWN0aW9uIHN0aWxsIG5lZWQgaW1wbGVtZW50YXRpb24gcHJvYmVzLgoKIyMgRG9jdW1lbnRzCgotIFtEZXNpZ25dKGRlc2lnbi1kb2MvMDEtZW5naW5lLWFyY2hpdGVjdHVyZS1zY29wZS1vd25lcnNoaXAtYW5kLWV4ZWN1dGlvbi1jb250cmFjdHMubWQpCi0gW0RpYXJ5XShyZWZlcmVuY2UvMDEtaW1wbGVtZW50YXRpb24tZGlhcnkubWQpCi0gW1Rhc2tzXSh0YXNrcy5tZCkKCiMjIERlcGVuZGVuY2llcyBhbmQgc2NvcGUKCi0gTExWTS1KSVQtMDAxIGltcGxlbWVudHMgdGhpcyBjb250cmFjdC4KLSBMTFZNLU1PRFVMRVMtMDAyIHJlY29yZHMgb3B0aW9uYWwgbW9kdWxlIGZvbGxvdy11cHM7IG1vc3QgYXJlIG5vdCBwcmVyZXF1aXNpdGVzLgotIExMVk0tRUNNQS0wMDIgcmVtYWlucyB0aGUgb3duZXIgb2YgZGVlcGVyIGR5bmFtaWMtZXZhbHVhdGlvbiB3b3JrLgoKIyMgQ3VycmVudCBzdGF0ZQoKUGxhbm5pbmcgYXJ0aWZhY3RzIGFyZSBjb21wbGV0ZS4gRXhlY3V0aW9uIHRhc2tzIHJlbWFpbiBvcGVuOyBubyBlbmdpbmUgb3IgZm9sbG93LXVwIGZlYXR1cmUgaXMgY2xhaW1lZCBpbXBsZW1lbnRlZCBieSB0aGlzIGRvY3VtZW50YXRpb24gY2hhbmdlLgoKIyMgUmVsYXRlZCB0aWNrZXRzCgotIFtMTFZNLU1PRFVMRVMtMDAyXSguLi9MTFZNLU1PRFVMRVMtMDAyLS1tb2R1bGUtaG9zdC1mb2xsb3ctdXAtYmFja2xvZy1hbmQtYm91bmRlZC1pbXByb3ZlbWVudHMvaW5kZXgubWQpCi0gW0xMVk0tSklULTAwMV0oLi4vTExWTS1KSVQtMDAxLS1taW5pbWFsLWluLXByb2Nlc3MtbGx2bS1qaXQvaW5kZXgubWQpCg=="
+    }
+  ]
+}

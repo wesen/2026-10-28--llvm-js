@@ -11,3 +11,7 @@ Created source-grounded design and open task inventory for the practical compile
 ### Related Files
 
 - /home/manuel/code/wesen/2026-10-28--llvm-js/ttmp/2026/10/29/LLVM-ENGINE-001--practical-native-engine-and-jit-architecture/design-doc/01-engine-architecture-scope-ownership-and-execution-contracts.md — Architecture and acceptance contracts
+
+## 2026-10-29
+
+Validated two-unit LLJIT shared-runtime probe and recorded ownership, frontend, completion, and growable-unit-table decisions for implementation.

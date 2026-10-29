@@ -56,3 +56,42 @@ Read the design's current-state section and proposed contracts, then the Related
 
 ### Technical details
 Source checkpoint: 8db50e0; module implementation: 185923d. Initial target: Linux x86-64 host64 with installed LLVM 18. References are local source plus https://releases.llvm.org/18.1.8/docs/ORCv2.html; the documentation version is not an assertion about the installed toolchain's patch version.
+
+## Step 2: Probe shared-runtime linkage and close architecture decisions
+
+The compiled LLJIT probe executed two creator-only units in one runtime, printing two-units-ok and linkage-lifetime-ok. Source review uncovered the eight-slot native unit table, which must be expanded for a useful persistent engine.
+
+### Prompt Context
+**User prompt (verbatim):** "ok, do it. commit at appropriate intervals and keep a detailed diary as you work (using the diary format from the skill)
+
+Then do LLVM-JIT-001"
+
+### What I did
+Compiled the retained scripts/01-linkage-probe.cpp with LLVM 18, emitted two sources through shermes creator-only mode, loaded the shared bridge, and executed both units through _sh_unit_init_guarded. Inspected StaticHUnit.cpp, Runtime.cpp, StaticHInit.cpp, and the frontend pipeline.
+
+### Why
+The persistent engine must share exactly one runtime and preserve code lifetime. An executable two-unit probe resolves the linkage question before constructing an embedding API.
+
+### What worked
+The corrected probe exits zero and shares a mutable object and closure. Runtime destruction precedes JIT destruction. Existing creator-only emission avoids changes to native call conventions.
+
+### What didn't work
+The first Clang invocation failed with fatal error: 'cstdint' file not found. Added --gcc-install-dir=/usr/lib/gcc/x86_64-linux-gnu/13, matching the configured build. The source audit found SHUnit *units[8] and a process-global increasing index; the probe does not qualify sessions beyond that limit.
+
+### What I learned
+The CLI runtime initializer resets global option parsing, so an embedded frontend should use explicit RuntimeConfig. The console drain waits for timers and must not be advertised as nonblocking.
+
+### What was tricky to build
+Compiler llvh and system LLVM must coexist without sharing IR objects or duplicating the VM. A textual IR buffer and one shared runtime provide that boundary.
+
+### What warrants a second pair of eyes
+Growable unit table root iteration, exception-value rooting, retained failed units, and module completion notifications need integration tests.
+
+### What should be done in the future
+Implement LLVM-JIT-001 with the decisions appended to the design, including the discovered unit-capacity correction.
+
+### Code review instructions
+Run scripts/02-run-linkage-probe.sh from this checkout and inspect reference/02-linkage-probe-results.txt. Review design section 11 and the shared runtime registration code.
+
+### Technical details
+Probe source and runner are retained. Installed LLVM 18.1.3; configured Clang uses GCC 13 standard library headers. No speculative optimization, dynamic unloading, or full-conformance gate is introduced.
