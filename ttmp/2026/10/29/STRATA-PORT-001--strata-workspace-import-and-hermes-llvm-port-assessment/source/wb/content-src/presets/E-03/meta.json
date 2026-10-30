@@ -1,0 +1,14 @@
+{
+  "id": "E-03",
+  "title": "Timers in virtual time",
+  "group": "Engine",
+  "about": "setTimeout on a virtual clock: earliest due first, ties in order, microtasks drained between timers; how real engines differ.",
+  "tries": [
+    "Why does the job print before the 0 ms timers?",
+    "Why does Node print the last two lines in the other order?",
+    "What would break if the specification used the host's real clock?"
+  ],
+  "view": { "fn": "main", "level": "L1", "tab": "events", "overlays": [], "mode": "spec", "gc": "off" },
+  "chapters": [17],
+  "docs": ["jobs"]
+}

@@ -1,0 +1,15 @@
+{
+  "id": "L-04",
+  "title": "A plan with a hole",
+  "group": "Lowering",
+  "about": "The none root strategy: the plan checker lists every value a safepoint needs and does not get, before anything runs.",
+  "tries": [
+    "Why is a missing at obj.new when the new object does not exist yet?",
+    "What is the difference between live across and borrowed by?",
+    "Why does the checker refuse a plan that would print the right answer with GC off?"
+  ],
+  "view": { "fn": "pair", "level": "L3", "tab": "plan", "overlays": ["safepoints", "stale"], "mode": "spec", "gc": "off" },
+  "chapters": [13],
+  "docs": ["gc-roots"],
+  "expect": { "compile": "errors" }
+}

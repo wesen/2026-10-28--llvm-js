@@ -1,0 +1,15 @@
+{
+  "id": "C-04",
+  "title": "The throwing getter",
+  "group": "Contracts",
+  "about": "Why an unused js.get cannot be erased: the contract, the refused decision, and what erasing it anyway prints.",
+  "tries": [
+    "Why was the js.get in load not erased?",
+    "What fact would let the compiler erase the read?",
+    "Compare the outputs with and without naive-dce"
+  ],
+  "view": { "fn": "load", "level": "L1", "tab": "events", "overlays": ["safepoints"], "mode": "spec", "gc": "off" },
+  "chapters": [7],
+  "docs": ["effects"],
+  "expect": { "compile": "ok" }
+}

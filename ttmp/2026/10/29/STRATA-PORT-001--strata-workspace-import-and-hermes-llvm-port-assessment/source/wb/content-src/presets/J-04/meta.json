@@ -1,0 +1,11 @@
+{
+  "id": "J-04",
+  "title": "A tokenizer",
+  "group": "JavaScript scenarios",
+  "about": "A loop over a string with one object per token: block parameters for two loops, && as blocks, and a length read the compiler may not hoist.",
+  "tries": ["Why can the compiler not hoist text.length out of the loop?", "Follow the && in the inner loop condition through its blocks", "Which values does tokenize keep in root slots?"],
+  "view": { "fn": "tokenize", "level": "L1", "tab": "ir", "overlays": ["safepoints"], "mode": "spec", "gc": "off" },
+  "chapters": [9],
+  "docs": ["liveness"],
+  "expect": { "compile": "ok" }
+}

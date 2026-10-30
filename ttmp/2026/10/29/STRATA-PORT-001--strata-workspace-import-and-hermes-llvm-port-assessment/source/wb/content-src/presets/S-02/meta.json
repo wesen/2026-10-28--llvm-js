@@ -1,0 +1,14 @@
+{
+  "id": "S-02",
+  "title": "What counts as the same",
+  "group": "Semantics",
+  "about": "Observations compared by SameValue and object identity up to renaming: same text, different behaviour.",
+  "tries": [
+    "Why is -0 against 0 not equal when both print 0?",
+    "Explain how the bijection decides pair four",
+    "Add a pair that differs only in the order of two prints"
+  ],
+  "view": { "fn": "main", "level": "L1", "tab": "experiments", "overlays": [], "mode": "spec", "gc": "off" },
+  "chapters": [2],
+  "docs": ["semantics"]
+}

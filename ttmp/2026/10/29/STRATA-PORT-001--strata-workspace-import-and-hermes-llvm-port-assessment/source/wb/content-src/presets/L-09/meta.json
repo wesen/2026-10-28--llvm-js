@@ -1,0 +1,14 @@
+{
+  "id": "L-09",
+  "title": "statusReturn and compatibility",
+  "group": "Lowering",
+  "about": "Which root and exception strategies combine, why statusReturn is refused with Hermes helpers, and risky compiled under it.",
+  "tries": [
+    "Why is arena with statusReturn refused when it would probably work?",
+    "What would the LLVM text of try3 look like under statusReturn?",
+    "Which providers does statusReturn need, and what makes Hermes's helpers unsuitable?"
+  ],
+  "view": { "fn": "risky", "level": "L3", "tab": "experiments", "overlays": ["exceptional"], "mode": "plan", "gc": "stress" },
+  "chapters": [14],
+  "docs": ["unwinding"]
+}

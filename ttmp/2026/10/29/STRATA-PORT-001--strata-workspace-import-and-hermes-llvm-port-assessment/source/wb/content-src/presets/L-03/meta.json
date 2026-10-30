@@ -1,0 +1,14 @@
+{
+  "id": "L-03",
+  "title": "Root strategies compared",
+  "group": "Lowering",
+  "about": "distinct, stackReuse and arena on the ledger: slots, frame bytes and 68 collections under stress, all equal to the spec.",
+  "tries": [
+    "Why does distinct give v4 a root slot when nothing needs it at a safepoint?",
+    "Which values share slot 1 of deposit under stackReuse, and why is that safe?",
+    "What does arena buy in exchange for its extra bytes?"
+  ],
+  "view": { "fn": "deposit", "level": "L3", "tab": "plan", "overlays": ["roots", "safepoints"], "mode": "plan", "gc": "stress" },
+  "chapters": [13],
+  "docs": ["gc-roots"]
+}

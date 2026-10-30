@@ -1,0 +1,15 @@
+{
+  "id": "C-05",
+  "title": "Your own operation",
+  "group": "Contracts",
+  "about": "Three operations defined in main.js: an honest square, a square that prints and lies about it, and one that tells the truth.",
+  "tries": [
+    "Why did the canonical rewrites delete squaring 3?",
+    "Define an operation that may throw, with the right behaviour and obligations",
+    "What does the LLVM text do with c05.square?"
+  ],
+  "view": { "fn": "main", "level": "L1", "tab": "laws", "overlays": [], "mode": "spec", "gc": "off" },
+  "chapters": [6],
+  "docs": ["effects", "refinement"],
+  "expect": { "compile": "ok", "lawsFail": true }
+}

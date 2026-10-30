@@ -1,0 +1,14 @@
+{
+  "id": "I-02",
+  "title": "Text, JSON and round trips",
+  "group": "IR",
+  "about": "Core IR as text and as JSON, parse errors, content hashes, and the round-trip law on generated functions.",
+  "tries": [
+    "What does the JSON form of check look like?",
+    "Write a function in program.ir that uses a string literal",
+    "What would a printer bug look like in the round-trip law's report?"
+  ],
+  "view": { "fn": "clamp", "level": "L1", "tab": "laws", "overlays": [], "mode": "spec", "gc": "off" },
+  "chapters": [3],
+  "docs": ["ssa"]
+}

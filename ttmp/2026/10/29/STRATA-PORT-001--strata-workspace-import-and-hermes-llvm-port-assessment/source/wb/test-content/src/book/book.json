@@ -1,0 +1,7 @@
+{ "title": "Compilers from First Principles", "subtitle": "test fixture edition",
+  "parts": [{ "id": "I", "title": "Meaning", "about": "what programs do" }, { "id": "II", "title": "Representation", "about": "how a compiler holds them" }],
+  "chapters": [
+    { "n": "P", "slug": "preface", "title": "Preface", "about": "how to read the book" },
+    { "n": 1, "part": "I", "slug": "fixture", "title": "A fixture chapter", "about": "testing the reader", "presets": ["I-01"], "docs": ["fixture-doc"], "file": "01-fixture.md" },
+    { "n": 2, "part": "II", "slug": "later", "title": "A chapter not written yet", "about": "blocks and edges" }
+  ] }

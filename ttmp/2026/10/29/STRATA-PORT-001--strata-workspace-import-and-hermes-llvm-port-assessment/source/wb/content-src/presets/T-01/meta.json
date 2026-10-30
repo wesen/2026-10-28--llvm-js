@@ -1,0 +1,15 @@
+{
+  "id": "T-01",
+  "title": "Folding and propagation",
+  "group": "Transforms",
+  "about": "The canonical rewrites fold constants, simplify a branch and remove an unreachable block: 14 operations become 5.",
+  "tries": [
+    "Why may js.mul(4, 8) be folded when js.mul is callsUser?",
+    "Which rewrite removed else3, and why?",
+    "Why are entry and then1 not merged?"
+  ],
+  "view": { "fn": "main", "level": "L1", "tab": "experiments", "overlays": [], "mode": "spec", "gc": "off" },
+  "chapters": [10],
+  "docs": ["rewriting"],
+  "expect": { "compile": "ok" }
+}

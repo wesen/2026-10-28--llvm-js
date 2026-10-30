@@ -1,0 +1,14 @@
+{
+  "id": "W-04",
+  "title": "LLVM IR in the Hermes shape",
+  "group": "Backends",
+  "about": "The ledger's deposit as LLVM IR text: shllvm_enter and the frame, root slots, helpers with out pointers, the string table.",
+  "tries": [
+    "Where does the 6 in shllvm_enter come from?",
+    "Why are helper operands passed as pointers to slots?",
+    "Which values of deposit live in unrooted stack words, and why is that safe?"
+  ],
+  "view": { "fn": "deposit", "level": "LLVM", "tab": "ir", "overlays": ["roots"], "mode": "spec", "gc": "off" },
+  "chapters": [16],
+  "docs": ["hermes-llvm"]
+}

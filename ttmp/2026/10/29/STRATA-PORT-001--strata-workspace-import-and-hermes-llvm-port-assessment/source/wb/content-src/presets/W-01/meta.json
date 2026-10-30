@@ -1,0 +1,14 @@
+{
+  "id": "W-01",
+  "title": "WebAssembly by hand",
+  "group": "Backends",
+  "about": "Two core-IR functions encoded to a 484-byte Wasm binary and run by the browser: the dispatch loop, locals, LEB128.",
+  "tries": [
+    "Walk me through how the back edge of the loop becomes Wasm instructions",
+    "Why does the backend refuse anything outside the core profile?",
+    "What would it take to let main call fib?"
+  ],
+  "view": { "fn": "main", "level": "WAT", "tab": "ir", "overlays": [], "mode": "wasm", "gc": "off" },
+  "chapters": [15],
+  "docs": ["wasm"]
+}

@@ -1,0 +1,15 @@
+{
+  "id": "T-06",
+  "title": "Passes and their requirements",
+  "group": "Transforms",
+  "about": "The default pass list with requires and provides, a pass of our own inserted after rewrite, and two pipelines check() refuses.",
+  "tries": [
+    "Why does rewrite invalidate the analyses?",
+    "Write a pass that requires safepoints and insert it",
+    "What does stopAfter('L1') keep?"
+  ],
+  "view": { "fn": "main", "level": "L1", "tab": "experiments", "overlays": [], "mode": "spec", "gc": "off" },
+  "chapters": [11],
+  "docs": ["refinement"],
+  "expect": { "compile": "ok" }
+}

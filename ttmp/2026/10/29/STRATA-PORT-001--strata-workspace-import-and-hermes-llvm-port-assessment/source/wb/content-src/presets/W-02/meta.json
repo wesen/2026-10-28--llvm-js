@@ -1,0 +1,14 @@
+{
+  "id": "W-02",
+  "title": "From JavaScript to Wasm",
+  "group": "Backends",
+  "about": "fib in JavaScript reaches the Wasm backend with an unchecked assumption and narrowing by facts; main stays out.",
+  "tries": [
+    "Why is the assumption alone not enough to get fib into Wasm?",
+    "Which facts prove that i is a number at the loop head?",
+    "What would a JIT do when the assumption about n fails?"
+  ],
+  "view": { "fn": "fib", "level": "L1", "tab": "experiments", "overlays": ["types"], "mode": "spec", "gc": "off" },
+  "chapters": [15],
+  "docs": ["wasm"]
+}

@@ -1,0 +1,15 @@
+{
+  "id": "C-01",
+  "title": "Behaviours and their join",
+  "group": "Contracts",
+  "about": "Six small functions, one behaviour summary each, computed as the join of their operations' behaviours.",
+  "tries": [
+    "Why is bump callsUser when it only adds 1?",
+    "What would make an unused call to make erasable?",
+    "Show me the behaviour of every operation in main"
+  ],
+  "view": { "fn": "add", "level": "L1", "tab": "experiments", "overlays": [], "mode": "spec", "gc": "off" },
+  "chapters": [6],
+  "docs": ["effects"],
+  "expect": { "compile": "ok" }
+}

@@ -1,0 +1,15 @@
+{
+  "id": "C-07",
+  "title": "More behaviour, fewer permissions",
+  "group": "Contracts",
+  "about": "The antitone law for derived permissions, a plausible erase rule that breaks it, and which neighbours may commute.",
+  "tries": [
+    "Explain the counterexample to myErase",
+    "Why can num.mul and num.eq not be swapped even though commute says yes?",
+    "Write an antitone merge rule and check it"
+  ],
+  "view": { "fn": "step", "level": "L1", "tab": "laws", "overlays": [], "mode": "spec", "gc": "off" },
+  "chapters": [7],
+  "docs": ["effects"],
+  "expect": { "compile": "ok", "lawsFail": true }
+}

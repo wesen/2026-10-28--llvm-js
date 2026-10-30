@@ -1,0 +1,30 @@
+// fib in core IR, numbers only, so the Wasm backend accepts every function.
+// main prints fib(30); fib(n) is exported on its own as well.
+fn main() -> number {
+entry:
+  jump head(0, 0, 1)
+head(i: number, a: number, b: number):
+  v1 = num.lt(i, 30)
+  branch v1, body(i, a, b), exit(a)
+body(i1: number, a1: number, b1: number):
+  v2 = num.add(i1, 1)
+  v3 = num.add(a1, b1)
+  jump head(v2, b1, v3)
+exit(r: number):
+  host.print(r)
+  return r
+}
+
+fn fib(n: number) -> number {
+entry:
+  jump head(0, 0, 1)
+head(i: number, a: number, b: number):
+  v1 = num.lt(i, n)
+  branch v1, body(i, a, b), exit(a)
+body(i1: number, a1: number, b1: number):
+  v2 = num.add(i1, 1)
+  v3 = num.add(a1, b1)
+  jump head(v2, b1, v3)
+exit(r: number):
+  return r
+}

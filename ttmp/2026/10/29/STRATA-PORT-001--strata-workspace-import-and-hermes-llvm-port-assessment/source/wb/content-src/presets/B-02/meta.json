@@ -1,0 +1,14 @@
+{
+  "id": "B-02",
+  "title": "One default at a time",
+  "group": "Basics",
+  "about": "Zero config, partial parameters, a named strategy and a lambda wrapping the default, compiled side by side.",
+  "tries": [
+    "What exactly changed between step 2 and step 3?",
+    "Write a roots lambda that uses arena for sumTo only",
+    "Why can js.le in sumTo not become num.le?"
+  ],
+  "view": { "fn": "sumTo", "level": "L1", "tab": "experiments", "overlays": ["safepoints"], "mode": "spec", "gc": "off" },
+  "chapters": [1, 11],
+  "docs": ["workbench-tour"]
+}

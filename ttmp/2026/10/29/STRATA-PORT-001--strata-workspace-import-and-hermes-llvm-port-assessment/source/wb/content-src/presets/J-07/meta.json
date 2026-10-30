@@ -1,0 +1,11 @@
+{
+  "id": "J-07",
+  "title": "Errors across calls",
+  "group": "JavaScript scenarios",
+  "about": "A throw three frames down, caught in a loop: why sum stays a cell while bad becomes a block parameter.",
+  "tries": ["Why is sum still a cell after promotion?", "Trace the first throw from readField to catch5", "What would make sum promotable?"],
+  "view": { "fn": "invoice", "level": "L1", "tab": "events", "overlays": ["exceptional"], "mode": "spec", "gc": "off" },
+  "chapters": [14],
+  "docs": ["exceptions"],
+  "expect": { "compile": "ok", "outcome": "throw" }
+}

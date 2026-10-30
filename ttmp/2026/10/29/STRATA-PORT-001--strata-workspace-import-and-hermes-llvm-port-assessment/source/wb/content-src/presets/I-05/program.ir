@@ -1,0 +1,29 @@
+// Count the odd and even numbers below n: a loop whose body is a diamond.
+fn main() -> number {
+entry throws unwind:
+  r = core.call(@parity, 7)
+  host.print(r)
+  return r
+}
+
+fn parity(n: number) -> number {
+entry:
+  jump head(0, 0)
+head(i: number, odd: number):
+  more = num.lt(i, n)
+  branch more, test(), exit()
+test():
+  half = num.mod(i, 2)
+  isOdd = num.eq(half, 1)
+  branch isOdd, yes(), no()
+yes():
+  odd1 = num.add(odd, 1)
+  jump merge(odd1)
+no():
+  jump merge(odd)
+merge(o: number):
+  next = num.add(i, 1)
+  jump head(next, o)
+exit():
+  return odd
+}

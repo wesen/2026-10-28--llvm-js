@@ -1,0 +1,11 @@
+{
+  "id": "X-06",
+  "title": "A factorial study of roots",
+  "group": "Experiments",
+  "about": "Three root strategies crossed with four programs, with hypotheses and thresholds written down before the run.",
+  "tries": ["Why does stackReuse save more on the tokenizer than on the counter?", "What would refute H2?", "Add a program to the study and recheck H3"],
+  "view": { "tab": "laws" },
+  "chapters": [20],
+  "docs": ["design-spaces", "gc-roots"],
+  "expect": { "compile": "ok" }
+}

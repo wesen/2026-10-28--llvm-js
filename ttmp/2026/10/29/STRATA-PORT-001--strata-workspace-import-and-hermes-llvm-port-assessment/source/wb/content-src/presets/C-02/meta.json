@@ -1,0 +1,15 @@
+{
+  "id": "C-02",
+  "title": "Obligations",
+  "group": "Contracts",
+  "about": "mayCollect, nonlocalThrow and writeBarrier: what lowering owes each operation, and what the root plan did about it.",
+  "tries": [
+    "Why does obj.new in pair root a and b?",
+    "Which operations need a write barrier, and why is a barrier not a safepoint?",
+    "What would change if pair had a try/catch?"
+  ],
+  "view": { "fn": "pair", "level": "L3", "tab": "experiments", "overlays": ["safepoints"], "mode": "spec", "gc": "off" },
+  "chapters": [6],
+  "docs": ["effects"],
+  "expect": { "compile": "ok" }
+}

@@ -8,7 +8,17 @@ Topics:
 DocType: design-doc
 Intent: long-term
 Owners: []
-RelatedFiles: []
+RelatedFiles:
+    - Path: repo://strata/native/emitter.js
+      Note: Real LLVM emission and Hermes ABI integration
+    - Path: repo://strata/native/roots.js
+      Note: Full-lifetime root interference and assignment checking
+    - Path: repo://strata/src/frontend.js
+      Note: Scope resolution and source semantic corrections
+    - Path: repo://strata/test/native.test.js
+      Note: Native differential qualification
+    - Path: repo://strata/tools/strata-native.js
+      Note: Verified emission linking and provenance
 ExternalSources: []
 Summary: ""
 LastUpdated: 2026-10-29T20:34:23.932784603-04:00
@@ -198,3 +208,49 @@ Review the runtime call builder and module data first, then root/call lifetime, 
 Read `hermes/lib/BCGen/SH/LLVMNative/runtime.h`, `runtime.c`, `LLVMBackend.cpp`, `hermes/include/hermes/VM/static_h.h`, `hermes/lib/VM/StaticH.cpp`, and `hermes/utils/shllvm.py` for current ABI and lifetime behavior. Read `source/wb/src/frontend.js`, `src/core/30-ir.js`, `50-analysis.js`, `60-rewrite.js`, and `70-lower.js` inside this ticket for the imported compiler model. The assessment document explains differences between the model and native implementation.
 
 Future work can extend the supported source profile, optimize proven numeric operations, replace completion environments with pairs, integrate generated units into the existing in-process JIT, or replace runtime services behind a versioned contract. None requires a speculative JIT immediately: eager runtime compilation is already JIT compilation. Guarded specialization and deoptimization are a later execution tier with their own frame-reconstruction requirements.
+
+## 13. Implemented result and reproducible commands
+
+The initial native subset described above is implemented in `strata/`. The first compiler milestone is commit `62ee096`; subsequent qualification and root-reuse work is recorded in the diary. The imported source remains unchanged under this ticket's `source/` directory and is verified by the import script.
+
+From the repository root, with the existing runtime build available:
+
+```sh
+node strata/tools/strata-native.js run strata/test/fixtures/ledger.js -O 2
+node strata/tools/strata-native.js build strata/test/fixtures/closures.js \
+  --roots distinct -o /tmp/strata-closures
+node strata/test/boundaries.test.js
+node strata/test/roots.test.js
+node strata/test/driver.test.js
+node strata/test/native.test.js /tmp/strata-final-normal
+```
+
+To create a separate stress runtime, configure the same source and build all three required targets. Building the static bridge alone does not build the managed runtime libraries:
+
+```sh
+cmake -S hermes -B hermes/build-strata-gcstress -G Ninja \
+  -DCMAKE_BUILD_TYPE=Release \
+  -DCMAKE_C_COMPILER=clang-18 -DCMAKE_CXX_COMPILER=clang++-18 \
+  '-DCMAKE_C_FLAGS_RELEASE=-O1 -DNDEBUG' \
+  '-DCMAKE_CXX_FLAGS_RELEASE=-O1 -DNDEBUG' \
+  -DHERMESVM_SANITIZE_HANDLES=ON \
+  -DHERMES_ENABLE_ADDRESS_SANITIZER=ON \
+  -DHERMES_BUILD_LLVM_JIT=OFF
+cmake --build hermes/build-strata-gcstress \
+  --target shllvm_runtime hermesvm shermes_console --parallel 8
+node strata/test/native.test.js /tmp/strata-final-stress \
+  hermes/build-strata-gcstress stress
+node strata/test/gc-negative.test.js hermes/build-strata-gcstress
+```
+
+This machine also required `-DCMAKE_CXX_FLAGS=--gcc-install-dir=/usr/lib/gcc/x86_64-linux-gnu/13`, as documented in the existing fork's import notes. That path is machine-specific; do not copy it to a machine with a different installed GCC layout. The recorded LLVM/Clang version is 18.1.3. The driver derives sanitizer link flags from the chosen build cache.
+
+The final matrix contains 19 fixtures, each executed with distinct and reused homes at LLVM O0 and O2. The normal-runtime run passed 76/76 checks, and the aggressive handle-sanitizing ASan run also passed 76/76. Each contains 72 successful executions and four expected uncaught-language-error executions of J-07. The compiler-input fingerprints were identical across all 152 checks; fixture hashes match the delivered source. These are targeted host results, not full ECMAScript conformance or complete generated-body sanitizer instrumentation.
+
+The negative GC control first runs a valid program that prints 42, then changes only its generated root-registration count to zero. The mutated executable produces an ASan invalid-read/SEGV during property definition. The exact diagnostic is preserved; it is not described as a specifically labeled heap-use-after-free. A separate root-assignment test rejects an intentionally colliding allocation before emission.
+
+A function containing 1,200 sequential additions has 1,201 SSA definitions in this frontend, including a script-global value. Distinct homes exceed the admission bound. Reuse needs two SSA homes, 12 total root homes, and one outgoing argument slot, and executes to print 1200. This result establishes useful reuse on a sequential workload, not a claim that fflate is already accepted. The ledger's main function decreases from 47 roots to 24.
+
+The native frontend now preserves method lookup before argument evaluation, distinguishes TDZ emptiness from legitimate undefined, propagates strictness for receiver/write behavior, and handles global typeof lookup. It explicitly rejects async/generator syntax, direct eval, named function expressions and implicit arguments where lowering is absent. The original array-oriented for-of form and special host-global forms retain their documented admitted-profile restrictions. Read `strata/README.md` before extending that profile.
+
+Native helper declarations currently derive from the checked-in header, with its digest recorded; there is no runtime-enforced ABI version negotiation or generated universal effect database yet. The emitter conservatively roots all value homes and includes handler liveness for every operation. Keeping that policy explicit avoids claiming that header types alone prove the more ambitious contract table in the original roadmap.

@@ -1,0 +1,14 @@
+{
+  "id": "W-05",
+  "title": "Closures and calls in LLVM",
+  "group": "Backends",
+  "about": "A counter closure in the LLVM text: shllvm_closure with a function index and captured cells, shllvm_call through argv.",
+  "tries": [
+    "Walk me through the arguments of shllvm_call in main",
+    "Why are the cells rooted across js.closure?",
+    "What would go wrong if a helper collected before reading argv?"
+  ],
+  "view": { "fn": "makeCounter", "level": "LLVM", "tab": "ir", "overlays": ["roots"], "mode": "spec", "gc": "off" },
+  "chapters": [16],
+  "docs": ["hermes-llvm"]
+}

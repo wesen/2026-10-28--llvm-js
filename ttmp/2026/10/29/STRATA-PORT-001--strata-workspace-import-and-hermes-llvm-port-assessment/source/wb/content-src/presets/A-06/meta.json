@@ -1,0 +1,15 @@
+{
+  "id": "A-06",
+  "title": "The solver on any graph",
+  "group": "Analysis",
+  "about": "The same fixed-point solver on a reference graph: what each function reaches, and the recursive group found by Tarjan's algorithm.",
+  "tries": [
+    "Why does the cycle cost extra solver visits?",
+    "Compute the callers of each function instead",
+    "Why is the closure for unused missing from main?"
+  ],
+  "view": { "fn": "main", "level": "L1", "tab": "experiments", "overlays": [], "mode": "spec", "gc": "off" },
+  "chapters": [8],
+  "docs": ["lattices"],
+  "expect": { "compile": "ok" }
+}

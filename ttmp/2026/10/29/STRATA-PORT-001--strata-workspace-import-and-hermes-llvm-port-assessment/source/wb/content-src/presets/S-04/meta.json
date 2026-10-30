@@ -1,0 +1,14 @@
+{
+  "id": "S-04",
+  "title": "The temporal dead zone",
+  "group": "Semantics",
+  "about": "A let read before its declaration: the empty cell, cell.load_checked and the ReferenceError.",
+  "tries": [
+    "Why is the load in show checked but the store in main not?",
+    "Which reads in a program can the frontend leave unchecked?",
+    "What would a compiler need to prove to drop the check?"
+  ],
+  "view": { "fn": "show", "level": "L1", "tab": "machine", "overlays": ["exceptional"], "mode": "spec", "gc": "off" },
+  "chapters": [2, 4],
+  "docs": ["semantics", "ssa"]
+}

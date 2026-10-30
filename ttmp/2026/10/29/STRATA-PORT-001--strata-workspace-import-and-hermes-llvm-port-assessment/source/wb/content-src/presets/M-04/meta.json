@@ -1,0 +1,11 @@
+{
+  "id": "M-04",
+  "title": "Differential testing",
+  "group": "Method",
+  "about": "Spec, plan mode at three GC settings and Wasm on the same programs, with a compiler that forgets a root on purpose.",
+  "tries": ["Why does only GC stress catch the forgotten root?", "Why is the Collatz program immune to forgetOne?", "Which executors refuse which programs, and why?"],
+  "view": { "fn": "main", "level": "L1", "tab": "experiments", "overlays": [], "mode": "wasm", "gc": "off" },
+  "chapters": [19],
+  "docs": ["property-testing", "wasm"],
+  "expect": { "compile": "ok" }
+}

@@ -1,0 +1,15 @@
+{
+  "id": "T-04",
+  "title": "Narrowing by facts",
+  "group": "Transforms",
+  "about": "The standard rewrites on the ledger: three operations narrow to num.* and str.concat, and total loses two safepoints.",
+  "tries": [
+    "Why does the js.add in body2 not narrow?",
+    "What does narrowing change in L2 and in the plan?",
+    "Make the sum in total narrow"
+  ],
+  "view": { "fn": "total", "level": "L1", "tab": "experiments", "overlays": ["safepoints"], "mode": "spec", "gc": "off" },
+  "chapters": [10, 12],
+  "docs": ["type-facts", "rewriting"],
+  "expect": { "compile": "ok" }
+}

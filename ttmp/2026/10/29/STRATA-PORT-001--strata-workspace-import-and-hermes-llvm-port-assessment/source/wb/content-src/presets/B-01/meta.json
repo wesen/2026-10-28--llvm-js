@@ -1,0 +1,14 @@
+{
+  "id": "B-01",
+  "title": "The running example: a ledger",
+  "group": "Basics",
+  "about": "A small ledger with a closure, a getter, a throw and a job, compiled with every default; the book's running example.",
+  "tries": [
+    "Walk me through what each pass did to deposit",
+    "Why does total need three root slots?",
+    "Which operations could the optimiser not erase, and why?"
+  ],
+  "view": { "fn": "deposit", "level": "L1", "tab": "ir", "overlays": ["safepoints"], "mode": "spec", "gc": "off" },
+  "chapters": [1],
+  "docs": ["workbench-tour"]
+}

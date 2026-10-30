@@ -1,0 +1,14 @@
+{
+  "id": "E-05",
+  "title": "Admission refuses",
+  "group": "Engine",
+  "about": "Four things an engine must not run, each refused with a reason before any code runs; the fifth admitted for contrast.",
+  "tries": [
+    "Why does the engine refuse a correct program compiled with stackReuse?",
+    "What does ranCode: false promise?",
+    "Should an engine compile sources itself on admission? Argue both sides."
+  ],
+  "view": { "fn": "main", "level": "L1", "tab": "experiments", "overlays": [], "mode": "spec", "gc": "off" },
+  "chapters": [18],
+  "docs": ["lts"]
+}

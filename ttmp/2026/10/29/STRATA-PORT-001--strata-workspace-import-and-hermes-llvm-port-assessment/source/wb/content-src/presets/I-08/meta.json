@@ -1,0 +1,14 @@
+{
+  "id": "I-08",
+  "title": "Captured variables stay cells",
+  "group": "IR",
+  "about": "A counter whose closure writes a shared cell, and the per-iteration let of a for loop: what promotion must leave alone.",
+  "tries": [
+    "Why may the load of n after inc() not be forwarded?",
+    "How does the frontend give each turn of the loop its own i?",
+    "What would change if inc only read n?"
+  ],
+  "view": { "fn": "makeCounter", "level": "L1", "tab": "events", "overlays": ["roots"], "mode": "spec", "gc": "off" },
+  "chapters": [4],
+  "docs": ["ssa"]
+}

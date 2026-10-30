@@ -1,0 +1,14 @@
+{
+  "id": "I-06",
+  "title": "Every variable a cell",
+  "group": "IR",
+  "about": "The frontend's output before promotion: one cell per binding, closures that receive cells, and what promotion keeps.",
+  "tries": [
+    "Why does a var start as undefined but a let as an empty cell?",
+    "Which cells of account does pay share with canPay?",
+    "Could c_canPay6 be removed without changing the program?"
+  ],
+  "view": { "fn": "account", "level": "L1.cells", "tab": "ir", "overlays": [], "mode": "spec", "gc": "off" },
+  "chapters": [4],
+  "docs": ["ssa"]
+}

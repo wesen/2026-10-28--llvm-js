@@ -1,0 +1,75 @@
+{
+  "normal": {
+    "checks": 76,
+    "normal_executions": 72,
+    "expected_language_errors": 4,
+    "runtimeLibraries": {
+      "lib/libshllvm_runtime.a": "c13c7ab2bc4357670deaa8e588d0f0c18a7b2172766f066fb6446ad9978e0e18",
+      "lib/libhermesvm.so": "5e24838fbcb07dd36c6d8baadae26df880f83ca4e7b77da04220a57b8f37227d",
+      "tools/shermes/libshermes_console.so": "03569f41f29a0970afc2da807eba7372e99a8a96a67a0b237f51321fc6f7b27b"
+    }
+  },
+  "stress": {
+    "checks": 76,
+    "normal_executions": 72,
+    "expected_language_errors": 4,
+    "runtimeLibraries": {
+      "lib/libshllvm_runtime.a": "7e2dfac8245beff79c64f7a2990f9375705a768fdcbee58381804039041af960",
+      "lib/libhermesvm.so": "789d16aed56ea62a21c51e6c42abdf3374e16dfb45e18d203fdb0a4e3d13654d",
+      "tools/shermes/libshermes_console.so": "6cab825f44e5a6f3630ee1a8a91ea1a094b60a66a1a68e6ca2a990700f08b11d"
+    }
+  },
+  "wide": {
+    "name": "main",
+    "rootSlots": 12,
+    "argumentSlots": 1,
+    "valueSlots": 2,
+    "ssaValues": 1201,
+    "livenessRounds": 1
+  },
+  "compilerInputs": {
+    "src/frontend.js": "8974b28f5cdfa8a7374c1837cb24cbb7066f74cf9345984965a95c4df55be442",
+    "vendor/acorn.js": "fc3ed7b81e58464715d0291402892f22c3d86ea75302645a330390f85d8015c9",
+    "src/core/00-prelude.js": "c2f4164be9b9be8e1ce328f6d41f3d850944a39f9d6ddcfc3fc0f87e60dd1d1d",
+    "src/core/10-effects.js": "7cebd932fcaabfb56f5df64b3583efc2247644f5e5ab04ae8d32139c4f3fe156",
+    "src/core/20-ops.js": "73d4a54abf5d2c8dcacab998f2be7a1eabc5612d1c7607d26ccc6948a3365c4a",
+    "src/core/30-ir.js": "76a4888f0f176d7e5429cd71e976d566a11c8a6d7bb42a2581def098eadfb863",
+    "src/core/40-machine.js": "ce1ea708b4bf9a49a5a682dc4adf0008f174612a789a56b407636cb0548559ac",
+    "src/core/50-analysis.js": "6e2ee99fa295e182288144eeb536e816b2ab0f06de77291b351a0be388f90f10",
+    "src/core/60-rewrite.js": "e32faf7f42aabd2e01062a84274ea06ffc3ecad45f1d3c5947e0c8e5d66fb14e",
+    "src/core/70-lower.js": "23bded41b6e5fcaa57f7bd284bccbb8663e6988546f58ef3b67cee785d588d37",
+    "src/core/80-pipeline.js": "6e6c6e44833951d48f6af9a6b1fd7918fab0f576e2f75d9f87fb952c7e09d41b",
+    "src/core/90-engine.js": "b27a5861104bc3434357080dfb47b4b04d17eaec2ef0a94d979390f347fdce08",
+    "native/abi.js": "d56b5ed93f43384b5520b4d43c7cf17e493794997984210d63be302fdbf88a8f",
+    "native/emitter.js": "aa560bf7ac9f7d77517f66709cbe4ba4efe54b2c2a15c40e2dd0043278aac8fd",
+    "native/frontend.js": "142d9bdc0df64e26a5ac35870308ccc932b791b3a76d143675c90d6cf5c29955",
+    "native/roots.js": "e62c0ac0a37a503fe51cc0ad3274bb467c8c77f2e0399f6a0e9112f7c7a9a28a",
+    "tools/build-engine.js": "7011d7fa1e79a54c04bfdda01256b6eade106eea0b4b3dc4b5c2f5f04a4b7644",
+    "tools/strata-native.js": "a8842bc3ae153ec7fab7264f0c023ee4dbbbd3550f8f0ff5d1f81b1bed178900"
+  },
+  "boundaries": {
+    "unsupported_contexts": 8,
+    "parse_errors": 1
+  },
+  "root_assignment_negative": "colliding assignment rejected",
+  "driver_checks": "failed compile preserves all five artifacts; source collision and invalid optimization rejected",
+  "gc_negative": {
+    "control": {
+      "status": 0,
+      "stdout": "42\n"
+    },
+    "mutation": "native registered root count set to zero",
+    "mutant": {
+      "status": 1,
+      "signal": null,
+      "asan": true
+    },
+    "buildDir": "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-strata-gcstress",
+    "runtimeLibraries": {
+      "lib/libshllvm_runtime.a": "7e2dfac8245beff79c64f7a2990f9375705a768fdcbee58381804039041af960",
+      "lib/libhermesvm.so": "789d16aed56ea62a21c51e6c42abdf3374e16dfb45e18d203fdb0a4e3d13654d",
+      "tools/shermes/libshermes_console.so": "6cab825f44e5a6f3630ee1a8a91ea1a094b60a66a1a68e6ca2a990700f08b11d"
+    },
+    "diagnostic": "AddressSanitizer SEGV/invalid read in JSObject::defineOwnPropertyInternal; not labeled heap-use-after-free"
+  }
+}

@@ -1,0 +1,10 @@
+; Uses the three operations main.js registers. b and c are never used.
+fn main() -> number {
+entry:
+  a = c05.square(7)
+  b = c05.square(a)
+  c = c05.lying_square(3)
+  d = c05.honest_square(4)
+  host.print(a)
+  return a
+}

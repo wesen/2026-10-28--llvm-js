@@ -1,0 +1,4 @@
+{ "id": "I-01", "title": "Test fixture: a loop", "group": "IR", "about": "a loop with two allocations (shell test fixture)",
+  "tries": ["Why is v8 not erased?", "Run in Plan mode with GC stress"],
+  "view": { "fn": "total", "level": "L1", "tab": "notes", "overlays": ["live", "safepoints", "path", "exceptional", "stale"] },
+  "chapters": [1], "docs": ["fixture-doc"] }

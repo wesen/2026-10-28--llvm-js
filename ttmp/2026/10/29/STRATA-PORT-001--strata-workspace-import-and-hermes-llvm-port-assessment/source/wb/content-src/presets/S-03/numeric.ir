@@ -1,0 +1,15 @@
+// Core IR: numbers, a loop, a print. Nothing here can run user code.
+fn sumTo(n: number) -> number {
+entry:
+  jump loop(0, 1)
+loop(s: number, i: number):
+  c = num.le(i, n)
+  branch c, body(s, i), done(s)
+body(s1: number, i1: number):
+  s2 = num.add(s1, i1)
+  i2 = num.add(i1, 1)
+  jump loop(s2, i2)
+done(r: number):
+  host.print(r)
+  return r
+}

@@ -1,0 +1,11 @@
+{
+  "id": "M-01",
+  "title": "Laws as tests",
+  "group": "Method",
+  "about": "Twelve of the engine's own laws run as a test suite; floating-point associativity fails on purpose, with its counterexample.",
+  "tries": ["Why does associativity fail for num.add but hold for i32.add?", "Which part of the engine depends on monotone(liveness)?", "Write a law that meet is below both arguments"],
+  "view": { "tab": "laws" },
+  "chapters": [19],
+  "docs": ["property-testing"],
+  "expect": { "lawsFail": true }
+}

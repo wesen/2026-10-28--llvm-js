@@ -1,0 +1,11 @@
+{
+  "id": "M-02",
+  "title": "Fuzzing a pipeline",
+  "group": "Method",
+  "about": "Four refinement laws on 20 generated programs each: the pipelines and root strategies hold, naive DCE fails on the first program.",
+  "tries": ["Why does naive DCE fail on the very first generated program?", "What does a pipeline law check that a rewrite law does not?", "How many programs would catch a broken root strategy?"],
+  "view": { "tab": "laws" },
+  "chapters": [19],
+  "docs": ["property-testing", "refinement"],
+  "expect": { "lawsFail": true }
+}

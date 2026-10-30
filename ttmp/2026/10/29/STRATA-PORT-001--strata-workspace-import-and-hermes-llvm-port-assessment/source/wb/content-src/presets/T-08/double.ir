@@ -1,0 +1,7 @@
+; One doubling, for a pair of rewrites that undo each other.
+fn twice(a: number) -> number {
+entry:
+  v1 = num.mul(a, 2)
+  host.print(v1)
+  return v1
+}

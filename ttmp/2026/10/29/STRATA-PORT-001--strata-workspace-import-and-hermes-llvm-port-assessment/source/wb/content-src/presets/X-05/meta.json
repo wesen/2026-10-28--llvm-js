@@ -1,0 +1,11 @@
+{
+  "id": "X-05",
+  "title": "Your own metric",
+  "group": "Experiments",
+  "about": "Two metrics written in main.js, safepoints and frame bytes, registered with g.metric and used to rank a search.",
+  "tries": ["Which two safepoints do the standard rewrites remove?", "Why is the arena's frame bytes figure not stack space?", "Write a metric that counts cell loads"],
+  "view": { "fn": "total", "level": "L1", "tab": "experiments", "overlays": ["safepoints"], "mode": "plan", "gc": "stress" },
+  "chapters": [20],
+  "docs": ["design-spaces"],
+  "expect": { "compile": "ok" }
+}

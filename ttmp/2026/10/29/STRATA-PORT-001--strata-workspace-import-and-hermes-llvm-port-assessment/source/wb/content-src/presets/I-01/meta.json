@@ -1,0 +1,14 @@
+{
+  "id": "I-01",
+  "title": "Core IR by hand",
+  "group": "IR",
+  "about": "fib, a branch and merge, and direct calls written with the g.fn builder: blocks, terminators and block parameters.",
+  "tries": [
+    "Add a block to fib that returns early when n is 0",
+    "Why are the parameters of body called i1, a1 and b1?",
+    "Write sum(n) with the builder, in the style of fib"
+  ],
+  "view": { "fn": "fib", "level": "L1", "tab": "ir", "overlays": [], "mode": "spec", "gc": "off" },
+  "chapters": [3],
+  "docs": ["ssa"]
+}

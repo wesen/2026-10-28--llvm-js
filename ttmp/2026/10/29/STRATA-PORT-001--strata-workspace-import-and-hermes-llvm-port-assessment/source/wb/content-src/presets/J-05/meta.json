@@ -1,0 +1,11 @@
+{
+  "id": "J-05",
+  "title": "An event queue",
+  "group": "JavaScript scenarios",
+  "about": "Timers, microtasks and promise reactions in one script: the output order is an observation the engine must keep.",
+  "tries": ["Explain why then 2 prints after 4 notes so far", "Which operations put work on a queue, and are they safepoints?", "What would reordering two enqueues break?"],
+  "view": { "fn": "main", "level": "L1", "tab": "events", "overlays": ["safepoints"], "mode": "spec", "gc": "off" },
+  "chapters": [17],
+  "docs": ["jobs"],
+  "expect": { "compile": "ok" }
+}

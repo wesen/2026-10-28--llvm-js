@@ -1,0 +1,20 @@
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+==3237860==ERROR: AddressSanitizer: SEGV on unknown address 0x000000000034 (pc 0x79797f5d1eba bp 0x7ffc2fc3c890 sp 0x7ffc2fc3c7e0 T0)
+==3237860==The signal is caused by a READ memory access.
+==3237860==Hint: address points to the zero page.
+    #0 0x79797f5d1eba in hermes::vm::JSObject::defineOwnPropertyInternal(hermes::vm::Handle<hermes::vm::JSObject>, hermes::vm::Runtime&, hermes::vm::SymbolID, hermes::vm::DefinePropertyFlags, hermes::vm::Handle<hermes::vm::HermesValue>, hermes::vm::PropOpFlags) (/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-strata-gcstress/lib/libhermesvm.so+0x7d1eba) (BuildId: 84fdeff08e5d7a948d63842fdd0a0670af0ddc40)
+    #1 0x79797f5cea87 in hermes::vm::JSObject::defineOwnComputedPrimitive(hermes::vm::Handle<hermes::vm::JSObject>, hermes::vm::Runtime&, hermes::vm::Handle<hermes::vm::HermesValue>, hermes::vm::DefinePropertyFlags, hermes::vm::Handle<hermes::vm::HermesValue>, hermes::vm::PropOpFlags) (/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-strata-gcstress/lib/libhermesvm.so+0x7cea87) (BuildId: 84fdeff08e5d7a948d63842fdd0a0670af0ddc40)
+    #2 0x79797f6a8bac in _sh_ljs_define_own_by_val (/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-strata-gcstress/lib/libhermesvm.so+0x8a8bac) (BuildId: 84fdeff08e5d7a948d63842fdd0a0670af0ddc40)
+    #3 0x578935e73e55 in f0 mutant.ll
+    #4 0x79797f6c871a in sh_unit_run(SHRuntime*, SHUnit*) StaticHUnit.cpp
+    #5 0x79797f6c7913 in _sh_unit_init_guarded (/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-strata-gcstress/lib/libhermesvm.so+0x8c7913) (BuildId: 84fdeff08e5d7a948d63842fdd0a0670af0ddc40)
+    #6 0x79797f6c7294 in _sh_initialize_units (/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-strata-gcstress/lib/libhermesvm.so+0x8c7294) (BuildId: 84fdeff08e5d7a948d63842fdd0a0670af0ddc40)
+    #7 0x578935e768e6 in shllvm_run (/tmp/strata-gc-negative/mutant+0x10a8e6) (BuildId: 5415b38614e4ef7d2583975aefcae51017406e39)
+    #8 0x79797ea2a1c9 in __libc_start_call_main csu/../sysdeps/nptl/libc_start_call_main.h:58:16
+    #9 0x79797ea2a28a in __libc_start_main csu/../csu/libc-start.c:360:3
+    #10 0x578935d9a924 in _start (/tmp/strata-gc-negative/mutant+0x2e924) (BuildId: 5415b38614e4ef7d2583975aefcae51017406e39)
+
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV (/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-strata-gcstress/lib/libhermesvm.so+0x7d1eba) (BuildId: 84fdeff08e5d7a948d63842fdd0a0670af0ddc40) in hermes::vm::JSObject::defineOwnPropertyInternal(hermes::vm::Handle<hermes::vm::JSObject>, hermes::vm::Runtime&, hermes::vm::SymbolID, hermes::vm::DefinePropertyFlags, hermes::vm::Handle<hermes::vm::HermesValue>, hermes::vm::PropOpFlags)
+==3237860==ABORTING

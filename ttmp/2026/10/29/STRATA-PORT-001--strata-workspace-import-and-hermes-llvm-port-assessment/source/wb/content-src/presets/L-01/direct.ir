@@ -1,0 +1,13 @@
+// Direct calls: core.call names its callee, so no closure and no frame lookup.
+fn main() -> number {
+entry throws unwind:
+  v1 = core.call(@square, 7)
+  host.print(v1)
+  return v1
+}
+
+fn square(x: number) -> number {
+entry:
+  v1 = num.mul(x, x)
+  return v1
+}

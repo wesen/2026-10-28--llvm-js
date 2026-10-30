@@ -1,0 +1,18 @@
+// The dominance example, fixed: the merge receives the value as a block parameter.
+fn main() -> number {
+entry throws unwind:
+  a = core.call(@fixed, true, 4)
+  b = core.call(@fixed, false, 4)
+  host.print(a, b)
+  return a
+}
+
+fn fixed(c: boolean, x: number) -> number {
+entry:
+  branch c, left(), join(x)
+left():
+  y = num.add(x, 1)
+  jump join(y)
+join(r: number):
+  return r
+}

@@ -1,0 +1,11 @@
+{
+  "id": "M-06",
+  "title": "The process as a value",
+  "group": "Method",
+  "about": "Two plans for porting the ledger, written as processes and checked for missing outputs and unresolved alternatives.",
+  "tries": ["What does the hurried plan skip, and what goes wrong because of it?", "Make the hurried plan pass with as few steps as possible", "Write a process for adding an operation to the core set"],
+  "view": { "tab": "experiments" },
+  "chapters": [21],
+  "docs": ["design-spaces"],
+  "expect": {}
+}

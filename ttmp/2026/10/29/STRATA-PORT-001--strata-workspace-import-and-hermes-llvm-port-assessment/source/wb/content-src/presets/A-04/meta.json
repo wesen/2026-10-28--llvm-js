@@ -1,0 +1,15 @@
+{
+  "id": "A-04",
+  "title": "Your own analysis: constants",
+  "group": "Analysis",
+  "about": "Constant propagation written in main.js with a flat map lattice and an edge rule, then used by a rewrite of our own.",
+  "tries": [
+    "Why is r a constant although one path computes it and the other passes a literal?",
+    "Is this transfer function monotone? Argue it",
+    "Extend the analysis to num.div"
+  ],
+  "view": { "fn": "calc", "level": "L1", "tab": "experiments", "overlays": [], "mode": "spec", "gc": "off" },
+  "chapters": [8],
+  "docs": ["lattices"],
+  "expect": { "compile": "ok" }
+}

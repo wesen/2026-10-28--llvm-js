@@ -24,9 +24,13 @@ The [assessment](analysis/01-workspace-inventory-and-hermes-llvm-port-findings.m
 
 Read the [imported intern guide](reference/02-imported-strata-hermes-llvm-intern-guide.md). The full ZIP is preserved under `archive/strata-workspace-full.zip`; the extracted tree is `source/`. Recreate it with `python3 scripts/01-import-workspace.py` from this ticket directory. Hashes are in `reference/import-manifest.json`; the [diary](reference/01-import-and-investigation-diary.md) records the investigation.
 
+## Native implementation
+
+The user selected the Strata-first direction. Read the [native design and intern guide](design-doc/01-strata-first-native-compiler-design-and-intern-implementation-guide.md). Working implementation lives in repository `strata/`; `source/` remains the unchanged imported reference workspace. The diary and evidence distinguish normal execution, aggressive GC runs, expected language errors, and unsupported-context rejections.
+
 ## Overview
 
-Import and inspection are complete. The native port remains proposed. The archive contains both an older Hermes-emitter improvement plan and a later Strata-first plan; the assessment distinguishes them and identifies integration corrections before any implementation.
+Import and inspection are complete. The initial Strata-first native subset is implemented; qualification is recorded in the diary. The archive contains both an older Hermes-emitter improvement plan and a later Strata-first plan; the assessment distinguishes them and identifies integration corrections before any implementation.
 
 ## Key Links
 
@@ -58,3 +62,5 @@ See [changelog.md](./changelog.md) for recent changes and decisions.
 - scripts/ - Temporary code and tooling
 - various/ - Working notes and research
 - archive/ - Deprecated or reference-only artifacts
+
+Imported implementation and authored documentation are tracked under `source/wb/src/`, `source/wb/content-src/`, `source/exports/`, and `source/strata-api/`. Build tools and test content are also preserved there. Generated websites and other assets can be reconstructed from the committed ZIP.

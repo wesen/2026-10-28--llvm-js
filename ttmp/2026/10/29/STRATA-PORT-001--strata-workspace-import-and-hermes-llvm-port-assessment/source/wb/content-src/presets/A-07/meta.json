@@ -1,0 +1,15 @@
+{
+  "id": "A-07",
+  "title": "Monotone or not",
+  "group": "Analysis",
+  "about": "g.law.monotone passes the honest liveness and catches a 'register budget' variant whose solve silently goes wrong.",
+  "tries": [
+    "Explain the monotonicity counterexample",
+    "Why did the solver stop with a wrong answer instead of failing?",
+    "Write a monotone but unsound transfer function and catch it"
+  ],
+  "view": { "fn": "total", "level": "L1", "tab": "laws", "overlays": ["live"], "mode": "spec", "gc": "off" },
+  "chapters": [8],
+  "docs": ["liveness", "lattices"],
+  "expect": { "compile": "ok", "lawsFail": true }
+}

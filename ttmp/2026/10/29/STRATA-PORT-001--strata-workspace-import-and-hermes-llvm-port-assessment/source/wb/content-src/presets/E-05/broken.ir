@@ -1,0 +1,14 @@
+// v1 is defined only on the left path but used after the join: the verifier refuses it.
+fn main(a: number) -> number {
+entry:
+  v0 = num.lt(a, 1)
+  branch v0, left(), right()
+left():
+  v1 = num.add(a, 1)
+  jump join()
+right():
+  jump join()
+join():
+  host.print(v1)
+  return v1
+}

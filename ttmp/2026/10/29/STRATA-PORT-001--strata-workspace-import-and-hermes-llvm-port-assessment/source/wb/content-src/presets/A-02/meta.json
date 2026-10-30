@@ -1,0 +1,15 @@
+{
+  "id": "A-02",
+  "title": "Liveness, one step at a time",
+  "group": "Analysis",
+  "about": "The solver computes liveness for the ledger's total loop in eight visits; replay each one on the Stage.",
+  "tries": [
+    "Walk me through step 6 of the liveness solve",
+    "Why is sum3_1 not live across the js.add in body2?",
+    "How does the edge rule handle block parameters?"
+  ],
+  "view": { "fn": "total", "level": "L1", "tab": "facts", "overlays": ["live", "iteration"], "mode": "spec", "gc": "off" },
+  "chapters": [8, 9],
+  "docs": ["liveness", "lattices"],
+  "expect": { "compile": "ok" }
+}

@@ -1,0 +1,11 @@
+{
+  "id": "J-06",
+  "title": "Recursion",
+  "group": "JavaScript scenarios",
+  "about": "Recursive functions through a cell, the cost of one frame times the depth of the stack, and the interpreter's 300-frame limit.",
+  "tries": ["Why does fib load its own cell twice?", "How big is the stack at the deepest point of countDown?", "Which values must survive the recursive calls in depthSum?"],
+  "view": { "fn": "fib", "level": "L1", "tab": "plan", "overlays": ["safepoints", "roots"], "mode": "plan", "gc": "off" },
+  "chapters": [2, 13],
+  "docs": ["gc-roots"],
+  "expect": { "compile": "ok" }
+}

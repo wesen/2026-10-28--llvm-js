@@ -137,3 +137,93 @@ Review strata/native, tools/strata-native.js and test/native.test.js. Run the di
 
 ### Technical details
 Native compilation reads sanitizer configuration from the selected CMake cache. The current cache enables neither sanitizer. Every fixture compiles with the Strata frontend and cell promotion, with no speculative rewriting or type-based root omission.
+
+## Step 5: Root reuse, imported applications and frontend corrections
+
+Added full-lifetime root interference and a separate assignment checker. The expanded ledger/J corpus passed 68/68 checks with both distinct and reused storage at O0/O2, including expected-error J-07. A generated 1,200-value function was rejected with distinct storage but executed with 12 roots plus one argument slot under reuse, printing 1200. Subsequent receiver/profile review exposed a new strictness-metadata bug, recorded below and corrected before final validation.
+
+### Prompt Context
+See Step 3.
+
+### What I did
+Added native/roots.js, root-assignment negative checks, a wide-function probe, eight unchanged J fixtures and the ledger. Corrected method lookup to precede argument evaluation, separated EMPTY from legitimate undefined in TDZ storage, rejected unsupported async/generator declarations and direct eval, and added strict/sloppy receiver and global-typeof handling. Added explicit collection fixtures and configured a separate ASan plus handle-sanitizing runtime build.
+
+### Why
+Safepoint-only coloring cannot safely assign permanent homes: noncollecting lifetimes and helper output writes also conflict. The differential corpus needs to classify intentional errors separately. Frontend shortcuts become externally visible once the model runs against the real JavaScript runtime.
+
+### What worked
+The imported ledger and eight J programs passed the 68-case campaign, including the original uncaught error in J-07. The root checker rejects an intentionally colliding assignment. Wide execution prints 1200 with two SSA value slots and ten fixed/literal/global homes. The existing runtime bridge remained unchanged.
+
+### What didn't work
+The first imported runner aborted at J-07 with `AssertionError ... Error: missing field price` because it assumed every fixture exits successfully. Updated it to require the expected error message and failure exit while preserving preceding stdout. Source review found the initial TDZ mask would reject legitimate undefined; changed uninitialized cells to SHLLVM_EMPTY and check mask 1, with a regression.
+
+After adding strict writes, the next campaign reported 36/72 passed and repeated `Cannot read properties of undefined (reading 'strict')`. Assignment targets are not all present in the frontend's scope map. Strictness is a function-level property here, so emission now reads `this.fn.meta.strict` rather than assuming every target has scope metadata. The failed receipt is retained. Final results must come from the corrected campaign, not this checkpoint.
+
+The first stress build target built only the static bridge, not its managed-runtime dependencies. Started explicit hermesvm and shermes_console targets in tmux. No stress result is claimed until those libraries finish and programs execute.
+
+### What I learned
+The runtime's SHLLVM_UNINIT maps to undefined for particular inherited lowering conventions; Strata requires an unambiguous EMPTY sentinel for its cell model. Source metadata ownership is easier to maintain on the function than on every assignment AST node.
+
+### What was tricky to build
+The allocator handles parallel block transfers, function/block parameter writes, exceptional live values and result/operand conflicts. Constants and scratch homes remain separate. Handler liveness is conservatively included for every operation rather than relying on the imported effect annotations to exclude throws.
+
+### What warrants a second pair of eyes
+Review root interference around exceptional edges, source binding/receiver semantics, intentional library/subset boundaries, and whether stress negative controls actually force a relevant collection. The assignment checker checks allocation against recomputed requirements; it is not an independent proof that the liveness equations model every runtime obligation.
+
+### What should be done in the future
+Finish corrected native/stress validation, record configuration identities, complete CLI boundary and publication checks, and document the admitted profile precisely.
+
+### Code review instructions
+Inspect native/roots.js, frontend changes, and the new fixture sources. Run roots.test.js and boundaries.test.js, then native.test.js with the plain and stress runtime builds. Read the failed and successful receipts separately.
+
+### Technical details
+The stress build uses clang-18, Release O1 runtime compilation, HERMESVM_SANITIZE_HANDLES=ON and HERMES_ENABLE_ADDRESS_SANITIZER=ON. The normal build remains unchanged. The native test runner supports explicit build directories and a stress mode that passes -gc-sanitize-handles=1.
+
+## Step 6: Complete native qualification and GC negative control
+
+The final frozen compiler passed 76/76 checks on the normal runtime and 76/76 on a separately built ASan and handle-sanitizing runtime. Each matrix has 72 normal executions and four expected uncaught-error checks. All 152 build receipts have identical compiler-input fingerprints; delivered fixture hashes match their inputs. The first compiler milestone was committed as `62ee096`.
+
+### Prompt Context
+See Step 3 for the implementation and reference-source requests.
+
+### What I did
+Finished the supported-profile review, added receiver and explicit-collection cases, added rejection contracts for missing frontend behavior, and improved output publication/identity records. Made engine assembly publish via process-specific temporary files and rename so independent compiler processes cannot read partially generated modules. Ran the final plain and stress matrices in separate output directories. Recorded compressed receipts, a qualification summary, and the exact GC-negative diagnostic. Added run/build instructions and the implemented status to the guide.
+
+### Why
+A useful native compiler must demonstrate actual machine-code execution and collection safety for its admitted profile. Documentation must separate source limitations, expected language errors, and unsafe-root detection rather than combining them into a single success count. Fingerprints establish which code and runtime produced these results.
+
+### What worked
+- `node strata/test/native.test.js /tmp/strata-final-normal`: 76/76 passed.
+- `node strata/test/native.test.js /tmp/strata-final-stress hermes/build-strata-gcstress stress`: 76/76 passed, passing `-gc-sanitize-handles=1` to every executable.
+- `node strata/test/boundaries.test.js`: eight unsupported-context contracts and one parse-error contract passed.
+- `node strata/test/roots.test.js`: corrupt allocation rejected, distinct wide-function admission rejected, reuse assigned two SSA homes and 12 total roots.
+- `/tmp/strata-wide`: printed 1200 at LLVM O2.
+- `node strata/test/driver.test.js`: failed compilation preserved five existing artifacts; source/output collision and invalid optimization were rejected; identity metadata was present.
+- `node strata/test/gc-negative.test.js`: valid control printed 42; root-hidden mutation failed with an AddressSanitizer invalid read.
+- Import verification still matched all 1,083 reference files.
+
+### What didn't work
+An early description called the GC-negative report a heap-use-after-free before inspecting its exact category. Corrected immediately: the actual report is `AddressSanitizer: SEGV on unknown address ...`, a read in `JSObject::defineOwnPropertyInternal`. The retained stderr is authoritative. The guide and final report use the actual category.
+
+The first stress pass overlapped formatting of the CLI; no semantics changed, but those input identities were not treated as final. Repeated the qualification after source changes stopped, then verified fingerprint equality across both final matrices. No leak-check disabling was necessary in the successful stress run.
+
+### What I learned
+The existing bridge can execute independent Strata output under aggressive handle sanitization without changes to Hermes source. Root reuse substantially reduces a sequential program's frame, but constants and genuinely overlapping values remain bounded. Named function-expression self identity and implicit arguments need deliberate lowering, so the native profile rejects them rather than inheriting incorrect model behavior.
+
+### What was tricky to build
+The native compiler now separates frontend semantics, root allocation, ABI calls, and tool orchestration. This prevents the educational LLVM printer or unproven type facts from silently governing native memory safety. Manifests hash runtime shared libraries as well as the bridge, since hashing only the static bridge would miss a changed collector.
+
+### What warrants a second pair of eyes
+Review the remaining array-only iteration and fixed host-global assumptions before expanding the profile. Inspect root liveness equations and exceptional transfers independently of the passing corpus. The GC-negative mutation establishes detector activity for this concrete program, not universal detection completeness.
+
+### What should be done in the future
+Expand source constructs and iterator semantics based on real application failures, reduce constant-root pressure if measurements justify it, and decide whether to integrate Strata-generated units into the existing in-process JIT. ABI version negotiation, a replacement runtime/collector, and speculative tiers remain separate future work.
+
+### Code review instructions
+Read strata/README.md and guide section 13; inspect native/roots.js and emitter.js, then the frontend diffs. The final receipts are reference/evidence/final-native-normal.json.gz and final-native-stress.json.gz, summarized by native-qualification-summary.json. Run scripts/02-collect-native-evidence.py after reproducing the recorded output directories to verify identities.
+
+### Technical details
+Both root policies and LLVM O0/O2 are covered. The stress runtime uses HERMESVM_SANITIZE_HANDLES=ON, HERMES_ENABLE_ADDRESS_SANITIZER=ON, and runtime probability one. The runtime is ASan-instrumented; complete instrumentation of generated LLVM bodies is not asserted. Current root storage remains native-stack based under the 1,024 combined-slot bound. No runtime/frontend Hermes source changes were needed.
+
+### Delivery and reference preservation
+The validated guide uploaded successfully as `STRATA-PORT-001 Strata First Native Compiler Validated Guide.pdf` under `/ai/2026/10/29/STRATA-PORT-001`; the upload receipt is retained in reference/03-native-guide-delivery.txt. Imported implementation, authored documentation, source examples, and build tools are tracked verbatim under source/. Generated websites and remaining assets remain reconstructable from the preserved ZIP. This keeps the requested reference material directly readable in Git while retaining the complete original release.

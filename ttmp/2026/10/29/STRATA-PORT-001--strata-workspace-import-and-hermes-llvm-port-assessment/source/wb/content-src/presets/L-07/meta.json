@@ -1,0 +1,14 @@
+{
+  "id": "L-07",
+  "title": "The 1,024-slot frame",
+  "group": "Lowering",
+  "about": "A function whose objects all stay live: its frame is n + 3 slots, measured, against the native frame limit and a g.limit check.",
+  "tries": [
+    "Why can stackReuse not share the slots of o11 to o18?",
+    "At what n would wide exceed the 1,024-slot limit, and how do you know?",
+    "How does the arena strategy change what is limited?"
+  ],
+  "view": { "fn": "wide", "level": "L3", "tab": "plan", "overlays": ["safepoints", "roots"], "mode": "spec", "gc": "off" },
+  "chapters": [13],
+  "docs": ["gc-roots", "hermes-llvm"]
+}

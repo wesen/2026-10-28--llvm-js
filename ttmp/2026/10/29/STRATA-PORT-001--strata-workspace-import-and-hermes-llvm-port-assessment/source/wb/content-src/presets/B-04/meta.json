@@ -1,0 +1,14 @@
+{
+  "id": "B-04",
+  "title": "Reading the Stage",
+  "group": "Basics",
+  "about": "Blocks, edges, exceptional edges, overlays and the Inspector, on a loop with a try inside.",
+  "tries": [
+    "Why does catch5 have a parameter?",
+    "Which values share root slot 2 in tally, and why may they?",
+    "Explain every dashed edge on the Stage"
+  ],
+  "view": { "fn": "tally", "level": "L1", "tab": "plan", "overlays": ["exceptional", "safepoints"], "mode": "plan", "gc": "stress" },
+  "chapters": [1],
+  "docs": ["workbench-tour", "exceptions"]
+}

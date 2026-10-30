@@ -1,0 +1,11 @@
+{
+  "id": "M-03",
+  "title": "Shrinking a counterexample",
+  "group": "Method",
+  "about": "A nine-statement failure shrunk twice: a loose predicate finds a different bug, a strict one keeps the getter.",
+  "tries": ["Why does the loose shrink end with a ReferenceError?", "Write a predicate that keeps the failure in the finally line", "How many runs did each shrink cost?"],
+  "view": { "fn": "main", "level": "L1", "tab": "experiments", "overlays": ["exceptional"], "mode": "spec", "gc": "off" },
+  "chapters": [19],
+  "docs": ["property-testing"],
+  "expect": { "compile": "ok" }
+}

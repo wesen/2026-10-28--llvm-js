@@ -1,0 +1,14 @@
+{
+  "id": "L-06",
+  "title": "Your own root strategy",
+  "group": "Lowering",
+  "about": "Root strategies as lambdas: one that chooses per function and one that forgets a value, both judged by the same checker.",
+  "tries": [
+    "Write a strategy that uses distinct only for functions without loops",
+    "Why does the checker name four sites for the forgotten sum2_1?",
+    "What does ctx.required(site) return at total's js.add?"
+  ],
+  "view": { "fn": "arrow", "level": "L3", "tab": "experiments", "overlays": ["roots"], "mode": "plan", "gc": "stress" },
+  "chapters": [13],
+  "docs": ["gc-roots"]
+}

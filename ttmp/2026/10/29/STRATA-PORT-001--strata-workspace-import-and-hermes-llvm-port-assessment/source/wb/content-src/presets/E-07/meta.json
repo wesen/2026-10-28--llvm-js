@@ -1,0 +1,15 @@
+{
+  "id": "E-07",
+  "title": "A plugin host",
+  "group": "Engine",
+  "about": "Three plugins and a dispatcher in one engine: shared globals, calls across units, a refused plugin, and why code stays retained.",
+  "tries": [
+    "Why can plugin A's code not be released after A's main returns?",
+    "How does B's exception reach the dispatcher's handler?",
+    "Why does the dispatcher fail when run on its own?"
+  ],
+  "view": { "fn": "dispatch", "level": "L1", "tab": "experiments", "overlays": ["exceptional"], "mode": "spec", "gc": "off" },
+  "chapters": [18],
+  "docs": ["lts"],
+  "expect": { "outcome": "throw" }
+}

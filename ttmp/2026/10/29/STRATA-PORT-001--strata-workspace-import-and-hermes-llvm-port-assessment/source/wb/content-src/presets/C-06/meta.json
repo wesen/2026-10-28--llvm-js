@@ -1,0 +1,15 @@
+{
+  "id": "C-06",
+  "title": "Variants and narrowing",
+  "group": "Contracts",
+  "about": "js.add narrows to num.add or str.concat where typeof has proved the operand types; g.law.variant checks the variants.",
+  "tries": [
+    "Why does the third + stay js.add?",
+    "Why is i32.add not a variant of num.add?",
+    "What does narrowing change in L2 and L3?"
+  ],
+  "view": { "fn": "describe", "level": "L1", "tab": "events", "overlays": ["types"], "mode": "spec", "gc": "off" },
+  "chapters": [7, 12],
+  "docs": ["type-facts", "effects"],
+  "expect": { "compile": "ok", "lawsFail": true }
+}

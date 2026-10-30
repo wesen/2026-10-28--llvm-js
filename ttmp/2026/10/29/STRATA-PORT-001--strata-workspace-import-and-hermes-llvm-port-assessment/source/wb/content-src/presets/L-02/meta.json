@@ -1,0 +1,14 @@
+{
+  "id": "L-02",
+  "title": "Representations",
+  "group": "Lowering",
+  "about": "Tagged 64-bit words against unboxed f64 and bool, chosen from type facts; what a value's word looks like.",
+  "tries": [
+    "Why does this stay tagged in hyp when everything else is f64?",
+    "What does unboxing a double cost under NaN-boxing?",
+    "Would unboxing change how many root slots label needs?"
+  ],
+  "view": { "fn": "hyp", "level": "L2", "tab": "experiments", "overlays": [], "mode": "spec", "gc": "off" },
+  "chapters": [12],
+  "docs": ["nan-boxing"]
+}

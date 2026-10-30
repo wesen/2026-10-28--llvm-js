@@ -1,0 +1,15 @@
+{
+  "id": "A-05",
+  "title": "Intervals and widening",
+  "group": "Analysis",
+  "about": "An interval analysis on a counting loop: plain, refined on the branch, and widened with thresholds.",
+  "tries": [
+    "Why does the plain version never converge?",
+    "Why is the refined bound 101 and not 99?",
+    "Pick thresholds that make the widened answer exact"
+  ],
+  "view": { "fn": "count", "level": "L1", "tab": "experiments", "overlays": [], "mode": "spec", "gc": "off" },
+  "chapters": [8],
+  "docs": ["lattices"],
+  "expect": { "compile": "ok" }
+}

@@ -1,0 +1,48 @@
+// Two ways to say where a throw goes: an invoke terminator, or a block's exceptional exit.
+fn main() -> any {
+entry throws unwind:
+  good = obj.new()
+  js.define(good, "value", 42)
+  bad = obj.new()
+  thrower = js.closure(@explode)
+  js.define_getter(bad, "value", thrower)
+  quiet = js.closure(@nothing)
+  a = core.call(@readAfterCall, good, quiet)
+  b = core.call(@readAfterCall, bad, quiet)
+  c = core.call(@guarded, good, "fallback")
+  d = core.call(@guarded, bad, "fallback")
+  host.print(a, b, c, d)
+  return a
+}
+
+// invoke: one operation, a normal edge (the result arrives as the first parameter) and a throw edge.
+fn readAfterCall(object: any, callback: any) -> any {
+entry:
+  invoke js.call(callback, undefined) normal afterCall() throw failed()
+afterCall(ignored: any):
+  invoke js.get(object, "value") normal done() throw failed()
+done(value: any):
+  return value
+failed(e: any):
+  return "failed"
+}
+
+// A block-level exit: any throw in entry goes to handler, which gets the thrown value and fallback.
+fn guarded(o: any, fallback: any) -> any {
+entry throws to handler(fallback):
+  v = js.get(o, "value")
+  return v
+handler(e: any, fb: any):
+  return fb
+}
+
+fn explode(this: any) -> any {
+entry throws unwind:
+  err = js.new_error[Error]("getter exploded")
+  throw err
+}
+
+fn nothing(this: any) -> any {
+entry:
+  return undefined
+}

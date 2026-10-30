@@ -1,0 +1,11 @@
+{
+  "id": "J-08",
+  "title": "A generated program",
+  "group": "JavaScript scenarios",
+  "about": "A program written by g.gen.js from seed 1, compiled, run under GC stress, and checked against a rewrite it breaks.",
+  "tries": ["Why does naive DCE change the output of this program?", "Which templates did seed 1 draw, and what does each one test?", "Is there a seed whose program naive DCE does not break?"],
+  "view": { "fn": "main", "level": "L1", "tab": "laws", "overlays": ["safepoints"], "mode": "plan", "gc": "stress" },
+  "chapters": [19],
+  "docs": ["property-testing"],
+  "expect": { "compile": "ok", "lawsFail": true }
+}

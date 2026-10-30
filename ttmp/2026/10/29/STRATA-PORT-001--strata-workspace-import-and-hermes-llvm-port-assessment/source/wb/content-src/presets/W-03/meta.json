@@ -1,0 +1,14 @@
+{
+  "id": "W-03",
+  "title": "Reading WAT",
+  "group": "Backends",
+  "about": "The Collatz loop in Wasm: locals for block parameters, the br_table dispatch, an if per branch, imports for % and print.",
+  "tries": [
+    "Explain how the join at next appears in the WAT",
+    "Why does num.mod become an imported call?",
+    "Which block number does each edge set, and where does it come from?"
+  ],
+  "view": { "fn": "main", "level": "WAT", "tab": "experiments", "overlays": [], "mode": "wasm", "gc": "off" },
+  "chapters": [15],
+  "docs": ["wasm"]
+}

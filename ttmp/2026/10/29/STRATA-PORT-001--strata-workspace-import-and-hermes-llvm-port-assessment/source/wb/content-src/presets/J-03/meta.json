@@ -1,0 +1,11 @@
+{
+  "id": "J-03",
+  "title": "finally with return",
+  "group": "JavaScript scenarios",
+  "about": "A return inside try waits for finally: completion records, the one finally block, and the rethrow.",
+  "tries": ["Walk through withResource for the throwing call", "Why is completion.return a safepoint?", "What changes if finally itself returns?"],
+  "view": { "fn": "withResource", "level": "L1", "tab": "ir", "overlays": ["exceptional"], "mode": "spec", "gc": "off" },
+  "chapters": [5],
+  "docs": ["exceptions"],
+  "expect": { "compile": "ok" }
+}

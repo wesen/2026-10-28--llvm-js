@@ -1,0 +1,14 @@
+{
+  "id": "E-04",
+  "title": "An engine: admit, evaluate, close",
+  "group": "Engine",
+  "about": "One engine through its life: admit the ledger, evaluate, run its jobs, read metrics, close, and fail once closed.",
+  "tries": [
+    "Why is the audit line missing after evaluateScript?",
+    "Why does close destroy the runtime before releasing the code?",
+    "What does admission check, and what does it not check?"
+  ],
+  "view": { "fn": "main", "level": "L1", "tab": "experiments", "overlays": [], "mode": "spec", "gc": "off" },
+  "chapters": [18],
+  "docs": ["lts"]
+}

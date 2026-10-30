@@ -1,0 +1,25 @@
+; main calls calc twice. In calc, constants flow forward and a diamond joins them.
+fn main() -> number {
+entry throws unwind:
+  x = core.call(@calc, 3)
+  y = core.call(@calc, 30)
+  host.print(x, y)
+  return y
+}
+
+fn calc(a: number) -> number {
+entry:
+  v1 = num.add(2, 3)
+  v2 = num.mul(v1, 4)
+  v3 = num.lt(a, 10)
+  branch v3, small(v2), large(v2)
+small(s: number):
+  v4 = num.sub(s, 20)
+  jump done(v4, v1)
+large(l: number):
+  v5 = num.add(l, a)
+  jump done(0, v1)
+done(r: number, k: number):
+  v6 = num.add(r, k)
+  return v6
+}

@@ -1,0 +1,11 @@
+{
+  "id": "X-01",
+  "title": "A design space of pipelines",
+  "group": "Experiments",
+  "about": "Twelve pipelines from three parameters, compiled on the ledger and ranked by root slots in a grid search.",
+  "tries": ["Why do distinct and stackReuse give the same steps but different root slots?", "What does turning promotion off cost the ledger?", "Break the tie between the two 15-slot points"],
+  "view": { "fn": "total", "level": "L3", "tab": "experiments", "overlays": ["roots"], "mode": "plan", "gc": "stress" },
+  "chapters": [20],
+  "docs": ["design-spaces"],
+  "expect": { "compile": "ok" }
+}

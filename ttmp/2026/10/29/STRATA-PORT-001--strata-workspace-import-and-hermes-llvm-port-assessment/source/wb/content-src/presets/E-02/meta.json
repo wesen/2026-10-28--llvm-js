@@ -1,0 +1,14 @@
+{
+  "id": "E-02",
+  "title": "Promises and then",
+  "group": "Engine",
+  "about": "Reactions are jobs: then on a fulfilled promise queues at once, settling a promise queues its reactions, and adoption takes extra turns.",
+  "tries": [
+    "Why does second then print after the plain job?",
+    "How many jobs does adoption take here, and how many does the standard require?",
+    "What does then return, and when is it fulfilled?"
+  ],
+  "view": { "fn": "main", "level": "L1", "tab": "events", "overlays": [], "mode": "spec", "gc": "off" },
+  "chapters": [17],
+  "docs": ["jobs"]
+}

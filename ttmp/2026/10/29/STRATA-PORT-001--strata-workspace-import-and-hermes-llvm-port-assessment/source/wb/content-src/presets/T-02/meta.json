@@ -1,0 +1,15 @@
+{
+  "id": "T-02",
+  "title": "Dead code that is not dead",
+  "group": "Transforms",
+  "about": "naive-dce deletes a getter with a side effect; g.law.refines catches it on this program and on generated ones, and shrinks the witness.",
+  "tries": [
+    "Why is the shrunk counterexample a different bug?",
+    "Write a dead-code rewrite that passes all three laws",
+    "What exactly does g.law.refines compare?"
+  ],
+  "view": { "fn": "main", "level": "L1", "tab": "laws", "overlays": [], "mode": "spec", "gc": "off" },
+  "chapters": [10],
+  "docs": ["rewriting", "refinement"],
+  "expect": { "compile": "ok", "lawsFail": true }
+}

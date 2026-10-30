@@ -1,0 +1,15 @@
+{
+  "id": "T-05",
+  "title": "Forwarding stores to loads",
+  "group": "Transforms",
+  "about": "A captured counter stays a cell; three of its loads are forwarded from the store before them, two stay, each for a reason.",
+  "tries": [
+    "Why is the load after report(second) kept?",
+    "Why does a store to count block a load of report?",
+    "Walk me through the three rounds of forwarding"
+  ],
+  "view": { "fn": "makeCounter", "level": "L1", "tab": "experiments", "overlays": [], "mode": "spec", "gc": "off" },
+  "chapters": [10],
+  "docs": ["rewriting"],
+  "expect": { "compile": "ok" }
+}

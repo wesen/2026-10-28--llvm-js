@@ -1,2 +1,17 @@
-# Recreated from the preserved ZIP by scripts/01-import-workspace.py.
-/source/
+# Reference source and authored documents are tracked verbatim.
+# Generated sites and remaining assets are recreated from the preserved ZIP.
+/source/*
+!/source/wb/
+/source/wb/*
+!/source/wb/src/
+!/source/wb/content-src/
+!/source/wb/test-content/
+!/source/wb/tools/
+!/source/wb/CONTRACT.md
+!/source/wb/package.json
+!/source/exports/
+!/source/strata-api/
+/source/strata-api/*
+!/source/strata-api/README.md
+!/source/strata-api/package.json
+!/source/strata-api/examples/

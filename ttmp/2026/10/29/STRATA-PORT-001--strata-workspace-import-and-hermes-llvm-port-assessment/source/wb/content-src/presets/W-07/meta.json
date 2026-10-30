@@ -1,0 +1,14 @@
+{
+  "id": "W-07",
+  "title": "The structural checker",
+  "group": "Backends",
+  "about": "g.llvm.check on readBoth broken six ways: it catches fall-through, undeclared calls and missing names, not types, dominance or meaning.",
+  "tries": [
+    "Why does the checker accept %t0 used in a block it does not dominate?",
+    "Write a check that finds the missing try_state reset",
+    "What would LLVM's own verifier add?"
+  ],
+  "view": { "fn": "readBoth", "level": "LLVM", "tab": "experiments", "overlays": [], "mode": "spec", "gc": "off" },
+  "chapters": [16],
+  "docs": ["hermes-llvm"]
+}

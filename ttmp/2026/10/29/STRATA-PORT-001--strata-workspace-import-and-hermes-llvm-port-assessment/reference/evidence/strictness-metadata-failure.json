@@ -1,0 +1,2322 @@
+[
+  {
+    "name": "call-order.js",
+    "optimization": "0",
+    "strategy": "distinct",
+    "stress": false,
+    "buildDir": "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm",
+    "outcome": "normal",
+    "ok": true,
+    "output": "3 get;arg;call;\n",
+    "roots": [
+      {
+        "name": "main",
+        "roots": 19
+      },
+      {
+        "name": "get_f",
+        "roots": 14
+      },
+      {
+        "name": "anon_2",
+        "roots": 14
+      },
+      {
+        "name": "arg",
+        "roots": 14
+      }
+    ]
+  },
+  {
+    "name": "call-order.js",
+    "optimization": "2",
+    "strategy": "distinct",
+    "stress": false,
+    "buildDir": "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm",
+    "outcome": "normal",
+    "ok": true,
+    "output": "3 get;arg;call;\n",
+    "roots": [
+      {
+        "name": "main",
+        "roots": 19
+      },
+      {
+        "name": "get_f",
+        "roots": 14
+      },
+      {
+        "name": "anon_2",
+        "roots": 14
+      },
+      {
+        "name": "arg",
+        "roots": 14
+      }
+    ]
+  },
+  {
+    "name": "call-order.js",
+    "optimization": "0",
+    "strategy": "reuse",
+    "stress": false,
+    "buildDir": "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm",
+    "outcome": "normal",
+    "ok": true,
+    "output": "3 get;arg;call;\n",
+    "roots": [
+      {
+        "name": "main",
+        "roots": 15
+      },
+      {
+        "name": "get_f",
+        "roots": 12
+      },
+      {
+        "name": "anon_2",
+        "roots": 13
+      },
+      {
+        "name": "arg",
+        "roots": 13
+      }
+    ]
+  },
+  {
+    "name": "call-order.js",
+    "optimization": "2",
+    "strategy": "reuse",
+    "stress": false,
+    "buildDir": "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm",
+    "outcome": "normal",
+    "ok": true,
+    "output": "3 get;arg;call;\n",
+    "roots": [
+      {
+        "name": "main",
+        "roots": 15
+      },
+      {
+        "name": "get_f",
+        "roots": 12
+      },
+      {
+        "name": "anon_2",
+        "roots": 13
+      },
+      {
+        "name": "arg",
+        "roots": 13
+      }
+    ]
+  },
+  {
+    "name": "closures.js",
+    "optimization": "0",
+    "strategy": "distinct",
+    "stress": false,
+    "buildDir": "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm",
+    "outcome": "normal",
+    "ok": true,
+    "output": "11 11 12\n55\n0 1 2\n",
+    "roots": [
+      {
+        "name": "main",
+        "roots": 43
+      },
+      {
+        "name": "counter",
+        "roots": 16
+      },
+      {
+        "name": "inc",
+        "roots": 14
+      },
+      {
+        "name": "read",
+        "roots": 11
+      },
+      {
+        "name": "fib",
+        "roots": 21
+      },
+      {
+        "name": "arrow_3",
+        "roots": 11
+      }
+    ]
+  },
+  {
+    "name": "closures.js",
+    "optimization": "2",
+    "strategy": "distinct",
+    "stress": false,
+    "buildDir": "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm",
+    "outcome": "normal",
+    "ok": true,
+    "output": "11 11 12\n55\n0 1 2\n",
+    "roots": [
+      {
+        "name": "main",
+        "roots": 43
+      },
+      {
+        "name": "counter",
+        "roots": 16
+      },
+      {
+        "name": "inc",
+        "roots": 14
+      },
+      {
+        "name": "read",
+        "roots": 11
+      },
+      {
+        "name": "fib",
+        "roots": 21
+      },
+      {
+        "name": "arrow_3",
+        "roots": 11
+      }
+    ]
+  },
+  {
+    "name": "closures.js",
+    "optimization": "0",
+    "strategy": "reuse",
+    "stress": false,
+    "buildDir": "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm",
+    "outcome": "normal",
+    "ok": true,
+    "output": "11 11 12\n55\n0 1 2\n",
+    "roots": [
+      {
+        "name": "main",
+        "roots": 21
+      },
+      {
+        "name": "counter",
+        "roots": 13
+      },
+      {
+        "name": "inc",
+        "roots": 12
+      },
+      {
+        "name": "read",
+        "roots": 10
+      },
+      {
+        "name": "fib",
+        "roots": 15
+      },
+      {
+        "name": "arrow_3",
+        "roots": 10
+      }
+    ]
+  },
+  {
+    "name": "closures.js",
+    "optimization": "2",
+    "strategy": "reuse",
+    "stress": false,
+    "buildDir": "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm",
+    "outcome": "normal",
+    "ok": true,
+    "output": "11 11 12\n55\n0 1 2\n",
+    "roots": [
+      {
+        "name": "main",
+        "roots": 21
+      },
+      {
+        "name": "counter",
+        "roots": 13
+      },
+      {
+        "name": "inc",
+        "roots": 12
+      },
+      {
+        "name": "read",
+        "roots": 10
+      },
+      {
+        "name": "fib",
+        "roots": 15
+      },
+      {
+        "name": "arrow_3",
+        "roots": 10
+      }
+    ]
+  },
+  {
+    "name": "collection.js",
+    "optimization": "0",
+    "strategy": "distinct",
+    "stress": false,
+    "buildDir": "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm",
+    "outcome": "normal",
+    "ok": true,
+    "output": "11 4 5\n17 17\n11 17\n",
+    "roots": [
+      {
+        "name": "main",
+        "roots": 38
+      },
+      {
+        "name": "capture",
+        "roots": 14
+      },
+      {
+        "name": "arrow",
+        "roots": 22
+      },
+      {
+        "name": "arrow_2",
+        "roots": 13
+      },
+      {
+        "name": "arrow_3",
+        "roots": 19
+      }
+    ]
+  },
+  {
+    "name": "collection.js",
+    "optimization": "2",
+    "strategy": "distinct",
+    "stress": false,
+    "buildDir": "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm",
+    "outcome": "normal",
+    "ok": true,
+    "output": "11 4 5\n17 17\n11 17\n",
+    "roots": [
+      {
+        "name": "main",
+        "roots": 38
+      },
+      {
+        "name": "capture",
+        "roots": 14
+      },
+      {
+        "name": "arrow",
+        "roots": 22
+      },
+      {
+        "name": "arrow_2",
+        "roots": 13
+      },
+      {
+        "name": "arrow_3",
+        "roots": 19
+      }
+    ]
+  },
+  {
+    "name": "collection.js",
+    "optimization": "0",
+    "strategy": "reuse",
+    "stress": false,
+    "buildDir": "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm",
+    "outcome": "normal",
+    "ok": true,
+    "output": "11 4 5\n17 17\n11 17\n",
+    "roots": [
+      {
+        "name": "main",
+        "roots": 19
+      },
+      {
+        "name": "capture",
+        "roots": 12
+      },
+      {
+        "name": "arrow",
+        "roots": 14
+      },
+      {
+        "name": "arrow_2",
+        "roots": 11
+      },
+      {
+        "name": "arrow_3",
+        "roots": 14
+      }
+    ]
+  },
+  {
+    "name": "collection.js",
+    "optimization": "2",
+    "strategy": "reuse",
+    "stress": false,
+    "buildDir": "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm",
+    "outcome": "normal",
+    "ok": true,
+    "output": "11 4 5\n17 17\n11 17\n",
+    "roots": [
+      {
+        "name": "main",
+        "roots": 19
+      },
+      {
+        "name": "capture",
+        "roots": 12
+      },
+      {
+        "name": "arrow",
+        "roots": 14
+      },
+      {
+        "name": "arrow_2",
+        "roots": 11
+      },
+      {
+        "name": "arrow_3",
+        "roots": 14
+      }
+    ]
+  },
+  {
+    "name": "control.js",
+    "optimization": "0",
+    "strategy": "distinct",
+    "stress": false,
+    "buildDir": "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm",
+    "outcome": "normal",
+    "ok": true,
+    "output": "144 233\n15 4 7 9\n",
+    "roots": [
+      {
+        "name": "main",
+        "roots": 38
+      }
+    ]
+  },
+  {
+    "name": "control.js",
+    "optimization": "2",
+    "strategy": "distinct",
+    "stress": false,
+    "buildDir": "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm",
+    "outcome": "normal",
+    "ok": true,
+    "output": "144 233\n15 4 7 9\n",
+    "roots": [
+      {
+        "name": "main",
+        "roots": 38
+      }
+    ]
+  },
+  {
+    "name": "control.js",
+    "optimization": "0",
+    "strategy": "reuse",
+    "stress": false,
+    "buildDir": "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm",
+    "outcome": "normal",
+    "ok": true,
+    "output": "144 233\n15 4 7 9\n",
+    "roots": [
+      {
+        "name": "main",
+        "roots": 24
+      }
+    ]
+  },
+  {
+    "name": "control.js",
+    "optimization": "2",
+    "strategy": "reuse",
+    "stress": false,
+    "buildDir": "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm",
+    "outcome": "normal",
+    "ok": true,
+    "output": "144 233\n15 4 7 9\n",
+    "roots": [
+      {
+        "name": "main",
+        "roots": 24
+      }
+    ]
+  },
+  {
+    "name": "exceptions.js",
+    "optimization": "0",
+    "strategy": "distinct",
+    "stress": false,
+    "buildDir": "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm",
+    "outcome": "normal",
+    "ok": true,
+    "output": "true 1\na\nb\ncleanup\n42\ncleanup\nbad\n2\nError oops\n",
+    "roots": [
+      {
+        "name": "main",
+        "roots": 41
+      },
+      {
+        "name": "get_x",
+        "roots": 18
+      },
+      {
+        "name": "f",
+        "roots": 24
+      },
+      {
+        "name": "g",
+        "roots": 14
+      }
+    ]
+  },
+  {
+    "name": "exceptions.js",
+    "optimization": "2",
+    "strategy": "distinct",
+    "stress": false,
+    "buildDir": "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm",
+    "outcome": "normal",
+    "ok": true,
+    "output": "true 1\na\nb\ncleanup\n42\ncleanup\nbad\n2\nError oops\n",
+    "roots": [
+      {
+        "name": "main",
+        "roots": 41
+      },
+      {
+        "name": "get_x",
+        "roots": 18
+      },
+      {
+        "name": "f",
+        "roots": 24
+      },
+      {
+        "name": "g",
+        "roots": 14
+      }
+    ]
+  },
+  {
+    "name": "exceptions.js",
+    "optimization": "0",
+    "strategy": "reuse",
+    "stress": false,
+    "buildDir": "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm",
+    "outcome": "normal",
+    "ok": true,
+    "output": "true 1\na\nb\ncleanup\n42\ncleanup\nbad\n2\nError oops\n",
+    "roots": [
+      {
+        "name": "main",
+        "roots": 24
+      },
+      {
+        "name": "get_x",
+        "roots": 13
+      },
+      {
+        "name": "f",
+        "roots": 15
+      },
+      {
+        "name": "g",
+        "roots": 12
+      }
+    ]
+  },
+  {
+    "name": "exceptions.js",
+    "optimization": "2",
+    "strategy": "reuse",
+    "stress": false,
+    "buildDir": "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm",
+    "outcome": "normal",
+    "ok": true,
+    "output": "true 1\na\nb\ncleanup\n42\ncleanup\nbad\n2\nError oops\n",
+    "roots": [
+      {
+        "name": "main",
+        "roots": 24
+      },
+      {
+        "name": "get_x",
+        "roots": 13
+      },
+      {
+        "name": "f",
+        "roots": 15
+      },
+      {
+        "name": "g",
+        "roots": 12
+      }
+    ]
+  },
+  {
+    "name": "imported-J-01.js",
+    "optimization": "0",
+    "strategy": "distinct",
+    "stress": false,
+    "buildDir": "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm",
+    "outcome": "normal",
+    "ok": true,
+    "output": "a 4, b 98\na after reset 1\n",
+    "roots": [
+      {
+        "name": "main",
+        "roots": 40
+      },
+      {
+        "name": "makeCounter",
+        "roots": 20
+      },
+      {
+        "name": "inc",
+        "roots": 14
+      },
+      {
+        "name": "dec",
+        "roots": 14
+      },
+      {
+        "name": "reset",
+        "roots": 13
+      }
+    ]
+  },
+  {
+    "name": "imported-J-01.js",
+    "optimization": "2",
+    "strategy": "distinct",
+    "stress": false,
+    "buildDir": "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm",
+    "outcome": "normal",
+    "ok": true,
+    "output": "a 4, b 98\na after reset 1\n",
+    "roots": [
+      {
+        "name": "main",
+        "roots": 40
+      },
+      {
+        "name": "makeCounter",
+        "roots": 20
+      },
+      {
+        "name": "inc",
+        "roots": 14
+      },
+      {
+        "name": "dec",
+        "roots": 14
+      },
+      {
+        "name": "reset",
+        "roots": 13
+      }
+    ]
+  },
+  {
+    "name": "imported-J-01.js",
+    "optimization": "0",
+    "strategy": "reuse",
+    "stress": false,
+    "buildDir": "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm",
+    "outcome": "normal",
+    "ok": true,
+    "output": "a 4, b 98\na after reset 1\n",
+    "roots": [
+      {
+        "name": "main",
+        "roots": 21
+      },
+      {
+        "name": "makeCounter",
+        "roots": 15
+      },
+      {
+        "name": "inc",
+        "roots": 12
+      },
+      {
+        "name": "dec",
+        "roots": 12
+      },
+      {
+        "name": "reset",
+        "roots": 11
+      }
+    ]
+  },
+  {
+    "name": "imported-J-01.js",
+    "optimization": "2",
+    "strategy": "reuse",
+    "stress": false,
+    "buildDir": "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm",
+    "outcome": "normal",
+    "ok": true,
+    "output": "a 4, b 98\na after reset 1\n",
+    "roots": [
+      {
+        "name": "main",
+        "roots": 21
+      },
+      {
+        "name": "makeCounter",
+        "roots": 15
+      },
+      {
+        "name": "inc",
+        "roots": 12
+      },
+      {
+        "name": "dec",
+        "roots": 12
+      },
+      {
+        "name": "reset",
+        "roots": 11
+      }
+    ]
+  },
+  {
+    "name": "imported-J-02.js",
+    "optimization": "0",
+    "strategy": "distinct",
+    "stress": false,
+    "buildDir": "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm",
+    "outcome": "normal",
+    "ok": true,
+    "output": "68\n100\nRangeError: below absolute zero\nTypeError: not a number: warm\nreads 2\n",
+    "roots": [
+      {
+        "name": "main",
+        "roots": 37
+      },
+      {
+        "name": "makeThermometer",
+        "roots": 22
+      },
+      {
+        "name": "get_celsius",
+        "roots": 15
+      },
+      {
+        "name": "set_celsius",
+        "roots": 22
+      },
+      {
+        "name": "get_fahrenheit",
+        "roots": 17
+      },
+      {
+        "name": "set_fahrenheit",
+        "roots": 17
+      },
+      {
+        "name": "get_reads",
+        "roots": 11
+      }
+    ]
+  },
+  {
+    "name": "imported-J-02.js",
+    "optimization": "2",
+    "strategy": "distinct",
+    "stress": false,
+    "buildDir": "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm",
+    "outcome": "normal",
+    "ok": true,
+    "output": "68\n100\nRangeError: below absolute zero\nTypeError: not a number: warm\nreads 2\n",
+    "roots": [
+      {
+        "name": "main",
+        "roots": 37
+      },
+      {
+        "name": "makeThermometer",
+        "roots": 22
+      },
+      {
+        "name": "get_celsius",
+        "roots": 15
+      },
+      {
+        "name": "set_celsius",
+        "roots": 22
+      },
+      {
+        "name": "get_fahrenheit",
+        "roots": 17
+      },
+      {
+        "name": "set_fahrenheit",
+        "roots": 17
+      },
+      {
+        "name": "get_reads",
+        "roots": 11
+      }
+    ]
+  },
+  {
+    "name": "imported-J-02.js",
+    "optimization": "0",
+    "strategy": "reuse",
+    "stress": false,
+    "buildDir": "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm",
+    "outcome": "normal",
+    "ok": true,
+    "output": "68\n100\nRangeError: below absolute zero\nTypeError: not a number: warm\nreads 2\n",
+    "roots": [
+      {
+        "name": "main",
+        "roots": 23
+      },
+      {
+        "name": "makeThermometer",
+        "roots": 16
+      },
+      {
+        "name": "get_celsius",
+        "roots": 13
+      },
+      {
+        "name": "set_celsius",
+        "roots": 16
+      },
+      {
+        "name": "get_fahrenheit",
+        "roots": 14
+      },
+      {
+        "name": "set_fahrenheit",
+        "roots": 15
+      },
+      {
+        "name": "get_reads",
+        "roots": 10
+      }
+    ]
+  },
+  {
+    "name": "imported-J-02.js",
+    "optimization": "2",
+    "strategy": "reuse",
+    "stress": false,
+    "buildDir": "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm",
+    "outcome": "normal",
+    "ok": true,
+    "output": "68\n100\nRangeError: below absolute zero\nTypeError: not a number: warm\nreads 2\n",
+    "roots": [
+      {
+        "name": "main",
+        "roots": 23
+      },
+      {
+        "name": "makeThermometer",
+        "roots": 16
+      },
+      {
+        "name": "get_celsius",
+        "roots": 13
+      },
+      {
+        "name": "set_celsius",
+        "roots": 16
+      },
+      {
+        "name": "get_fahrenheit",
+        "roots": 14
+      },
+      {
+        "name": "set_fahrenheit",
+        "roots": 15
+      },
+      {
+        "name": "get_reads",
+        "roots": 10
+      }
+    ]
+  },
+  {
+    "name": "imported-J-03.js",
+    "optimization": "0",
+    "strategy": "distinct",
+    "stress": false,
+    "buildDir": "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm",
+    "outcome": "normal",
+    "ok": true,
+    "output": "open a\nclose a\n5\nopen b\nclose b\n0\nopen c\nclose c\ncaught expected a number\n",
+    "roots": [
+      {
+        "name": "main",
+        "roots": 26
+      },
+      {
+        "name": "withResource",
+        "roots": 26
+      },
+      {
+        "name": "parsePositive",
+        "roots": 17
+      },
+      {
+        "name": "arrow",
+        "roots": 13
+      },
+      {
+        "name": "arrow_2",
+        "roots": 14
+      },
+      {
+        "name": "arrow_3",
+        "roots": 13
+      }
+    ]
+  },
+  {
+    "name": "imported-J-03.js",
+    "optimization": "2",
+    "strategy": "distinct",
+    "stress": false,
+    "buildDir": "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm",
+    "outcome": "normal",
+    "ok": true,
+    "output": "open a\nclose a\n5\nopen b\nclose b\n0\nopen c\nclose c\ncaught expected a number\n",
+    "roots": [
+      {
+        "name": "main",
+        "roots": 26
+      },
+      {
+        "name": "withResource",
+        "roots": 26
+      },
+      {
+        "name": "parsePositive",
+        "roots": 17
+      },
+      {
+        "name": "arrow",
+        "roots": 13
+      },
+      {
+        "name": "arrow_2",
+        "roots": 14
+      },
+      {
+        "name": "arrow_3",
+        "roots": 13
+      }
+    ]
+  },
+  {
+    "name": "imported-J-03.js",
+    "optimization": "0",
+    "strategy": "reuse",
+    "stress": false,
+    "buildDir": "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm",
+    "outcome": "normal",
+    "ok": true,
+    "output": "open a\nclose a\n5\nopen b\nclose b\n0\nopen c\nclose c\ncaught expected a number\n",
+    "roots": [
+      {
+        "name": "main",
+        "roots": 17
+      },
+      {
+        "name": "withResource",
+        "roots": 15
+      },
+      {
+        "name": "parsePositive",
+        "roots": 14
+      },
+      {
+        "name": "arrow",
+        "roots": 11
+      },
+      {
+        "name": "arrow_2",
+        "roots": 12
+      },
+      {
+        "name": "arrow_3",
+        "roots": 11
+      }
+    ]
+  },
+  {
+    "name": "imported-J-03.js",
+    "optimization": "2",
+    "strategy": "reuse",
+    "stress": false,
+    "buildDir": "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm",
+    "outcome": "normal",
+    "ok": true,
+    "output": "open a\nclose a\n5\nopen b\nclose b\n0\nopen c\nclose c\ncaught expected a number\n",
+    "roots": [
+      {
+        "name": "main",
+        "roots": 17
+      },
+      {
+        "name": "withResource",
+        "roots": 15
+      },
+      {
+        "name": "parsePositive",
+        "roots": 14
+      },
+      {
+        "name": "arrow",
+        "roots": 11
+      },
+      {
+        "name": "arrow_2",
+        "roots": 12
+      },
+      {
+        "name": "arrow_3",
+        "roots": 11
+      }
+    ]
+  },
+  {
+    "name": "imported-J-04.js",
+    "optimization": "0",
+    "strategy": "distinct",
+    "stress": false,
+    "buildDir": "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm",
+    "outcome": "normal",
+    "ok": true,
+    "output": "num:12 op:+ num:345 op:* num:6 \n5 tokens\n",
+    "roots": [
+      {
+        "name": "main",
+        "roots": 39
+      },
+      {
+        "name": "isDigit",
+        "roots": 15
+      },
+      {
+        "name": "isSpace",
+        "roots": 12
+      },
+      {
+        "name": "tokenize",
+        "roots": 52
+      }
+    ]
+  },
+  {
+    "name": "imported-J-04.js",
+    "optimization": "2",
+    "strategy": "distinct",
+    "stress": false,
+    "buildDir": "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm",
+    "outcome": "normal",
+    "ok": true,
+    "output": "num:12 op:+ num:345 op:* num:6 \n5 tokens\n",
+    "roots": [
+      {
+        "name": "main",
+        "roots": 39
+      },
+      {
+        "name": "isDigit",
+        "roots": 15
+      },
+      {
+        "name": "isSpace",
+        "roots": 12
+      },
+      {
+        "name": "tokenize",
+        "roots": 52
+      }
+    ]
+  },
+  {
+    "name": "imported-J-04.js",
+    "optimization": "0",
+    "strategy": "reuse",
+    "stress": false,
+    "buildDir": "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm",
+    "outcome": "normal",
+    "ok": true,
+    "output": "num:12 op:+ num:345 op:* num:6 \n5 tokens\n",
+    "roots": [
+      {
+        "name": "main",
+        "roots": 24
+      },
+      {
+        "name": "isDigit",
+        "roots": 12
+      },
+      {
+        "name": "isSpace",
+        "roots": 11
+      },
+      {
+        "name": "tokenize",
+        "roots": 26
+      }
+    ]
+  },
+  {
+    "name": "imported-J-04.js",
+    "optimization": "2",
+    "strategy": "reuse",
+    "stress": false,
+    "buildDir": "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm",
+    "outcome": "normal",
+    "ok": true,
+    "output": "num:12 op:+ num:345 op:* num:6 \n5 tokens\n",
+    "roots": [
+      {
+        "name": "main",
+        "roots": 24
+      },
+      {
+        "name": "isDigit",
+        "roots": 12
+      },
+      {
+        "name": "isSpace",
+        "roots": 11
+      },
+      {
+        "name": "tokenize",
+        "roots": 26
+      }
+    ]
+  },
+  {
+    "name": "imported-J-05.js",
+    "optimization": "0",
+    "strategy": "distinct",
+    "stress": false,
+    "buildDir": "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm",
+    "outcome": "normal",
+    "ok": true,
+    "output": "script start\nscript end\nthen 1\nmicrotask\n4 notes so far\nthen 2\ntimer 0\nmicrotask from timer 0\ntimer 20\n",
+    "roots": [
+      {
+        "name": "main",
+        "roots": 34
+      },
+      {
+        "name": "note",
+        "roots": 15
+      },
+      {
+        "name": "arrow",
+        "roots": 13
+      },
+      {
+        "name": "arrow_2",
+        "roots": 14
+      },
+      {
+        "name": "arrow_3",
+        "roots": 13
+      },
+      {
+        "name": "arrow_4",
+        "roots": 17
+      },
+      {
+        "name": "arrow_5",
+        "roots": 15
+      },
+      {
+        "name": "arrow_6",
+        "roots": 13
+      },
+      {
+        "name": "arrow_7",
+        "roots": 15
+      }
+    ]
+  },
+  {
+    "name": "imported-J-05.js",
+    "optimization": "2",
+    "strategy": "distinct",
+    "stress": false,
+    "buildDir": "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm",
+    "outcome": "normal",
+    "ok": true,
+    "output": "script start\nscript end\nthen 1\nmicrotask\n4 notes so far\nthen 2\ntimer 0\nmicrotask from timer 0\ntimer 20\n",
+    "roots": [
+      {
+        "name": "main",
+        "roots": 34
+      },
+      {
+        "name": "note",
+        "roots": 15
+      },
+      {
+        "name": "arrow",
+        "roots": 13
+      },
+      {
+        "name": "arrow_2",
+        "roots": 14
+      },
+      {
+        "name": "arrow_3",
+        "roots": 13
+      },
+      {
+        "name": "arrow_4",
+        "roots": 17
+      },
+      {
+        "name": "arrow_5",
+        "roots": 15
+      },
+      {
+        "name": "arrow_6",
+        "roots": 13
+      },
+      {
+        "name": "arrow_7",
+        "roots": 15
+      }
+    ]
+  },
+  {
+    "name": "imported-J-05.js",
+    "optimization": "0",
+    "strategy": "reuse",
+    "stress": false,
+    "buildDir": "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm",
+    "outcome": "normal",
+    "ok": true,
+    "output": "script start\nscript end\nthen 1\nmicrotask\n4 notes so far\nthen 2\ntimer 0\nmicrotask from timer 0\ntimer 20\n",
+    "roots": [
+      {
+        "name": "main",
+        "roots": 20
+      },
+      {
+        "name": "note",
+        "roots": 13
+      },
+      {
+        "name": "arrow",
+        "roots": 11
+      },
+      {
+        "name": "arrow_2",
+        "roots": 12
+      },
+      {
+        "name": "arrow_3",
+        "roots": 11
+      },
+      {
+        "name": "arrow_4",
+        "roots": 14
+      },
+      {
+        "name": "arrow_5",
+        "roots": 12
+      },
+      {
+        "name": "arrow_6",
+        "roots": 11
+      },
+      {
+        "name": "arrow_7",
+        "roots": 12
+      }
+    ]
+  },
+  {
+    "name": "imported-J-05.js",
+    "optimization": "2",
+    "strategy": "reuse",
+    "stress": false,
+    "buildDir": "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm",
+    "outcome": "normal",
+    "ok": true,
+    "output": "script start\nscript end\nthen 1\nmicrotask\n4 notes so far\nthen 2\ntimer 0\nmicrotask from timer 0\ntimer 20\n",
+    "roots": [
+      {
+        "name": "main",
+        "roots": 20
+      },
+      {
+        "name": "note",
+        "roots": 13
+      },
+      {
+        "name": "arrow",
+        "roots": 11
+      },
+      {
+        "name": "arrow_2",
+        "roots": 12
+      },
+      {
+        "name": "arrow_3",
+        "roots": 11
+      },
+      {
+        "name": "arrow_4",
+        "roots": 14
+      },
+      {
+        "name": "arrow_5",
+        "roots": 12
+      },
+      {
+        "name": "arrow_6",
+        "roots": 11
+      },
+      {
+        "name": "arrow_7",
+        "roots": 12
+      }
+    ]
+  },
+  {
+    "name": "imported-J-06.js",
+    "optimization": "0",
+    "strategy": "distinct",
+    "stress": false,
+    "buildDir": "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm",
+    "outcome": "normal",
+    "ok": true,
+    "output": "fib(12) = 144\nsum = 15\n",
+    "roots": [
+      {
+        "name": "main",
+        "roots": 47
+      },
+      {
+        "name": "fib",
+        "roots": 22
+      },
+      {
+        "name": "depthSum",
+        "roots": 28
+      },
+      {
+        "name": "countDown",
+        "roots": 18
+      }
+    ]
+  },
+  {
+    "name": "imported-J-06.js",
+    "optimization": "2",
+    "strategy": "distinct",
+    "stress": false,
+    "buildDir": "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm",
+    "outcome": "normal",
+    "ok": true,
+    "output": "fib(12) = 144\nsum = 15\n",
+    "roots": [
+      {
+        "name": "main",
+        "roots": 47
+      },
+      {
+        "name": "fib",
+        "roots": 22
+      },
+      {
+        "name": "depthSum",
+        "roots": 28
+      },
+      {
+        "name": "countDown",
+        "roots": 18
+      }
+    ]
+  },
+  {
+    "name": "imported-J-06.js",
+    "optimization": "0",
+    "strategy": "reuse",
+    "stress": false,
+    "buildDir": "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm",
+    "outcome": "normal",
+    "ok": true,
+    "output": "fib(12) = 144\nsum = 15\n",
+    "roots": [
+      {
+        "name": "main",
+        "roots": 28
+      },
+      {
+        "name": "fib",
+        "roots": 15
+      },
+      {
+        "name": "depthSum",
+        "roots": 20
+      },
+      {
+        "name": "countDown",
+        "roots": 13
+      }
+    ]
+  },
+  {
+    "name": "imported-J-06.js",
+    "optimization": "2",
+    "strategy": "reuse",
+    "stress": false,
+    "buildDir": "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm",
+    "outcome": "normal",
+    "ok": true,
+    "output": "fib(12) = 144\nsum = 15\n",
+    "roots": [
+      {
+        "name": "main",
+        "roots": 28
+      },
+      {
+        "name": "fib",
+        "roots": 15
+      },
+      {
+        "name": "depthSum",
+        "roots": 20
+      },
+      {
+        "name": "countDown",
+        "roots": 13
+      }
+    ]
+  },
+  {
+    "name": "imported-J-07.js",
+    "optimization": "0",
+    "strategy": "distinct",
+    "stress": false,
+    "buildDir": "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm",
+    "outcome": "expected-language-error",
+    "ok": true,
+    "output": "skipped: missing field qty\nsum 16, skipped 1\n",
+    "roots": [
+      {
+        "name": "main",
+        "roots": 38
+      },
+      {
+        "name": "readField",
+        "roots": 16
+      },
+      {
+        "name": "total",
+        "roots": 18
+      },
+      {
+        "name": "invoice",
+        "roots": 36
+      }
+    ]
+  },
+  {
+    "name": "imported-J-07.js",
+    "optimization": "2",
+    "strategy": "distinct",
+    "stress": false,
+    "buildDir": "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm",
+    "outcome": "expected-language-error",
+    "ok": true,
+    "output": "skipped: missing field qty\nsum 16, skipped 1\n",
+    "roots": [
+      {
+        "name": "main",
+        "roots": 38
+      },
+      {
+        "name": "readField",
+        "roots": 16
+      },
+      {
+        "name": "total",
+        "roots": 18
+      },
+      {
+        "name": "invoice",
+        "roots": 36
+      }
+    ]
+  },
+  {
+    "name": "imported-J-07.js",
+    "optimization": "0",
+    "strategy": "reuse",
+    "stress": false,
+    "buildDir": "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm",
+    "outcome": "expected-language-error",
+    "ok": true,
+    "output": "skipped: missing field qty\nsum 16, skipped 1\n",
+    "roots": [
+      {
+        "name": "main",
+        "roots": 25
+      },
+      {
+        "name": "readField",
+        "roots": 12
+      },
+      {
+        "name": "total",
+        "roots": 14
+      },
+      {
+        "name": "invoice",
+        "roots": 24
+      }
+    ]
+  },
+  {
+    "name": "imported-J-07.js",
+    "optimization": "2",
+    "strategy": "reuse",
+    "stress": false,
+    "buildDir": "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm",
+    "outcome": "expected-language-error",
+    "ok": true,
+    "output": "skipped: missing field qty\nsum 16, skipped 1\n",
+    "roots": [
+      {
+        "name": "main",
+        "roots": 25
+      },
+      {
+        "name": "readField",
+        "roots": 12
+      },
+      {
+        "name": "total",
+        "roots": 14
+      },
+      {
+        "name": "invoice",
+        "roots": 24
+      }
+    ]
+  },
+  {
+    "name": "imported-J-08.js",
+    "optimization": "0",
+    "strategy": "distinct",
+    "stress": false,
+    "buildDir": "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm",
+    "outcome": "normal",
+    "ok": true,
+    "output": "2\nno throw\nfinally 2\njob 9\n",
+    "roots": [
+      {
+        "name": "main",
+        "roots": 65
+      },
+      {
+        "name": "get_x",
+        "roots": 17
+      },
+      {
+        "name": "f0",
+        "roots": 15
+      },
+      {
+        "name": "arrow_2",
+        "roots": 14
+      }
+    ]
+  },
+  {
+    "name": "imported-J-08.js",
+    "optimization": "2",
+    "strategy": "distinct",
+    "stress": false,
+    "buildDir": "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm",
+    "outcome": "normal",
+    "ok": true,
+    "output": "2\nno throw\nfinally 2\njob 9\n",
+    "roots": [
+      {
+        "name": "main",
+        "roots": 65
+      },
+      {
+        "name": "get_x",
+        "roots": 17
+      },
+      {
+        "name": "f0",
+        "roots": 15
+      },
+      {
+        "name": "arrow_2",
+        "roots": 14
+      }
+    ]
+  },
+  {
+    "name": "imported-J-08.js",
+    "optimization": "0",
+    "strategy": "reuse",
+    "stress": false,
+    "buildDir": "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm",
+    "outcome": "normal",
+    "ok": true,
+    "output": "2\nno throw\nfinally 2\njob 9\n",
+    "roots": [
+      {
+        "name": "main",
+        "roots": 24
+      },
+      {
+        "name": "get_x",
+        "roots": 14
+      },
+      {
+        "name": "f0",
+        "roots": 12
+      },
+      {
+        "name": "arrow_2",
+        "roots": 12
+      }
+    ]
+  },
+  {
+    "name": "imported-J-08.js",
+    "optimization": "2",
+    "strategy": "reuse",
+    "stress": false,
+    "buildDir": "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm",
+    "outcome": "normal",
+    "ok": true,
+    "output": "2\nno throw\nfinally 2\njob 9\n",
+    "roots": [
+      {
+        "name": "main",
+        "roots": 24
+      },
+      {
+        "name": "get_x",
+        "roots": 14
+      },
+      {
+        "name": "f0",
+        "roots": 12
+      },
+      {
+        "name": "arrow_2",
+        "roots": 12
+      }
+    ]
+  },
+  {
+    "name": "jobs.js",
+    "optimization": "0",
+    "strategy": "distinct",
+    "stress": false,
+    "buildDir": "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm",
+    "outcome": "normal",
+    "ok": true,
+    "output": "sync\nmicro 1\npromise 3\nnext 4\ntimer 1\n",
+    "roots": [
+      {
+        "name": "main",
+        "roots": 23
+      },
+      {
+        "name": "arrow",
+        "roots": 16
+      },
+      {
+        "name": "arrow_2",
+        "roots": 13
+      },
+      {
+        "name": "arrow_3",
+        "roots": 11
+      },
+      {
+        "name": "arrow_4",
+        "roots": 12
+      }
+    ]
+  },
+  {
+    "name": "jobs.js",
+    "optimization": "2",
+    "strategy": "distinct",
+    "stress": false,
+    "buildDir": "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm",
+    "outcome": "normal",
+    "ok": true,
+    "output": "sync\nmicro 1\npromise 3\nnext 4\ntimer 1\n",
+    "roots": [
+      {
+        "name": "main",
+        "roots": 23
+      },
+      {
+        "name": "arrow",
+        "roots": 16
+      },
+      {
+        "name": "arrow_2",
+        "roots": 13
+      },
+      {
+        "name": "arrow_3",
+        "roots": 11
+      },
+      {
+        "name": "arrow_4",
+        "roots": 12
+      }
+    ]
+  },
+  {
+    "name": "jobs.js",
+    "optimization": "0",
+    "strategy": "reuse",
+    "stress": false,
+    "buildDir": "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm",
+    "outcome": "normal",
+    "ok": true,
+    "output": "sync\nmicro 1\npromise 3\nnext 4\ntimer 1\n",
+    "roots": [
+      {
+        "name": "main",
+        "roots": 17
+      },
+      {
+        "name": "arrow",
+        "roots": 13
+      },
+      {
+        "name": "arrow_2",
+        "roots": 12
+      },
+      {
+        "name": "arrow_3",
+        "roots": 11
+      },
+      {
+        "name": "arrow_4",
+        "roots": 11
+      }
+    ]
+  },
+  {
+    "name": "jobs.js",
+    "optimization": "2",
+    "strategy": "reuse",
+    "stress": false,
+    "buildDir": "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm",
+    "outcome": "normal",
+    "ok": true,
+    "output": "sync\nmicro 1\npromise 3\nnext 4\ntimer 1\n",
+    "roots": [
+      {
+        "name": "main",
+        "roots": 17
+      },
+      {
+        "name": "arrow",
+        "roots": 13
+      },
+      {
+        "name": "arrow_2",
+        "roots": 12
+      },
+      {
+        "name": "arrow_3",
+        "roots": 11
+      },
+      {
+        "name": "arrow_4",
+        "roots": 11
+      }
+    ]
+  },
+  {
+    "name": "ledger.js",
+    "optimization": "0",
+    "strategy": "distinct",
+    "stress": false,
+    "buildDir": "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm",
+    "outcome": "normal",
+    "ok": true,
+    "output": "rejected: amount must be a number\nmain 42 42\naudit 42\n",
+    "roots": [
+      {
+        "name": "main",
+        "roots": 47
+      },
+      {
+        "name": "makeLedger",
+        "roots": 22
+      },
+      {
+        "name": "deposit",
+        "roots": 24
+      },
+      {
+        "name": "get_balance",
+        "roots": 11
+      },
+      {
+        "name": "total",
+        "roots": 23
+      },
+      {
+        "name": "arrow",
+        "roots": 16
+      }
+    ]
+  },
+  {
+    "name": "ledger.js",
+    "optimization": "2",
+    "strategy": "distinct",
+    "stress": false,
+    "buildDir": "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm",
+    "outcome": "normal",
+    "ok": true,
+    "output": "rejected: amount must be a number\nmain 42 42\naudit 42\n",
+    "roots": [
+      {
+        "name": "main",
+        "roots": 47
+      },
+      {
+        "name": "makeLedger",
+        "roots": 22
+      },
+      {
+        "name": "deposit",
+        "roots": 24
+      },
+      {
+        "name": "get_balance",
+        "roots": 11
+      },
+      {
+        "name": "total",
+        "roots": 23
+      },
+      {
+        "name": "arrow",
+        "roots": 16
+      }
+    ]
+  },
+  {
+    "name": "ledger.js",
+    "optimization": "0",
+    "strategy": "reuse",
+    "stress": false,
+    "buildDir": "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm",
+    "outcome": "normal",
+    "ok": true,
+    "output": "rejected: amount must be a number\nmain 42 42\naudit 42\n",
+    "roots": [
+      {
+        "name": "main",
+        "roots": 24
+      },
+      {
+        "name": "makeLedger",
+        "roots": 17
+      },
+      {
+        "name": "deposit",
+        "roots": 16
+      },
+      {
+        "name": "get_balance",
+        "roots": 10
+      },
+      {
+        "name": "total",
+        "roots": 16
+      },
+      {
+        "name": "arrow",
+        "roots": 13
+      }
+    ]
+  },
+  {
+    "name": "ledger.js",
+    "optimization": "2",
+    "strategy": "reuse",
+    "stress": false,
+    "buildDir": "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm",
+    "outcome": "normal",
+    "ok": true,
+    "output": "rejected: amount must be a number\nmain 42 42\naudit 42\n",
+    "roots": [
+      {
+        "name": "main",
+        "roots": 24
+      },
+      {
+        "name": "makeLedger",
+        "roots": 17
+      },
+      {
+        "name": "deposit",
+        "roots": 16
+      },
+      {
+        "name": "get_balance",
+        "roots": 10
+      },
+      {
+        "name": "total",
+        "roots": 16
+      },
+      {
+        "name": "arrow",
+        "roots": 13
+      }
+    ]
+  },
+  {
+    "name": "objects.js",
+    "optimization": "0",
+    "strategy": "distinct",
+    "stress": false,
+    "buildDir": "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm",
+    "outcome": "normal",
+    "ok": true,
+    "output": "4 1\n9 2\n4 1-2-3-4\n{\"a\":9,\"b\":\"hello\"}\n",
+    "roots": [
+      {
+        "name": "main",
+        "roots": 44
+      },
+      {
+        "name": "get_x",
+        "roots": 16
+      },
+      {
+        "name": "set_x",
+        "roots": 13
+      }
+    ]
+  },
+  {
+    "name": "objects.js",
+    "optimization": "2",
+    "strategy": "distinct",
+    "stress": false,
+    "buildDir": "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm",
+    "outcome": "normal",
+    "ok": true,
+    "output": "4 1\n9 2\n4 1-2-3-4\n{\"a\":9,\"b\":\"hello\"}\n",
+    "roots": [
+      {
+        "name": "main",
+        "roots": 44
+      },
+      {
+        "name": "get_x",
+        "roots": 16
+      },
+      {
+        "name": "set_x",
+        "roots": 13
+      }
+    ]
+  },
+  {
+    "name": "objects.js",
+    "optimization": "0",
+    "strategy": "reuse",
+    "stress": false,
+    "buildDir": "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm",
+    "outcome": "normal",
+    "ok": true,
+    "output": "4 1\n9 2\n4 1-2-3-4\n{\"a\":9,\"b\":\"hello\"}\n",
+    "roots": [
+      {
+        "name": "main",
+        "roots": 29
+      },
+      {
+        "name": "get_x",
+        "roots": 14
+      },
+      {
+        "name": "set_x",
+        "roots": 13
+      }
+    ]
+  },
+  {
+    "name": "objects.js",
+    "optimization": "2",
+    "strategy": "reuse",
+    "stress": false,
+    "buildDir": "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm",
+    "outcome": "normal",
+    "ok": true,
+    "output": "4 1\n9 2\n4 1-2-3-4\n{\"a\":9,\"b\":\"hello\"}\n",
+    "roots": [
+      {
+        "name": "main",
+        "roots": 29
+      },
+      {
+        "name": "get_x",
+        "roots": 14
+      },
+      {
+        "name": "set_x",
+        "roots": 13
+      }
+    ]
+  },
+  {
+    "name": "receivers.js",
+    "optimization": "0",
+    "strategy": "distinct",
+    "stress": false,
+    "buildDir": "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm",
+    "outcome": "normal",
+    "ok": true,
+    "output": "true\ntrue\ntrue\n9\nobject undefined\nTypeError\n1\n",
+    "roots": [
+      {
+        "name": "main",
+        "roots": 45
+      },
+      {
+        "name": "sloppy",
+        "roots": 12
+      },
+      {
+        "name": "strict",
+        "roots": 10
+      },
+      {
+        "name": "f",
+        "roots": 11
+      },
+      {
+        "name": "arrow",
+        "roots": 13
+      },
+      {
+        "name": "strictWrite",
+        "roots": 13
+      }
+    ]
+  },
+  {
+    "name": "receivers.js",
+    "optimization": "2",
+    "strategy": "distinct",
+    "stress": false,
+    "buildDir": "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm",
+    "outcome": "normal",
+    "ok": true,
+    "output": "true\ntrue\ntrue\n9\nobject undefined\nTypeError\n1\n",
+    "roots": [
+      {
+        "name": "main",
+        "roots": 45
+      },
+      {
+        "name": "sloppy",
+        "roots": 12
+      },
+      {
+        "name": "strict",
+        "roots": 10
+      },
+      {
+        "name": "f",
+        "roots": 11
+      },
+      {
+        "name": "arrow",
+        "roots": 13
+      },
+      {
+        "name": "strictWrite",
+        "roots": 13
+      }
+    ]
+  },
+  {
+    "name": "receivers.js",
+    "optimization": "0",
+    "strategy": "reuse",
+    "stress": false,
+    "buildDir": "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm",
+    "outcome": "normal",
+    "ok": true,
+    "output": "true\ntrue\ntrue\n9\nobject undefined\nTypeError\n1\n",
+    "roots": [
+      {
+        "name": "main",
+        "roots": 25
+      },
+      {
+        "name": "sloppy",
+        "roots": 12
+      },
+      {
+        "name": "strict",
+        "roots": 10
+      },
+      {
+        "name": "f",
+        "roots": 10
+      },
+      {
+        "name": "arrow",
+        "roots": 11
+      },
+      {
+        "name": "strictWrite",
+        "roots": 12
+      }
+    ]
+  },
+  {
+    "name": "receivers.js",
+    "optimization": "2",
+    "strategy": "reuse",
+    "stress": false,
+    "buildDir": "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm",
+    "outcome": "normal",
+    "ok": true,
+    "output": "true\ntrue\ntrue\n9\nobject undefined\nTypeError\n1\n",
+    "roots": [
+      {
+        "name": "main",
+        "roots": 25
+      },
+      {
+        "name": "sloppy",
+        "roots": 12
+      },
+      {
+        "name": "strict",
+        "roots": 10
+      },
+      {
+        "name": "f",
+        "roots": 10
+      },
+      {
+        "name": "arrow",
+        "roots": 11
+      },
+      {
+        "name": "strictWrite",
+        "roots": 12
+      }
+    ]
+  },
+  {
+    "name": "scalar.js",
+    "optimization": "0",
+    "strategy": "distinct",
+    "stress": false,
+    "buildDir": "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm",
+    "outcome": "normal",
+    "ok": true,
+    "output": "3\nhello 世界\nNaN Infinity -Infinity\n",
+    "roots": [
+      {
+        "name": "main",
+        "roots": 20
+      }
+    ]
+  },
+  {
+    "name": "scalar.js",
+    "optimization": "2",
+    "strategy": "distinct",
+    "stress": false,
+    "buildDir": "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm",
+    "outcome": "normal",
+    "ok": true,
+    "output": "3\nhello 世界\nNaN Infinity -Infinity\n",
+    "roots": [
+      {
+        "name": "main",
+        "roots": 20
+      }
+    ]
+  },
+  {
+    "name": "scalar.js",
+    "optimization": "0",
+    "strategy": "reuse",
+    "stress": false,
+    "buildDir": "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm",
+    "outcome": "normal",
+    "ok": true,
+    "output": "3\nhello 世界\nNaN Infinity -Infinity\n",
+    "roots": [
+      {
+        "name": "main",
+        "roots": 17
+      }
+    ]
+  },
+  {
+    "name": "scalar.js",
+    "optimization": "2",
+    "strategy": "reuse",
+    "stress": false,
+    "buildDir": "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm",
+    "outcome": "normal",
+    "ok": true,
+    "output": "3\nhello 世界\nNaN Infinity -Infinity\n",
+    "roots": [
+      {
+        "name": "main",
+        "roots": 17
+      }
+    ]
+  },
+  {
+    "name": "tdz.js",
+    "optimization": "0",
+    "strategy": "distinct",
+    "stress": false,
+    "buildDir": "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm",
+    "outcome": "normal",
+    "ok": true,
+    "output": "true\n7\nReferenceError\ntrue\n9\n",
+    "roots": [
+      {
+        "name": "main",
+        "roots": 17
+      },
+      {
+        "name": "get",
+        "roots": 11
+      },
+      {
+        "name": "f",
+        "roots": 19
+      },
+      {
+        "name": "read",
+        "roots": 11
+      }
+    ]
+  },
+  {
+    "name": "tdz.js",
+    "optimization": "2",
+    "strategy": "distinct",
+    "stress": false,
+    "buildDir": "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm",
+    "outcome": "normal",
+    "ok": true,
+    "output": "true\n7\nReferenceError\ntrue\n9\n",
+    "roots": [
+      {
+        "name": "main",
+        "roots": 17
+      },
+      {
+        "name": "get",
+        "roots": 11
+      },
+      {
+        "name": "f",
+        "roots": 19
+      },
+      {
+        "name": "read",
+        "roots": 11
+      }
+    ]
+  },
+  {
+    "name": "tdz.js",
+    "optimization": "0",
+    "strategy": "reuse",
+    "stress": false,
+    "buildDir": "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm",
+    "outcome": "normal",
+    "ok": true,
+    "output": "true\n7\nReferenceError\ntrue\n9\n",
+    "roots": [
+      {
+        "name": "main",
+        "roots": 14
+      },
+      {
+        "name": "get",
+        "roots": 10
+      },
+      {
+        "name": "f",
+        "roots": 14
+      },
+      {
+        "name": "read",
+        "roots": 10
+      }
+    ]
+  },
+  {
+    "name": "tdz.js",
+    "optimization": "2",
+    "strategy": "reuse",
+    "stress": false,
+    "buildDir": "/home/manuel/code/wesen/2026-10-28--llvm-js/hermes/build-llvm",
+    "outcome": "normal",
+    "ok": true,
+    "output": "true\n7\nReferenceError\ntrue\n9\n",
+    "roots": [
+      {
+        "name": "main",
+        "roots": 14
+      },
+      {
+        "name": "get",
+        "roots": 10
+      },
+      {
+        "name": "f",
+        "roots": 14
+      },
+      {
+        "name": "read",
+        "roots": 10
+      }
+    ]
+  }
+]

@@ -1,0 +1,11 @@
+{
+  "id": "M-07",
+  "title": "The capstone",
+  "group": "Method",
+  "about": "The ledger end to end: specification, a fully stated pipeline, static and dynamic checks, an engine run, a search and a decision.",
+  "tries": ["Which of the ten laws would catch a forgotten root first?", "Why does the specification come before every other check?", "What would you add before shipping to a native build?"],
+  "view": { "fn": "deposit", "level": "L3", "tab": "laws", "overlays": ["safepoints", "roots"], "mode": "plan", "gc": "stress" },
+  "chapters": [21],
+  "docs": ["refinement", "design-spaces"],
+  "expect": { "compile": "ok" }
+}

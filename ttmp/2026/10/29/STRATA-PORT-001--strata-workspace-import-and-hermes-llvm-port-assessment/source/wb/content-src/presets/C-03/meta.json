@@ -1,0 +1,15 @@
+{
+  "id": "C-03",
+  "title": "Derived permissions",
+  "group": "Contracts",
+  "about": "Erase, merge, move, duplicate, hoist and speculate, derived from behaviour for nine operations and one loop.",
+  "tries": [
+    "Why can the cell.load of k not be hoisted out of the loop?",
+    "Explain obj.new's erase condition",
+    "Which permissions does cell.load_checked lose, and why?"
+  ],
+  "view": { "fn": "arrow", "level": "L1", "tab": "experiments", "overlays": [], "mode": "spec", "gc": "off" },
+  "chapters": [7],
+  "docs": ["effects"],
+  "expect": { "compile": "ok" }
+}

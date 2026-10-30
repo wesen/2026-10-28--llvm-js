@@ -1,0 +1,11 @@
+{
+  "id": "M-05",
+  "title": "Decision records",
+  "group": "Method",
+  "about": "A design decision as a value with options, measured evidence, a counterexample sought and an overturn condition, checked by check().",
+  "tries": ["What would overturn the choice of stackReuse?", "Fix the hurried record so check() accepts it", "Write a record for the exception strategy"],
+  "view": { "fn": "total", "level": "L3", "tab": "experiments", "overlays": ["roots"], "mode": "spec", "gc": "off" },
+  "chapters": [21],
+  "docs": ["design-spaces"],
+  "expect": { "compile": "ok" }
+}

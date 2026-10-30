@@ -1,0 +1,14 @@
+{
+  "id": "L-08",
+  "title": "Unwinding with setjmp",
+  "group": "Lowering",
+  "about": "A getter throws inside a helper; the setjmp protocol brings control to the catch, which needs its values in root slots.",
+  "tries": [
+    "Why is box live across the js.get in the protected block?",
+    "What would go wrong if try_state were an ordinary register value?",
+    "What does a catch restore under the arena strategy, and why?"
+  ],
+  "view": { "fn": "risky", "level": "L3", "tab": "plan", "overlays": ["exceptional", "live"], "mode": "plan", "gc": "stress" },
+  "chapters": [14],
+  "docs": ["unwinding"]
+}

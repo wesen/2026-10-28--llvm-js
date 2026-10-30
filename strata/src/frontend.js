@@ -22,6 +22,7 @@ class Scope {
   constructor(kind, parent, fnScope) {
     this.kind = kind; this.parent = parent; this.fnScope = kind === 'function' ? this : fnScope;
     this.decls = new Map();
+    this.strict = parent ? parent.strict : false;
   }
   declare(name, kind, node) {
     if (this.decls.has(name) && kind !== 'var' && kind !== 'function') throw new Unsupported(`${name} is declared twice in one scope`, node);
@@ -35,9 +36,18 @@ Scope.n = 0;
 const BUILTINS = new Set(['print', 'queueMicrotask', 'setTimeout', 'Promise', 'Error', 'TypeError', 'RangeError', 'undefined', 'NaN', 'Infinity']);
 
 // Pass 1: build scopes and declarations; pass 2: resolve references and record captures.
+function hasStrictDirective(body) {
+  for (const statement of body) {
+    if (!statement.directive) return false;
+    if (statement.directive === 'use strict') return true;
+  }
+  return false;
+}
+
 function analyzeScopes(program) {
   const scopeOf = new Map(), fnInfo = new Map();
   const top = new Scope('function', null, null);
+  top.strict = hasStrictDirective(program.body);
   top.declare('this', 'this');
   scopeOf.set(program, top);
   fnInfo.set(program, { scope: top, free: new Map(), node: program, usesThis: false });
@@ -57,7 +67,9 @@ function analyzeScopes(program) {
     }
   };
   const visitFn = (node, parentScope) => {
+    if (node.async || node.generator) throw new Unsupported('async and generator functions are outside the native subset', node);
     const s = new Scope('function', parentScope, null);
+    s.strict = s.strict || hasStrictDirective(node.body.type === 'BlockStatement' ? node.body.body : []);
     if (node.type !== 'ArrowFunctionExpression') s.declare('this', 'this');
     node.params.forEach(p => {
       if (p.type !== 'Identifier') throw new Unsupported('only simple parameters are supported (no defaults, rest or destructuring)', p);
@@ -174,6 +186,10 @@ function compileJS(text, opts = {}) {
   let ast;
   try { ast = acornLib.parse(text, { ecmaVersion: 2022, sourceType: 'script', locations: true }); }
   catch (e) { throw new StrataError(`parse error: ${e.message}`, { kind: 'parse', loc: e.loc ? { line: e.loc.line, col: e.loc.column + 1 } : null }); }
+  if (opts.native) walk(ast, n => {
+    if (n.type === 'FunctionExpression' && n.id) throw new Unsupported('named function expressions require current-callee support and are not admitted', n);
+    return true;
+  });
   const sc = analyzeScopes(ast);
   const fns = [], names = new Set();
   const uniqueName = base => { let n = base.replace(/[^\w$]/g, '_') || 'anon', i = 1; const b = n; while (names.has(n)) n = `${b}_${++i}`; names.add(n); return n; };
@@ -204,7 +220,7 @@ function lowerFunction(node, sc, fnName, opts) {
   const captures = [...info.free.values()];
   const fn = new Fn({ name: fnName.get(node), params: [], result: t.any, meta: {
     kind: isScript ? 'script' : node.type === 'ArrowFunctionExpression' ? 'arrow' : 'function',
-    captures: captures.map(d => d.name), jsParams: isScript ? 0 : node.params.length,
+    strict: scope.strict, captures: captures.map(d => d.name), jsParams: isScript ? 0 : node.params.length,
     loc: node.loc ? { line: node.loc.start.line, col: node.loc.start.column + 1 } : null, source: opts.name,
   } });
   const L = new Lowerer(fn, sc, fnName, opts);
@@ -222,7 +238,7 @@ function lowerFunction(node, sc, fnName, opts) {
   } else {
     L.start();
     const thisDecl = scope.decls.get('this');
-    if (thisDecl) L.bindParam(thisDecl, lit(undefined));
+    if (thisDecl) L.bindParam(thisDecl, opts.native ? L.emit('js.global_object') : lit(undefined));
   }
   // Cells for every declaration of the function scope (var, let, const, functions).
   L.enterScope(scope, node.body && node.body.type === 'BlockStatement' ? node.body.body : node.type === 'Program' ? node.body : []);
@@ -522,7 +538,7 @@ class Lowerer {
         this.cur = join; return join.params[0].id;
       }
       case 'UnaryExpression': {
-        if (e.operator === 'typeof' && e.argument.type === 'Identifier' && !this.scopeOf(e.argument).lookup(e.argument.name) && !BUILTINS.has(e.argument.name)) return this.emit('js.typeof', lit(undefined));
+        if (e.operator === 'typeof' && e.argument.type === 'Identifier' && !this.scopeOf(e.argument).lookup(e.argument.name) && !BUILTINS.has(e.argument.name)) return this.emit('js.typeof', this.emit('js.global_get', lit(e.argument.name), { allowMissing: true }));
         const v = this.expr(e.argument);
         if (e.operator === '-') return this.emit('js.neg', v, { node: e });
         if (e.operator === '+') return this.emit('js.mul', v, lit(1), { node: e });
@@ -546,7 +562,7 @@ class Lowerer {
           const o = this.expr(e.left.object), k = e.left.computed ? this.expr(e.left.property) : lit(e.left.property.name);
           const old = this.emit('js.get', o, k, { node: e.left });
           const v = this.emit(ops[e.operator], old, this.expr(e.right), { node: e });
-          this.emit('js.put', o, k, v, { node: e }); return v;
+          this.emit('js.put', o, k, v, { strict: this.fn.meta.strict, node: e }); return v;
         }
         const v = this.emit(ops[e.operator], this.expr(e.left), this.expr(e.right), { node: e });
         this.assignTo(e.left, v); return v;
@@ -589,17 +605,18 @@ class Lowerer {
     if (e.name === 'undefined') return lit(undefined);
     if (e.name === 'NaN') return lit(NaN);
     if (e.name === 'Infinity') return lit(Infinity);
+    if (this.opts.native && e.name === 'arguments') throw new Unsupported('implicit arguments objects are outside the native subset', e);
     return this.emit('js.global_get', lit(e.name), { hint: e.name, node: e });
   }
   assignTo(target, v) {
     if (target.type === 'Identifier') {
       const d = this.scopeOf(target).lookup(target.name);
       if (d) return this.store(d, v, target);
-      return this.emit('js.global_put', lit(target.name), v);
+      return this.emit('js.global_put', lit(target.name), v, { strict: this.fn.meta.strict });
     }
     if (target.type === 'MemberExpression') {
       const o = this.expr(target.object), k = target.computed ? this.expr(target.property) : lit(target.property.name);
-      return this.emit('js.put', o, k, v, { node: target });
+      return this.emit('js.put', o, k, v, { strict: this.fn.meta.strict, node: target });
     }
     throw new Unsupported('only names and properties can be assigned', target);
   }
@@ -619,6 +636,7 @@ class Lowerer {
   call(e) {
     const args = () => e.arguments.map(a => { if (a.type === 'SpreadElement') throw new Unsupported('spread arguments are outside this subset', a); return this.expr(a); });
     const c = e.callee;
+    if (c.type === 'Identifier' && c.name === 'eval' && !this.scopeOf(c).lookup('eval')) throw new Unsupported('direct eval needs lexical environment metadata and is not admitted', e);
     const builtin = name => c.type === 'Identifier' && c.name === name && !this.scopeOf(c).lookup(name);
     if (builtin('print')) { this.emit('host.print', ...args(), { node: e }); return lit(undefined); }
     if (builtin('queueMicrotask')) { this.emit('job.enqueue', ...args(), { node: e }); return lit(undefined); }
@@ -628,7 +646,8 @@ class Lowerer {
     }
     if (c.type === 'MemberExpression') {
       const o = this.expr(c.object), k = c.computed ? this.expr(c.property) : lit(c.property.name);
-      return this.emit('js.call_method', o, k, ...args(), { node: e, hint: 'r' });
+      const callee = this.emit('js.get', o, k, { node: c, hint: 'callee' });
+      return this.emit('js.call', callee, o, ...args(), { node: e, hint: 'r' });
     }
     const f = this.expr(c);
     return this.emit('js.call', f, lit(undefined), ...args(), { node: e, hint: 'r' });

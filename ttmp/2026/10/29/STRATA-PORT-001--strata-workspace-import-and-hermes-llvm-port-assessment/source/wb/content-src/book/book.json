@@ -1,0 +1,453 @@
+{
+ "title": "Compilers from First Principles",
+ "subtitle": "A JavaScript compiler built as values, read in the Strata workbench",
+ "parts": [
+  {
+   "id": "I",
+   "title": "Seeing and meaning",
+   "about": "A compiler as something you can watch, and the specification every part of it answers to."
+  },
+  {
+   "id": "II",
+   "title": "Representation",
+   "about": "How the compiler holds a program: blocks, edges, SSA, and exceptions as edges."
+  },
+  {
+   "id": "III",
+   "title": "Contracts",
+   "about": "What each operation may do, what lowering owes it, and the permissions that follow."
+  },
+  {
+   "id": "IV",
+   "title": "Analysis",
+   "about": "Facts about programs computed as least fixed points over lattices."
+  },
+  {
+   "id": "V",
+   "title": "Transformation",
+   "about": "Rewrites with side conditions, refinement, and pipelines of passes."
+  },
+  {
+   "id": "VI",
+   "title": "Lowering",
+   "about": "From values to machine words: representations, garbage-collection roots and unwinding."
+  },
+  {
+   "id": "VII",
+   "title": "Backends",
+   "about": "WebAssembly built by hand and LLVM IR in the shape of the Hermes backend."
+  },
+  {
+   "id": "VIII",
+   "title": "The runtime",
+   "about": "Jobs, promises and timers, and engines as state machines."
+  },
+  {
+   "id": "IX",
+   "title": "Method",
+   "about": "Laws, fuzzing and experiments, and the road from the workbench to a real compiler."
+  }
+ ],
+ "chapters": [
+  {
+   "n": "P",
+   "slug": "preface",
+   "title": "Preface",
+   "about": "Who the book is for, how to read it with the workbench open, the running example, and what the workbench is and is not (no Hermes or LLVM in the page).",
+   "presets": [],
+   "file": "00-preface.md"
+  },
+  {
+   "n": 1,
+   "slug": "a-compiler-you-can-see",
+   "title": "A compiler you can see",
+   "about": "The ledger compiled with every default and read view by view: source, cells, SSA, helpers, root plan, LLVM text; what a pass is, what the trace and decisions record; the shape of the whole book.",
+   "part": "I",
+   "presets": [
+    "B-01",
+    "B-02",
+    "B-03",
+    "B-04"
+   ],
+   "file": "01-a-compiler-you-can-see.md",
+   "docs": [
+    "workbench-tour"
+   ]
+  },
+  {
+   "n": 2,
+   "slug": "meaning-first",
+   "title": "Meaning first",
+   "about": "The reference interpreter as the specification: steps, frames, outcomes (normal, throw, diverge), observations and SameValue, object identity up to renaming, profiles, coercion running user code, the temporal dead zone; why every later chapter compares against this.",
+   "part": "I",
+   "presets": [
+    "S-01",
+    "S-02",
+    "S-03",
+    "S-04",
+    "S-05",
+    "S-06",
+    "J-06"
+   ],
+   "file": "02-meaning-first.md",
+   "docs": [
+    "semantics"
+   ]
+  },
+  {
+   "n": 3,
+   "slug": "blocks-edges-and-ssa",
+   "title": "Blocks, edges and SSA",
+   "about": "Core IR: functions, blocks, operations, terminators; static single assignment with block parameters instead of phi nodes; loops as edges carrying arguments; the text form, JSON and round trips; the verifier's rules and dominance with a counter-path.",
+   "part": "II",
+   "presets": [
+    "I-01",
+    "I-02",
+    "I-03",
+    "I-04",
+    "I-05"
+   ],
+   "file": "03-blocks-edges-and-ssa.md",
+   "docs": [
+    "ssa",
+    "dominance"
+   ]
+  },
+  {
+   "n": 4,
+   "slug": "building-ssa-from-source",
+   "title": "Building SSA from source",
+   "about": "The frontend: scopes, declarations, captures; every variable a cell; mem2reg as promote-cells: dominance frontiers, placing block parameters, renaming along the dominator tree, pruning dead parameters; what captured variables and the temporal dead zone keep as cells.",
+   "part": "II",
+   "presets": [
+    "S-04",
+    "I-05",
+    "I-06",
+    "I-07",
+    "I-08",
+    "J-01"
+   ],
+   "file": "04-building-ssa-from-source.md",
+   "docs": [
+    "ssa",
+    "dominance"
+   ]
+  },
+  {
+   "n": 5,
+   "slug": "exceptions-as-edges",
+   "title": "Exceptions as edges",
+   "about": "Throwing operations as control flow: block-level exceptional exits (throws to H(args)), invoke, the handler's implicit parameter; try/catch and try/finally lowered with completion records; why a handler sees values at the head of the protected block, and what that means for promotion.",
+   "part": "II",
+   "presets": [
+    "I-09",
+    "I-10",
+    "J-03"
+   ],
+   "file": "05-exceptions-as-edges.md",
+   "docs": [
+    "exceptions"
+   ]
+  },
+  {
+   "n": 6,
+   "slug": "effects-and-contracts",
+   "title": "Effects and contracts",
+   "about": "Behaviours (reads, writes, fresh, throws, diverges, callsUser, host) as a join-semilattice; obligations (mayCollect, nonlocalThrow, write barriers); the standard operation sets and their contracts; writing your own operation; providers.",
+   "part": "III",
+   "presets": [
+    "S-06",
+    "C-01",
+    "C-02",
+    "C-05",
+    "C-08"
+   ],
+   "file": "06-effects-and-contracts.md",
+   "docs": [
+    "effects"
+   ]
+  },
+  {
+   "n": 7,
+   "slug": "permissions-and-the-throwing-getter",
+   "title": "Permissions and the throwing getter",
+   "about": "Erase, merge, move, duplicate, hoist and speculate derived from behaviour; the antitone law; commuting operations; why an unused js.get is not dead code, followed end to end from a getter that prints and throws; variants and narrowing as the way to earn permissions.",
+   "part": "III",
+   "presets": [
+    "C-03",
+    "C-04",
+    "C-06",
+    "C-07",
+    "J-02"
+   ],
+   "file": "07-permissions-and-the-throwing-getter.md",
+   "docs": [
+    "effects"
+   ]
+  },
+  {
+   "n": 8,
+   "slug": "lattices-and-fixed-points",
+   "title": "Lattices and fixed points",
+   "about": "Partial orders, joins, lattices of finite height; monotone transfer functions and the least fixed point (Kleene iteration, the worklist algorithm); the one solver; powerset, flat, map, product, interval lattices; widening; writing a constant-propagation analysis; analyses on any graph.",
+   "part": "IV",
+   "presets": [
+    "A-01",
+    "A-02",
+    "A-04",
+    "A-05",
+    "A-06",
+    "A-07"
+   ],
+   "file": "08-lattices-and-fixed-points.md",
+   "docs": [
+    "lattices"
+   ]
+  },
+  {
+   "n": 9,
+   "slug": "liveness-safepoints-and-types",
+   "title": "Liveness, safepoints and types",
+   "about": "Liveness as a backward analysis over block parameters, its edge rule and exceptional edges; safepoints as operations that may collect; live-across sets; type facts as a forward analysis with branch refinement; the solver's steps on the ledger's total loop.",
+   "part": "IV",
+   "presets": [
+    "A-02",
+    "A-03",
+    "A-08",
+    "J-04"
+   ],
+   "file": "09-liveness-safepoints-and-types.md",
+   "docs": [
+    "liveness",
+    "type-facts"
+   ]
+  },
+  {
+   "n": 10,
+   "slug": "rewrites-and-refinement",
+   "title": "Rewrites and refinement",
+   "about": "Rewrites as match, side condition and action; the decision log; folding, propagation, branch simplification, narrowing, store-to-load forwarding; naive DCE and why it is wrong; refinement as the correctness criterion and g.law.refines; idempotent canonical forms.",
+   "part": "V",
+   "presets": [
+    "T-01",
+    "T-02",
+    "T-03",
+    "T-04",
+    "T-05",
+    "T-08"
+   ],
+   "file": "10-rewrites-and-refinement.md",
+   "docs": [
+    "rewriting",
+    "refinement"
+   ]
+  },
+  {
+   "n": 11,
+   "slug": "passes-and-pipelines",
+   "title": "Passes and pipelines",
+   "about": "A pass as a function with declared requirements and products; pipelines as immutable values with four-way slots; inserting a pass; check(); presets as functions; why correct passes compose (refinement is transitive).",
+   "part": "V",
+   "presets": [
+    "B-02",
+    "T-06",
+    "T-07"
+   ],
+   "file": "11-passes-and-pipelines.md",
+   "docs": [
+    "refinement"
+   ]
+  },
+  {
+   "n": 12,
+   "slug": "values-and-representations",
+   "title": "Values and representations",
+   "about": "From the type lattice to machine words: NaN-boxed tagged values, unboxed doubles and int32, the representation choice; binding operations to inline instructions, runtime helpers and direct calls (L2); quantities, units and layouts.",
+   "part": "VI",
+   "presets": [
+    "B-05",
+    "C-06",
+    "T-04",
+    "L-01",
+    "L-02"
+   ],
+   "file": "12-values-and-representations.md",
+   "docs": [
+    "nan-boxing"
+   ]
+  },
+  {
+   "n": 13,
+   "slug": "garbage-collection-and-roots",
+   "title": "Garbage collection and roots",
+   "about": "Moving collection and why references in registers go stale; root slots; what a plan must root at each safepoint (live-across and borrowed operands); distinct, stackReuse and arena strategies; the plan checker; the simulated collector that poisons moved addresses; the 1,024-slot native frame.",
+   "part": "VI",
+   "presets": [
+    "L-03",
+    "L-04",
+    "L-05",
+    "L-06",
+    "L-07",
+    "J-06"
+   ],
+   "file": "13-garbage-collection-and-roots.md",
+   "docs": [
+    "gc-roots"
+   ]
+  },
+  {
+   "n": 14,
+   "slug": "unwinding",
+   "title": "Unwinding",
+   "about": "Getting an exception from a helper to a handler: setjmp and the try state as in Hermes, status returns, landing pads; what a catch must restore; strategy compatibility as a declared relation; why statusReturn needs providers that do not throw nonlocally.",
+   "part": "VI",
+   "presets": [
+    "C-08",
+    "L-08",
+    "L-09",
+    "J-07"
+   ],
+   "file": "14-unwinding.md",
+   "docs": [
+    "unwinding"
+   ]
+  },
+  {
+   "n": 15,
+   "slug": "webassembly-by-hand",
+   "title": "WebAssembly by hand",
+   "about": "The core profile, f64 locals, block parameters as locals, the dispatch loop with br_table, encoding sections and LEB128 by hand, running the binary in the page; getting JavaScript into the core profile with assumptions and narrowing.",
+   "part": "VII",
+   "presets": [
+    "W-01",
+    "W-02",
+    "W-03"
+   ],
+   "file": "15-webassembly-by-hand.md",
+   "docs": [
+    "wasm"
+   ]
+  },
+  {
+   "n": 16,
+   "slug": "llvm-ir-and-the-hermes-abi",
+   "title": "LLVM IR and the Hermes ABI",
+   "about": "The textual LLVM IR the workbench prints in the shape of the Hermes LLVM backend: define internal i64 @f(ptr %shr), shllvm_enter and the frame, root slots as getelementptr, helper calls with out pointers, constants, closures and calls through argv, the setjmp try protocol and catch.dispatch; the structural checker; what changes when this text meets a real LLVM.",
+   "part": "VII",
+   "presets": [
+    "W-04",
+    "W-05",
+    "W-06",
+    "W-07"
+   ],
+   "file": "16-llvm-ir-and-the-hermes-abi.md",
+   "docs": [
+    "hermes-llvm"
+   ]
+  },
+  {
+   "n": 17,
+   "slug": "jobs-promises-and-order",
+   "title": "Jobs, promises and order",
+   "about": "Run to completion, the microtask queue, promises and then, adoption, timers in virtual time; the order of output as an observation; what an engine must preserve.",
+   "part": "VIII",
+   "presets": [
+    "E-01",
+    "E-02",
+    "E-03",
+    "J-05"
+   ],
+   "file": "17-jobs-promises-and-order.md",
+   "docs": [
+    "jobs"
+   ]
+  },
+  {
+   "n": 18,
+   "slug": "engines-and-lifecycles",
+   "title": "Engines and lifecycles",
+   "about": "An engine as an execution domain: admission before execution, units, evaluation, jobs, closing (runtime before code); lifecycles as labelled transition systems; synchronised products and invariants; a use after close found by search.",
+   "part": "VIII",
+   "presets": [
+    "E-04",
+    "E-05",
+    "E-06",
+    "E-07"
+   ],
+   "file": "18-engines-and-lifecycles.md",
+   "docs": [
+    "lts"
+   ]
+  },
+  {
+   "n": 19,
+   "slug": "laws-fuzzing-and-shrinking",
+   "title": "Laws, fuzzing and shrinking",
+   "about": "Properties as executable laws; generators of IR and JavaScript; refinement checked on generated programs; shrinking a counterexample by deleting statements; differential testing of spec, plan and Wasm.",
+   "part": "IX",
+   "presets": [
+    "M-01",
+    "M-02",
+    "M-03",
+    "M-04",
+    "J-08"
+   ],
+   "file": "19-laws-fuzzing-and-shrinking.md",
+   "docs": [
+    "property-testing"
+   ]
+  },
+  {
+   "n": 20,
+   "slug": "experiments-and-design-spaces",
+   "title": "Experiments and design spaces",
+   "about": "A design as a product space of pipelines; metrics; objectives (weighted, lexicographic, Pareto) and where they disagree; feasibility; grid and random search; a factorial study of root strategies measured on a corpus.",
+   "part": "IX",
+   "presets": [
+    "X-01",
+    "X-02",
+    "X-03",
+    "X-04",
+    "X-05",
+    "X-06",
+    "X-07"
+   ],
+   "file": "20-experiments-and-design-spaces.md",
+   "docs": [
+    "design-spaces"
+   ]
+  },
+  {
+   "n": 21,
+   "slug": "from-the-workbench-to-a-real-compiler",
+   "title": "From the workbench to a real compiler",
+   "about": "What carries over to a Hermes and LLVM build: the specification as oracle, contracts as data, the plan checker, laws as tests, the decision records; what does not (real helpers, real LLVM, a real collector); a step-by-step plan to port, and the decision records and processes that keep it honest.",
+   "part": "IX",
+   "presets": [
+    "M-05",
+    "M-06",
+    "M-07"
+   ],
+   "file": "21-from-the-workbench-to-a-real-compiler.md",
+   "docs": [
+    "refinement"
+   ]
+  },
+  {
+   "n": "A",
+   "slug": "core-ir-reference",
+   "title": "Appendix A: Core IR reference",
+   "about": "Every operation of the standard sets with operands, results, behaviour, obligations and set; the text grammar; the verifier's rules.",
+   "presets": [],
+   "file": "A-core-ir-reference.md"
+  },
+  {
+   "n": "B",
+   "slug": "glossary",
+   "title": "Appendix B: Glossary",
+   "about": "Every term defined in bold in the book, with the chapter that defines it.",
+   "presets": [],
+   "file": "B-glossary.md"
+  }
+ ]
+}

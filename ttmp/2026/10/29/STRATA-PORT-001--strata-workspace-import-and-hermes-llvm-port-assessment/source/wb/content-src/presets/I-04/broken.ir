@@ -1,0 +1,57 @@
+// Seven functions, each breaking one rule of the verifier.
+
+// A value defined on one arm of a branch, used after the merge.
+fn dominance(c: boolean, x: number) -> number {
+entry:
+  branch c, left(), join()
+left():
+  y = num.add(x, 1)
+  jump join()
+join():
+  return y
+}
+
+// An edge that passes two arguments to a block with one parameter.
+fn arity(x: number) -> number {
+entry:
+  jump done(x, 1)
+done(r: number):
+  return r
+}
+
+// A string passed to a number parameter.
+fn types(x: number) -> number {
+entry:
+  jump done("seven")
+done(r: number):
+  return r
+}
+
+// A property read that may throw, in a block that says nothing about throws.
+fn throwing(o: object) -> any {
+entry:
+  v = js.get(o, "k")
+  return v
+}
+
+// The same name defined twice.
+fn twice(x: number) -> number {
+entry:
+  y = num.add(x, 1)
+  y = num.mul(x, 2)
+  return y
+}
+
+// An edge to a block that does not exist.
+fn missing(x: number) -> number {
+entry:
+  jump nowhere(x)
+}
+
+// A block nothing can reach: a warning, not an error.
+fn island(x: number) -> number {
+entry:
+  return x
+lost():
+  return 0
+}

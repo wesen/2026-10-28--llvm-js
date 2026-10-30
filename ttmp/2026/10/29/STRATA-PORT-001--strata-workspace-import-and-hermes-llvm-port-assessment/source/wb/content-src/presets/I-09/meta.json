@@ -1,0 +1,14 @@
+{
+  "id": "I-09",
+  "title": "Exceptions as edges",
+  "group": "IR",
+  "about": "invoke with normal and throw edges, and block-level exits throws to H(args), on a getter that throws.",
+  "tries": [
+    "Why is fallback live across the js.get in guarded?",
+    "Rewrite guarded with invoke instead of a block exit",
+    "What may a throws to clause pass, and what may it not?"
+  ],
+  "view": { "fn": "readAfterCall", "level": "L1", "tab": "events", "overlays": ["exceptional"], "mode": "spec", "gc": "off" },
+  "chapters": [5],
+  "docs": ["exceptions"]
+}

@@ -1,0 +1,14 @@
+{
+  "id": "L-01",
+  "title": "Bound to helpers",
+  "group": "Lowering",
+  "about": "L2, the runtime IR: each operation bound to an inline instruction, a runtime helper or a direct call, with its obligations.",
+  "tries": [
+    "Which operations in this program lower inline, and what makes them eligible?",
+    "What does 'throws (setjmp)' on a helper commit the backend to?",
+    "Why does scale need no root slots while area needs two?"
+  ],
+  "view": { "fn": "area", "level": "L2", "tab": "ir", "overlays": ["safepoints"], "mode": "spec", "gc": "off" },
+  "chapters": [12],
+  "docs": ["nan-boxing"]
+}

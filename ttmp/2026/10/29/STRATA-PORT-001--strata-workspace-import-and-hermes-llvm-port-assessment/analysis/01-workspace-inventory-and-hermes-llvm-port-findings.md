@@ -24,6 +24,8 @@ WhenToUse: ""
 
 # Strata workspace import and Hermes/LLVM port findings
 
+> Historical import-time assessment. Subsequent native implementation is documented in the ticket design guide and diary; the reference archive remains unchanged.
+
 ## Finding
 
 The archive contains a detailed, explicit porting guide: **Strata on the real Hermes and LLVM: an intern's guide**, approximately 54 KB. Its intended architecture is Strata frontend → Strata core IR/analyses/root plans → real LLVM IR → LLVM native compilation → Hermes managed runtime through the existing `shllvm_*` bridge. The fork's compiler becomes a comparison baseline rather than the frontend of this new path.

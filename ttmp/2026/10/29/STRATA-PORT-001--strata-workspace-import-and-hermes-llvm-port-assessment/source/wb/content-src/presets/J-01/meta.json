@@ -1,0 +1,11 @@
+{
+  "id": "J-01",
+  "title": "A counter with closures",
+  "group": "JavaScript scenarios",
+  "about": "Three closures share one variable: the cell that survives promotion, checked loads, and what each closure captures.",
+  "tries": ["Why does inc reload count after storing it?", "Which variables stay cells, and why?", "What would change if count were a var?"],
+  "view": { "fn": "inc", "level": "L1", "tab": "ir", "overlays": ["safepoints"], "mode": "spec", "gc": "off" },
+  "chapters": [4],
+  "docs": ["ssa"],
+  "expect": { "compile": "ok" }
+}

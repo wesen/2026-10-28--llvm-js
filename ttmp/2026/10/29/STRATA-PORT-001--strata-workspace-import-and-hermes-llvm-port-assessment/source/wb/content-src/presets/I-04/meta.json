@@ -1,0 +1,14 @@
+{
+  "id": "I-04",
+  "title": "The verifier",
+  "group": "IR",
+  "about": "Seven functions that each break one rule: dominance with a counter-path, arity, types, throws, names, blocks.",
+  "tries": [
+    "Explain the counter-path in the dominance error",
+    "Fix every function in broken.ir and rerun",
+    "Why is an unreachable block only a warning?"
+  ],
+  "view": { "fn": "fixed", "level": "L1", "tab": "experiments", "overlays": [], "mode": "spec", "gc": "off" },
+  "chapters": [3],
+  "docs": ["dominance", "ssa"]
+}

@@ -1,0 +1,15 @@
+{
+  "id": "L-05",
+  "title": "A stale reference, caught",
+  "group": "Lowering",
+  "about": "One root removed from a correct plan, the checker turned off: the stress collector finds the stale use at step 10.",
+  "tries": [
+    "Why does the run with GC off print the right answer?",
+    "Why was b moved rather than freed?",
+    "Which collector setting would you use to test a new root strategy, and why?"
+  ],
+  "view": { "fn": "pair", "level": "L3", "tab": "events", "overlays": ["stale", "safepoints"], "mode": "plan", "gc": "stress" },
+  "chapters": [13],
+  "docs": ["gc-roots"],
+  "expect": { "compile": "ok", "outcome": "error", "stale": true }
+}

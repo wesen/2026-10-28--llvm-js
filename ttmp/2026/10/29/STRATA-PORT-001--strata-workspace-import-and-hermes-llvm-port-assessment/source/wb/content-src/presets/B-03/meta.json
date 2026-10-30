@@ -1,0 +1,14 @@
+{
+  "id": "B-03",
+  "title": "Every level of one function",
+  "group": "Basics",
+  "about": "One numeric function printed at every stage: source, cells, SSA, helpers, root plan, LLVM text and Wasm.",
+  "tries": [
+    "Explain how acc and i become block parameters of for1",
+    "Why is the root plan for poly empty?",
+    "What would change at L2 without the assumption?"
+  ],
+  "view": { "fn": "poly", "level": "L1", "tab": "ir", "overlays": [], "mode": "spec", "gc": "off" },
+  "chapters": [1],
+  "docs": ["workbench-tour", "ssa"]
+}

@@ -1,0 +1,11 @@
+{
+  "id": "X-03",
+  "title": "A Pareto frontier",
+  "group": "Experiments",
+  "about": "Twelve compilations on collections, root slots and assumptions: nine are dominated, three are real choices.",
+  "tries": ["Why is every distinct point dominated?", "Which of the three frontier points would you ship, and what would decide it?", "Does adding steps change the frontier?"],
+  "view": { "fn": "scale", "level": "L1", "tab": "experiments", "overlays": ["safepoints"], "mode": "plan", "gc": "stress" },
+  "chapters": [20],
+  "docs": ["design-spaces"],
+  "expect": { "compile": "ok" }
+}

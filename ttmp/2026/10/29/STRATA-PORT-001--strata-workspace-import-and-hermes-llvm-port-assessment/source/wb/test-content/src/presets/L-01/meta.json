@@ -1,0 +1,3 @@
+{ "id": "L-01", "title": "Test fixture: no roots", "group": "Lowering", "about": "the none root strategy loses v6 (shell test fixture)",
+  "tries": ["Explain the stale use"],
+  "view": { "fn": "total", "level": "L3", "tab": "laws", "mode": "plan", "gc": "stress" }, "chapters": [], "docs": [] }

@@ -1,0 +1,14 @@
+{
+  "id": "I-07",
+  "title": "Building SSA: promote-cells",
+  "group": "IR",
+  "about": "mem2reg with block parameters: which cells, where parameters go (iterated frontiers), renaming, and pruning dead ones.",
+  "tries": [
+    "Walk through the renaming of else7",
+    "Why does i get a parameter at for1 but not at endif6?",
+    "What would the IR look like without the dead-parameter sweep?"
+  ],
+  "view": { "fn": "classify", "level": "L1", "tab": "experiments", "overlays": [], "mode": "spec", "gc": "off" },
+  "chapters": [4],
+  "docs": ["ssa", "dominance"]
+}

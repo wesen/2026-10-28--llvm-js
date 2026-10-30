@@ -1,0 +1,14 @@
+; Count from 0 while i < 100. What range can i take at the loop head and at the exit?
+fn count() -> number {
+entry:
+  jump loop(0)
+loop(i: number):
+  c = num.lt(i, 100)
+  branch c, body(i), exit(i)
+body(j: number):
+  n = num.add(j, 1)
+  jump loop(n)
+exit(r: number):
+  host.print(r)
+  return r
+}

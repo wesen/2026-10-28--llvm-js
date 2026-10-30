@@ -1,0 +1,15 @@
+{
+  "id": "A-01",
+  "title": "Lattices and their laws",
+  "group": "Analysis",
+  "about": "The engine's lattices (types, powerset, flat, interval), a few joins, and the join laws checked on each.",
+  "tries": [
+    "Why must a join be idempotent for the solver to stop?",
+    "What is the height of the type lattice?",
+    "Build a product lattice and check its laws"
+  ],
+  "view": { "tab": "laws", "mode": "spec", "gc": "off" },
+  "chapters": [8],
+  "docs": ["lattices"],
+  "expect": { "lawsFail": true }
+}

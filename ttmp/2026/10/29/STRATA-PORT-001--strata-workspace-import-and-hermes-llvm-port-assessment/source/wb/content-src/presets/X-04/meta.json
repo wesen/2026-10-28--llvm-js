@@ -1,0 +1,11 @@
+{
+  "id": "X-04",
+  "title": "Constraints and feasibility",
+  "group": "Experiments",
+  "about": "Points removed before compiling, points not admitted, and points admitted but wrong: feasibility is a requirement, never a score.",
+  "tries": ["Why is the statusReturn point never compiled?", "Why does the broken point print the right output with GC off?", "What would happen without require('correct')?"],
+  "view": { "fn": "main", "level": "L3", "tab": "experiments", "overlays": ["stale", "safepoints"], "mode": "plan", "gc": "stress" },
+  "chapters": [20],
+  "docs": ["design-spaces"],
+  "expect": { "compile": "ok", "outcome": "error", "stale": true }
+}

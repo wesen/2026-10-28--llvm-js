@@ -1,0 +1,14 @@
+{
+  "id": "I-05",
+  "title": "Dominators",
+  "group": "IR",
+  "about": "Immediate dominators, the dominator tree and dominance frontiers of a loop with a diamond inside.",
+  "tries": [
+    "Why does merge hang from test in the dominator tree?",
+    "Compute the iterated dominance frontier of yes by hand",
+    "Which values defined in test may be used in exit?"
+  ],
+  "view": { "fn": "parity", "level": "L1", "tab": "experiments", "overlays": [], "mode": "spec", "gc": "off" },
+  "chapters": [3, 4],
+  "docs": ["dominance"]
+}

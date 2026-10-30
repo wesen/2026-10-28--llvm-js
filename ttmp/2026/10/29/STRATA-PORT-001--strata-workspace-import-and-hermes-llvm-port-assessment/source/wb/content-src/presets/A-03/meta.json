@@ -1,0 +1,15 @@
+{
+  "id": "A-03",
+  "title": "Type facts and branch refinement",
+  "group": "Analysis",
+  "about": "typeof tests refine x on each edge; the table shows what the facts know in every block of label.",
+  "tries": [
+    "Why is x any again in endif2?",
+    "Which type tests does the analysis refine on?",
+    "Why does x.length stay a js.get when x is known to be a string?"
+  ],
+  "view": { "fn": "label", "level": "L1", "tab": "experiments", "overlays": ["types"], "mode": "spec", "gc": "off" },
+  "chapters": [9],
+  "docs": ["type-facts"],
+  "expect": { "compile": "ok" }
+}

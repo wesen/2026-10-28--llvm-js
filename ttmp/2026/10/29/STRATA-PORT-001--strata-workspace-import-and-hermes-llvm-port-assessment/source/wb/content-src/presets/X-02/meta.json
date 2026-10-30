@@ -1,0 +1,11 @@
+{
+  "id": "X-02",
+  "title": "Objectives that disagree",
+  "group": "Experiments",
+  "about": "Assumed parameter types trade unchecked guesses for fewer collections; a weighted and a lexicographic objective pick different winners.",
+  "tries": ["Why does assuming k and n remove the safepoints in scale?", "At what weight do the two objectives agree?", "Which objective would you choose for a production compiler, and why?"],
+  "view": { "fn": "scale", "level": "L1", "tab": "experiments", "overlays": ["safepoints"], "mode": "plan", "gc": "stress" },
+  "chapters": [20],
+  "docs": ["design-spaces"],
+  "expect": { "compile": "ok" }
+}

@@ -1,0 +1,15 @@
+{
+  "id": "T-08",
+  "title": "Idempotent canonical form",
+  "group": "Transforms",
+  "about": "Three orders of the canonical rules reach one form; two correct rules that undo each other never settle, and only one of two checks notices.",
+  "tries": [
+    "Why does g.law.idempotent pass for the two rules that undo each other?",
+    "Why does the spare multiplication survive the canonical rules?",
+    "Give the doubling rules a measure that decreases"
+  ],
+  "view": { "fn": "size", "level": "L1", "tab": "laws", "overlays": [], "mode": "spec", "gc": "off" },
+  "chapters": [10],
+  "docs": ["rewriting"],
+  "expect": { "compile": "ok", "lawsFail": true }
+}

@@ -137,6 +137,7 @@ const STD = [
   { name: 'cell.load', operands: [t.cell], results: [A], behaviour: fx.reads('cells'), step: (s, [c]) => s.cellLoad(c, false), lower: { helper: 'shllvm_env_load' } },
   { name: 'cell.load_checked', operands: [t.cell], results: [A], behaviour: fx.reads('cells').join(fx.throws), obligations: ob.nonlocalThrow, step: (s, [c], op) => s.cellLoad(c, true, op.attrs.name), lower: { helper: 'shllvm_check_tdz' } },
   { name: 'cell.store', operands: [t.cell, A], results: [], behaviour: fx.writes('cells'), obligations: ob.writeBarrier, step: (s, [c, v]) => s.cellStore(c, v), lower: { helper: 'shllvm_env_store' } },
+  { name: 'js.global_object', operands: [], results: [t.object], behaviour: fx.reads('globals'), lower: { helper: 'shllvm_global' } },
   { name: 'js.global_get', operands: [S], results: [A], behaviour: fx.reads('globals').join(fx.throws), obligations: ob.nonlocalThrow, step: (s, [n]) => s.globalGet(n), lower: { helper: 'shllvm_global' } },
   { name: 'js.global_put', operands: [S, A], results: [], behaviour: fx.writes('globals'), obligations: ob.writeBarrier, step: (s, [n, v]) => s.globalPut(n, v), lower: { helper: 'shllvm_declare_global' } },
   { name: 'js.new_error', operands: [A], results: [t.object], behaviour: ALLOC.join(USER), obligations: CALLING, attrs: ['kind'], step: (s, [m], op) => s.newError(op.attrs.kind || 'Error', m), lower: { helper: 'shllvm_constructed_object' } },

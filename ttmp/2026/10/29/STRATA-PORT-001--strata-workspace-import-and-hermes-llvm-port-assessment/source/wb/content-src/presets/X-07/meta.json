@@ -1,0 +1,11 @@
+{
+  "id": "X-07",
+  "title": "Measuring a corpus",
+  "group": "Experiments",
+  "about": "The seven J programs measured with one definition: operations by contract class, cells, safepoints, roots, steps and collections.",
+  "tries": ["Which operation would most reward better type facts here?", "Why does the recursion program dominate the collections?", "Add a column for the share of user operations after narrowing"],
+  "view": { "tab": "experiments" },
+  "chapters": [20],
+  "docs": ["design-spaces", "effects"],
+  "expect": { "compile": "ok" }
+}

@@ -1,0 +1,14 @@
+{
+  "id": "E-01",
+  "title": "Microtasks and order",
+  "group": "Engine",
+  "about": "Run to completion, then the microtask queue in order: a job that queues another, and a job that throws without stopping the rest.",
+  "tries": [
+    "Why does job E print last although job A created it first?",
+    "What does the contract of job.enqueue forbid an optimiser to do?",
+    "What happens to the program's outcome when job C throws?"
+  ],
+  "view": { "fn": "main", "level": "L1", "tab": "events", "overlays": ["path"], "mode": "spec", "gc": "off" },
+  "chapters": [17],
+  "docs": ["jobs"]
+}

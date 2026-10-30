@@ -1,0 +1,14 @@
+{
+  "id": "W-06",
+  "title": "try/catch in LLVM",
+  "group": "Backends",
+  "about": "Two protected regions under the setjmp protocol: one jump buffer, a volatile try_state that every block sets, and catch.dispatch.",
+  "tries": [
+    "Why must try_state be volatile?",
+    "What happens if catch1 itself throws, and which store decides it?",
+    "Why do first and second stay cells?"
+  ],
+  "view": { "fn": "readBoth", "level": "LLVM", "tab": "ir", "overlays": ["exceptional"], "mode": "spec", "gc": "off" },
+  "chapters": [16],
+  "docs": ["unwinding", "hermes-llvm"]
+}

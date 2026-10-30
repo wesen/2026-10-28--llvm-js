@@ -22,6 +22,13 @@ WhenToUse: ""
 
 Oct 29, 2026 · @Manuel
 
+
+## Current implementation decisions
+
+The working native compiler is now under the repository's `strata/` directory; reference source and original documents are under this ticket's `source/`. Follow the separate detailed design guide for the selected initial scope. The longer roadmap below remains useful context, but replacement of Hermes/LLVM, expanded frontend syntax, ABI-version admission, speculative JIT tiers, and a generated contract database remain future work.
+
+The initial compiler uses managed two-slot completion environments, full-lifetime root reuse with a distinct-home comparison, exact header-derived helper prototypes, and build-dependent sanitizer link flags. It does not use the workbench's illustrative LLVM output as executable code. Published test results belong in the implementation diary and evidence directory; imported historical counts are not new native evidence.
+
 ## 1. What this guide is for
 
 This guide takes you from two separate codebases to one working setup, where the Strata workbench's ideas run against the real Hermes runtime and real LLVM on your machine. Read sections 2 to 4 first: they introduce the concepts and the code. Then do the steps in order; each one says why it exists, what to build, where in the code to work, and how you know it is done.
@@ -37,7 +44,7 @@ This guide takes you from two separate codebases to one working setup, where the
 
 **The aim.** The long-term goal is an engine built from Strata's own parts, with Hermes and LLVM replaced. This guide gets there in a way that works for real at every stage. Strata does as much of the compiling as it can from the start: the frontend, the core IR, the analyses, the root plans and the emitter. Two parts are borrowed until they are replaced: the **Hermes runtime** (object model, standard library, collector), reached through the bridge's helper ABI, and **LLVM**, which turns Strata's LLVM IR into machine code. The fork's own compiler stays as a yardstick, not as the product.
 
-**What you will have at the end:** the fork built and its gates reproduced; Strata running in Node; one runner comparing Node, Hermes and Strata on the same programs; Strata compiling JavaScript to native executables that run on the real Hermes runtime; the runtime ABI written down as a versioned contract; Strata's root plans proven under the real moving collector; a language subset grown by real programs; measurements against the fork's compiler; and a roadmap for replacing each borrowed part.
+**What you will have at the end:** the fork built and its gates reproduced; Strata running in Node; one runner comparing Node, Hermes and Strata on the same programs; Strata compiling JavaScript to native executables that run on the real Hermes runtime; the runtime ABI written down as a versioned contract; Strata's native root plans tested under aggressive collection; a language subset grown by real programs; measurements against the fork's compiler; and a roadmap for replacing each borrowed part.
 
 ## 2. The big picture
 
@@ -45,7 +52,7 @@ The starting line is a working native path in which Strata does the compiling. I
 
 &#91;embedded content: The starting line · Strata owns the compiler, borrows LLVM and the Hermes runtime\]
 
-Solid boxes are Strata's; dashed boxes are borrowed (LLVM, the bridge, the Hermes runtime) or kept only as a yardstick (the fork's own compiler). The differential runner judges every step: Node decides what correct means, and the fork's compiler shows what the starting line has to match. The fork matters in two ways: its bridge and runtime are what Strata's code links against, and its emitter is the reference for how to call them.
+Solid boxes are Strata's; dashed boxes are borrowed (LLVM, the bridge, the Hermes runtime) or kept only as a yardstick (the fork's own compiler). The differential runner judges every step: Node supplies a differential reference for the admitted profile, and the fork's compiler shows what the starting line has to match. The fork matters in two ways: its bridge and runtime are what Strata's code links against, and its emitter is the reference for how to call them.
 
 What each side brings to the starting line:
 
@@ -100,7 +107,7 @@ Hermes helpers report a JavaScript exception by `longjmp`: they jump straight ba
 
 A **contract** says what an operation may do: read or write the heap, allocate, throw, run user code (its **behaviour**), and what the lowering owes it, such as roots or an unwinding path (its **obligations**). Optimisations are allowed only when the contract permits them. An unused property read cannot be deleted, because a getter may print or throw.
 
-A compiler is correct when the compiled program **refines** the source: everything it is observed to do (output, uncaught exceptions, job order), the source could do too. For full JavaScript the judge is an **oracle**, Node. For the subset it is Strata's reference interpreter. The differential runner of step 3 applies this definition to every program you care about.
+A compiler is correct when the compiled program **refines** the source: everything it is observed to do (output, uncaught exceptions, job order), the source could do too. For admitted JavaScript programs, Node is a differential reference; specification-directed disagreements require investigation. For the subset it is Strata's reference interpreter. The differential runner of step 3 applies this definition to every program you care about.
 
 ## 4. Map of the code
 
@@ -357,7 +364,7 @@ Read `out/probe.ll` beside `runtime.h` and the matching part of `LLVMBackend.cpp
 2. **Completion records need a native form.** `try`/`finally` in Strata uses `completion.*` operations that have no helper. Add a Strata pass that lowers a completion to a pair of values (a kind number and a value) carried on block parameters, before emission.
 3. **Module data.** A runnable module needs more than functions: string pools, function descriptors (`%SHLLVMFunctionInfo = type { i32, i32, i32, i32 }`), the `sh_export_<unit>` constructor and a `main` that calls `shllvm_run`. Port this from `ModuleEmitter` in `LLVMBackend.cpp`, using the golden files to check every field.
 
-**Where to put the code.** A new part `src/core/75-hermes-abi.js` holding the binding table and the module-data emitter, so the old textual emitter stays available as the teaching version. Keep Strata's own root plan (`stackReuse`) and frame layout: the frame size you pass to `shllvm_frame_size` and `shllvm_enter` is your plan's slot count plus scratch and discard.
+**Current source layout.** `strata/native/abi.js` reads the actual bridge declarations and enums; `strata/native/emitter.js` emits native functions and module data. The imported textual emitter remains a separate educational implementation. Use the native full-lifetime `reuse` allocation described in the current design guide, not the workbench's safepoint-only coloring for permanent homes. Preserve the runtime frame layout: the frame size you pass to `shllvm_frame_size` and `shllvm_enter` is your plan's slot count plus scratch and discard.
 
 The link example below assumes the ASan build configured earlier; derive actual sanitizer flags from CMakeCache.txt, as the existing driver does.
 
@@ -441,7 +448,7 @@ Add `strata-native-gcstress` to the differential runner: the same Strata output 
 **Run three experiments:**
 
 1. **The corpus under stress** with the default `stackReuse` plans and with `distinct` (one slot per value). Both must pass. Record frame sizes per function for both; the difference is what liveness-based sharing saves on real code.
-2. **A negative control.** Compile with a plan that is known to be wrong and must fail: `g.pipeline().roots('none').checks({ gcSafety: false })`, or Strata's L-06 lambda strategy that drops one value. If stress does not catch it, the setup is not testing anything; fix that before you trust a pass.
+2. **A negative control.** Compile with a plan that is known to be wrong and must fail: `g.pipeline().roots('none').checks({ gcSafety: false })`, or Strata's L-06 lambda strategy that drops one value. If this control is not detected, establish whether the relevant path and collection occurred before drawing conclusions about the detector.
 3. **The checker's agreement.** Accepted plans must pass the selected stress corpus. Rejected plans are not required to fail every execution: rejection can be conservative and the relevant path may not run. Use targeted negative controls with known live references and actual collection; investigate mismatches without treating test agreement as a proof.
 
 **The frame limit.** Strata applies the fork's rule: root slots plus 2 plus the larger of 1 and the outgoing argument count must not exceed 1,024 (the fork's `LLVMBackend.cpp` line 955; Strata's `NATIVE_FRAME_LIMIT`). Generate wide functions as Strata's L-07 does and confirm that Strata and the bridge refuse at the same size. Measuring the fflate factory with Strata waits for step 7, because fflate uses features outside today's subset; until then the fork's own numbers stand (1,084 roots plus 3 argument slots at `-O0`).

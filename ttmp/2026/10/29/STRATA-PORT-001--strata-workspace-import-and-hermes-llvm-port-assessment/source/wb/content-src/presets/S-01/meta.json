@@ -1,0 +1,14 @@
+{
+  "id": "S-01",
+  "title": "The interpreter, step by step",
+  "group": "Semantics",
+  "about": "A recursive factorial replayed in the Machine view: steps, records, frames and outcomes.",
+  "tries": [
+    "Explain steps 17 to 22 one by one",
+    "Why does the record of a call come after its callee's steps?",
+    "How many frames are on the stack at step 13?"
+  ],
+  "view": { "fn": "fact", "level": "L1", "tab": "machine", "overlays": ["path"], "mode": "spec", "gc": "off" },
+  "chapters": [2],
+  "docs": ["semantics"]
+}

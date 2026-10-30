@@ -1,0 +1,15 @@
+{
+  "id": "A-08",
+  "title": "Safepoints and live-across",
+  "group": "Analysis",
+  "about": "For each safepoint in describe: the values live across it, the operands it borrows, and the root slot each one gets.",
+  "tries": [
+    "Why is user rooted at the first js.get although it is dead afterwards?",
+    "Why does length13 need a root?",
+    "Which values can share slot 0, and why?"
+  ],
+  "view": { "fn": "describe", "level": "L3", "tab": "experiments", "overlays": ["safepoints", "live"], "mode": "spec", "gc": "off" },
+  "chapters": [9],
+  "docs": ["liveness", "gc-roots"],
+  "expect": { "compile": "ok" }
+}

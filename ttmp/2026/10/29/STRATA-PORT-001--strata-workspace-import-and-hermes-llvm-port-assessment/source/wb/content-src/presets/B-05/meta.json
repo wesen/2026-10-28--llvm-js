@@ -1,0 +1,14 @@
+{
+  "id": "B-05",
+  "title": "Quantities and layouts",
+  "group": "Basics",
+  "about": "Sizes with units, the DimensionError, slots to bytes through a layout, and the native frame limit as a check.",
+  "tries": [
+    "Why is slots times slots an error?",
+    "Which function of the ledger has the largest frame, and what is in it?",
+    "Write a limit for the total number of root slots in a program"
+  ],
+  "view": { "fn": "makeLedger", "level": "L3", "tab": "experiments", "overlays": [], "mode": "spec", "gc": "off" },
+  "chapters": [12],
+  "docs": ["gc-roots"]
+}

@@ -1,0 +1,11 @@
+{
+  "id": "J-02",
+  "title": "Getters and setters",
+  "group": "JavaScript scenarios",
+  "about": "A thermometer with accessors: every property access may be a call, so every js.get and js.put is a safepoint that cannot be erased.",
+  "tries": ["Trace t.celsius = -300 from the put to the handler", "Why can the read of t.fahrenheit not be erased?", "Which values does main keep in root slots, and where?"],
+  "view": { "fn": "main", "level": "L1", "tab": "ir", "overlays": ["safepoints", "exceptional"], "mode": "spec", "gc": "off" },
+  "chapters": [7],
+  "docs": ["effects"],
+  "expect": { "compile": "ok" }
+}

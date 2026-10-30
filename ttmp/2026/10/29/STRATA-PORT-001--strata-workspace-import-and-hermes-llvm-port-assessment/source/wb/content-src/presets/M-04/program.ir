@@ -1,0 +1,25 @@
+; Collatz step count in core IR: numbers only, so the Wasm backend accepts it.
+; Starting from 27, it halves even values, maps odd x to 3x + 1, and counts steps until x <= 1.
+fn main() -> number {
+entry:
+  jump loop(27, 0)
+loop(x: number, k: number):
+  v1 = num.le(x, 1)
+  branch v1, done(k), body(x, k)
+body(x1: number, k1: number):
+  v2 = num.mod(x1, 2)
+  v3 = num.eq(v2, 0)
+  branch v3, even(x1, k1), odd(x1, k1)
+even(x2: number, k2: number):
+  v4 = num.div(x2, 2)
+  v5 = num.add(k2, 1)
+  jump loop(v4, v5)
+odd(x3: number, k3: number):
+  v6 = num.mul(x3, 3)
+  v7 = num.add(v6, 1)
+  v8 = num.add(k3, 1)
+  jump loop(v7, v8)
+done(r: number):
+  host.print(r)
+  return r
+}

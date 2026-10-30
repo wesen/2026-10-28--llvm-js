@@ -1,0 +1,15 @@
+{
+  "id": "S-05",
+  "title": "Divergence and budgets",
+  "group": "Semantics",
+  "about": "A loop that never ends, the step budget, and why running out of steps is not a meaning.",
+  "tries": [
+    "Why is the block after while (true) gone?",
+    "How many steps does one turn of the collatz loop take?",
+    "When is a diverge outcome a real bug and when is it the budget?"
+  ],
+  "view": { "fn": "collatz", "level": "L1", "tab": "experiments", "overlays": ["path"], "mode": "spec", "gc": "off" },
+  "chapters": [2],
+  "docs": ["semantics"],
+  "expect": { "compile": "ok", "outcome": "diverge" }
+}

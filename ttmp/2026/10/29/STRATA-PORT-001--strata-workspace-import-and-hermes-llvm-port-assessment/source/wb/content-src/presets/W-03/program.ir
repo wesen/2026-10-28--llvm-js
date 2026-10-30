@@ -1,0 +1,27 @@
+// Collatz: from 27, halve even numbers and map odd x to 3x + 1 until reaching 1.
+// A loop, a diamond (even or odd) that joins in next, a remainder and a boolean.
+fn main() -> number {
+entry:
+  jump loop(27, 0)
+loop(x: number, steps: number):
+  v1 = num.eq(x, 1)
+  branch v1, done(steps), step(x, steps)
+step(x1: number, s1: number):
+  v2 = num.mod(x1, 2)
+  v3 = num.eq(v2, 0)
+  branch v3, even(x1, s1), odd(x1, s1)
+even(x2: number, s2: number):
+  v4 = num.div(x2, 2)
+  jump next(v4, s2)
+odd(x3: number, s3: number):
+  v5 = num.mul(x3, 3)
+  v6 = num.add(v5, 1)
+  jump next(v6, s3)
+next(y: number, s4: number):
+  v7 = num.add(s4, 1)
+  jump loop(y, v7)
+done(r: number):
+  v8 = num.gt(r, 100)
+  host.print(r, v8)
+  return r
+}

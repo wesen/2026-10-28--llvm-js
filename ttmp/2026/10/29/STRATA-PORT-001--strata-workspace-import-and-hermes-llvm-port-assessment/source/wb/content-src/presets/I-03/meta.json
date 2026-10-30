@@ -1,0 +1,14 @@
+{
+  "id": "I-03",
+  "title": "Loops and block arguments",
+  "group": "IR",
+  "about": "Euclid's algorithm and two nested loops from JavaScript: loop-carried variables as parameters of the header.",
+  "tries": [
+    "Why does the swap in gcd need no temporary in the IR?",
+    "Which values does the back edge of the inner loop pass?",
+    "Write the gcd loop by hand with g.fn"
+  ],
+  "view": { "fn": "gcd", "level": "L1", "tab": "ir", "overlays": [], "mode": "spec", "gc": "off" },
+  "chapters": [3],
+  "docs": ["ssa"]
+}

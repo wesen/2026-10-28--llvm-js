@@ -1,0 +1,15 @@
+{
+  "id": "T-07",
+  "title": "Pipelines as values",
+  "group": "Transforms",
+  "about": "Seven pipelines branched from one base with use(), with() and set(); their hashes, strategies and results on the ledger.",
+  "tries": [
+    "Why do use(optimised, lean) and use(optimised) hash the same?",
+    "Write a debug preset and compose it two ways",
+    "Explain every default in g.pipeline().summary()"
+  ],
+  "view": { "fn": "total", "level": "L1", "tab": "experiments", "overlays": [], "mode": "spec", "gc": "off" },
+  "chapters": [11],
+  "docs": ["refinement"],
+  "expect": { "compile": "ok" }
+}

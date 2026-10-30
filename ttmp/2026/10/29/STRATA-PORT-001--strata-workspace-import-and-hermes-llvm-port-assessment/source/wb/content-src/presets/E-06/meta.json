@@ -1,0 +1,15 @@
+{
+  "id": "E-06",
+  "title": "Lifecycles as state machines",
+  "group": "Engine",
+  "about": "Runtime and code as labelled transition systems; their product, searched, finds a call into freed code unless a host orders teardown.",
+  "tries": [
+    "Explain the two-step counterexample in the first law",
+    "Why can the product take release only after destroy once the host is added?",
+    "Model a finaliser that runs during teardown and check it"
+  ],
+  "view": { "fn": "main", "level": "L1", "tab": "laws", "overlays": [], "mode": "spec", "gc": "off" },
+  "chapters": [18],
+  "docs": ["lts"],
+  "expect": { "lawsFail": true }
+}

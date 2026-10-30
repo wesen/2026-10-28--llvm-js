@@ -1,0 +1,14 @@
+{
+  "id": "S-06",
+  "title": "Coercion runs user code",
+  "group": "Semantics",
+  "about": "valueOf and toString called from inside js.add, js.lt and js.mul: why these operators are callsUser.",
+  "tries": [
+    "Walk through steps 8 to 14 in the Machine view",
+    "Why can calls not be forwarded from the store at the start of main?",
+    "What facts would let js.add become num.add here?"
+  ],
+  "view": { "fn": "main", "level": "L1", "tab": "machine", "overlays": ["safepoints"], "mode": "spec", "gc": "off" },
+  "chapters": [2, 6],
+  "docs": ["semantics", "effects"]
+}

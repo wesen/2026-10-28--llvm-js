@@ -1,0 +1,14 @@
+{
+  "id": "S-03",
+  "title": "Profiles",
+  "group": "Semantics",
+  "about": "core, js-sync and js-async: which programs each admits and which observations it preserves.",
+  "tries": [
+    "Which operation keeps program.js out of js-sync?",
+    "Define a profile that admits sync.js but not program.js",
+    "Why does job order belong to js-async only?"
+  ],
+  "view": { "fn": "main", "level": "L1", "tab": "experiments", "overlays": [], "mode": "spec", "gc": "off" },
+  "chapters": [2],
+  "docs": ["semantics", "jobs"]
+}

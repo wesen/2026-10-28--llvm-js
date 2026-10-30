@@ -1,0 +1,15 @@
+{
+  "id": "T-03",
+  "title": "Your own rewrite",
+  "group": "Transforms",
+  "about": "mul-one removes x * 1 when the facts prove x is a number; without the condition it turns \"5\" * 1 + 1 into \"51\".",
+  "tries": [
+    "Why may x * 1 be removed in count but not in asNumber?",
+    "Write mul-zero and find out why it fails",
+    "What can a side condition read from ctx?"
+  ],
+  "view": { "fn": "count", "level": "L1", "tab": "laws", "overlays": [], "mode": "spec", "gc": "off" },
+  "chapters": [10],
+  "docs": ["rewriting", "refinement"],
+  "expect": { "compile": "ok", "lawsFail": true }
+}

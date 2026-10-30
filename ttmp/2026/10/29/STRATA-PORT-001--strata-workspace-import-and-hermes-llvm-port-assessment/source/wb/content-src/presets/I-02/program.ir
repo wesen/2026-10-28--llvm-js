@@ -1,0 +1,19 @@
+// Core IR as text. Comments start with // or ;. The first function is the module's main.
+fn main() -> number {
+entry throws unwind:
+  a = core.call(@clamp, 15, 0, 10)
+  b = core.call(@clamp, -3, 0, 10)
+  host.print(a, b)
+  return a
+}
+
+fn clamp(x: number, lo: number, hi: number) -> number {
+entry:
+  below = num.lt(x, lo)
+  branch below, out(lo), check(x)      ; an edge passes arguments to the target's parameters
+check(y: number):
+  above = num.gt(y, hi)
+  branch above, out(hi), out(y)
+out(r: number):
+  return r
+}

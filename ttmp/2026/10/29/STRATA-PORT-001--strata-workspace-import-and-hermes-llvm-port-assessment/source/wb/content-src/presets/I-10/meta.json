@@ -1,0 +1,14 @@
+{
+  "id": "I-10",
+  "title": "try, catch and finally lowered",
+  "group": "IR",
+  "about": "Completion records for return, normal and throw, one finally join that dispatches on them, and a rethrow.",
+  "tries": [
+    "Which completion does each of the three calls produce, and where is it made?",
+    "Why does steps stay a cell?",
+    "What happens to the record when finally itself returns?"
+  ],
+  "view": { "fn": "attempt", "level": "L1", "tab": "machine", "overlays": ["exceptional"], "mode": "spec", "gc": "off" },
+  "chapters": [5],
+  "docs": ["exceptions"]
+}
