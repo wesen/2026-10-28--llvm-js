@@ -16,7 +16,7 @@ WhatFor: ""
 WhenToUse: ""
 ---
 
-> Imported verbatim from the archive export. This is a proposed porting plan, not evidence of a completed native port. See the ticket analysis for discrepancies and qualifications.
+> Working revision of the imported guide. The unchanged original is preserved in source/exports and the ZIP. The Strata-first direction is selected. The current native implementation decisions and milestone scope are in ../design-doc/01-strata-first-native-compiler-design-and-intern-implementation-guide.md.
 
 # Strata on the real Hermes and LLVM: an intern's guide
 
@@ -31,7 +31,7 @@ This guide takes you from two separate codebases to one working setup, where the
 - **Strata** is the workbench: a compiler framework written in JavaScript that runs in a browser page or in Node. It has a JavaScript-subset frontend, a core IR, a reference interpreter (the *specification*), analyses, rewrites, a root plan for the garbage collector, a simulated moving collector, LLVM IR printed as text, and a real WebAssembly backend. It is small and every part can be inspected, but nothing in it is native.
 - **The Hermes fork** is the real thing: Meta's Hermes engine, branch `static_h`, base commit `f837b9dd8396ebf5c4e8115412417d273565f0fe`, extended with a *direct LLVM backend*. Static source follows JavaScript → Hermes SSA → LLVM IR → LLVM, linked against the real Hermes managed runtime through a small C/C++ bridge (`shllvm_runtime`). The recorded toolchain is LLVM/Clang 18.1.3 on Linux x86-64.
 
-**"The real stuff"** in this guide means that fork, LLVM 18 and Node. Node is the *oracle*: the engine whose output decides what correct means for full JavaScript.
+**"The real stuff"** in this guide means that fork, LLVM 18 and Node. Node is a differential reference. ECMAScript semantics and the admitted host profile determine correctness; disagreements require investigation.
 
 **Which fork release you have matters.** The original release is a 40-file patch; generators and direct eval are rejected there. The extension release is a 124-file patch with generators, async functions, eval and more, validated at 53/53 source contracts. Check `IMPORT.md` and `EXTENSIONS-IMPORT.md` at the top of your checkout before you trust any result in this guide, and never apply the patch to a tree that already contains it.
 
@@ -233,7 +233,7 @@ cmake -S . -B build-llvm -DHERMES_BUILD_LLVM_JIT=ON -DSHLLVM_CONFIG=/usr/lib/llv
 cmake --build build-llvm --target shllvm-jit shllvm-jit-test shermes shllvm_runtime --parallel 4
 ```
 
-**Done when** all four gates report the recorded counts on your machine. Write the counts, your tool versions and the commit of your tree into a file `docs/llvm/evidence/local-baseline.md`; it is your reference for every later step. If a gate differs, stop and resolve it first (section 15 lists the usual causes).
+**Done when** the gates pass against the selected current source revision. Historical counts identify the old release and may differ after later fixtures are added. Write the counts, your tool versions and the commit of your tree into a file `docs/llvm/evidence/local-baseline.md`; it is your reference for every later step. If a gate differs, stop and resolve it first (section 15 lists the usual causes).
 
 ## 7. Step 2: run Strata locally in Node
 
@@ -242,9 +242,8 @@ Strata is your laboratory: a place to try an idea in minutes before it costs a d
 **1. Install the Node dependencies** in `~/work/strata`:
 
 ```sh
-npm init -y
-npm install acorn@8.18.0 sax playwright
-npx playwright install chromium
+pnpm add acorn@8.18.0 sax playwright
+pnpm exec playwright install chromium
 ```
 
 **2. Fix three hard-coded paths.** `tools/harness.js`, `tools/check-common.js` and `tools/preset-check.js` load acorn and sax from `/opt/npm-tools/node_modules/`, the machine they were written on. Point them at your install:
@@ -360,10 +359,12 @@ Read `out/probe.ll` beside `runtime.h` and the matching part of `LLVMBackend.cpp
 
 **Where to put the code.** A new part `src/core/75-hermes-abi.js` holding the binding table and the module-data emitter, so the old textual emitter stays available as the teaching version. Keep Strata's own root plan (`stackReuse`) and frame layout: the frame size you pass to `shllvm_frame_size` and `shllvm_enter` is your plan's slot count plus scratch and discard.
 
+The link example below assumes the ASan build configured earlier; derive actual sanitizer flags from CMakeCache.txt, as the existing driver does.
+
 **A driver**, `tools/strata-native.js prog.js -o prog`, that compiles with Strata, writes `prog.ll`, checks it with `llvm-as` and `opt -passes=verify`, then links exactly as the fork's driver does (`utils/shllvm.py`, line 222):
 
 ```sh
-clang-18 prog.bc -O2 -Wno-override-module \
+clang-18 prog.bc -O2 -Wno-override-module -fsanitize=address \
   -L$B/lib -L$B/tools/shermes -L$B/jsi -Wl,-rpath,$B/lib -Wl,-rpath,$B/tools/shermes -Wl,-rpath,$B/jsi \
   $B/lib/libshllvm_runtime.a -lshermes_console -lhermesvm -lm -o prog     # B = the fork's build-llvm
 ```
@@ -408,7 +409,7 @@ Argument roles are fixed words: `out` (a root slot written), `shr` (the runtime)
 - `strata_abi.h`, the C declarations. A small compile test includes it together with the fork's `runtime.h`; any mismatch is a compile error, so the table cannot drift from the bridge.
 - `src/core/abi-table.js`, the same entries as Strata data. `bindOps` takes helper names from it, and the safepoint analysis takes `mayCollect` from it, so root plans follow the table.
 
-**Start conservative, narrow with evidence.** Every helper begins as `callsUser` with `mayCollect` and `nonlocalThrow`: that is always safe and costs only extra roots. A helper loses an obligation only with a test that shows it and a decision record that cites the test. This is the antitone law in practice: removing behaviour can only add permissions, so every removal must be justified.
+**Start conservative, narrow with evidence.** Initially classify helpers conservatively as potentially collecting, throwing, and calling user code, while preserving their actual signatures and control-flow contracts. This can add roots and exception handling and inhibit transformations; metadata alone cannot repair incorrect lifetime handling. A helper loses an obligation only after source-level review establishes the property and targeted tests support it. Absence of allocation in a test does not prove absence of collection or establish a universal contract. This is the antitone law in practice: removing behaviour can only add permissions, so every removal must be justified.
 
 **Tests for each kind of claim**, built as debug-only wrappers generated from the table:
 
@@ -441,7 +442,7 @@ Add `strata-native-gcstress` to the differential runner: the same Strata output 
 
 1. **The corpus under stress** with the default `stackReuse` plans and with `distinct` (one slot per value). Both must pass. Record frame sizes per function for both; the difference is what liveness-based sharing saves on real code.
 2. **A negative control.** Compile with a plan that is known to be wrong and must fail: `g.pipeline().roots('none').checks({ gcSafety: false })`, or Strata's L-06 lambda strategy that drops one value. If stress does not catch it, the setup is not testing anything; fix that before you trust a pass.
-3. **The checker's agreement.** For every function the checker accepts, the stress run passes; for every one it rejects (with checks turned off), the stress run fails. A disagreement in either direction is a bug in the liveness, the contract table of step 5, or the stress build.
+3. **The checker's agreement.** Accepted plans must pass the selected stress corpus. Rejected plans are not required to fail every execution: rejection can be conservative and the relevant path may not run. Use targeted negative controls with known live references and actual collection; investigate mismatches without treating test agreement as a proof.
 
 **The frame limit.** Strata applies the fork's rule: root slots plus 2 plus the larger of 1 and the outgoing argument count must not exceed 1,024 (the fork's `LLVMBackend.cpp` line 955; Strata's `NATIVE_FRAME_LIMIT`). Generate wide functions as Strata's L-07 does and confirm that Strata and the bridge refuse at the same size. Measuring the fflate factory with Strata waits for step 7, because fflate uses features outside today's subset; until then the fork's own numbers stand (1,084 roots plus 3 argument slots at `-O0`).
 
@@ -511,7 +512,7 @@ The three tracks are independent until the last JIT stage, which needs the runti
 
 **Code generation track (behind the LLVM IR seam).** Strata already has a WebAssembly backend for the numeric core; extend it, or write a direct emitter for one machine target (x86-64, or RV32 for the fork's PicoCalc lane). The plans, contracts and checker carry over unchanged, because they sit in front of the seam. Keep LLVM for optimised ahead-of-time builds for as long as measurements say it wins.
 
-**Execution track.** The fork already has an eager, in-process JIT on LLVM's ORC (`shllvm-jit`) with no speculation and no deoptimisation (its JIT.md). A real JIT needs three things on top: an interpreter it can fall back to (your own, running core IR natively), profiling to choose what to compile, and speculation with guards from type facts plus **deoptimisation**, which rebuilds the interpreter's frame when a guard fails. This is the largest piece of the whole project; start it only after the runtime core exists, because deoptimised frames belong to the runtime.
+**Execution track.** The fork already has an eager, in-process JIT on LLVM's ORC (`shllvm-jit`) with no speculation and no deoptimisation (its JIT.md). A future speculative optimizing tier could add three things on top: an interpreter it can fall back to (your own, running core IR natively), profiling to choose what to compile, and speculation with guards from type facts plus **deoptimisation**, which rebuilds the interpreter's frame when a guard fails. This is the largest piece of the whole project; start it only after the runtime core exists, because deoptimised frames belong to the runtime.
 
 **Two rules for every replacement.** Change one part per step, so a failure has one suspect. Never change the ABI and the part behind it in the same change: first version the ABI (step 5), then swap the part.
 

@@ -11,7 +11,7 @@ manifest = json.loads((root / 'reference/import-manifest.json').read_text())
 archive = root / 'archive/strata-workspace-full.zip'
 assert hashlib.sha256(archive.read_bytes()).hexdigest() == manifest['sha256']
 expected = {entry['path']: entry for entry in manifest['entries']}
-destination = root / 'archive/workspace'
+destination = root / 'source'
 with zipfile.ZipFile(archive) as z:
     assert z.testzip() is None, 'ZIP CRC failure'
     names = [i.filename for i in z.infolist() if not i.is_dir()]

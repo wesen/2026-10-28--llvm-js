@@ -22,7 +22,7 @@ WhenToUse: ""
 
 The [assessment](analysis/01-workspace-inventory-and-hermes-llvm-port-findings.md) identifies the porting documents, implementation status, conflicting migration directions, and concrete corrections.
 
-Read the [imported intern guide](reference/02-imported-strata-hermes-llvm-intern-guide.md). The full ZIP is preserved under `archive/strata-workspace-full.zip`; the extracted tree is `archive/workspace/`. Recreate it with `python3 scripts/01-import-workspace.py` from this ticket directory. Hashes are in `reference/import-manifest.json`; the [diary](reference/01-import-and-investigation-diary.md) records the investigation.
+Read the [imported intern guide](reference/02-imported-strata-hermes-llvm-intern-guide.md). The full ZIP is preserved under `archive/strata-workspace-full.zip`; the extracted tree is `source/`. Recreate it with `python3 scripts/01-import-workspace.py` from this ticket directory. Hashes are in `reference/import-manifest.json`; the [diary](reference/01-import-and-investigation-diary.md) records the investigation.
 
 ## Overview
 

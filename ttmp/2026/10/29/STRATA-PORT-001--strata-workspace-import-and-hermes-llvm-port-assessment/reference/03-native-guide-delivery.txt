@@ -1,0 +1,3 @@
+Input: design-doc/01-strata-first-native-compiler-design-and-intern-implementation-guide.md
+OK: uploaded STRATA-PORT-001 Strata First Native Compiler Guide.pdf -> /ai/2026/10/29/STRATA-PORT-001
+Evidence: cloud upload completed; physical device synchronization is not asserted.

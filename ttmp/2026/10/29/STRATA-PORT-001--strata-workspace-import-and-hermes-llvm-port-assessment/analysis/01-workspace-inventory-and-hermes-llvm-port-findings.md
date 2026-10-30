@@ -34,7 +34,7 @@ The current import is read-only with respect to implementation: no dependency in
 
 ## Imported material and provenance
 
-The original ZIP is preserved at `archive/strata-workspace-full.zip`; the extracted copy is at `archive/workspace/`. The manifest at `reference/import-manifest.json` records the original ZIP SHA-256 and individual file sizes/hashes. The archive contains 1,307 entries, including directories, and 1,083 regular files totaling 25,527,745 uncompressed bytes. ZIP CRC validation passed and extracted bytes were checked against the manifest.
+The original ZIP is preserved at `archive/strata-workspace-full.zip`; the extracted copy is at `source/`. The manifest at `reference/import-manifest.json` records the original ZIP SHA-256 and individual file sizes/hashes. The archive contains 1,307 entries, including directories, and 1,083 regular files totaling 25,527,745 uncompressed bytes. ZIP CRC validation passed and extracted bytes were checked against the manifest.
 
 | Directory | Files | Contents |
 |---|---:|---|
@@ -52,11 +52,11 @@ The archive includes compiled/generated web assets, so version control retains t
 ## Where to read
 
 1. [Imported intern porting guide](../reference/02-imported-strata-hermes-llvm-intern-guide.md). The principal actionable plan; sections 9–14 contain the native emitter, ABI, GC-stress, language growth, measurement, and replacement work.
-2. [Workbench Hermes/LLVM documentation](../archive/workspace/wb/content-src/docs/16-hermes-llvm.md). The clearest inventory of what current LLVM text reproduces and omits.
-3. [Textbook Chapter 16](../archive/workspace/wb/content-src/book/16-llvm-ir-and-the-hermes-abi.md). Extended explanation of emitted LLVM shape and the Hermes ABI.
-4. [Textbook Chapter 21](../archive/workspace/wb/content-src/book/21-from-the-workbench-to-a-real-compiler.md). An earlier, materially different migration plan that initially improves the existing Hermes emitter.
-5. [Semantics-first architecture export](<../archive/workspace/exports/Semantics-first architecture for a composable JS compiler and JIT.html>). Foundational architecture document supplied as HTML; retained for subsequent design review, not exhaustively evaluated in this import.
-6. [Session summary](../archive/workspace/session-records/SESSION-SUMMARY.md). Explains that the intern guide became Strata-first after clarification, and lists reported checks and known gaps.
+2. [Workbench Hermes/LLVM documentation](../source/wb/content-src/docs/16-hermes-llvm.md). The clearest inventory of what current LLVM text reproduces and omits.
+3. [Textbook Chapter 16](../source/wb/content-src/book/16-llvm-ir-and-the-hermes-abi.md). Extended explanation of emitted LLVM shape and the Hermes ABI.
+4. [Textbook Chapter 21](../source/wb/content-src/book/21-from-the-workbench-to-a-real-compiler.md). An earlier, materially different migration plan that initially improves the existing Hermes emitter.
+5. [Semantics-first architecture export](<../source/exports/Semantics-first architecture for a composable JS compiler and JIT.html>). Foundational architecture document supplied as HTML; retained for subsequent design review, not exhaustively evaluated in this import.
+6. [Session summary](../source/session-records/SESSION-SUMMARY.md). Explains that the intern guide became Strata-first after clarification, and lists reported checks and known gaps.
 
 The exported guide contains embedded-content placeholders where diagrams appeared in the original document. Scratch screenshots are supplied, but I have not reconstructed or matched those placeholders to images. Workbench chapters include inline SVG diagrams. The session-records README explicitly says raw conversation/subagent transcripts were unavailable: the summaries are reconstructions, not verbatim transcripts.
 

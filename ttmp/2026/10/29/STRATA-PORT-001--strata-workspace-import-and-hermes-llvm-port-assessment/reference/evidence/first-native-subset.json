@@ -1,0 +1,258 @@
+[
+  {
+    "name": "closures.js",
+    "optimization": "0",
+    "ok": true,
+    "output": "11 11 12\n55\n0 1 2\n",
+    "roots": [
+      {
+        "name": "main",
+        "roots": 36
+      },
+      {
+        "name": "counter",
+        "roots": 16
+      },
+      {
+        "name": "inc",
+        "roots": 14
+      },
+      {
+        "name": "read",
+        "roots": 11
+      },
+      {
+        "name": "fib",
+        "roots": 21
+      },
+      {
+        "name": "arrow_3",
+        "roots": 11
+      }
+    ]
+  },
+  {
+    "name": "closures.js",
+    "optimization": "2",
+    "ok": true,
+    "output": "11 11 12\n55\n0 1 2\n",
+    "roots": [
+      {
+        "name": "main",
+        "roots": 36
+      },
+      {
+        "name": "counter",
+        "roots": 16
+      },
+      {
+        "name": "inc",
+        "roots": 14
+      },
+      {
+        "name": "read",
+        "roots": 11
+      },
+      {
+        "name": "fib",
+        "roots": 21
+      },
+      {
+        "name": "arrow_3",
+        "roots": 11
+      }
+    ]
+  },
+  {
+    "name": "control.js",
+    "optimization": "0",
+    "ok": true,
+    "output": "144 233\n15 4 7 9\n",
+    "roots": [
+      {
+        "name": "main",
+        "roots": 37
+      }
+    ]
+  },
+  {
+    "name": "control.js",
+    "optimization": "2",
+    "ok": true,
+    "output": "144 233\n15 4 7 9\n",
+    "roots": [
+      {
+        "name": "main",
+        "roots": 37
+      }
+    ]
+  },
+  {
+    "name": "exceptions.js",
+    "optimization": "0",
+    "ok": true,
+    "output": "true 1\na\nb\ncleanup\n42\ncleanup\nbad\n2\nError oops\n",
+    "roots": [
+      {
+        "name": "main",
+        "roots": 40
+      },
+      {
+        "name": "get_x",
+        "roots": 18
+      },
+      {
+        "name": "f",
+        "roots": 24
+      },
+      {
+        "name": "g",
+        "roots": 14
+      }
+    ]
+  },
+  {
+    "name": "exceptions.js",
+    "optimization": "2",
+    "ok": true,
+    "output": "true 1\na\nb\ncleanup\n42\ncleanup\nbad\n2\nError oops\n",
+    "roots": [
+      {
+        "name": "main",
+        "roots": 40
+      },
+      {
+        "name": "get_x",
+        "roots": 18
+      },
+      {
+        "name": "f",
+        "roots": 24
+      },
+      {
+        "name": "g",
+        "roots": 14
+      }
+    ]
+  },
+  {
+    "name": "jobs.js",
+    "optimization": "0",
+    "ok": true,
+    "output": "sync\nmicro 1\npromise 3\nnext 4\ntimer 1\n",
+    "roots": [
+      {
+        "name": "main",
+        "roots": 20
+      },
+      {
+        "name": "arrow",
+        "roots": 16
+      },
+      {
+        "name": "arrow_2",
+        "roots": 13
+      },
+      {
+        "name": "arrow_3",
+        "roots": 11
+      },
+      {
+        "name": "arrow_4",
+        "roots": 12
+      }
+    ]
+  },
+  {
+    "name": "jobs.js",
+    "optimization": "2",
+    "ok": true,
+    "output": "sync\nmicro 1\npromise 3\nnext 4\ntimer 1\n",
+    "roots": [
+      {
+        "name": "main",
+        "roots": 20
+      },
+      {
+        "name": "arrow",
+        "roots": 16
+      },
+      {
+        "name": "arrow_2",
+        "roots": 13
+      },
+      {
+        "name": "arrow_3",
+        "roots": 11
+      },
+      {
+        "name": "arrow_4",
+        "roots": 12
+      }
+    ]
+  },
+  {
+    "name": "objects.js",
+    "optimization": "0",
+    "ok": true,
+    "output": "4 1\n9 2\n4 1-2-3-4\n{\"a\":9,\"b\":\"hello\"}\n",
+    "roots": [
+      {
+        "name": "main",
+        "roots": 40
+      },
+      {
+        "name": "get_x",
+        "roots": 16
+      },
+      {
+        "name": "set_x",
+        "roots": 13
+      }
+    ]
+  },
+  {
+    "name": "objects.js",
+    "optimization": "2",
+    "ok": true,
+    "output": "4 1\n9 2\n4 1-2-3-4\n{\"a\":9,\"b\":\"hello\"}\n",
+    "roots": [
+      {
+        "name": "main",
+        "roots": 40
+      },
+      {
+        "name": "get_x",
+        "roots": 16
+      },
+      {
+        "name": "set_x",
+        "roots": 13
+      }
+    ]
+  },
+  {
+    "name": "scalar.js",
+    "optimization": "0",
+    "ok": true,
+    "output": "3\nhello 世界\nNaN Infinity -Infinity\n",
+    "roots": [
+      {
+        "name": "main",
+        "roots": 19
+      }
+    ]
+  },
+  {
+    "name": "scalar.js",
+    "optimization": "2",
+    "ok": true,
+    "output": "3\nhello 世界\nNaN Infinity -Infinity\n",
+    "roots": [
+      {
+        "name": "main",
+        "roots": 19
+      }
+    ]
+  }
+]
